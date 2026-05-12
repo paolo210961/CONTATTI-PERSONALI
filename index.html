@@ -3,131 +3,50 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
-
     <title>SOS Drive - Emergenza</title>
 
-    <!-- PWA / Home screen support -->
+    <!-- ICONA HOME SCREEN -->
+    <link rel="apple-touch-icon" sizes="180x180" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAALQAAAC0CAYAAAA9zQYyAAAACXBIWXMAAAsTAAALEwEAmpwYAAADV0lEQVR4nO3dLXLbQBhA4W8YKhVWYRVWYRVWYRVWYRVWYRVWYRVWYRVWYRV2woQJEyZMmDBhwoQJEyZMmDBhwoQJEyZMmDBhwoQJEyZMmDBgwd6dXW3WK2kvP6321/1SKAqFQqFQKBQKhUKhUCgUCoVCoVAoFAqFQqFQKBQKhUKhUCgUCoVCoVAoFAqFQqFQKBQKhUKhUCgUCoVCoVAo7lPTuFegUCgUCoVCoVAoFAqFQqFQKBQKhUKhuE+P6V6BQqFQKBQKhUKhUCgUCoVCoVAoFAqFQqFQKBQKhUKhUCgUCoVCoVAoFAqFQqFQKBQKhUKhUCgUivuMGe8KFAqFQqFQKBQKhUKhUCgUCoVCoVAoFAqFQqFQKBQKhUKhUCgUCoVCoVAoFAqFQqFQKBQKhUKhUCgUin0G/QhFIGSiDVqCGeD4Ee6FQmmDRgPQADQADUAD0AA0AA1AA9AANAANQAPQ7D9AGzQNQAPQADQADUAD0AA0AA1AA9AANAANQLP/DdqgaQAagAagAWgAGoAGoAFoABqABqABaPa/QRs0DUAD0AA0AA1AA9AANAANQAPQADQADUCz/w3aoGkAGoAGoAFoABqABqABaAAagAagAWgAmv1v0AZNA9AANAANQAPQADQADUAD0OwBgDZoGoAGoAFoABqABqABaPYAQBs0DUAD0AA0AA1AA9AANHsAoA2aBqABaAAagAagAWgAmj0A0AZNA9AANAANQAPQADQAzR4AaIOmAWgAGoAGoAFoABqAZg8AtEHTADQADUAD0AA0AA1AswcA2qBpABqABqABaAAagAag2QMAbdA0AA1AA9AANAANQAPQ7AGANugQQBvd7wmANigagAagAWgAGoAGoNlvgDYoGoAGoAFoABqABqDZb4A2KBqABqABaAAagAag2W+ANigagAagAWgAGoAGoNlvgDYoGoAGoAFoABqABqDZb4D+DYq+FX1B01AogDb+hKa9oWkoaIM+aJqGhgIFvEH/U5qOhqa9oWkoaIMyaIqGAjrQoYC+L0Abf0LT0dC0NzQNBW3QBU1DAQ10gAP6GIA2Pvct/U2D8vY/ABqABqABaAAagAagAWgAGoAGoAFoABqABqABaAAagAagAWgAGoAGoAFoABqABqABaAAagAagAWgAGoAGoAFoABqABqABaPZL/juANmgagAagAWgAGoAGoNkvAW1QNAANQAPQADQADUCzXwLaoGgAGoAGoAFoABqAZr8EtEHRe+CfeAOFQqFQKBQKhUKhUCgUCoVCoVAoFAqFQqFQKBQKhUKhUCgUCoVCoVAoFAqFQqFQKBQKhUKhUCgUivv1eAUAAP//zp3hQgAAAAhA6F9FQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFhUWPSO0kAAAAASUVORK5CYII=">
+
     <meta name="theme-color" content="#e3170a">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="SOS Drive">
-
-    <!-- ICONA HOME -->
-    <link rel="apple-touch-icon" sizes="180x180" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAALQAAAC0CAYAAAA9zQYyAAAACXBIWXMAAAsTAAALEwEAmpwYAAADV0lEQVR4nO3dLXLbQBhA4W8YKhVWYRVWYRVWYRVWYRVWYRVWYRVWYRVWYRV2woQJEyZMmDBhwoQJEyZMmDBhwoQJEyZMmDBhwoQJEyZMmDBgwd6dXW3WK2kvP6321/1SKAqFQqFQKBQKhUKhUCgUCoVCoVAoFAqFQqFQKBQKhUKhUCgUCoVCoVAoFAqFQqFQKBQKhUKhUCgUCoVCoVAo7lPTuFegUCgUCoVCoVAoFAqFQqFQKBQKhUKhuE+P6V6BQqFQKBQKhUKhUCgUCoVCoVAoFAqFQqFQKBQKhUKhUCgUCoVCoVAoFAqFQqFQKBQKhUKhUCgUCoVivuMGe8KFAqFQqFQKBQKhUKhUCgUCoVCoVAoFAqFQqFQKBQKhUKhUCgUCoVCoVAoFAqFQqFQKBQKhUKhUCgUCoVCoVAo7lPTuFegUCgUCoVCoVAoFAqFQqFQKBQKhUKhuE+P6V6BQqFQKBQKhUKhUCgUCoVCoVAoFAqFQqFQKBQKhUKhUCgUCoVCoVAoFAqFQqFQKBQKhUKhUCgUCoVCoVAo7lPTuFeg==">
 
     <style>
         *{margin:0;padding:0;box-sizing:border-box}
-        body{
-            font-family:system-ui;
-            background:#e9ecef;
-            min-height:100vh;
-            display:flex;
-            justify-content:center;
-            align-items:center;
-            padding:12px;
-        }
-        .container{width:100%;max-width:600px}
-        .page{
-            background:#fff;
-            border-radius:28px;
-            padding:20px;
-            box-shadow:0 8px 24px rgba(0,0,0,.08);
-        }
-        .hidden{display:none!important}
-        h1,h2{text-align:center;color:#c62828}
-        h1{font-size:1.8rem;margin-bottom:10px}
-        h2{font-size:1.4rem;margin-bottom:10px}
-
-        .grid-2{display:flex;flex-direction:column;gap:12px;margin:20px 0}
-        .big-btn{
-            background:#d32f2f;
-            color:#fff;
-            border:none;
-            border-radius:50px;
-            padding:14px;
-            font-size:1.2rem;
-            font-weight:700;
-        }
-        .big-btn:active{transform:scale(.97)}
-
-        input,textarea{
-            width:100%;
-            padding:12px;
-            border-radius:20px;
-            border:1px solid #ccc;
-        }
-
-        .small-btn{
-            padding:10px;
-            border:none;
-            border-radius:20px;
-            color:#fff;
-            background:#607d8b;
-        }
-
-        .info-card{
-            background:#f5f5f5;
-            padding:10px;
-            border-radius:16px;
-            font-size:.85rem;
-        }
+        body{font-family:system-ui;background:#e9ecef;padding:16px}
+        .page{background:#fff;border-radius:28px;padding:20px}
+        .hidden{display:none}
+        h1{text-align:center;color:#c62828;font-size:1.9rem}
+        .tunisia{text-align:center;color:#444;font-weight:600;margin-top:4px}
+        .big-btn{background:#d32f2f;color:#fff;border:none;padding:16px;border-radius:40px;margin:10px 0;font-size:1.2rem}
     </style>
 </head>
 
 <body>
-<div class="container">
 
-<!-- HOME -->
 <div id="homePage" class="page">
     <h1>🆘 SOS EMERGENZA</h1>
+    <div class="tunisia">TUNISIA</div>
 
-    <div class="grid-2">
-        <button class="big-btn" onclick="showEmergency('ambulanza')">🚑 AMBULANZA</button>
-        <button class="big-btn" onclick="showEmergency('polizia')">👮 POLIZIA</button>
-        <button class="big-btn" onclick="showEmergency('veterinario')">🐾 VETERINARIO</button>
-        <button class="big-btn" onclick="showEmergency('clinica')">🏥 CLINICA</button>
-    </div>
+    <button class="big-btn" onclick="openApp()">🚑 AMBULANZA</button>
+    <button class="big-btn" onclick="openApp()">👮 POLIZIA</button>
+    <button class="big-btn" onclick="openApp()">🐾 VETERINARIO</button>
+    <button class="big-btn" onclick="openApp()">🏥 CLINICA</button>
 </div>
 
-<!-- EMERGENZA -->
-<div id="emergencyPage" class="page hidden">
-
-    <h2 id="title">SERVIZIO</h2>
-
-    <input id="phone" placeholder="Numero">
-
-    <button class="small-btn" onclick="goHome()">⬅ Home</button>
-
-</div>
-
+<div id="appPage" class="page hidden">
+    <h2>APP SOS ATTIVA</h2>
+    <button class="big-btn" onclick="backHome()">⬅ TORNA HOME</button>
 </div>
 
 <script>
-let currentService=null;
-
-/* FIX HOME TEXT SPORCO */
-document.addEventListener("DOMContentLoaded",()=>{
-    const home=document.getElementById("homePage");
-    if(!home) return;
-    home.childNodes.forEach(n=>{
-        if(n.nodeType===3) n.textContent="";
-    });
-});
-
-function showEmergency(s){
-    currentService=s;
+function openApp(){
     document.getElementById("homePage").classList.add("hidden");
-    document.getElementById("emergencyPage").classList.remove("hidden");
-
-    document.getElementById("title").innerText=
-        s==="ambulanza"?"🚑 AMBULANZA":
-        s==="polizia"?"👮 POLIZIA":
-        s==="veterinario"?"🐾 VETERINARIO":"🏥 CLINICA";
+    document.getElementById("appPage").classList.remove("hidden");
 }
-
-function goHome(){
-    document.getElementById("emergencyPage").classList.add("hidden");
+function backHome(){
+    document.getElementById("appPage").classList.add("hidden");
     document.getElementById("homePage").classList.remove("hidden");
 }
 </script>
