@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
-    <title>SOS Drive - Emergenza</title>
+    <title>SOS Drive - Emergenza v0150</title>
     
     <!-- Icone per aggiunta a schermata Home (formato PNG base64 stabile) -->
     <link rel="apple-touch-icon" sizes="180x180" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAALQAAAC0CAYAAAA9zQYyAAAACXBIWXMAAAsTAAALEwEAmpwYAAADV0lEQVR4nO3dLXLbQBhA4W8YKhVWYRVWYRVWYRVWYRVWYRVWYRVWYRVWYRV2woQJEyZMmDBhwoQJEyZMmDBhwoQJEyZMmDBhwoQJEyZMmDBgwd6dXW3WK2kvP6321/1SKAqFQqFQKBQKhUKhUCgUCoVCoVAoFAqFQqFQKBQKhUKhUCgUCoVCoVAoFAqFQqFQKBQKhUKhUCgUCoVCoVAo7lPTuFegUCgUCoVCoVAoFAqFQqFQKBQKhUKhuE+P6V6BQqFQKBQKhUKhUCgUCoVCoVAoFAqFQqFQKBQKhUKhUCgUCoVCoVAoFAqFQqFQKBQKhUKhUCgUivuMGe8KFAqFQqFQKBQKhUKhUCgUCoVCoVAoFAqFQqFQKBQKhUKhUCgUCoVCoVAoFAqFQqFQKBQKhUKhUCgUin0G/QhFIGSiDVqCGeD4Ee6FQmmDRgPQADQADUAD0AA0AA1AA9AANAANQAPQ7D9AGzQNQAPQADQADUAD0AA0AA1AA9AANAANQLP/DdqgaQAagAagAWgAGoAGoAFoABqABqABaPa/QRs0DUAD0AA0AA1AA9AANAANQAPQADQADUCz/w3aoGkAGoAGoAFoABqABqABaAAagAagAWgAmv1v0AZNA9AANAANQAPQADQADUAD0OwBgDZoGoAGoAFoABqABqABaPYAQBs0DUAD0AA0AA1AA9AANHsAoA2aBqABaAAagAagAWgAmj0A0AZNA9AANAANQAPQADQAzR4AaIOmAWgAGoAGoAFoABqAZg8AtEHTADQADUAD0AA0AA1AswcA2qBpABqABqABaAAagAag2QMAbdA0AA1AA9AANAANQAPQ7AGANugQQBvd7wmANigagAagAWgAGoAGoNlvgDYoGoAGoAFoABqABqDZb4A2KBqABqABaAAagAag2W+ANigagAagAWgAGoAGoNlvgDYoGoAGoAFoABqABqDZb4D+DYq+FX1B01AogDb+hKa9oWkoaIM+aJqGhgIFvEH/U5qOhqa9oWkoaIMyaIqGAjrQoYC+L0Abf0LT0dC0NzQNBW3QBU1DAQ10gAP6GIA2Pvct/U2D8vY/ABqABqABaAAagAagAWgAGoAGoAFoABqABqABaAAagAagAWgAGoAGoAFoABqABqABaAAagAagAWgAGoAGoAFoABqABqABaPZL/juANmgagAagAWgAGoAGoNkvAW1QNAANQAPQADQADUCzXwLaoGgAGoAGoAFoABqAZr8EtEHRe+CfeAOFQqFQKBQKhUKhUCgUCoVCoVAoFAqFQqFQKBQKhUKhUCgUCoVCoVAoFAqFQqFQKBQKhUKhUCgUivv1eAUAAP//zp3hQgAAAAhA6F9FQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFhUWPSO0kAAAAASUVORK5CYII=">
@@ -48,7 +48,7 @@
             font-size: 1.9rem;
             text-align: center;
             color: #c62828;
-            margin: 0 0 8px 0;
+            margin: 8px 0;
             font-weight: 700;
         }
         h2 {
@@ -79,7 +79,6 @@
             box-shadow: 0 2px 6px rgba(0,0,0,0.1);
             user-select: none;
             -webkit-tap-highlight-color: transparent;
-            pointer-events: auto;
         }
         .big-btn:active {
             transform: scale(0.97);
@@ -107,8 +106,6 @@
             flex: 1;
             text-align: center;
             background: #5f7f9e;
-            pointer-events: auto;
-            user-select: none;
         }
         .flex-row {
             display: flex;
@@ -203,6 +200,22 @@
             background: white;
             font-size: 0.85rem;
         }
+        .version-badge {
+            text-align: center;
+            margin-bottom: 8px;
+        }
+        .version-badge button {
+            background: #6c757d;
+            color: white;
+            border: none;
+            border-radius: 40px;
+            padding: 6px 16px;
+            font-size: 0.75rem;
+            font-weight: normal;
+            cursor: default;
+            opacity: 0.8;
+            pointer-events: none;
+        }
         @media (max-width: 480px) {
             body {
                 padding: 8px;
@@ -241,6 +254,7 @@
 <div class="container">
     <!-- HOME PAGE -->
     <div id="homePage" class="page">
+        <div class="version-badge"><button>🔢 Versione n° 0150</button></div>
         <h1>🆘 SOS EMERGENZA</h1>
         <div class="grid-2">
             <button id="btnAmbulanza" class="big-btn">🚑 AMBULANZA</button>
@@ -318,44 +332,17 @@
 </div>
 
 <script>
-    // === PULIZIA DOM: rimuove nodi di testo indesiderati mantenendo l'integrità della pagina ===
-    (function cleanDOM() {
-        // Funzione per pulire un elemento e i suoi figli
-        const cleanElement = (element) => {
-            if (!element) return;
-            // Itera sui nodi figli
-            const nodes = [...element.childNodes];
-            for (let node of nodes) {
-                if (node.nodeType === 3) { // Nodo di testo
-                    const text = node.textContent;
-                    // Se il testo è vuoto o contiene solo spazi, rimuovilo
-                    if (text.trim() === "") {
-                        node.remove();
-                    }
-                } else if (node.nodeType === 1) { // Elemento
-                    // Ricorsione per gli elementi
-                    cleanElement(node);
-                }
-            }
-        };
-        // Pulisce il body intero
-        cleanElement(document.body);
-        // Forza pulizia anche nei container principali
-        cleanElement(document.getElementById("homePage"));
-        cleanElement(document.getElementById("emergencyPage"));
-    })();
+    // ==================== VERSIONE 0150 ====================
+    // 1) Home: pulsante versione 0150 non cliccabile
+    // 2) Fix modifica nota: aggiorna textarea al cambio selezione
+    // 3) Numeri telefono persistenti (indipendenti dalla versione)
+    // 4) POI priorità aziende con nome (evita generici "area commerciale")
+    // 5) Lettura: velocità normale 1.0, pausa tra parole 0.2s, pausa coordinate 2s
+    // 6) Salta riferimenti vuoti ("Nessun altro punto...") durante la lettura
+    // 7) Fine messaggio: solo suono bip (nessuna parola "bip")
+    // =======================================================*/
 
-    // ==================== VERSIONE FINALE STABILE ====================
-    // - Raggio 300 metri, categorie ampliate (aziende, aree commerciali)
-    // - Tre riferimenti POI (nessun indirizzo come terzo)
-    // - Velocità coordinate normale (rate=1.0), pausa 2 secondi tra i caratteri
-    // - Nessun bip durante le coordinate, solo bip finale dopo la domanda
-    // - Wake Lock per schermo sempre acceso
-    // - Persistenza note e numeri telefono
-    // - Icona home screen funzionante (PNG base64)
-    // ================================================================*/
-
-    const CURRENT_VERSION = "final";
+    const APP_VERSION = "0150";   // solo per esposizione
     let currentService = "ambulanza";
     let currentLat = null, currentLng = null;
     let currentAddress = "";
@@ -406,6 +393,7 @@
         if ('wakeLock' in navigator) {
             try {
                 wakeLock = await navigator.wakeLock.request('screen');
+                console.log('Wake Lock attivo');
             } catch (err) {
                 console.warn('Wake Lock non supportato', err);
             }
@@ -413,7 +401,10 @@
     }
     function releaseWakeLock() {
         if (wakeLock !== null) {
-            wakeLock.release().then(() => { wakeLock = null; });
+            wakeLock.release().then(() => {
+                console.log('Wake Lock rilasciato');
+                wakeLock = null;
+            });
         }
     }
 
@@ -473,26 +464,26 @@
         };
     }
 
-    // ---------- GESTIONE NOTE ----------
+    // ---------- GESTIONE NOTE (con fix modifica) ----------
     function migrateOld() {
         const services = ["ambulanza", "polizia", "veterinario", "clinica"];
         for (let s of services) {
-            if (localStorage.getItem(`sos_notes_${s}_${CURRENT_VERSION}`)) continue;
+            if (localStorage.getItem(`sos_notes_${s}_${APP_VERSION}`)) continue;
             for (let ver of ["final","0037","0036"]) {
                 let old = localStorage.getItem(`sos_notes_${s}_${ver}`);
                 if (old) {
                     try {
                         let arr = JSON.parse(old);
                         let norm = arr.map(n => ({ id: n.id || Date.now()+Math.random(), text: n.text || n.textIT || "" })).filter(n => n.text);
-                        if (norm.length) localStorage.setItem(`sos_notes_${s}_${CURRENT_VERSION}`, JSON.stringify(norm));
+                        if (norm.length) localStorage.setItem(`sos_notes_${s}_${APP_VERSION}`, JSON.stringify(norm));
                         break;
                     } catch(e) {}
                 }
             }
         }
     }
-    function getNoteKey(s) { return `sos_notes_${s}_${CURRENT_VERSION}`; }
-    function getSelectedKey(s) { return `sos_selected_note_${s}_${CURRENT_VERSION}`; }
+    function getNoteKey(s) { return `sos_notes_${s}_${APP_VERSION}`; }
+    function getSelectedKey(s) { return `sos_selected_note_${s}_${APP_VERSION}`; }
     function saveNotes() {
         if (!currentService) return;
         localStorage.setItem(getNoteKey(currentService), JSON.stringify(notesArray));
@@ -536,7 +527,11 @@
                 selectedNoteId = parseInt(e.target.value);
                 saveNotes();
                 let n = notesArray.find(x => x.id === selectedNoteId);
-                if (n) { editNoteText.value = n.text; editNoteArea.style.display = 'block'; currentEditingNoteId = selectedNoteId; }
+                if (n) {
+                    editNoteText.value = n.text;
+                    editNoteArea.style.display = 'block';
+                    currentEditingNoteId = selectedNoteId;
+                }
             });
         });
         document.querySelectorAll('.delete-note').forEach(btn => {
@@ -687,9 +682,14 @@
                 let display = name ? `${name} (${readable})` : readable;
                 if (addrPart) display += `, ${addrPart}`;
                 let dist = haversine(lat,lng,latEl,lonEl);
-                items.push({display: `${display} a ${Math.round(dist)} metri`, dist});
+                items.push({display: `${display} a ${Math.round(dist)} metri`, dist, hasName: !!name, isGeneric: (cat === "commercial" || cat === "retail" || cat === "industrial" || cat === "area commerciale" || cat === "area industriale") });
             }
-            items.sort((a,b)=>a.dist-b.dist);
+            // Ordina per distanza ma privilegia quelli con nome proprio rispetto a generici
+            items.sort((a,b) => {
+                if (a.hasName && !b.hasName) return -1;
+                if (!a.hasName && b.hasName) return 1;
+                return a.dist - b.dist;
+            });
             let refs = items.slice(0,3).map(i=>i.display);
             while(refs.length<3) refs.push("Nessun altro punto nelle vicinanze");
             return refs;
@@ -755,7 +755,7 @@
         gpsStatus.innerHTML = "";
     }
 
-    // ---------- LETTURA VOCALE ----------
+    // ---------- LETTURA VOCALE (rate 1.0, pausa parole 0.2s, pausa coordinate 2s, salta riferimenti vuoti) ----------
     function playBeep() {
         try { let ctx = new (window.AudioContext||window.webkitAudioContext)(); let osc = ctx.createOscillator(); let gain = ctx.createGain(); osc.connect(gain); gain.connect(ctx.destination); osc.frequency.value=880; gain.gain.value=0.3; osc.type="sine"; osc.start(); gain.gain.exponentialRampToValueAtTime(0.00001, ctx.currentTime+0.5); osc.stop(ctx.currentTime+0.5); ctx.resume(); } catch(e) {}
     }
@@ -765,7 +765,7 @@
             let u = new SpeechSynthesisUtterance(w);
             u.lang = langCode; u.rate = rate;
             speechSynthesis.speak(u);
-            await new Promise(r=>setTimeout(r,500));
+            await new Promise(r=>setTimeout(r,200)); // pausa 0.2 secondi tra parole
         }
     }
     async function speakCoords(text, langCode) {
@@ -777,8 +777,11 @@
             u.lang = langCode;
             u.rate = 1.0;
             speechSynthesis.speak(u);
-            await new Promise(r=>setTimeout(r,2000));
+            await new Promise(r=>setTimeout(r,2000)); // pausa 2 secondi tra i caratteri
         }
+    }
+    function isPlaceholder(ref) {
+        return ref.includes("Nessun altro punto") || ref.includes("Nessun punto nelle vicinanze");
     }
     async function speakFull(lang) {
         if (!window.speechSynthesis) { alert(lang==='it'?"Sintesi non supportata":"Synthèse non supportée"); return; }
@@ -793,9 +796,9 @@
             gpsStatus.innerHTML = "⏳ Traduzione FR...";
             note = await translateToFrench(note);
             if (currentAddress && currentAddress !== "non disponibile") addr = await translateToFrench(currentAddress);
-            if (currentRefA && currentRefA !== "non disponibile") refA = await translateToFrench(currentRefA);
-            if (currentRefB && currentRefB !== "non disponibile") refB = await translateToFrench(currentRefB);
-            if (currentRefC && currentRefC !== "non disponibile") refC = await translateToFrench(currentRefC);
+            if (!isPlaceholder(refA)) refA = await translateToFrench(refA);
+            if (!isPlaceholder(refB)) refB = await translateToFrench(refB);
+            if (!isPlaceholder(refC)) refC = await translateToFrench(refC);
             gpsStatus.innerHTML = "🔊 Lettura FR...";
         } else gpsStatus.innerHTML = "🔊 Lettura IT...";
         let intro = (lang==='it') ? "Attenzione, sono italiano e questo è un messaggio tradotto, mi trovo in Emergenza, ripeto questa è un emergenza," : await translateToFrench("Attenzione, sono italiano e questo è un messaggio tradotto, mi trovo in Emergenza, ripeto questa è un emergenza,");
@@ -806,14 +809,14 @@
         await speakWords("Indirizzo", lang==='it'?'it-IT':'fr-FR');
         await speakWords(addr, lang==='it'?'it-IT':'fr-FR');
         await speakWords("Sono vicino a 1", lang==='it'?'it-IT':'fr-FR');
-        await speakWords(refA, lang==='it'?'it-IT':'fr-FR');
+        if (!isPlaceholder(currentRefA)) await speakWords(refA, lang==='it'?'it-IT':'fr-FR');
         await speakWords("Sono vicino a 2", lang==='it'?'it-IT':'fr-FR');
-        await speakWords(refB, lang==='it'?'it-IT':'fr-FR');
+        if (!isPlaceholder(currentRefB)) await speakWords(refB, lang==='it'?'it-IT':'fr-FR');
         await speakWords("Sono vicino a 3", lang==='it'?'it-IT':'fr-FR');
-        await speakWords(refC, lang==='it'?'it-IT':'fr-FR');
+        if (!isPlaceholder(currentRefC)) await speakWords(refC, lang==='it'?'it-IT':'fr-FR');
         let domanda = (lang==='it') ? "se hai capito il messaggio e dove mi trovo in questo momento, rispondi: Ho capito, altrimenti pronuncia ripeti dopo il bip." : await translateToFrench("se hai capito il messaggio e dove mi trovo in questo momento, rispondi: Ho capito, altrimenti pronuncia ripeti dopo il bip.");
         await speakWords(domanda, lang==='it'?'it-IT':'fr-FR');
-        playBeep();
+        playBeep();   // solo il suono, nessuna parola "bip"
         await new Promise(r=>setTimeout(r,800));
         gpsStatus.innerHTML = "✅ Messaggio completo. Avvio ascolto...";
         if (true) setTimeout(()=>startListening(),500);
@@ -845,22 +848,25 @@
         reader.readAsText(file,"UTF-8");
     }
 
-    // ---------- UTILITIES ----------
-    function loadCounter() { let c = localStorage.getItem(`sos_counter_${CURRENT_VERSION}`); return c ? parseInt(c) : 1; }
-    function incCounter() { let c = loadCounter(); localStorage.setItem(`sos_counter_${CURRENT_VERSION}`, c+1); return c; }
-    function savePhone(s,n) { localStorage.setItem(`phone_${s}_${CURRENT_VERSION}`, n); }
-    function getPhone(s) { return localStorage.getItem(`phone_${s}_${CURRENT_VERSION}`); }
+    // ---------- UTILITIES (numeri telefono persistenti senza versione) ----------
+    function getPhoneStorageKey(s) { return `phone_${s}_persistent`; }
+    function savePhone(s, n) { localStorage.setItem(getPhoneStorageKey(s), n); }
+    function getPhone(s) { return localStorage.getItem(getPhoneStorageKey(s)); }
     const defaultPhone = { ambulanza:"118", polizia:"113", veterinario:"800123456", clinica:"800987654" };
+    
+    function loadCounter() { let c = localStorage.getItem(`sos_counter_${APP_VERSION}`); return c ? parseInt(c) : 1; }
+    function incCounter() { let c = loadCounter(); localStorage.setItem(`sos_counter_${APP_VERSION}`, c+1); return c; }
     function showEmergency(s) {
         currentService = s;
         let label = {ambulanza:"🚑 AMBULANZA", polizia:"👮 POLIZIA", veterinario:"🐾 VETERINARIO", clinica:"🏥 CLINICA"}[s];
         serviceTitleSpan.innerText = label;
-        phoneInput.value = getPhone(s) || defaultPhone[s];
+        let savedPhone = getPhone(s);
+        phoneInput.value = (savedPhone !== null) ? savedPhone : defaultPhone[s];
         loadNotes(s); resetCoords();
         homePage.classList.add("hidden");
         emergencyPage.classList.remove("hidden");
         phoneSaveMsg.innerText = "";
-        requestWakeLock();
+        requestWakeLock();  // schermo sempre acceso
     }
     function onPhoneChange() { let n = phoneInput.value.trim(); if (n) { savePhone(currentService, n); phoneSaveMsg.innerText = "✅ Numero salvato"; setTimeout(()=>phoneSaveMsg.innerText="",2000); } }
     function backHome() {
@@ -871,7 +877,7 @@
         selectedNoteId = null;
         renderNotes();
         editNoteArea.style.display = 'none';
-        releaseWakeLock();
+        releaseWakeLock();   // rilascia wake lock
     }
 
     // ---------- INIT ----------
@@ -905,3 +911,4 @@
 </script>
 </body>
 </html>
+```
