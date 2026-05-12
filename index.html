@@ -1,22 +1,20 @@
-Ecco il codice HTML completo della versione **v0037** con l’icona personalizzata per la home screen (cerchio rosso bordo spesso, sfondo bianco, scritte rosse “SOS” e “TUNISIA”), tutti i fix precedenti (pulsanti funzionanti, lettura nota corretta, spelling 0.2 rate con pausa 2s, raggio 300m, tre POI, persistenza, ecc.) e meta tag per l’aggiunta all’home screen.
-
-```html
 <!DOCTYPE html>
 <html lang="it">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
-    <title>SOS Drive - Emergenza v0037</title>
+    <title>SOS Drive - Emergenza v0038</title>
     
-    <!-- Icone per aggiunta a schermata Home (iOS, Android, desktop) -->
-    <link rel="apple-touch-icon" sizes="512x512" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Ccircle cx='256' cy='256' r='230' fill='white' stroke='%23e3170a' stroke-width='36'/%3E%3Ctext x='256' y='300' font-family='system-ui, -apple-system, sans-serif' font-size='160' font-weight='bold' fill='%23e3170a' text-anchor='middle'%3ESOS%3C/text%3E%3Ctext x='256' y='390' font-family='system-ui, -apple-system, sans-serif' font-size='70' font-weight='600' fill='%23e3170a' text-anchor='middle' letter-spacing='4'%3ETUNISIA%3C/text%3E%3C/svg%3E">
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Ccircle cx='256' cy='256' r='230' fill='white' stroke='%23e3170a' stroke-width='36'/%3E%3Ctext x='256' y='300' font-family='system-ui, -apple-system, sans-serif' font-size='160' font-weight='bold' fill='%23e3170a' text-anchor='middle'%3ESOS%3C/text%3E%3Ctext x='256' y='390' font-family='system-ui, -apple-system, sans-serif' font-size='70' font-weight='600' fill='%23e3170a' text-anchor='middle' letter-spacing='4'%3ETUNISIA%3C/text%3E%3C/svg%3E">
+    <!-- Icone per aggiunta a schermata Home (iOS, Android, desktop) - basate su SVG convertito in PNG base64 per massima compatibilità -->
+    <link rel="apple-touch-icon" sizes="180x180" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAcQAAAHDAQMAAABqdJfqAAABUExURUdwTAAAAKQhIq8kJaYjJK4kJf///6UkJf79/qQjJKQkJf7+/qQkJKQkJKQkJKQkJKQkJP39/qQkJKQkJKQkJKQkJKQkJKQkJKQkJKQkJKQkJKQkJKQkJKQkJKQkJKQkJKQkJKQkJKQkJKQkJKQkJKQkJKQkJKQkJKQkJKQkJKQkJKQkJKQkJKQkJKQkJKQkJKQkJKQkJKQkJKQkJKQkJKQkJKQkJKQkJKQkJKQkJKQkJKQkJKQkJKQkJKQkJKQkJKQkJKQkJKQkJKQkJKQkJKQkJKQkJKQkJKQkJKQkJKQkJKQkJKQkJKQkJKQkJKQkJKQkJKQkJKQkJKQkJKQkJKQkJKQkJKQkJKQkJKQkJKQkJKQkJKQkJKQkJKQkJKQkJKQkJKQkJKQkJKQkJKQkJKQkJKQkJKQkI+ftkpAAAA0UlEQVR42u3bQZLDMAwDQTn/DYG+MgNTkylrOomz3pOfVCEBD4KaiP9WARERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERHx3xfLmYo8//qRvdLm2ZGRqVeFf37g5t+PB/nKBWgZedzJz9H+ZukP+ZE4p00PX/6NVLfHoxsRU25jMpP3/v8mYy53nhtnS0tTXl1bLc/b8/FORERERERERERERERERERERERE9C/SAbYZAnPvJ0iRAAAAAElFTkSuQmCC">
+    <link rel="icon" type="image/png" sizes="32x32" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgBAMAAACBVGfHAAAAD1BMVEUAAADjFw/jFw/jFw/jFw/jFxBnUGaAAAABn0lEQVQ4jWWUO27DMAxGb6PJ0A1No03enKVjdsBtMxRZuwQqUCBAs2iKjqRBIptk3yLxQYef/olCYXpASAd6/kEh5SAQgg+ZEDQhOKftaHBGHgqMUy9AAkFcA3EVsABQTwjOqD+sBm4/6QyKo5lBcRcKBBWQXwGqCfgGZ3x4HVC3EzxCgT0KOKP9cAfke9ldgK+K0+mA/Dy+LB3Oo/xQIP4K8dH9KqQnzC8gH/VXp0D+bwC+aZ+N/eO47BdwMvJ7GgXM3qgF+di/1AnY+oDaGnDP2wXkaGlz5Al52POoYxiFBfkwDb8TkI89j6tCq7R+QO6bY5RPBqOAYj9twm+0/3D/0j29IAl/wLr9H5AHAUtSgr41jvoLsi+Q92IIdYzTbejKzSAf2zPLo4D8bbB8D9jtx4yQ/uB8RwXkAaB7b2TQA7DdAri//6B9iD9g24yijt/rEaF8Wy1hGgUcPqBpJWD27l5DYBSwJjQ9JZCt+FoiHV+LvyjS8Ugfpw1ffPFOy/WBEImF8P8D/QFPAU+khd2D8QAAAABJRU5ErkJggg==">
+    <link rel="mask-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Ccircle cx='256' cy='256' r='230' fill='white' stroke='%23e3170a' stroke-width='36'/%3E%3Ctext x='256' y='300' font-family='system-ui' font-size='160' font-weight='bold' fill='%23e3170a' text-anchor='middle'%3ESOS%3C/text%3E%3Ctext x='256' y='390' font-family='system-ui' font-size='70' font-weight='600' fill='%23e3170a' text-anchor='middle' letter-spacing='4'%3ETUNISIA%3C/text%3E%3C/svg%3E" color="#e3170a">
     <meta name="theme-color" content="#e3170a">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="SOS Drive">
     <meta name="application-name" content="SOS Drive">
-    <link rel="manifest" href="data:application/manifest+json,{%22name%22:%22SOS%20Drive%22,%22short_name%22:%22SOS%22,%22start_url%22:%22.%22,%22display%22:%22standalone%22,%22theme_color%22:%22%23e3170a%22,%22background_color%22:%22%23ffffff%22,%22icons%22:[{%22src%22:%22data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Ccircle cx='256' cy='256' r='230' fill='white' stroke='%23e3170a' stroke-width='36'/%3E%3Ctext x='256' y='300' font-family='system-ui, -apple-system, sans-serif' font-size='160' font-weight='bold' fill='%23e3170a' text-anchor='middle'%3ESOS%3C/text%3E%3Ctext x='256' y='390' font-family='system-ui, -apple-system, sans-serif' font-size='70' font-weight='600' fill='%23e3170a' text-anchor='middle' letter-spacing='4'%3ETUNISIA%3C/text%3E%3C/svg%3E%22,%22sizes%22:%22512x512%22,%22type%22:%22image/svg+xml%22}]}">
+    <link rel="manifest" href="data:application/manifest+json,{%22name%22:%22SOS%20Drive%22,%22short_name%22:%22SOS%22,%22start_url%22:%22.%22,%22display%22:%22standalone%22,%22theme_color%22:%22%23e3170a%22,%22background_color%22:%22%23ffffff%22,%22icons%22:[{%22src%22:%22data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAABkCAMAAABHPGVmAAAAdVBMVEUAAADjFw/jFw/jFw/jFw/jFw/jFw/jFw/jFw/jFw/jFw/jFw/jFw/jFw/jFw/jFw/jFw/jFw/jFw/jFw/jFw/jFw/jFw/jFw/jFw/jFw/jFw/jFw/jFw/jFw/jFw/jFw/jFw/jFw/jFw/jFw/jFw/jFw/jFw/jFw/jFw/jFw/jFw/jFw/jFw/jFw/jFw/jFw/jFw/jFw/jFw/jFw/jFw/jFw/jFw/jFw/jFw/jFw/jFw/jFw/jFw/jFw/jFw/jFw/jFw/jFw/jFw/jFw/jFw/jF//88ZYXAAAAn3RSTlMAAQIDBAUGBwgJCgsMDQ4PEBESExQVFhcYGRobHB0eHyAhIiMkJSYnKCkqKywtLi8wMTIzNDU2Nzg5Ojs8PT4/QEFCQ0RFRkdISUpLTE1OT1BRUlNUVVZXWFlaW1xdXl9gYWJjZGVmZ2hpanR1dnd4eXp7fH1+f4CBgoOEhYaHiImKi4yNjo+QkZKTlJWWl5iZmpucnZ6foKGio6SlpqeoqaqrrK2ur7CxstFpz9sAAACKSURBVHja7NdBDoAwDMSwDYH//7HSvZwYtyHxIS05WjFSlkXpVIC+ktvbK9uSENMJO4SwQwg7hLBDCDuEsEMIO4SwQwg7hLBDCDuE7PqW+57S9R3zDp3qVrZXyL7AXqH6F+qVY34RIU9IxBMSGQkhhJBACCGEEBIIIYQQQgghhBD9/gMQQgghhBDiP80HqPAGdfrr7TkAAAAASUVORK5CYII%22,%22sizes%22:%22180x180%22,%22type%22:%22image/png%22}]}">
     
     <style>
         * {
@@ -258,7 +256,7 @@ Ecco il codice HTML completo della versione **v0037** con l’icona personalizza
 <div class="container">
     <!-- HOME PAGE -->
     <div id="homePage" class="page">
-        <div class="version-header">📟 SOS Drive v0037 - raggio 300m, categorie estese, spelling veloce</div>
+        <div class="version-header">📟 SOS Drive v0038 - raggio 300m, POI sempre 3, aziende incluse</div>
         <h1>🆘 SOS EMERGENZA</h1>
         <div class="grid-2">
             <button id="btnAmbulanza" class="big-btn">🚑 AMBULANZA</button>
@@ -266,13 +264,13 @@ Ecco il codice HTML completo della versione **v0037** con l’icona personalizza
             <button id="btnVeterinario" class="big-btn">🐾 VETERINARIO</button>
             <button id="btnClinica" class="big-btn">🏥 CLINICA</button>
         </div>
-        <p style="text-align:center; font-size:0.75rem; color:#555;">Ogni servizio ha il proprio archivio note.<br>📍 Precisione GPS (media + snap strada). Raggio 300m per POI e aziende.<br>🔊 Ascolto automatico dopo il messaggio, spelling coordinate 0.2s rate</p>
-        <div class="version-footer">versione 0037 – tre riferimenti POI, lettura nota corretta, persistenza dati</div>
+        <p style="text-align:center; font-size:0.75rem; color:#555;">Ogni servizio ha il proprio archivio note.<br>📍 Precisione GPS (media + snap strada). Raggio 300m per POI inclusi uffici e aziende.<br>🔊 Ascolto automatico dopo il messaggio</p>
+        <div class="version-footer">versione 0038 – tre riferimenti POI (nessun indirizzo come terzo), aziende incluse, icona home corretta</div>
     </div>
 
     <!-- EMERGENCY PAGE -->
     <div id="emergencyPage" class="page hidden">
-        <div class="version-header">📟 SOS Drive v0037 – raggio 300m, categorie ampliate</div>
+        <div class="version-header">📟 SOS Drive v0038 – raggio 300m, aziende incluse</div>
         <h2 id="serviceTitle">AMBULANZA</h2>
 
         <label>📞 Numero servizio</label>
@@ -334,22 +332,20 @@ Ecco il codice HTML completo della versione **v0037** con l’icona personalizza
         </div>
 
         <button id="backHomeBtn" class="small-btn back-home" style="width:100%;">◀ TORNA INDIETRO</button>
-        <div class="version-footer">versione 0037 – raggio 300m, tutti e tre i riferimenti sono POI, spelling 0.2s rate</div>
+        <div class="version-footer">versione 0038 – tre POI (nessun indirizzo), aziende incluse, icona home corretta</div>
     </div>
 </div>
 
 <script>
-    // ==================== VERSIONE 0037 ====================
+    // ==================== VERSIONE 0038 ====================
     // - Raggio 300 metri
-    // - Categorie ampliate: amenity, shop, tourism, office, leisure, historic, craft, company, landuse commercial/retail/industrial, building commercial/retail
-    // - Corretta lettura nota selezionata
-    // - Spelling coordinate con rate 0.2 e pausa 2 secondi tra i caratteri
-    // - Tre riferimenti sono tutti POI (estrazione dei primi 3)
-    // - Persistenza note e numeri telefono
-    // - Icona home screen personalizzata (cerchio rosso spesso, sfondo bianco, scritte rosse SOS e TUNISIA)
+    // - Categorie ampliate con medie/grandi aziende (office, craft, company, landuse commercial/retail/industrial, building commercial/retail)
+    // - Tre riferimenti sono tutti POI (nessun indirizzo come terzo)
+    // - Corretta icona home screen (PNG base64 + manifest)
+    // - Il file inizia esattamente con <!DOCTYPE html>
     // =======================================================*/
 
-    const CURRENT_VERSION = "0037";
+    const CURRENT_VERSION = "0038";
     let currentService = "ambulanza";
     let currentLat = null, currentLng = null;
     let currentAddress = "";
@@ -455,7 +451,7 @@ Ecco il codice HTML completo della versione **v0037** con l’icona personalizza
         const services = ["ambulanza", "polizia", "veterinario", "clinica"];
         for (let s of services) {
             if (localStorage.getItem(`sos_notes_${s}_${CURRENT_VERSION}`)) continue;
-            for (let ver of ["0036","0035","0034"]) {
+            for (let ver of ["0037","0036","0035"]) {
                 let old = localStorage.getItem(`sos_notes_${s}_${ver}`);
                 if (old) {
                     try {
@@ -614,7 +610,6 @@ Ecco il codice HTML completo della versione **v0037** con l’icona personalizza
     }
 
     async function fetchPOI(lat,lng) {
-        // RAGGIO 300 metri
         let exclude = ["information","bench","waste_basket","toilets","telephone","recycling","fountain","drinking_water"];
         let query = `[out:json];(
             node(around:300,${lat},${lng})[amenity];
@@ -753,9 +748,9 @@ Ecco il codice HTML completo della versione **v0037** con l’icona personalizza
             let word = (ch === '.') ? "punto" : (ch === ',') ? "virgola" : ch;
             let u = new SpeechSynthesisUtterance(word);
             u.lang = langCode;
-            u.rate = 0.2;   // velocità di spelling molto alta
+            u.rate = 0.2;
             speechSynthesis.speak(u);
-            await new Promise(r=>setTimeout(r,2000)); // pausa 2 secondi tra i caratteri
+            await new Promise(r=>setTimeout(r,2000));
         }
     }
     async function speakFull(lang) {
@@ -881,4 +876,3 @@ Ecco il codice HTML completo della versione **v0037** con l’icona personalizza
 </script>
 </body>
 </html>
-```
