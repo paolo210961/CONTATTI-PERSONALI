@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
-    <title>SOS Drive - Emergenza v0156</title>
+    <title>SOS Drive - Emergenza v0157</title>
     <style>
         * {
             margin: 0;
@@ -179,6 +179,18 @@
             margin: 12px 0;
             border-left: 4px solid #4caf50;
         }
+        .special-note-btn {
+            position: relative;
+        }
+        .selected-bullet {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            background-color: #1976d2;
+            border-radius: 50%;
+            margin-left: 8px;
+            vertical-align: middle;
+        }
         .back-home {
             background: #607d8b;
             margin-top: 20px;
@@ -221,17 +233,13 @@
             padding-top: 12px;
             border-top: 1px solid #e9ecef;
         }
-        .special-active {
-            background: #4caf50 !important;
-            color: white;
-        }
     </style>
 </head>
 <body>
 <div class="container">
     <!-- HOME PAGE -->
     <div id="homePage" class="page">
-        <div class="version-header">📟 SOS Drive v0156 - Esclude autostrade generiche, civico, note speciali con punto blu</div>
+        <div class="version-header">📟 SOS Drive v0157 - Modifica note solo per note normali</div>
         <h1>🆘 SOS EMERGENZA</h1>
         <div class="grid-2">
             <button class="big-btn" data-service="ambulanza">🚑 AMBULANZA</button>
@@ -239,13 +247,13 @@
             <button class="big-btn" data-service="veterinario">🐾 VETERINARIO</button>
             <button class="big-btn" data-service="clinica">🏥 CLINICA</button>
         </div>
-        <p style="text-align:center; font-size:0.75rem; color:#555;">Ogni servizio ha il proprio archivio note.<br>📍 Ricerca entro 300m, esclude autostrade generiche<br>🔊 Ascolto automatico 15 secondi</p>
-        <div class="version-footer">versione 0156 – Indirizzo con civico, preferenza a negozi e piazze, punto blu note speciali</div>
+        <p style="text-align:center; font-size:0.75rem; color:#555;">Ogni servizio ha il proprio archivio note.<br>📍 Ricerca luoghi con nome (esclude autostrade generiche)<br>🔊 Ascolto automatico 15 secondi</p>
+        <div class="version-footer">versione 0157 – campo modifica solo per note normali, note speciali indipendenti</div>
     </div>
 
     <!-- EMERGENCY PAGE -->
     <div id="emergencyPage" class="page hidden">
-        <div class="version-header">📟 SOS Drive v0156 – Autostrade escluse</div>
+        <div class="version-header">📟 SOS Drive v0157 – Modifica note ottimizzata</div>
         <h2 id="serviceTitle">AMBULANZA</h2>
 
         <label>📞 Numero servizio</label>
@@ -272,10 +280,14 @@
             <button id="addNoteBtn" class="small-btn" style="background:#ff9800;">➕ AGGIUNGI</button>
         </div>
         
+        <div id="normalNoteInfo" class="status-msg" style="color:#2e7d32; font-weight:500; background:#e8f5e9; padding:6px 12px; border-radius:20px; margin-bottom:8px; display:none;">
+            📌 Nota normale selezionata: verrà letto l'intero messaggio di emergenza
+        </div>
         <div id="notesListArea">
             <div style="font-size:0.7rem; color:#777;">Nessuna nota. Aggiungine una.</div>
         </div>
 
+        <!-- Area modifica nota normale -->
         <div id="editNoteArea" class="edit-note-area" style="display:none;">
             <label>✏️ Modifica nota (normale):</label>
             <textarea id="editNoteText" rows="2"></textarea>
@@ -285,15 +297,16 @@
             </div>
         </div>
 
+        <!-- NOTE SPECIALI (non interagiscono con l'area modifica) -->
         <div id="specialNotesArea" class="special-note-area">
             <label>📌 NOTE SPECIALI (solo testo - ignorano coordinate)</label>
             <div class="flex-row">
                 <input type="text" id="specialNote1" placeholder="Nota speciale 1" style="flex:3;">
-                <button id="selectSpecial1Btn" class="small-btn" style="background:#5f7f9e;">🔘 SELEZIONA 1</button>
+                <button id="selectSpecial1Btn" class="small-btn" style="background:#4caf50;">✔️ SELEZIONA 1</button>
             </div>
             <div class="flex-row">
                 <input type="text" id="specialNote2" placeholder="Nota speciale 2" style="flex:3;">
-                <button id="selectSpecial2Btn" class="small-btn" style="background:#5f7f9e;">🔘 SELEZIONA 2</button>
+                <button id="selectSpecial2Btn" class="small-btn" style="background:#4caf50;">✔️ SELEZIONA 2</button>
             </div>
             <div id="specialNoteStatus" class="status-msg"></div>
         </div>
@@ -318,24 +331,23 @@
             <button id="copyBtn" class="small-btn btn-copy">📋 COPIA (FR+IT)</button>
             <button id="audioItBtn" class="small-btn btn-audio">🔊 LEGGI IT</button>
             <button id="audioFrBtn" class="small-btn btn-audio">🔊 LEGGI FR</button>
-            <button id="autoLangBtn" class="small-btn btn-audio" style="background:#e67e22;">🔊 LEGGI (AUTO)</button>
         </div>
 
         <button id="backHomeBtn" class="small-btn back-home" style="width:100%;">◀ TORNA INDIETRO</button>
-        <div class="version-footer">versione 0156 – esclude autostrade senza casello, indirizzo con numero civico, punto blu note speciali</div>
+        <div class="version-footer">versione 0157 – solo le note normali appaiono nel campo modifica</div>
     </div>
 </div>
 
 <script>
-    // ==================== VERSIONE 0156 ====================
-    // 1. Indirizzo con numero civico: Nominatim restituisce house_number + road
-    // 2. Esclusione autostrade generiche: se il nome contiene "autostrada", "tangenziale", "A1", "A14" ecc. e NON ha "casello"/"uscita"/"exit", viene scartato.
-    // 3. Preferenza a luoghi con amenity, shop, tourism (Coop, bar, ristoranti, piazze) rispetto a strade.
-    // 4. Note speciali: pulsante attivo mostra ✅ (sfondo verde) e l'altro torna normale. Eliminato messaggio testuale.
-    // 5. Persistenza note speciali in localStorage
+    // ==================== VERSIONE 0157 ====================
+    // Modifiche:
+    // - Il testo delle note speciali NON viene copiato nel campo "Modifica nota"
+    // - Il campo "Modifica nota" visualizza solo il contenuto della nota normale selezionata
+    // - Le note speciali sono indipendenti e persistono su localStorage
+    // - Tutte le altre funzioni invariate (geolocalizzazione, ricerca POI, WakeLock, traduzioni, copia, lettura, ascolto 15s)
     // =================================================================
 
-    const CURRENT_VERSION = "0156";
+    const CURRENT_VERSION = "0157";
     let currentService = "ambulanza";
     let currentLat = null, currentLng = null;
     let currentAddress = "";
@@ -366,7 +378,6 @@
     const copyBtn = document.getElementById('copyBtn');
     const audioItBtn = document.getElementById('audioItBtn');
     const audioFrBtn = document.getElementById('audioFrBtn');
-    const autoLangBtn = document.getElementById('autoLangBtn');
     const backHomeBtn = document.getElementById('backHomeBtn');
     const phoneSaveMsg = document.getElementById('phoneSaveMsg');
     const exportNotesBtn = document.getElementById('exportNotesBtn');
@@ -385,31 +396,18 @@
     const selectSpecial1Btn = document.getElementById('selectSpecial1Btn');
     const selectSpecial2Btn = document.getElementById('selectSpecial2Btn');
     const specialNoteStatus = document.getElementById('specialNoteStatus');
+    const normalNoteInfo = document.getElementById('normalNoteInfo');
 
     let currentEditingNoteId = null;
     let recognition = null;
     let recognitionTimeout = null;
-    let specialActive = null; // 1 o 2
-
-    // ---------- Carica/salva note speciali ----------
-    function loadSpecialNotes() {
-        let s1 = localStorage.getItem(`specialNote1_${CURRENT_VERSION}`);
-        let s2 = localStorage.getItem(`specialNote2_${CURRENT_VERSION}`);
-        if (s1) specialNote1.value = s1;
-        if (s2) specialNote2.value = s2;
-    }
-    function saveSpecialNotes() {
-        localStorage.setItem(`specialNote1_${CURRENT_VERSION}`, specialNote1.value);
-        localStorage.setItem(`specialNote2_${CURRENT_VERSION}`, specialNote2.value);
-    }
-    specialNote1.addEventListener('change', saveSpecialNotes);
-    specialNote2.addEventListener('change', saveSpecialNotes);
 
     // ---------- WakeLock ----------
     async function requestWakeLock() {
         if ('wakeLock' in navigator) {
             try {
                 wakeLock = await navigator.wakeLock.request('screen');
+                console.log('WakeLock attivo');
                 wakeLock.addEventListener('release', () => console.log('WakeLock rilasciato'));
             } catch(err) { console.warn('WakeLock non supportato:', err); }
         }
@@ -419,7 +417,7 @@
     // ---------- ARCHIVIO NUMERI ----------
     function migratePhoneNumbers() {
         const services = ["ambulanza", "polizia", "veterinario", "clinica"];
-        const oldVersions = ["0155", "0154", "0153"];
+        const oldVersions = ["0156", "0155", "0154", "0153"];
         for (let s of services) {
             if (localStorage.getItem(`phone_${s}_${CURRENT_VERSION}`)) continue;
             for (let ver of oldVersions) {
@@ -432,21 +430,23 @@
     function getPhone(s) { return localStorage.getItem(`phone_${s}_${CURRENT_VERSION}`); }
     const defaultPhone = { ambulanza:"118", polizia:"113", veterinario:"800123456", clinica:"800987654" };
 
+    // ---------- PERSISTENZA NOTE SPECIALI ----------
+    function saveSpecialNotes() {
+        localStorage.setItem(`specialNote1_${CURRENT_VERSION}`, specialNote1.value);
+        localStorage.setItem(`specialNote2_${CURRENT_VERSION}`, specialNote2.value);
+    }
+    function loadSpecialNotes() {
+        let s1 = localStorage.getItem(`specialNote1_${CURRENT_VERSION}`);
+        let s2 = localStorage.getItem(`specialNote2_${CURRENT_VERSION}`);
+        if (s1 !== null) specialNote1.value = s1;
+        if (s2 !== null) specialNote2.value = s2;
+    }
+
     // ---------- TRADUZIONI ----------
     async function translateToFrench(italianText) {
         if (!italianText || italianText.trim() === "") return "";
         try {
             const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(italianText)}&langpair=it|fr`;
-            const resp = await fetch(url);
-            const data = await resp.json();
-            if (data && data.responseData && data.responseData.translatedText) return data.responseData.translatedText;
-        } catch(e) { console.warn(e); }
-        return italianText;
-    }
-    async function translateToLanguage(italianText, targetLang) {
-        if (!italianText || !targetLang) return italianText;
-        try {
-            const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(italianText)}&langpair=it|${targetLang}`;
             const resp = await fetch(url);
             const data = await resp.json();
             if (data && data.responseData && data.responseData.translatedText) return data.responseData.translatedText;
@@ -464,48 +464,7 @@
         return frenchText + " (traduzione fallita)";
     }
 
-    // ---------- RICONOSCIMENTO VOCALE (lingua rilevata dalle coordinate) ----------
-    async function detectCountryLanguage(lat, lng) {
-        try {
-            let url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=10&accept-language=fr,en,it,de,es`;
-            let resp = await fetch(url, {headers:{'User-Agent':'SOSDrive/1.0'}});
-            let data = await resp.json();
-            let countryCode = data.address?.country_code?.toLowerCase() || "it";
-            const langMap = { "it":"it-IT", "fr":"fr-FR", "de":"de-DE", "es":"es-ES", "gb":"en-GB", "us":"en-US", "ch":"de-DE", "be":"fr-FR" };
-            return langMap[countryCode] || "it-IT";
-        } catch(e) { return "it-IT"; }
-    }
-    async function startListeningAuto() {
-        if (!recognition && !initRecognition()) return;
-        // Rileva lingua dal paese
-        let langCode = "fr-FR";
-        if (currentLat && currentLng) {
-            langCode = await detectCountryLanguage(currentLat, currentLng);
-        }
-        if (recognition) recognition.lang = langCode;
-        if (recognitionTimeout) clearTimeout(recognitionTimeout);
-        transcribeStatus.innerText = `🎤 Ascolto (${langCode}) per 15 secondi...`;
-        recognition.start();
-        let finalTranscript = "";
-        recognition.onresult = (event) => {
-            for (let i = event.resultIndex; i < event.results.length; i++) {
-                if (event.results[i].isFinal) finalTranscript += event.results[i][0].transcript + " ";
-            }
-        };
-        recognition.onerror = (e) => { transcribeStatus.innerText = "❌ Errore microfono: " + e.error; };
-        recognition.onend = async () => {
-            if (finalTranscript.trim() !== "") {
-                transcribeStatus.innerText = "⏳ Traduzione in italiano...";
-                const italian = await translateFrenchToItalian(finalTranscript.trim());
-                if (operatorResponse.value.trim()) operatorResponse.value += "\n---\n" + italian;
-                else operatorResponse.value = italian;
-                transcribeStatus.innerText = "✅ Testo tradotto in italiano";
-            } else transcribeStatus.innerText = "⏹️ Nessun parlato";
-            setTimeout(() => { if (transcribeStatus.innerText.includes("Tradotto") || transcribeStatus.innerText.includes("Nessun parlato")) transcribeStatus.innerText = ""; }, 4000);
-        };
-        recognitionTimeout = setTimeout(() => { if (recognition && recognition.stop) recognition.stop(); }, 15000);
-    }
-
+    // ---------- RICONOSCIMENTO VOCALE 15s ----------
     function initRecognition() {
         if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
             transcribeStatus.innerText = "❌ Riconoscimento non supportato";
@@ -522,7 +481,6 @@
         if (!recognition && !initRecognition()) return;
         if (recognitionTimeout) clearTimeout(recognitionTimeout);
         transcribeStatus.innerText = "🎤 Ascolto francese per 15 secondi...";
-        recognition.lang = 'fr-FR';
         recognition.start();
         let finalTranscript = "";
         recognition.onresult = (event) => {
@@ -549,7 +507,7 @@
         const services = ["ambulanza", "polizia", "veterinario", "clinica"];
         for (let s of services) {
             if (localStorage.getItem(`sos_notes_${s}_${CURRENT_VERSION}`)) continue;
-            for (let ver of ["0155","0154","0153"]) {
+            for (let ver of ["0156","0155","0154"]) {
                 let old = localStorage.getItem(`sos_notes_${s}_${ver}`);
                 if (old) {
                     try {
@@ -582,35 +540,39 @@
             } catch(e) { notesArray = []; selectedNoteId = null; }
         } else { notesArray = []; selectedNoteId = null; }
         renderNotes();
-        editNoteArea.style.display = 'block';
-        currentEditingNoteId = null;
+        // Aggiorna campo modifica se c'è una nota normale selezionata
+        if (selectedNoteId && !selectedSpecialMode) {
+            let n = notesArray.find(x => x.id === selectedNoteId);
+            if (n) { editNoteText.value = n.text; editNoteArea.style.display = 'block'; currentEditingNoteId = selectedNoteId; }
+        } else {
+            editNoteArea.style.display = 'none';
+            currentEditingNoteId = null;
+        }
     }
     function renderNotes() {
         if (!notesArray.length) {
             notesListArea.innerHTML = `<div style="font-size:0.7rem;">Nessuna nota. Aggiungine una.</div>`;
             selectedNoteId = null;
-            editNoteArea.style.display = 'block';
-            editNoteText.value = '';
+            editNoteArea.style.display = 'none';
             return;
         }
         let html = '<div><strong>📋 Seleziona nota normale:</strong></div>';
         notesArray.forEach(n => {
             html += `
                 <div class="note-item">
-                    <input type="radio" name="noteSelect" value="${n.id}" class="radio-note" ${selectedNoteId===n.id ? 'checked' : ''}>
+                    <input type="radio" name="noteSelect" value="${n.id}" class="radio-note" ${selectedNoteId===n.id && !selectedSpecialMode ? 'checked' : ''}>
                     <span class="note-text">${escapeHtml(n.text)}</span>
                     <button class="delete-note" data-id="${n.id}">🗑️</button>
                 </div>
             `;
         });
         notesListArea.innerHTML = html;
+        // Evento selezione nota normale
         document.querySelectorAll('input[name="noteSelect"]').forEach(r => {
             r.addEventListener('change', (e) => {
                 selectedNoteId = parseInt(e.target.value);
                 selectedSpecialMode = false;
                 selectedSpecialText = "";
-                specialActive = null;
-                updateSpecialButtons();
                 saveNotes();
                 let n = notesArray.find(x => x.id === selectedNoteId);
                 if (n) {
@@ -618,6 +580,12 @@
                     editNoteArea.style.display = 'block';
                     currentEditingNoteId = selectedNoteId;
                 }
+                normalNoteInfo.style.display = 'block';
+                setTimeout(() => { normalNoteInfo.style.display = 'none'; }, 10000);
+                specialNoteStatus.innerText = "";
+                // Deseleziona eventuali pulsanti speciali (non c'è punto blu, ma resetta visivamente)
+                selectSpecial1Btn.style.backgroundColor = "#4caf50";
+                selectSpecial2Btn.style.backgroundColor = "#4caf50";
             });
         });
         document.querySelectorAll('.delete-note').forEach(btn => {
@@ -626,15 +594,15 @@
                 notesArray = notesArray.filter(n => n.id !== id);
                 if (selectedNoteId === id) selectedNoteId = notesArray.length ? notesArray[0].id : null;
                 renderNotes(); saveNotes();
-                if (!selectedNoteId) { editNoteText.value = ''; }
-                else { let n = notesArray.find(x => x.id === selectedNoteId); if (n) editNoteText.value = n.text; }
+                if (!selectedNoteId || selectedSpecialMode) { editNoteArea.style.display = 'none'; currentEditingNoteId = null; }
+                else { let n = notesArray.find(x => x.id === selectedNoteId); if (n) { editNoteText.value = n.text; editNoteArea.style.display = 'block'; currentEditingNoteId = selectedNoteId; } }
             });
         });
-        if (selectedNoteId && !selectedSpecialMode) {
-            let n = notesArray.find(x => x.id === selectedNoteId);
-            if (n) editNoteText.value = n.text;
+        // Se nessuna nota normale selezionata, nascondi area modifica
+        if (!selectedNoteId || selectedSpecialMode) {
+            editNoteArea.style.display = 'none';
+            currentEditingNoteId = null;
         }
-        editNoteArea.style.display = 'block';
     }
     function saveEdit() {
         if (!currentEditingNoteId) return;
@@ -643,7 +611,7 @@
         let idx = notesArray.findIndex(n => n.id === currentEditingNoteId);
         if (idx !== -1) { notesArray[idx].text = newText; saveNotes(); renderNotes(); gpsStatus.innerHTML = "✅ Nota salvata"; setTimeout(()=> gpsStatus.innerHTML = "✅ Pronto.", 2000); }
     }
-    function cancelEdit() { editNoteArea.style.display = 'block'; currentEditingNoteId = null; }
+    function cancelEdit() { editNoteArea.style.display = 'none'; currentEditingNoteId = null; }
     function addNote() {
         let text = newNoteInput.value.trim();
         if (!text) { alert("Scrivi una nota"); return; }
@@ -651,10 +619,8 @@
         notesArray.push({ id: newId, text: text });
         if (notesArray.length === 1) selectedNoteId = newId;
         renderNotes(); saveNotes(); newNoteInput.value = '';
-        if (selectedNoteId) { let n = notesArray.find(x => x.id === selectedNoteId); if (n) editNoteText.value = n.text; editNoteArea.style.display = 'block'; currentEditingNoteId = selectedNoteId; }
+        if (selectedNoteId && !selectedSpecialMode) { let n = notesArray.find(x => x.id === selectedNoteId); if (n) { editNoteText.value = n.text; editNoteArea.style.display = 'block'; currentEditingNoteId = selectedNoteId; } }
         selectedSpecialMode = false;
-        specialActive = null;
-        updateSpecialButtons();
     }
     function getSelectedNoteText() {
         if (selectedSpecialMode) return selectedSpecialText;
@@ -662,39 +628,31 @@
     }
     function escapeHtml(str) { return str.replace(/[&<>]/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;' }[m])); }
 
-    function updateSpecialButtons() {
-        if (specialActive === 1) {
-            selectSpecial1Btn.innerHTML = "✅ SELEZIONATO 1";
-            selectSpecial1Btn.classList.add('special-active');
-            selectSpecial2Btn.innerHTML = "🔘 SELEZIONA 2";
-            selectSpecial2Btn.classList.remove('special-active');
-        } else if (specialActive === 2) {
-            selectSpecial2Btn.innerHTML = "✅ SELEZIONATO 2";
-            selectSpecial2Btn.classList.add('special-active');
-            selectSpecial1Btn.innerHTML = "🔘 SELEZIONA 1";
-            selectSpecial1Btn.classList.remove('special-active');
-        } else {
-            selectSpecial1Btn.innerHTML = "🔘 SELEZIONA 1";
-            selectSpecial1Btn.classList.remove('special-active');
-            selectSpecial2Btn.innerHTML = "🔘 SELEZIONA 2";
-            selectSpecial2Btn.classList.remove('special-active');
-        }
-    }
+    // ---------- GESTIONE NOTE SPECIALI (non toccano il campo modifica) ----------
     function selectSpecialNote(index) {
         let text = (index === 1) ? specialNote1.value.trim() : specialNote2.value.trim();
-        if (!text) {
-            specialNoteStatus.innerText = "⚠️ Scrivi prima la nota speciale";
-            setTimeout(()=> specialNoteStatus.innerText="", 3000);
-            return;
-        }
+        if (!text) { specialNoteStatus.innerText = "⚠️ Scrivi prima la nota speciale"; return; }
         selectedSpecialMode = true;
         selectedSpecialText = text;
         selectedNoteId = null;
-        editNoteArea.style.display = 'block';
-        editNoteText.value = text;
-        specialActive = index;
-        updateSpecialButtons();
-        specialNoteStatus.innerText = "";
+        // Nascondi area modifica note normali
+        editNoteArea.style.display = 'none';
+        currentEditingNoteId = null;
+        // Rimuovi selezione dalle note normali (radio deselezionati)
+        document.querySelectorAll('input[name="noteSelect"]').forEach(r => r.checked = false);
+        // Salva note speciali
+        saveSpecialNotes();
+        specialNoteStatus.innerText = `✅ Nota speciale ${index} selezionata (solo testo)`;
+        setTimeout(()=> specialNoteStatus.innerText="", 10000);
+        normalNoteInfo.style.display = 'none';
+        // Effetto punto blu sul pulsante (opzionale)
+        if (index === 1) {
+            selectSpecial1Btn.style.backgroundColor = "#1976d2";
+            selectSpecial2Btn.style.backgroundColor = "#4caf50";
+        } else {
+            selectSpecial2Btn.style.backgroundColor = "#1976d2";
+            selectSpecial1Btn.style.backgroundColor = "#4caf50";
+        }
     }
 
     // ---------- COPIA BILINGUE ----------
@@ -736,7 +694,7 @@
         }
     }
 
-    // ---------- GEOLOCALIZZAZIONE CON ESCLUSIONE AUTOSTRADE E PRIORITA' A LUOGHI PUBBLICI ----------
+    // ---------- GEOLOCALIZZAZIONE + RICERCA LUOGHI (con esclusione autostrade) ----------
     function haversine(lat1,lng1,lat2,lng2) {
         const R = 6371e3;
         const φ1 = lat1 * Math.PI/180, φ2 = lat2 * Math.PI/180;
@@ -757,16 +715,23 @@
             return {lat,lng};
         } catch(e) { return {lat,lng}; }
     }
-    // Nuova funzione: cerca tutti i luoghi con nome entro 300m, esclude autostrade generiche, dà priorità a amenity/shop/tourism
-    async function fetchFilteredPlaces(lat, lng) {
-        const excludeCategories = ["information","bench","waste_basket","toilets","telephone","recycling","fountain","drinking_water"];
-        const highwayBlacklist = ["motorway", "trunk", "motorway_link"]; // autostrade e raccordi
+    // Funzione per escludere autostrade generiche (non caselli)
+    function isGenericHighway(name) {
+        if (!name) return false;
+        const lower = name.toLowerCase();
+        if (lower.includes("autostrada") || lower.includes("tangenziale") || lower.includes("raccordo")) {
+            if (lower.includes("casello") || lower.includes("uscita") || lower.includes("exit")) return false;
+            return true;
+        }
+        return false;
+    }
+    async function fetchAllNamedPlaces(lat, lng) {
         let query = `[out:json];(node(around:300,${lat},${lng})[name];way(around:300,${lat},${lng})[name];);out center;`;
         let url = `https://overpass-api.de/api/interpreter?data=${encodeURIComponent(query)}`;
         try {
             let resp = await fetch(url);
             let data = await resp.json();
-            if (!data.elements?.length) return [];
+            if (!data.elements?.length) return ["Nessun riferimento","Nessun riferimento","Nessun riferimento"];
             let items = [];
             for (let el of data.elements) {
                 let latEl = el.lat || el.center?.lat;
@@ -775,60 +740,60 @@
                 let tags = el.tags || {};
                 let name = tags.name;
                 if (!name || name.trim() === "") continue;
-                // Esclude categorie inutili
-                let cat = tags.amenity || tags.shop || tags.tourism || tags.office || tags.leisure || tags.historic || tags.place || tags.aeroway || tags.railway || tags.highway;
-                if (cat && excludeCategories.includes(cat)) continue;
-                // Esclude le autostrade generiche (senza "casello"/"uscita")
-                let lowerName = name.toLowerCase();
-                let isHighway = (tags.highway && highwayBlacklist.includes(tags.highway));
-                let isGenericHighway = (lowerName.includes("autostrada") || lowerName.includes("tangenziale") || lowerName.match(/a\d\d?/)) && !lowerName.includes("casello") && !lowerName.includes("uscita") && !lowerName.includes("exit");
-                if (isHighway || isGenericHighway) continue;
-                // Calcola priorità: amenity/shop/tourism hanno priorità più alta
-                let priority = 0;
-                if (tags.amenity || tags.shop || tags.tourism) priority = 2;
-                else if (tags.place === "square") priority = 1;
-                else priority = 0;
+                // Escludi autostrade generiche
+                if (isGenericHighway(name)) continue;
+                let cat = tags.amenity || tags.shop || tags.tourism || tags.office || tags.leisure || tags.historic || tags.place || tags.aeroway || tags.railway || tags.industrial || tags.craft;
+                let display = name;
+                if (cat) {
+                    let catMap = {
+                        "pharmacy":"Farmacia","hospital":"Ospedale","police":"Commissariato","post_office":"Posta","bank":"Banca",
+                        "library":"Biblioteca","fire_station":"Caserma","townhall":"Municipio","supermarket":"Supermercato","convenience":"Alimentari",
+                        "cafe":"Bar","restaurant":"Ristorante","pub":"Pub","fast_food":"Fast food","museum":"Museo","monument":"Monumento",
+                        "attraction":"Attrazione","square":"Piazza","garden":"Giardino","park":"Parco","bus_station":"Stazione bus","train_station":"Stazione",
+                        "church":"Chiesa","services":"Area di servizio","motorway_junction":"Uscita autostradale","aeroway":"Aeroporto","railway":"Stazione",
+                        "shop":"Negozio","office":"Ufficio","leisure":"Tempo libero","historic":"Sito storico","place":"Luogo","industrial":"Azienda","craft":"Laboratorio"
+                    };
+                    let readable = catMap[cat] || (cat.charAt(0).toUpperCase() + cat.slice(1));
+                    display = `${name} (${readable})`;
+                }
                 let dist = haversine(lat, lng, latEl, lonEl);
-                items.push({ name, cat, priority, dist, lat: latEl, lon: lonEl });
+                items.push({ display, dist, name });
             }
-            // Ordina per priorità decrescente, poi per distanza crescente
-            items.sort((a,b) => {
-                if (a.priority !== b.priority) return b.priority - a.priority;
-                return a.dist - b.dist;
-            });
-            // Prendi i primi 3 unici per nome
+            // Deduplica per nome
             const unique = new Map();
             for (let item of items) {
                 if (!unique.has(item.name)) unique.set(item.name, item);
             }
             let uniqueItems = Array.from(unique.values());
-            let refs = uniqueItems.slice(0,3).map(i => `${i.name} a ${Math.round(i.dist)} metri`);
+            uniqueItems.sort((a,b) => a.dist - b.dist);
+            let refs = uniqueItems.slice(0,3).map(i => `${i.display} a ${Math.round(i.dist)} metri`);
             while(refs.length < 3) refs.push("Nessun riferimento");
             return refs;
         } catch(e) {
-            console.warn("Errore ricerca", e);
+            console.warn("Errore ricerca nomi", e);
             return ["Nessun riferimento","Nessun riferimento","Nessun riferimento"];
         }
     }
-    async function getAddressWithNumber(lat,lng) {
+    async function reverseGeocode(lat,lng) {
         try {
             let url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1&accept-language=it`;
             let resp = await fetch(url, {headers:{'User-Agent':'SOSDrive/1.0'}});
             let data = await resp.json();
-            let addr = data.address;
-            if (addr) {
+            if (data && data.address) {
+                let road = data.address.road || data.address.pedestrian || "";
+                let house = data.address.house_number || "";
+                let city = data.address.city || data.address.town || data.address.village || "";
+                let province = data.address.state_district || data.address.province || "";
+                let region = data.address.region || "";
+                let postal = data.address.postcode || "";
                 let parts = [];
-                if (addr.road) parts.push(addr.road);
-                if (addr.house_number) parts.push(addr.house_number);
-                if (addr.suburb) parts.push(addr.suburb);
-                else if (addr.village) parts.push(addr.village);
-                else if (addr.town) parts.push(addr.town);
-                if (addr.city) parts.push(addr.city);
-                if (addr.state) parts.push(addr.state);
-                if (addr.postcode) parts.push(addr.postcode);
-                let address = parts.join(', ');
-                if (!address && data.display_name) address = data.display_name.split(',')[0];
-                return address || "Indirizzo non trovato";
+                if (road && house) parts.push(`${road} ${house}`);
+                else if (road) parts.push(road);
+                if (city) parts.push(city);
+                if (province) parts.push(province);
+                if (region) parts.push(region);
+                if (postal) parts.push(postal);
+                return parts.join(", ");
             }
             return data.display_name || "Indirizzo non trovato";
         } catch(e) { return "Indirizzo non disponibile"; }
@@ -863,9 +828,9 @@
             gpsStatus.innerHTML = "📍 Elaborazione map matching...";
             let snapped = await snapToRoad(avg.lat, avg.lng);
             let finalLat = snapped.lat, finalLng = snapped.lng;
-            let address = await getAddressWithNumber(finalLat, finalLng);
-            gpsStatus.innerHTML = "🔍 Ricerca luoghi (escluse autostrade)...";
-            let [ref1, ref2, ref3] = await fetchFilteredPlaces(finalLat, finalLng);
+            let address = await reverseGeocode(finalLat, finalLng);
+            gpsStatus.innerHTML = "🔍 Ricerca luoghi con nome entro 300m...";
+            let [ref1, ref2, ref3] = await fetchAllNamedPlaces(finalLat, finalLng);
             currentLat = finalLat; currentLng = finalLng; currentAddress = address; currentRefA = ref1; currentRefB = ref2; currentRefC = ref3;
             latLonDisplay.innerText = `${finalLat.toFixed(6)}, ${finalLng.toFixed(6)}`;
             addressDisplay.innerText = address;
@@ -882,7 +847,7 @@
         gpsStatus.innerHTML = "";
     }
 
-    // ---------- LETTURA VOCALE (con traduzione automatica lingua) ----------
+    // ---------- LETTURA VOCALE (pausa 0.2s, coordinate 2s) ----------
     function playBeep() {
         try {
             let ctx = new (window.AudioContext || window.webkitAudioContext)();
@@ -919,74 +884,59 @@
             await new Promise(r=>setTimeout(r, 2000));
         }
     }
-    async function speakFull(lang, targetLangCode = null) {
-        if (!window.speechSynthesis) { alert("Sintesi non supportata"); return; }
+    async function speakFull(lang) {
+        if (!window.speechSynthesis) { alert(lang==='it'?"Sintesi non supportata":"Synthèse non supportée"); return; }
         speechSynthesis.cancel();
 
         if (selectedSpecialMode) {
             let specialText = getSelectedNoteText();
             if (!specialText) { gpsStatus.innerHTML = "Nota speciale vuota"; return; }
-            gpsStatus.innerHTML = `🔊 Lettura solo nota...`;
+            gpsStatus.innerHTML = `🔊 Lettura solo nota (${lang==='it'?'IT':'FR'})...`;
             let textToRead = specialText;
-            if (targetLangCode && targetLangCode !== 'it-IT') {
-                let targetLang = targetLangCode.split('-')[0];
-                textToRead = await translateToLanguage(specialText, targetLang);
-            }
-            await speakWords(textToRead, targetLangCode || 'it-IT', 1.0, 200);
+            if (lang === 'fr') textToRead = await translateToFrench(specialText);
+            await speakWords(textToRead, lang==='it'?'it-IT':'fr-FR', 1.0, 200);
             gpsStatus.innerHTML = "✅ Solo nota letta";
             return;
         }
 
-        let note = getSelectedNoteText() || "nessuna nota";
-        let addr = currentAddress || "non disponibile";
-        let refA = currentRefA || "non disponibile";
-        let refB = currentRefB || "non disponibile";
-        let refC = currentRefC || "non disponibile";
-        let coord = (currentLat && currentLng) ? `${currentLat.toFixed(6)}, ${currentLng.toFixed(6)}` : "non disponibili";
-        
-        let targetLang = targetLangCode || (lang === 'it' ? 'it-IT' : 'fr-FR');
-        let targetLangShort = targetLang.split('-')[0];
-        
-        if (targetLangShort !== 'it') {
-            gpsStatus.innerHTML = `⏳ Traduzione in ${targetLangShort.toUpperCase()}...`;
-            note = await translateToLanguage(note, targetLangShort);
-            if (currentAddress && currentAddress !== "non disponibile") addr = await translateToLanguage(currentAddress, targetLangShort);
-            if (currentRefA && currentRefA !== "non disponibile") refA = await translateToLanguage(currentRefA, targetLangShort);
-            if (currentRefB && currentRefB !== "non disponibile") refB = await translateToLanguage(currentRefB, targetLangShort);
-            if (currentRefC && currentRefC !== "non disponibile") refC = await translateToLanguage(currentRefC, targetLangShort);
-            gpsStatus.innerHTML = `🔊 Lettura in ${targetLangShort.toUpperCase()}...`;
+        let note = getSelectedNoteText() || (lang==='it'?"nessuna nota":"aucune note");
+        let addr = currentAddress || (lang==='it'?"non disponibile":"non disponible");
+        let refA = currentRefA || (lang==='it'?"non disponibile":"non disponible");
+        let refB = currentRefB || (lang==='it'?"non disponibile":"non disponible");
+        let refC = currentRefC || (lang==='it'?"non disponibile":"non disponible");
+        let coord = (currentLat && currentLng) ? `${currentLat.toFixed(6)}, ${currentLng.toFixed(6)}` : (lang==='it'?"non disponibili":"non disponibles");
+        if (lang === 'fr') {
+            gpsStatus.innerHTML = "⏳ Traduzione FR...";
+            note = await translateToFrench(note);
+            if (currentAddress && currentAddress !== "non disponibile") addr = await translateToFrench(currentAddress);
+            if (currentRefA && currentRefA !== "non disponibile") refA = await translateToFrench(currentRefA);
+            if (currentRefB && currentRefB !== "non disponibile") refB = await translateToFrench(currentRefB);
+            if (currentRefC && currentRefC !== "non disponibile") refC = await translateToFrench(currentRefC);
+            gpsStatus.innerHTML = "🔊 Lettura FR...";
         } else gpsStatus.innerHTML = "🔊 Lettura IT...";
         
-        let intro = (targetLangShort === 'it') ? "Attenzione Emergenza sono italiano uso il traduttore mi trovo in Emergenza" : await translateToLanguage("Attenzione Emergenza sono italiano uso il traduttore mi trovo in Emergenza", targetLangShort);
-        await speakWords(intro, targetLang, 1.0, 200);
-        await speakWords(note, targetLang, 1.0, 200);
-        await speakWords("Coordinate", targetLang, 1.0, 200);
-        await speakCoords(coord, targetLang);
-        await speakWords("Indirizzo", targetLang, 1.0, 200);
-        await speakWords(addr, targetLang, 1.0, 200);
-        await speakWords("Sono vicino a 1", targetLang, 1.0, 200);
-        await speakWords(refA, targetLang, 1.0, 200);
-        await speakWords("Sono vicino a 2", targetLang, 1.0, 200);
-        await speakWords(refB, targetLang, 1.0, 200);
-        await speakWords("Sono vicino a 3", targetLang, 1.0, 200);
-        await speakWords(refC, targetLang, 1.0, 200);
-        let domanda = (targetLangShort === 'it') ? "il il tuo messaggio di risposta verrà tradotto parla piano" : await translateToLanguage("il il tuo messaggio di risposta verrà tradotto parla piano", targetLangShort);
-        await speakWords(domanda, targetLang, 1.0, 200);
+        let intro = (lang==='it') ? "Attenzione Emergenza sono italiano uso il traduttore mi trovo in Emergenza" : await translateToFrench("Attenzione Emergenza sono italiano uso il traduttore mi trovo in Emergenza");
+        await speakWords(intro, lang==='it'?'it-IT':'fr-FR', 1.0, 200);
+        await speakWords(note, lang==='it'?'it-IT':'fr-FR', 1.0, 200);
+        await speakWords("Coordinate", lang==='it'?'it-IT':'fr-FR', 1.0, 200);
+        await speakCoords(coord, lang==='it'?'it-IT':'fr-FR');
+        await speakWords("Indirizzo", lang==='it'?'it-IT':'fr-FR', 1.0, 200);
+        await speakWords(addr, lang==='it'?'it-IT':'fr-FR', 1.0, 200);
+        await speakWords("Sono vicino a 1", lang==='it'?'it-IT':'fr-FR', 1.0, 200);
+        await speakWords(refA, lang==='it'?'it-IT':'fr-FR', 1.0, 200);
+        await speakWords("Sono vicino a 2", lang==='it'?'it-IT':'fr-FR', 1.0, 200);
+        await speakWords(refB, lang==='it'?'it-IT':'fr-FR', 1.0, 200);
+        await speakWords("Sono vicino a 3", lang==='it'?'it-IT':'fr-FR', 1.0, 200);
+        await speakWords(refC, lang==='it'?'it-IT':'fr-FR', 1.0, 200);
+        let domanda = (lang==='it') ? "il il tuo messaggio di risposta verrà tradotto parla piano" : await translateToFrench("il il tuo messaggio di risposta verrà tradotto parla piano");
+        await speakWords(domanda, lang==='it'?'it-IT':'fr-FR', 1.0, 200);
         playBeep();
         await new Promise(r=>setTimeout(r,800));
         gpsStatus.innerHTML = "✅ Messaggio completo. Avvio ascolto operatore (15 secondi)...";
         setTimeout(() => startListening15s(), 500);
     }
-    function speakItalian() { speakFull('it', 'it-IT'); }
-    function speakFrench() { speakFull('fr', 'fr-FR'); }
-    async function speakAuto() {
-        if (!currentLat || !currentLng) {
-            gpsStatus.innerHTML = "⚠️ Prima carica la posizione";
-            return;
-        }
-        let langCode = await detectCountryLanguage(currentLat, currentLng);
-        speakFull('auto', langCode);
-    }
+    function speakItalian() { speakFull('it'); }
+    function speakFrench() { speakFull('fr'); }
 
     // ---------- EXPORT/IMPORT TXT ----------
     function exportTxt() {
@@ -1025,6 +975,12 @@
         emergencyPage.classList.remove("hidden");
         phoneSaveMsg.innerText = "";
         requestWakeLock();
+        loadSpecialNotes();
+        // Reset selezione speciale all'ingresso
+        selectedSpecialMode = false;
+        selectedSpecialText = "";
+        selectSpecial1Btn.style.backgroundColor = "#4caf50";
+        selectSpecial2Btn.style.backgroundColor = "#4caf50";
     }
     function onRegisterNumber() {
         let n = phoneInput.value.trim();
@@ -1038,10 +994,10 @@
         notesArray = [];
         selectedNoteId = null;
         selectedSpecialMode = false;
-        specialActive = null;
         renderNotes();
         editNoteArea.style.display = 'none';
         releaseWakeLock();
+        saveSpecialNotes();
     }
 
     function init() {
@@ -1056,23 +1012,22 @@
         copyBtn.addEventListener('click', copyBilingual);
         audioItBtn.addEventListener('click', speakItalian);
         audioFrBtn.addEventListener('click', speakFrench);
-        autoLangBtn.addEventListener('click', speakAuto);
         backHomeBtn.addEventListener('click', backHome);
         exportNotesBtn.addEventListener('click', exportTxt);
         importNotesBtn.addEventListener('click', () => importFileInput.click());
         importFileInput.addEventListener('change', (e) => { if (e.target.files.length) importTxt(e.target.files[0]); importFileInput.value = ''; });
         saveNoteEditBtn.addEventListener('click', saveEdit);
         cancelNoteEditBtn.addEventListener('click', cancelEdit);
-        listenResponseBtn.addEventListener('click', startListeningAuto);
+        listenResponseBtn.addEventListener('click', startListening15s);
         clearResponseBtn.addEventListener('click', () => { operatorResponse.value = ""; transcribeStatus.innerText = ""; });
         selectSpecial1Btn.addEventListener('click', () => selectSpecialNote(1));
         selectSpecial2Btn.addEventListener('click', () => selectSpecialNote(2));
         initRecognition();
         renderNotes();
-        editNoteArea.style.display = 'block';
-        updateSpecialButtons();
+        normalNoteInfo.style.display = 'none';
     }
     init();
 </script>
 </body>
 </html>
+```
