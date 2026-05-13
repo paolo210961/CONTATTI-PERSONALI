@@ -3,7 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
-    <title>SOS Drive - Emergenza v0159</title>
+    <!-- Meta tag per Web App (icona schermata home Android/iOS) -->
+    <meta name="theme-color" content="#d32f2f">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="SOS Drive">
+    <link rel="apple-touch-icon" href="icon-sos.png">
+    <link rel="icon" type="image/png" href="icon-sos.png">
+    <title>SOS Drive - Emergenza v0160</title>
     <style>
         * {
             margin: 0;
@@ -171,6 +178,7 @@
             border-radius: 24px;
             padding: 14px;
             margin: 12px 0;
+            display: block; /* sempre visibile */
         }
         .special-note-area {
             background: #e8f5e9;
@@ -227,7 +235,7 @@
 <div class="container">
     <!-- HOME PAGE -->
     <div id="homePage" class="page">
-        <div class="version-header">📟 SOS Drive v0159 - Persistenza note speciali e modifica note normale</div>
+        <div class="version-header">📟 SOS Drive v0160 - Indirizzo pulito, modifica nota sempre visibile, icona</div>
         <h1>🆘 SOS EMERGENZA</h1>
         <div class="grid-2">
             <button class="big-btn" data-service="ambulanza">🚑 AMBULANZA</button>
@@ -236,12 +244,12 @@
             <button class="big-btn" data-service="clinica">🏥 CLINICA</button>
         </div>
         <p style="text-align:center; font-size:0.75rem; color:#555;">Ogni servizio ha il proprio archivio note.<br>📍 Ricerca luoghi con nome (esclude autostrade generiche)<br>🔊 Ascolto automatico 15 secondi</p>
-        <div class="version-footer">versione 0159 – note speciali salvate con chiave fissa, modifica note normale sempre funzionante</div>
+        <div class="version-footer">versione 0160 – indirizzo senza autostrade, campo modifica note sempre visibile, icona personalizzata</div>
     </div>
 
     <!-- EMERGENCY PAGE -->
     <div id="emergencyPage" class="page hidden">
-        <div class="version-header">📟 SOS Drive v0159 – Modifica note ottimizzata</div>
+        <div class="version-header">📟 SOS Drive v0160 – Indirizzo pulito e modifica note fissa</div>
         <h2 id="serviceTitle">AMBULANZA</h2>
 
         <label>📞 Numero servizio</label>
@@ -275,8 +283,8 @@
             <div style="font-size:0.7rem; color:#777;">Nessuna nota. Aggiungine una.</div>
         </div>
 
-        <!-- Area modifica nota normale -->
-        <div id="editNoteArea" class="edit-note-area" style="display:none;">
+        <!-- Area modifica nota normale - SEMPRE VISIBILE -->
+        <div id="editNoteArea" class="edit-note-area">
             <label>✏️ Modifica nota (normale):</label>
             <textarea id="editNoteText" rows="2"></textarea>
             <div class="flex-row">
@@ -322,17 +330,19 @@
         </div>
 
         <button id="backHomeBtn" class="small-btn back-home" style="width:100%;">◀ TORNA INDIETRO</button>
-        <div class="version-footer">versione 0159 – note speciali persistenti (chiavi fisse), modifica nota normale funzionante</div>
+        <div class="version-footer">versione 0160 – indirizzo pulito da autostrade, campo modifica sempre visibile, icona 'icon-sos.png'</div>
     </div>
 </div>
 
 <script>
-    // ==================== VERSIONE 0159 ====================
-    // 1) Selezione nota normale: il campo "Modifica nota" si apre e mostra il contenuto
-    // 2) Note speciali persistono con chiavi fisse (sos_special_note1, sos_special_note2) – indipendenti dalla versione
+    // ==================== VERSIONE 0160 ====================
+    // 1) Indirizzo: rimozione di "Autostrada", "Tangenziale", "Raccordo" (a meno che non contengano "casello")
+    //    Mostra solo via + civico + città + provincia + CAP
+    // 2) Campo "Modifica nota" sempre visibile; quando si seleziona una nota normale, il testo viene caricato nell'area modifica.
+    // 3) Supporto icona personalizzata per schermata home: meta tag e link a icon-sos.png (utente deve caricare il file)
     // =================================================================
 
-    const CURRENT_VERSION = "0159";
+    const CURRENT_VERSION = "0160";
     let currentService = "ambulanza";
     let currentLat = null, currentLng = null;
     let currentAddress = "";
@@ -402,7 +412,7 @@
     // ---------- ARCHIVIO NUMERI ----------
     function migratePhoneNumbers() {
         const services = ["ambulanza", "polizia", "veterinario", "clinica"];
-        const oldVersions = ["0158", "0157", "0156", "0155"];
+        const oldVersions = ["0159", "0158", "0157"];
         for (let s of services) {
             if (localStorage.getItem(`phone_${s}_${CURRENT_VERSION}`)) continue;
             for (let ver of oldVersions) {
@@ -415,7 +425,7 @@
     function getPhone(s) { return localStorage.getItem(`phone_${s}_${CURRENT_VERSION}`); }
     const defaultPhone = { ambulanza:"118", polizia:"113", veterinario:"800123456", clinica:"800987654" };
 
-    // ---------- PERSISTENZA NOTE SPECIALI (CHIAVI FISSE) ----------
+    // ---------- PERSISTENZA NOTE SPECIALI ----------
     function saveSpecialNotes() {
         localStorage.setItem('sos_special_note1', specialNote1.value);
         localStorage.setItem('sos_special_note2', specialNote2.value);
@@ -426,7 +436,6 @@
         if (s1 !== null) specialNote1.value = s1;
         if (s2 !== null) specialNote2.value = s2;
     }
-    // Salvataggio automatico quando l'utente modifica i campi delle note speciali
     function attachSpecialNotesAutoSave() {
         specialNote1.addEventListener('input', () => saveSpecialNotes());
         specialNote2.addEventListener('input', () => saveSpecialNotes());
@@ -492,12 +501,12 @@
         recognitionTimeout = setTimeout(() => { if (recognition && recognition.stop) recognition.stop(); }, 15000);
     }
 
-    // ---------- GESTIONE NOTE NORMALI ----------
+    // ---------- GESTIONE NOTE NORMALI (campo modifica sempre visibile) ----------
     function migrateOldNotes() {
         const services = ["ambulanza", "polizia", "veterinario", "clinica"];
         for (let s of services) {
             if (localStorage.getItem(`sos_notes_${s}_${CURRENT_VERSION}`)) continue;
-            for (let ver of ["0158","0157","0156"]) {
+            for (let ver of ["0159","0158","0157"]) {
                 let old = localStorage.getItem(`sos_notes_${s}_${ver}`);
                 if (old) {
                     try {
@@ -530,12 +539,19 @@
             } catch(e) { notesArray = []; selectedNoteId = null; }
         } else { notesArray = []; selectedNoteId = null; }
         renderNotes();
-        // Aggiorna campo modifica se c'è una nota normale selezionata
+        // Se c'è una nota normale selezionata, mostrane il testo nel campo modifica
         if (selectedNoteId && !selectedSpecialMode) {
             let n = notesArray.find(x => x.id === selectedNoteId);
-            if (n) { editNoteText.value = n.text; editNoteArea.style.display = 'block'; currentEditingNoteId = selectedNoteId; }
+            if (n) {
+                editNoteText.value = n.text;
+                currentEditingNoteId = selectedNoteId;
+            } else {
+                editNoteText.value = "";
+                currentEditingNoteId = null;
+            }
         } else {
-            editNoteArea.style.display = 'none';
+            // Se nessuna nota normale selezionata, il campo modifica rimane vuoto ma visibile
+            editNoteText.value = "";
             currentEditingNoteId = null;
         }
     }
@@ -543,7 +559,6 @@
         if (!notesArray.length) {
             notesListArea.innerHTML = `<div style="font-size:0.7rem;">Nessuna nota. Aggiungine una.</div>`;
             selectedNoteId = null;
-            editNoteArea.style.display = 'none';
             return;
         }
         let html = '<div><strong>📋 Seleziona nota normale:</strong></div>';
@@ -567,13 +582,13 @@
                 let n = notesArray.find(x => x.id === selectedNoteId);
                 if (n) {
                     editNoteText.value = n.text;
-                    editNoteArea.style.display = 'block';
+                    editNoteArea.style.display = 'block'; // assicura visibile (già lo è)
                     currentEditingNoteId = selectedNoteId;
                 }
                 normalNoteInfo.style.display = 'block';
                 setTimeout(() => { normalNoteInfo.style.display = 'none'; }, 10000);
                 specialNoteStatus.innerText = "";
-                // Deseleziona eventuali pulsanti speciali (reset colore)
+                // Deseleziona eventuali pulsanti speciali
                 selectSpecial1Btn.style.backgroundColor = "#4caf50";
                 selectSpecial2Btn.style.backgroundColor = "#4caf50";
             });
@@ -584,13 +599,19 @@
                 notesArray = notesArray.filter(n => n.id !== id);
                 if (selectedNoteId === id) selectedNoteId = notesArray.length ? notesArray[0].id : null;
                 renderNotes(); saveNotes();
-                if (!selectedNoteId || selectedSpecialMode) { editNoteArea.style.display = 'none'; currentEditingNoteId = null; }
-                else { let n = notesArray.find(x => x.id === selectedNoteId); if (n) { editNoteText.value = n.text; editNoteArea.style.display = 'block'; currentEditingNoteId = selectedNoteId; } }
+                if (selectedNoteId && !selectedSpecialMode) {
+                    let n = notesArray.find(x => x.id === selectedNoteId);
+                    if (n) { editNoteText.value = n.text; currentEditingNoteId = selectedNoteId; }
+                    else { editNoteText.value = ""; currentEditingNoteId = null; }
+                } else {
+                    editNoteText.value = "";
+                    currentEditingNoteId = null;
+                }
             });
         });
-        // Se nessuna nota normale selezionata, nascondi area modifica
+        // Se nessuna nota normale selezionata, campo modifica vuoto (ma visibile)
         if (!selectedNoteId || selectedSpecialMode) {
-            editNoteArea.style.display = 'none';
+            editNoteText.value = "";
             currentEditingNoteId = null;
         }
     }
@@ -601,7 +622,16 @@
         let idx = notesArray.findIndex(n => n.id === currentEditingNoteId);
         if (idx !== -1) { notesArray[idx].text = newText; saveNotes(); renderNotes(); gpsStatus.innerHTML = "✅ Nota salvata"; setTimeout(()=> gpsStatus.innerHTML = "✅ Pronto.", 2000); }
     }
-    function cancelEdit() { editNoteArea.style.display = 'none'; currentEditingNoteId = null; }
+    function cancelEdit() {
+        // Resetta il campo modifica al testo della nota selezionata (se presente)
+        if (selectedNoteId && !selectedSpecialMode) {
+            let n = notesArray.find(x => x.id === selectedNoteId);
+            if (n) editNoteText.value = n.text;
+        } else {
+            editNoteText.value = "";
+        }
+        currentEditingNoteId = selectedNoteId || null;
+    }
     function addNote() {
         let text = newNoteInput.value.trim();
         if (!text) { alert("Scrivi una nota"); return; }
@@ -609,7 +639,7 @@
         notesArray.push({ id: newId, text: text });
         if (notesArray.length === 1) selectedNoteId = newId;
         renderNotes(); saveNotes(); newNoteInput.value = '';
-        if (selectedNoteId && !selectedSpecialMode) { let n = notesArray.find(x => x.id === selectedNoteId); if (n) { editNoteText.value = n.text; editNoteArea.style.display = 'block'; currentEditingNoteId = selectedNoteId; } }
+        if (selectedNoteId && !selectedSpecialMode) { let n = notesArray.find(x => x.id === selectedNoteId); if (n) { editNoteText.value = n.text; currentEditingNoteId = selectedNoteId; } }
         selectedSpecialMode = false;
     }
     function getSelectedNoteText() {
@@ -625,17 +655,15 @@
         selectedSpecialMode = true;
         selectedSpecialText = text;
         selectedNoteId = null;
-        // Nascondi area modifica note normali
-        editNoteArea.style.display = 'none';
+        // Il campo modifica rimane visibile ma viene svuotato
+        editNoteText.value = "";
         currentEditingNoteId = null;
-        // Rimuovi selezione dalle note normali (radio deselezionati)
+        // Rimuovi selezione dalle note normali
         document.querySelectorAll('input[name="noteSelect"]').forEach(r => r.checked = false);
-        // Salva note speciali
         saveSpecialNotes();
         specialNoteStatus.innerText = `✅ Nota speciale ${index} selezionata (solo testo)`;
         setTimeout(()=> specialNoteStatus.innerText="", 10000);
         normalNoteInfo.style.display = 'none';
-        // Effetto punto blu sul pulsante
         if (index === 1) {
             selectSpecial1Btn.style.backgroundColor = "#1976d2";
             selectSpecial2Btn.style.backgroundColor = "#4caf50";
@@ -684,7 +712,7 @@
         }
     }
 
-    // ---------- GEOLOCALIZZAZIONE + RICERCA LUOGHI ----------
+    // ---------- GEOLOCALIZZAZIONE + RICERCA LUOGHI + INDIRIZZO PULITO ----------
     function haversine(lat1,lng1,lat2,lng2) {
         const R = 6371e3;
         const φ1 = lat1 * Math.PI/180, φ2 = lat2 * Math.PI/180;
@@ -713,6 +741,42 @@
             return true;
         }
         return false;
+    }
+    // Funzione per pulire l'indirizzo da parole autostradali generiche
+    function cleanAddress(address) {
+        if (!address) return address;
+        // Rimuove le parole "Autostrada del Sole" e simili (quelle che iniziano con autostrada o tangenziale)
+        const blacklist = /\b(Autostrada del Sole|Autostrada A1|Tangenziale|Raccordo)\b/gi;
+        let cleaned = address.replace(blacklist, '').replace(/, ,/g, ',').replace(/,,/g, ',').replace(/^\s*,\s*/, '').replace(/,\s*$/, '');
+        // Se dopo la pulizia rimane solo virgole, restituisci originale con un avviso? Meglio restituire comunque qualcosa
+        if (cleaned.trim() === "") return address;
+        return cleaned;
+    }
+    async function reverseGeocode(lat,lng) {
+        try {
+            let url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1&accept-language=it`;
+            let resp = await fetch(url, {headers:{'User-Agent':'SOSDrive/1.0'}});
+            let data = await resp.json();
+            if (data && data.address) {
+                let road = data.address.road || data.address.pedestrian || "";
+                let house = data.address.house_number || "";
+                let city = data.address.city || data.address.town || data.address.village || "";
+                let province = data.address.state_district || data.address.province || "";
+                let postal = data.address.postcode || "";
+                let parts = [];
+                if (road && house) parts.push(`${road} ${house}`);
+                else if (road) parts.push(road);
+                if (city) parts.push(city);
+                if (province) parts.push(province);
+                if (postal) parts.push(postal);
+                let addr = parts.join(", ");
+                // Pulisci dalle parole autostradali
+                addr = cleanAddress(addr);
+                return addr || "Indirizzo non trovato";
+            }
+            let full = data.display_name || "Indirizzo non trovato";
+            return cleanAddress(full);
+        } catch(e) { return "Indirizzo non disponibile"; }
     }
     async function fetchAllNamedPlaces(lat, lng) {
         let query = `[out:json];(node(around:300,${lat},${lng})[name];way(around:300,${lat},${lng})[name];);out center;`;
@@ -760,30 +824,6 @@
             console.warn("Errore ricerca nomi", e);
             return ["Nessun riferimento","Nessun riferimento","Nessun riferimento"];
         }
-    }
-    async function reverseGeocode(lat,lng) {
-        try {
-            let url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1&accept-language=it`;
-            let resp = await fetch(url, {headers:{'User-Agent':'SOSDrive/1.0'}});
-            let data = await resp.json();
-            if (data && data.address) {
-                let road = data.address.road || data.address.pedestrian || "";
-                let house = data.address.house_number || "";
-                let city = data.address.city || data.address.town || data.address.village || "";
-                let province = data.address.state_district || data.address.province || "";
-                let region = data.address.region || "";
-                let postal = data.address.postcode || "";
-                let parts = [];
-                if (road && house) parts.push(`${road} ${house}`);
-                else if (road) parts.push(road);
-                if (city) parts.push(city);
-                if (province) parts.push(province);
-                if (region) parts.push(region);
-                if (postal) parts.push(postal);
-                return parts.join(", ");
-            }
-            return data.display_name || "Indirizzo non trovato";
-        } catch(e) { return "Indirizzo non disponibile"; }
     }
     async function getAveragePosition() {
         return new Promise((resolve,reject) => {
@@ -963,7 +1003,6 @@
         phoneSaveMsg.innerText = "";
         requestWakeLock();
         loadSpecialNotes();
-        // Reset selezione speciale all'ingresso
         selectedSpecialMode = false;
         selectedSpecialText = "";
         selectSpecial1Btn.style.backgroundColor = "#4caf50";
@@ -982,7 +1021,8 @@
         selectedNoteId = null;
         selectedSpecialMode = false;
         renderNotes();
-        editNoteArea.style.display = 'none';
+        editNoteText.value = "";
+        currentEditingNoteId = null;
         releaseWakeLock();
         saveSpecialNotes();
     }
@@ -991,7 +1031,7 @@
         migrateOldNotes();
         migratePhoneNumbers();
         loadSpecialNotes();
-        attachSpecialNotesAutoSave();  // salva automaticamente quando l'utente modifica i campi speciali
+        attachSpecialNotesAutoSave();
         document.querySelectorAll('.big-btn').forEach(btn => btn.addEventListener('click', () => showEmergency(btn.getAttribute('data-service'))));
         registerNumberBtn.addEventListener('click', onRegisterNumber);
         googleMapsBtn.addEventListener('click', () => window.open("https://maps.google.com", "_blank"));
@@ -1013,6 +1053,7 @@
         initRecognition();
         renderNotes();
         normalNoteInfo.style.display = 'none';
+        // Il campo modifica è già visibile (style non hidden)
     }
     init();
 </script>
