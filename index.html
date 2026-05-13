@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
-    <title>SOS Drive - Emergenza v0157</title>
+    <title>SOS Drive - Emergenza v0158</title>
     <style>
         * {
             margin: 0;
@@ -239,7 +239,7 @@
 <div class="container">
     <!-- HOME PAGE -->
     <div id="homePage" class="page">
-        <div class="version-header">📟 SOS Drive v0157 - Modifica note solo per note normali</div>
+        <div class="version-header">📟 SOS Drive v0158 - Persistenza note speciali e fix modifica nota</div>
         <h1>🆘 SOS EMERGENZA</h1>
         <div class="grid-2">
             <button class="big-btn" data-service="ambulanza">🚑 AMBULANZA</button>
@@ -248,12 +248,12 @@
             <button class="big-btn" data-service="clinica">🏥 CLINICA</button>
         </div>
         <p style="text-align:center; font-size:0.75rem; color:#555;">Ogni servizio ha il proprio archivio note.<br>📍 Ricerca luoghi con nome (esclude autostrade generiche)<br>🔊 Ascolto automatico 15 secondi</p>
-        <div class="version-footer">versione 0157 – campo modifica solo per note normali, note speciali indipendenti</div>
+        <div class="version-footer">versione 0158 – modifica nota normale funzionante, note speciali persistenti tra versioni</div>
     </div>
 
     <!-- EMERGENCY PAGE -->
     <div id="emergencyPage" class="page hidden">
-        <div class="version-header">📟 SOS Drive v0157 – Modifica note ottimizzata</div>
+        <div class="version-header">📟 SOS Drive v0158 – Modifica note ottimizzata</div>
         <h2 id="serviceTitle">AMBULANZA</h2>
 
         <label>📞 Numero servizio</label>
@@ -334,20 +334,17 @@
         </div>
 
         <button id="backHomeBtn" class="small-btn back-home" style="width:100%;">◀ TORNA INDIETRO</button>
-        <div class="version-footer">versione 0157 – solo le note normali appaiono nel campo modifica</div>
+        <div class="version-footer">versione 0158 – note speciali persistenti (chiave fissa), modifica nota normale funzionante</div>
     </div>
 </div>
 
 <script>
-    // ==================== VERSIONE 0157 ====================
-    // Modifiche:
-    // - Il testo delle note speciali NON viene copiato nel campo "Modifica nota"
-    // - Il campo "Modifica nota" visualizza solo il contenuto della nota normale selezionata
-    // - Le note speciali sono indipendenti e persistono su localStorage
-    // - Tutte le altre funzioni invariate (geolocalizzazione, ricerca POI, WakeLock, traduzioni, copia, lettura, ascolto 15s)
+    // ==================== VERSIONE 0158 ====================
+    // 1) Fix: selezionando una nota normale, il campo "Modifica nota" si apre e mostra il contenuto
+    // 2) Persistenza note speciali con chiavi fisse (indipendenti dalla versione)
     // =================================================================
 
-    const CURRENT_VERSION = "0157";
+    const CURRENT_VERSION = "0158";
     let currentService = "ambulanza";
     let currentLat = null, currentLng = null;
     let currentAddress = "";
@@ -414,10 +411,10 @@
     }
     function releaseWakeLock() { if (wakeLock) { wakeLock.release(); wakeLock = null; } }
 
-    // ---------- ARCHIVIO NUMERI ----------
+    // ---------- ARCHIVIO NUMERI (persistente tra versioni) ----------
     function migratePhoneNumbers() {
         const services = ["ambulanza", "polizia", "veterinario", "clinica"];
-        const oldVersions = ["0156", "0155", "0154", "0153"];
+        const oldVersions = ["0157", "0156", "0155", "0154"];
         for (let s of services) {
             if (localStorage.getItem(`phone_${s}_${CURRENT_VERSION}`)) continue;
             for (let ver of oldVersions) {
@@ -430,14 +427,14 @@
     function getPhone(s) { return localStorage.getItem(`phone_${s}_${CURRENT_VERSION}`); }
     const defaultPhone = { ambulanza:"118", polizia:"113", veterinario:"800123456", clinica:"800987654" };
 
-    // ---------- PERSISTENZA NOTE SPECIALI ----------
+    // ---------- PERSISTENZA NOTE SPECIALI (CHIAVI FISSE, INDIPENDENTI DALLA VERSIONE) ----------
     function saveSpecialNotes() {
-        localStorage.setItem(`specialNote1_${CURRENT_VERSION}`, specialNote1.value);
-        localStorage.setItem(`specialNote2_${CURRENT_VERSION}`, specialNote2.value);
+        localStorage.setItem('sos_special_note1', specialNote1.value);
+        localStorage.setItem('sos_special_note2', specialNote2.value);
     }
     function loadSpecialNotes() {
-        let s1 = localStorage.getItem(`specialNote1_${CURRENT_VERSION}`);
-        let s2 = localStorage.getItem(`specialNote2_${CURRENT_VERSION}`);
+        let s1 = localStorage.getItem('sos_special_note1');
+        let s2 = localStorage.getItem('sos_special_note2');
         if (s1 !== null) specialNote1.value = s1;
         if (s2 !== null) specialNote2.value = s2;
     }
@@ -507,7 +504,7 @@
         const services = ["ambulanza", "polizia", "veterinario", "clinica"];
         for (let s of services) {
             if (localStorage.getItem(`sos_notes_${s}_${CURRENT_VERSION}`)) continue;
-            for (let ver of ["0156","0155","0154"]) {
+            for (let ver of ["0157","0156","0155"]) {
                 let old = localStorage.getItem(`sos_notes_${s}_${ver}`);
                 if (old) {
                     try {
@@ -583,7 +580,7 @@
                 normalNoteInfo.style.display = 'block';
                 setTimeout(() => { normalNoteInfo.style.display = 'none'; }, 10000);
                 specialNoteStatus.innerText = "";
-                // Deseleziona eventuali pulsanti speciali (non c'è punto blu, ma resetta visivamente)
+                // Deseleziona eventuali pulsanti speciali (reset colore)
                 selectSpecial1Btn.style.backgroundColor = "#4caf50";
                 selectSpecial2Btn.style.backgroundColor = "#4caf50";
             });
@@ -715,7 +712,6 @@
             return {lat,lng};
         } catch(e) { return {lat,lng}; }
     }
-    // Funzione per escludere autostrade generiche (non caselli)
     function isGenericHighway(name) {
         if (!name) return false;
         const lower = name.toLowerCase();
@@ -740,7 +736,6 @@
                 let tags = el.tags || {};
                 let name = tags.name;
                 if (!name || name.trim() === "") continue;
-                // Escludi autostrade generiche
                 if (isGenericHighway(name)) continue;
                 let cat = tags.amenity || tags.shop || tags.tourism || tags.office || tags.leisure || tags.historic || tags.place || tags.aeroway || tags.railway || tags.industrial || tags.craft;
                 let display = name;
@@ -759,7 +754,6 @@
                 let dist = haversine(lat, lng, latEl, lonEl);
                 items.push({ display, dist, name });
             }
-            // Deduplica per nome
             const unique = new Map();
             for (let item of items) {
                 if (!unique.has(item.name)) unique.set(item.name, item);
