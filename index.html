@@ -8,7 +8,7 @@
     <link rel="apple-touch-icon" href="icon-sos-192.png">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
-    <title>SOS Drive - Emergenza v0162</title>
+    <title>SOS Drive - Emergenza v0163</title>
     <style>
         * {
             margin: 0;
@@ -233,7 +233,7 @@
 <div class="container">
     <!-- HOME PAGE -->
     <div id="homePage" class="page">
-        <div class="version-header">📟 SOS Drive v0162 - Aggiunte meta tag per PWA</div>
+        <div class="version-header">📟 SOS Drive v0163 - Fix definitivo note normali</div>
         <h1>🆘 SOS EMERGENZA</h1>
         <div class="grid-2">
             <button class="big-btn" data-service="ambulanza">🚑 AMBULANZA</button>
@@ -242,12 +242,12 @@
             <button class="big-btn" data-service="clinica">🏥 CLINICA</button>
         </div>
         <p style="text-align:center; font-size:0.75rem; color:#555;">Ogni servizio ha il proprio archivio note.<br>📍 Ricerca luoghi con nome (esclude autostrade generiche)<br>🔊 Ascolto automatico 15 secondi</p>
-        <div class="version-footer">versione 0162 – meta tag per app (manifest, theme-color, apple-touch-icon)</div>
+        <div class="version-footer">versione 0163 – selezione nota normale: riempie campo modifica, salva e annulla funzionanti</div>
     </div>
 
     <!-- EMERGENCY PAGE -->
     <div id="emergencyPage" class="page hidden">
-        <div class="version-header">📟 SOS Drive v0162 – Aggiunte meta tag</div>
+        <div class="version-header">📟 SOS Drive v0163 – Note normali corrette</div>
         <h2 id="serviceTitle">AMBULANZA</h2>
 
         <label>📞 Numero servizio</label>
@@ -328,16 +328,20 @@
         </div>
 
         <button id="backHomeBtn" class="small-btn back-home" style="width:100%;">◀ TORNA INDIETRO</button>
-        <div class="version-footer">versione 0162 – fix modifica nota normale e aggiunti meta tag per PWA</div>
+        <div class="version-footer">versione 0163 – note normali: selezione riempie campo, salvataggio persistente, annulla ripristina</div>
     </div>
 </div>
 
 <script>
-    // ==================== VERSIONE 0162 ====================
-    // Basata sulla 0161, aggiunte le 5 righe di meta tag e link per PWA.
+    // ==================== VERSIONE 0163 ====================
+    // Correzione completa della gestione note normali:
+    // - Alla selezione di una nota normale, il campo "Modifica nota" viene riempito con il testo della nota.
+    // - Il pulsante "SALVA" aggiorna la nota nell'array e in localStorage.
+    // - Il pulsante "ANNULLA" ripristina il testo originale della nota selezionata (senza cancellare).
+    // - Le note speciali non interferiscono con il campo modifica normale.
     // =================================================================
 
-    const CURRENT_VERSION = "0162";
+    const CURRENT_VERSION = "0163";
     let currentService = "ambulanza";
     let currentLat = null, currentLng = null;
     let currentAddress = "";
@@ -407,7 +411,7 @@
     // ---------- ARCHIVIO NUMERI ----------
     function migratePhoneNumbers() {
         const services = ["ambulanza", "polizia", "veterinario", "clinica"];
-        const oldVersions = ["0161", "0160", "0159"];
+        const oldVersions = ["0162", "0161", "0160"];
         for (let s of services) {
             if (localStorage.getItem(`phone_${s}_${CURRENT_VERSION}`)) continue;
             for (let ver of oldVersions) {
@@ -496,12 +500,12 @@
         recognitionTimeout = setTimeout(() => { if (recognition && recognition.stop) recognition.stop(); }, 15000);
     }
 
-    // ---------- GESTIONE NOTE NORMALI ----------
+    // ---------- GESTIONE NOTE NORMALI (CORRETTA) ----------
     function migrateOldNotes() {
         const services = ["ambulanza", "polizia", "veterinario", "clinica"];
         for (let s of services) {
             if (localStorage.getItem(`sos_notes_${s}_${CURRENT_VERSION}`)) continue;
-            for (let ver of ["0161","0160","0159"]) {
+            for (let ver of ["0162","0161","0160"]) {
                 let old = localStorage.getItem(`sos_notes_${s}_${ver}`);
                 if (old) {
                     try {
@@ -534,13 +538,14 @@
             } catch(e) { notesArray = []; selectedNoteId = null; }
         } else { notesArray = []; selectedNoteId = null; }
         renderNotes();
-        updateEditNoteFromSelection();
+        // Dopo aver caricato le note, aggiorna il campo modifica se c'è una nota selezionata
+        updateEditField();
     }
-    function updateEditNoteFromSelection() {
+    function updateEditField() {
         if (selectedNoteId && !selectedSpecialMode) {
-            let n = notesArray.find(x => x.id === selectedNoteId);
-            if (n) {
-                editNoteText.value = n.text;
+            let note = notesArray.find(n => n.id === selectedNoteId);
+            if (note) {
+                editNoteText.value = note.text;
                 currentEditingNoteId = selectedNoteId;
             } else {
                 editNoteText.value = "";
@@ -554,8 +559,6 @@
     function renderNotes() {
         if (!notesArray.length) {
             notesListArea.innerHTML = `<div style="font-size:0.7rem;">Nessuna nota. Aggiungine una.</div>`;
-            selectedNoteId = null;
-            updateEditNoteFromSelection();
             return;
         }
         let html = '<div><strong>📋 Seleziona nota normale:</strong></div>';
@@ -570,40 +573,55 @@
         });
         notesListArea.innerHTML = html;
         // Evento selezione nota normale
-        document.querySelectorAll('input[name="noteSelect"]').forEach(r => {
-            r.addEventListener('change', (e) => {
+        document.querySelectorAll('input[name="noteSelect"]').forEach(radio => {
+            radio.addEventListener('change', (e) => {
                 selectedNoteId = parseInt(e.target.value);
                 selectedSpecialMode = false;
                 selectedSpecialText = "";
                 saveNotes();
-                updateEditNoteFromSelection();
+                updateEditField();   // riempie il campo modifica con la nota selezionata
                 normalNoteInfo.style.display = 'block';
                 setTimeout(() => { normalNoteInfo.style.display = 'none'; }, 10000);
                 specialNoteStatus.innerText = "";
+                // Resetta colori pulsanti speciali
                 selectSpecial1Btn.style.backgroundColor = "#4caf50";
                 selectSpecial2Btn.style.backgroundColor = "#4caf50";
             });
         });
+        // Evento eliminazione nota
         document.querySelectorAll('.delete-note').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 let id = parseInt(btn.getAttribute('data-id'));
                 notesArray = notesArray.filter(n => n.id !== id);
                 if (selectedNoteId === id) selectedNoteId = notesArray.length ? notesArray[0].id : null;
-                renderNotes(); saveNotes();
-                updateEditNoteFromSelection();
+                renderNotes();
+                saveNotes();
+                updateEditField();
             });
         });
-        updateEditNoteFromSelection();
     }
     function saveEdit() {
-        if (!currentEditingNoteId) return;
+        if (!currentEditingNoteId) {
+            gpsStatus.innerHTML = "Nessuna nota selezionata";
+            return;
+        }
         let newText = editNoteText.value.trim();
         if (!newText) { gpsStatus.innerHTML = "Nota vuota"; return; }
         let idx = notesArray.findIndex(n => n.id === currentEditingNoteId);
-        if (idx !== -1) { notesArray[idx].text = newText; saveNotes(); renderNotes(); gpsStatus.innerHTML = "✅ Nota salvata"; setTimeout(()=> gpsStatus.innerHTML = "✅ Pronto.", 2000); }
+        if (idx !== -1) {
+            notesArray[idx].text = newText;
+            saveNotes();
+            renderNotes();   // aggiorna la lista visiva
+            updateEditField(); // rimette il testo appena salvato nel campo (coerenza)
+            gpsStatus.innerHTML = "✅ Nota salvata";
+            setTimeout(()=> gpsStatus.innerHTML = "✅ Pronto.", 2000);
+        }
     }
     function cancelEdit() {
-        updateEditNoteFromSelection();
+        // Ripristina il testo originale della nota selezionata
+        updateEditField();
+        gpsStatus.innerHTML = "Modifica annullata";
+        setTimeout(()=> gpsStatus.innerHTML = "✅ Pronto.", 1500);
     }
     function addNote() {
         let text = newNoteInput.value.trim();
@@ -611,13 +629,16 @@
         let newId = Date.now() + Math.random()*10000;
         notesArray.push({ id: newId, text: text });
         if (notesArray.length === 1) selectedNoteId = newId;
-        renderNotes(); saveNotes(); newNoteInput.value = '';
+        renderNotes(); 
+        saveNotes(); 
+        newNoteInput.value = '';
         selectedSpecialMode = false;
-        updateEditNoteFromSelection();
+        updateEditField();
     }
     function getSelectedNoteText() {
         if (selectedSpecialMode) return selectedSpecialText;
-        return notesArray.find(n => n.id === selectedNoteId)?.text || null;
+        let note = notesArray.find(n => n.id === selectedNoteId);
+        return note ? note.text : null;
     }
     function escapeHtml(str) { return str.replace(/[&<>]/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;' }[m])); }
 
@@ -628,8 +649,10 @@
         selectedSpecialMode = true;
         selectedSpecialText = text;
         selectedNoteId = null;
+        // Svuota il campo modifica note normali
         editNoteText.value = "";
         currentEditingNoteId = null;
+        // Deseleziona radio button delle note normali
         document.querySelectorAll('input[name="noteSelect"]').forEach(r => r.checked = false);
         saveSpecialNotes();
         specialNoteStatus.innerText = `✅ Nota speciale ${index} selezionata (solo testo)`;
@@ -975,7 +998,7 @@
         selectedSpecialText = "";
         selectSpecial1Btn.style.backgroundColor = "#4caf50";
         selectSpecial2Btn.style.backgroundColor = "#4caf50";
-        updateEditNoteFromSelection();
+        updateEditField();
     }
     function onRegisterNumber() {
         let n = phoneInput.value.trim();
