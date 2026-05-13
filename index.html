@@ -1,18 +1,14 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-<link rel="manifest" href="manifest.json">
-
-<meta name="theme-color" content="#ff0000">
-
-<meta name="mobile-web-app-capable" content="yes">
-
-<meta name="apple-mobile-web-app-capable" content="yes">
-
-<link rel="apple-touch-icon" href="icon-sos-192.png">
-<meta charset="UTF-8">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#ff0000">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <link rel="apple-touch-icon" href="icon-sos-192.png">
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
-    <title>SOS Drive - Emergenza v0160</title>
+    <title>SOS Drive - Emergenza v0162</title>
     <style>
         * {
             margin: 0;
@@ -180,6 +176,7 @@
             border-radius: 24px;
             padding: 14px;
             margin: 12px 0;
+            display: block;
         }
         .special-note-area {
             background: #e8f5e9;
@@ -236,7 +233,7 @@
 <div class="container">
     <!-- HOME PAGE -->
     <div id="homePage" class="page">
-        <div class="version-header">📟 SOS Drive v0160 - Indirizzo pulito e modifica nota corretta</div>
+        <div class="version-header">📟 SOS Drive v0162 - Aggiunte meta tag per PWA</div>
         <h1>🆘 SOS EMERGENZA</h1>
         <div class="grid-2">
             <button class="big-btn" data-service="ambulanza">🚑 AMBULANZA</button>
@@ -245,12 +242,12 @@
             <button class="big-btn" data-service="clinica">🏥 CLINICA</button>
         </div>
         <p style="text-align:center; font-size:0.75rem; color:#555;">Ogni servizio ha il proprio archivio note.<br>📍 Ricerca luoghi con nome (esclude autostrade generiche)<br>🔊 Ascolto automatico 15 secondi</p>
-        <div class="version-footer">versione 0160 – indirizzo senza autostrade, modifica nota funzionante</div>
+        <div class="version-footer">versione 0162 – meta tag per app (manifest, theme-color, apple-touch-icon)</div>
     </div>
 
     <!-- EMERGENCY PAGE -->
     <div id="emergencyPage" class="page hidden">
-        <div class="version-header">📟 SOS Drive v0160 – Indirizzo pulito e modifica nota</div>
+        <div class="version-header">📟 SOS Drive v0162 – Aggiunte meta tag</div>
         <h2 id="serviceTitle">AMBULANZA</h2>
 
         <label>📞 Numero servizio</label>
@@ -284,8 +281,8 @@
             <div style="font-size:0.7rem; color:#777;">Nessuna nota. Aggiungine una.</div>
         </div>
 
-        <!-- Area modifica nota normale -->
-        <div id="editNoteArea" class="edit-note-area" style="display:none;">
+        <!-- Area modifica nota normale - sempre visibile -->
+        <div id="editNoteArea" class="edit-note-area">
             <label>✏️ Modifica nota (normale):</label>
             <textarea id="editNoteText" rows="2"></textarea>
             <div class="flex-row">
@@ -331,18 +328,16 @@
         </div>
 
         <button id="backHomeBtn" class="small-btn back-home" style="width:100%;">◀ TORNA INDIETRO</button>
-        <div class="version-footer">versione 0160 – indirizzo pulito da autostrade, campo modifica si apre con la nota selezionata</div>
+        <div class="version-footer">versione 0162 – fix modifica nota normale e aggiunti meta tag per PWA</div>
     </div>
 </div>
 
 <script>
-    // ==================== VERSIONE 0160 ====================
-    // Modifiche rispetto alla 0159:
-    // 1) Indirizzo: rimozione di "Autostrada", "Tangenziale", "Raccordo" (non caselli)
-    // 2) Quando si seleziona una nota normale, il campo "Modifica nota" diventa visibile e mostra il contenuto
+    // ==================== VERSIONE 0162 ====================
+    // Basata sulla 0161, aggiunte le 5 righe di meta tag e link per PWA.
     // =================================================================
 
-    const CURRENT_VERSION = "0160";
+    const CURRENT_VERSION = "0162";
     let currentService = "ambulanza";
     let currentLat = null, currentLng = null;
     let currentAddress = "";
@@ -412,7 +407,7 @@
     // ---------- ARCHIVIO NUMERI ----------
     function migratePhoneNumbers() {
         const services = ["ambulanza", "polizia", "veterinario", "clinica"];
-        const oldVersions = ["0159", "0158", "0157"];
+        const oldVersions = ["0161", "0160", "0159"];
         for (let s of services) {
             if (localStorage.getItem(`phone_${s}_${CURRENT_VERSION}`)) continue;
             for (let ver of oldVersions) {
@@ -506,7 +501,7 @@
         const services = ["ambulanza", "polizia", "veterinario", "clinica"];
         for (let s of services) {
             if (localStorage.getItem(`sos_notes_${s}_${CURRENT_VERSION}`)) continue;
-            for (let ver of ["0159","0158","0157"]) {
+            for (let ver of ["0161","0160","0159"]) {
                 let old = localStorage.getItem(`sos_notes_${s}_${ver}`);
                 if (old) {
                     try {
@@ -539,12 +534,20 @@
             } catch(e) { notesArray = []; selectedNoteId = null; }
         } else { notesArray = []; selectedNoteId = null; }
         renderNotes();
-        // Aggiorna campo modifica se c'è una nota normale selezionata
+        updateEditNoteFromSelection();
+    }
+    function updateEditNoteFromSelection() {
         if (selectedNoteId && !selectedSpecialMode) {
             let n = notesArray.find(x => x.id === selectedNoteId);
-            if (n) { editNoteText.value = n.text; editNoteArea.style.display = 'block'; currentEditingNoteId = selectedNoteId; }
+            if (n) {
+                editNoteText.value = n.text;
+                currentEditingNoteId = selectedNoteId;
+            } else {
+                editNoteText.value = "";
+                currentEditingNoteId = null;
+            }
         } else {
-            editNoteArea.style.display = 'none';
+            editNoteText.value = "";
             currentEditingNoteId = null;
         }
     }
@@ -552,7 +555,7 @@
         if (!notesArray.length) {
             notesListArea.innerHTML = `<div style="font-size:0.7rem;">Nessuna nota. Aggiungine una.</div>`;
             selectedNoteId = null;
-            editNoteArea.style.display = 'none';
+            updateEditNoteFromSelection();
             return;
         }
         let html = '<div><strong>📋 Seleziona nota normale:</strong></div>';
@@ -573,16 +576,10 @@
                 selectedSpecialMode = false;
                 selectedSpecialText = "";
                 saveNotes();
-                let n = notesArray.find(x => x.id === selectedNoteId);
-                if (n) {
-                    editNoteText.value = n.text;
-                    editNoteArea.style.display = 'block';
-                    currentEditingNoteId = selectedNoteId;
-                }
+                updateEditNoteFromSelection();
                 normalNoteInfo.style.display = 'block';
                 setTimeout(() => { normalNoteInfo.style.display = 'none'; }, 10000);
                 specialNoteStatus.innerText = "";
-                // Deseleziona eventuali pulsanti speciali
                 selectSpecial1Btn.style.backgroundColor = "#4caf50";
                 selectSpecial2Btn.style.backgroundColor = "#4caf50";
             });
@@ -593,15 +590,10 @@
                 notesArray = notesArray.filter(n => n.id !== id);
                 if (selectedNoteId === id) selectedNoteId = notesArray.length ? notesArray[0].id : null;
                 renderNotes(); saveNotes();
-                if (!selectedNoteId || selectedSpecialMode) { editNoteArea.style.display = 'none'; currentEditingNoteId = null; }
-                else { let n = notesArray.find(x => x.id === selectedNoteId); if (n) { editNoteText.value = n.text; editNoteArea.style.display = 'block'; currentEditingNoteId = selectedNoteId; } }
+                updateEditNoteFromSelection();
             });
         });
-        // Se nessuna nota normale selezionata, nascondi area modifica
-        if (!selectedNoteId || selectedSpecialMode) {
-            editNoteArea.style.display = 'none';
-            currentEditingNoteId = null;
-        }
+        updateEditNoteFromSelection();
     }
     function saveEdit() {
         if (!currentEditingNoteId) return;
@@ -610,7 +602,9 @@
         let idx = notesArray.findIndex(n => n.id === currentEditingNoteId);
         if (idx !== -1) { notesArray[idx].text = newText; saveNotes(); renderNotes(); gpsStatus.innerHTML = "✅ Nota salvata"; setTimeout(()=> gpsStatus.innerHTML = "✅ Pronto.", 2000); }
     }
-    function cancelEdit() { editNoteArea.style.display = 'none'; currentEditingNoteId = null; }
+    function cancelEdit() {
+        updateEditNoteFromSelection();
+    }
     function addNote() {
         let text = newNoteInput.value.trim();
         if (!text) { alert("Scrivi una nota"); return; }
@@ -618,8 +612,8 @@
         notesArray.push({ id: newId, text: text });
         if (notesArray.length === 1) selectedNoteId = newId;
         renderNotes(); saveNotes(); newNoteInput.value = '';
-        if (selectedNoteId && !selectedSpecialMode) { let n = notesArray.find(x => x.id === selectedNoteId); if (n) { editNoteText.value = n.text; editNoteArea.style.display = 'block'; currentEditingNoteId = selectedNoteId; } }
         selectedSpecialMode = false;
+        updateEditNoteFromSelection();
     }
     function getSelectedNoteText() {
         if (selectedSpecialMode) return selectedSpecialText;
@@ -634,10 +628,8 @@
         selectedSpecialMode = true;
         selectedSpecialText = text;
         selectedNoteId = null;
-        // Nascondi area modifica note normali
-        editNoteArea.style.display = 'none';
+        editNoteText.value = "";
         currentEditingNoteId = null;
-        // Rimuovi selezione dalle note normali
         document.querySelectorAll('input[name="noteSelect"]').forEach(r => r.checked = false);
         saveSpecialNotes();
         specialNoteStatus.innerText = `✅ Nota speciale ${index} selezionata (solo testo)`;
@@ -983,6 +975,7 @@
         selectedSpecialText = "";
         selectSpecial1Btn.style.backgroundColor = "#4caf50";
         selectSpecial2Btn.style.backgroundColor = "#4caf50";
+        updateEditNoteFromSelection();
     }
     function onRegisterNumber() {
         let n = phoneInput.value.trim();
@@ -997,7 +990,6 @@
         selectedNoteId = null;
         selectedSpecialMode = false;
         renderNotes();
-        editNoteArea.style.display = 'none';
         releaseWakeLock();
         saveSpecialNotes();
     }
@@ -1033,3 +1025,4 @@
 </script>
 </body>
 </html>
+```
