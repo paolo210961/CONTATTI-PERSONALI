@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
-    <title>SOS Drive - Emergenza v0158</title>
+    <title>SOS Drive - Emergenza v0159</title>
     <style>
         * {
             margin: 0;
@@ -179,18 +179,6 @@
             margin: 12px 0;
             border-left: 4px solid #4caf50;
         }
-        .special-note-btn {
-            position: relative;
-        }
-        .selected-bullet {
-            display: inline-block;
-            width: 12px;
-            height: 12px;
-            background-color: #1976d2;
-            border-radius: 50%;
-            margin-left: 8px;
-            vertical-align: middle;
-        }
         .back-home {
             background: #607d8b;
             margin-top: 20px;
@@ -239,7 +227,7 @@
 <div class="container">
     <!-- HOME PAGE -->
     <div id="homePage" class="page">
-        <div class="version-header">📟 SOS Drive v0158 - Persistenza note speciali e fix modifica nota</div>
+        <div class="version-header">📟 SOS Drive v0159 - Persistenza note speciali e modifica note normale</div>
         <h1>🆘 SOS EMERGENZA</h1>
         <div class="grid-2">
             <button class="big-btn" data-service="ambulanza">🚑 AMBULANZA</button>
@@ -248,12 +236,12 @@
             <button class="big-btn" data-service="clinica">🏥 CLINICA</button>
         </div>
         <p style="text-align:center; font-size:0.75rem; color:#555;">Ogni servizio ha il proprio archivio note.<br>📍 Ricerca luoghi con nome (esclude autostrade generiche)<br>🔊 Ascolto automatico 15 secondi</p>
-        <div class="version-footer">versione 0158 – modifica nota normale funzionante, note speciali persistenti tra versioni</div>
+        <div class="version-footer">versione 0159 – note speciali salvate con chiave fissa, modifica note normale sempre funzionante</div>
     </div>
 
     <!-- EMERGENCY PAGE -->
     <div id="emergencyPage" class="page hidden">
-        <div class="version-header">📟 SOS Drive v0158 – Modifica note ottimizzata</div>
+        <div class="version-header">📟 SOS Drive v0159 – Modifica note ottimizzata</div>
         <h2 id="serviceTitle">AMBULANZA</h2>
 
         <label>📞 Numero servizio</label>
@@ -334,17 +322,17 @@
         </div>
 
         <button id="backHomeBtn" class="small-btn back-home" style="width:100%;">◀ TORNA INDIETRO</button>
-        <div class="version-footer">versione 0158 – note speciali persistenti (chiave fissa), modifica nota normale funzionante</div>
+        <div class="version-footer">versione 0159 – note speciali persistenti (chiavi fisse), modifica nota normale funzionante</div>
     </div>
 </div>
 
 <script>
-    // ==================== VERSIONE 0158 ====================
-    // 1) Fix: selezionando una nota normale, il campo "Modifica nota" si apre e mostra il contenuto
-    // 2) Persistenza note speciali con chiavi fisse (indipendenti dalla versione)
+    // ==================== VERSIONE 0159 ====================
+    // 1) Selezione nota normale: il campo "Modifica nota" si apre e mostra il contenuto
+    // 2) Note speciali persistono con chiavi fisse (sos_special_note1, sos_special_note2) – indipendenti dalla versione
     // =================================================================
 
-    const CURRENT_VERSION = "0158";
+    const CURRENT_VERSION = "0159";
     let currentService = "ambulanza";
     let currentLat = null, currentLng = null;
     let currentAddress = "";
@@ -411,10 +399,10 @@
     }
     function releaseWakeLock() { if (wakeLock) { wakeLock.release(); wakeLock = null; } }
 
-    // ---------- ARCHIVIO NUMERI (persistente tra versioni) ----------
+    // ---------- ARCHIVIO NUMERI ----------
     function migratePhoneNumbers() {
         const services = ["ambulanza", "polizia", "veterinario", "clinica"];
-        const oldVersions = ["0157", "0156", "0155", "0154"];
+        const oldVersions = ["0158", "0157", "0156", "0155"];
         for (let s of services) {
             if (localStorage.getItem(`phone_${s}_${CURRENT_VERSION}`)) continue;
             for (let ver of oldVersions) {
@@ -427,7 +415,7 @@
     function getPhone(s) { return localStorage.getItem(`phone_${s}_${CURRENT_VERSION}`); }
     const defaultPhone = { ambulanza:"118", polizia:"113", veterinario:"800123456", clinica:"800987654" };
 
-    // ---------- PERSISTENZA NOTE SPECIALI (CHIAVI FISSE, INDIPENDENTI DALLA VERSIONE) ----------
+    // ---------- PERSISTENZA NOTE SPECIALI (CHIAVI FISSE) ----------
     function saveSpecialNotes() {
         localStorage.setItem('sos_special_note1', specialNote1.value);
         localStorage.setItem('sos_special_note2', specialNote2.value);
@@ -437,6 +425,11 @@
         let s2 = localStorage.getItem('sos_special_note2');
         if (s1 !== null) specialNote1.value = s1;
         if (s2 !== null) specialNote2.value = s2;
+    }
+    // Salvataggio automatico quando l'utente modifica i campi delle note speciali
+    function attachSpecialNotesAutoSave() {
+        specialNote1.addEventListener('input', () => saveSpecialNotes());
+        specialNote2.addEventListener('input', () => saveSpecialNotes());
     }
 
     // ---------- TRADUZIONI ----------
@@ -504,7 +497,7 @@
         const services = ["ambulanza", "polizia", "veterinario", "clinica"];
         for (let s of services) {
             if (localStorage.getItem(`sos_notes_${s}_${CURRENT_VERSION}`)) continue;
-            for (let ver of ["0157","0156","0155"]) {
+            for (let ver of ["0158","0157","0156"]) {
                 let old = localStorage.getItem(`sos_notes_${s}_${ver}`);
                 if (old) {
                     try {
@@ -625,7 +618,7 @@
     }
     function escapeHtml(str) { return str.replace(/[&<>]/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;' }[m])); }
 
-    // ---------- GESTIONE NOTE SPECIALI (non toccano il campo modifica) ----------
+    // ---------- GESTIONE NOTE SPECIALI ----------
     function selectSpecialNote(index) {
         let text = (index === 1) ? specialNote1.value.trim() : specialNote2.value.trim();
         if (!text) { specialNoteStatus.innerText = "⚠️ Scrivi prima la nota speciale"; return; }
@@ -642,7 +635,7 @@
         specialNoteStatus.innerText = `✅ Nota speciale ${index} selezionata (solo testo)`;
         setTimeout(()=> specialNoteStatus.innerText="", 10000);
         normalNoteInfo.style.display = 'none';
-        // Effetto punto blu sul pulsante (opzionale)
+        // Effetto punto blu sul pulsante
         if (index === 1) {
             selectSpecial1Btn.style.backgroundColor = "#1976d2";
             selectSpecial2Btn.style.backgroundColor = "#4caf50";
@@ -691,7 +684,7 @@
         }
     }
 
-    // ---------- GEOLOCALIZZAZIONE + RICERCA LUOGHI (con esclusione autostrade) ----------
+    // ---------- GEOLOCALIZZAZIONE + RICERCA LUOGHI ----------
     function haversine(lat1,lng1,lat2,lng2) {
         const R = 6371e3;
         const φ1 = lat1 * Math.PI/180, φ2 = lat2 * Math.PI/180;
@@ -841,7 +834,7 @@
         gpsStatus.innerHTML = "";
     }
 
-    // ---------- LETTURA VOCALE (pausa 0.2s, coordinate 2s) ----------
+    // ---------- LETTURA VOCALE ----------
     function playBeep() {
         try {
             let ctx = new (window.AudioContext || window.webkitAudioContext)();
@@ -998,6 +991,7 @@
         migrateOldNotes();
         migratePhoneNumbers();
         loadSpecialNotes();
+        attachSpecialNotesAutoSave();  // salva automaticamente quando l'utente modifica i campi speciali
         document.querySelectorAll('.big-btn').forEach(btn => btn.addEventListener('click', () => showEmergency(btn.getAttribute('data-service'))));
         registerNumberBtn.addEventListener('click', onRegisterNumber);
         googleMapsBtn.addEventListener('click', () => window.open("https://maps.google.com", "_blank"));
