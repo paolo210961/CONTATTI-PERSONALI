@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
-    <title>SOS Drive - Emergenza v0154</title>
+    <title>SOS Drive - Emergenza v0155</title>
     <style>
         * {
             margin: 0;
@@ -90,6 +90,9 @@
         }
         .btn-gps {
             background: #2e7d32;
+        }
+        .btn-lang {
+            background: #00acc1;
         }
         .small-btn {
             padding: 10px 14px;
@@ -227,7 +230,7 @@
 <div class="container">
     <!-- HOME PAGE -->
     <div id="homePage" class="page">
-        <div class="version-header">📟 SOS Drive v0154 - Ricerca estesa a tutte le attività con nome</div>
+        <div class="version-header">📟 SOS Drive v0155 - Rilevamento lingua + correzione indirizzo autostrada</div>
         <h1>🆘 SOS EMERGENZA</h1>
         <div class="grid-2">
             <button class="big-btn" data-service="ambulanza">🚑 AMBULANZA</button>
@@ -235,13 +238,13 @@
             <button class="big-btn" data-service="veterinario">🐾 VETERINARIO</button>
             <button class="big-btn" data-service="clinica">🏥 CLINICA</button>
         </div>
-        <p style="text-align:center; font-size:0.75rem; color:#555;">Ogni servizio ha il proprio archivio note.<br>📍 Ricerca entro 300m di TUTTI i luoghi con nome (negozi, aziende, uffici, piazze, uscite autostradali)<br>🔊 Ascolto automatico 15 secondi dopo il messaggio</p>
-        <div class="version-footer">versione 0154 – ricerca ampliata a qualunque elemento con nome (es. Dardanelli, BS Autotrasporti, Rea Trasport)</div>
+        <p style="text-align:center; font-size:0.75rem; color:#555;">Ogni servizio ha il proprio archivio note.<br>📍 Rilevamento lingua paese tramite coordinate<br>🔊 LEGGI in qualsiasi lingua, ASCOLTA operatore in qualsiasi lingua → italiano</p>
+        <div class="version-footer">versione 0155 – indirizzo corretto (no autostrade), note speciali persistenti, pulsante LEGGI multilingua</div>
     </div>
 
     <!-- EMERGENCY PAGE -->
     <div id="emergencyPage" class="page hidden">
-        <div class="version-header">📟 SOS Drive v0154 – Ricerca estesa</div>
+        <div class="version-header">📟 SOS Drive v0155 – Rilevamento lingua</div>
         <h2 id="serviceTitle">AMBULANZA</h2>
 
         <label>📞 Numero servizio</label>
@@ -275,6 +278,7 @@
             <div style="font-size:0.7rem; color:#777;">Nessuna nota. Aggiungine una.</div>
         </div>
 
+        <!-- Area modifica nota normale (sempre visibile quando selezionata) -->
         <div id="editNoteArea" class="edit-note-area" style="display:none;">
             <label>✏️ Modifica nota (normale):</label>
             <textarea id="editNoteText" rows="2"></textarea>
@@ -284,6 +288,7 @@
             </div>
         </div>
 
+        <!-- NOTE SPECIALI con persistenza -->
         <div id="specialNotesArea" class="special-note-area">
             <label>📌 NOTE SPECIALI (solo testo - ignorano coordinate)</label>
             <div class="flex-row">
@@ -304,10 +309,10 @@
         </div>
 
         <div class="response-area">
-            <label>🎧 RISPOSTA OPERATORE (traduzione IT)</label>
+            <label>🎧 RISPOSTA OPERATORE (traduzione automatica in italiano)</label>
             <textarea id="operatorResponse" rows="3" readonly placeholder="Traduzione italiana"></textarea>
             <div class="flex-row">
-                <button id="listenResponseBtn" class="small-btn" style="background:#3f51b5;">🎤 ASCOLTA OPERATORE 15s</button>
+                <button id="listenResponseBtn" class="small-btn" style="background:#3f51b5;">🎤 ASCOLTA OPERATORE (qualsiasi lingua → IT)</button>
                 <button id="clearResponseBtn" class="small-btn" style="background:#757575;">🗑️ CANCELLA</button>
             </div>
             <div id="transcribeStatus" class="status-msg"></div>
@@ -317,23 +322,27 @@
             <button id="copyBtn" class="small-btn btn-copy">📋 COPIA (FR+IT)</button>
             <button id="audioItBtn" class="small-btn btn-audio">🔊 LEGGI IT</button>
             <button id="audioFrBtn" class="small-btn btn-audio">🔊 LEGGI FR</button>
+            <button id="audioLangBtn" class="small-btn btn-lang">🌍 LEGGI (lingua paese)</button>
         </div>
 
         <button id="backHomeBtn" class="small-btn back-home" style="width:100%;">◀ TORNA INDIETRO</button>
-        <div class="version-footer">versione 0154 – tutti i luoghi con nome entro 300m (esclude solo panchine/fontane/toilette)</div>
+        <div class="version-footer">versione 0155 – correzione indirizzi autostrada, note speciali persistenti, lettura in lingua locale</div>
     </div>
 </div>
 
 <script>
-    // ==================== VERSIONE 0154 ====================
-    // Modifica fondamentale: ricerca di TUTTI gli elementi (nodi/ways) che hanno un nome,
-    // entro 300 metri, escludendo solo categorie chiaramente inutili:
-    // - information, bench, waste_basket, toilets, telephone, recycling, fountain, drinking_water
-    // - senza filtro su amenity/shop/tourism, così catturiamo anche aziende come Dardanelli, BS Autotrasporti, Rea Trasport
-    // Il resto invariato: WakeLock, archivio numeri, testi personalizzati, velocità lettura 0.2s tra parole, coordinate 2s, ascolto 15s.
+    // ==================== VERSIONE 0155 ====================
+    // 1. Correzione indirizzo: se Nominatim restituisce "Autostrada" (e non "casello"), 
+    //    sostituisce la via con il riferimento (1) o (2) più vicino (via normale)
+    // 2. Campo modifica nota sempre visibile quando nota normale selezionata, con testo pre-caricato
+    // 3. Persistenza note speciali (localStorage, chiave separata)
+    // 4. Nuovo pulsante "LEGGI" che rileva la lingua del paese tramite reverse geocoding,
+    //    traduce tutto il messaggio in quella lingua e lo legge
+    // 5. Pulsante "ASCOLTA OPERATORE" rileva la lingua locale (dalle coordinate o browser)
+    //    e traduce il parlato in italiano
     // =================================================================
 
-    const CURRENT_VERSION = "0154";
+    const CURRENT_VERSION = "0155";
     let currentService = "ambulanza";
     let currentLat = null, currentLng = null;
     let currentAddress = "";
@@ -343,6 +352,8 @@
     let selectedSpecialMode = false;
     let selectedSpecialText = "";
     let wakeLock = null;
+    let currentCountryCode = "it";   // default
+    let currentCountryLang = "it";   // per lettura
 
     // DOM elements
     const homePage = document.getElementById('homePage');
@@ -364,6 +375,7 @@
     const copyBtn = document.getElementById('copyBtn');
     const audioItBtn = document.getElementById('audioItBtn');
     const audioFrBtn = document.getElementById('audioFrBtn');
+    const audioLangBtn = document.getElementById('audioLangBtn');
     const backHomeBtn = document.getElementById('backHomeBtn');
     const phoneSaveMsg = document.getElementById('phoneSaveMsg');
     const exportNotesBtn = document.getElementById('exportNotesBtn');
@@ -403,7 +415,7 @@
     // ---------- ARCHIVIO NUMERI ----------
     function migratePhoneNumbers() {
         const services = ["ambulanza", "polizia", "veterinario", "clinica"];
-        const oldVersions = ["0153", "0152", "0036"];
+        const oldVersions = ["0154", "0153", "0152"];
         for (let s of services) {
             if (localStorage.getItem(`phone_${s}_${CURRENT_VERSION}`)) continue;
             for (let ver of oldVersions) {
@@ -416,30 +428,53 @@
     function getPhone(s) { return localStorage.getItem(`phone_${s}_${CURRENT_VERSION}`); }
     const defaultPhone = { ambulanza:"118", polizia:"113", veterinario:"800123456", clinica:"800987654" };
 
-    // ---------- TRADUZIONI ----------
-    async function translateToFrench(italianText) {
-        if (!italianText || italianText.trim() === "") return "";
-        try {
-            const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(italianText)}&langpair=it|fr`;
-            const resp = await fetch(url);
-            const data = await resp.json();
-            if (data && data.responseData && data.responseData.translatedText) return data.responseData.translatedText;
-        } catch(e) { console.warn(e); }
-        return italianText;
+    // ---------- PERSISTENZA NOTE SPECIALI ----------
+    function loadSpecialNotes() {
+        let saved1 = localStorage.getItem(`special_note_1_${CURRENT_VERSION}`);
+        let saved2 = localStorage.getItem(`special_note_2_${CURRENT_VERSION}`);
+        if (saved1) specialNote1.value = saved1;
+        if (saved2) specialNote2.value = saved2;
     }
-    async function translateFrenchToItalian(frenchText) {
-        if (!frenchText || frenchText.trim() === "") return "";
+    function saveSpecialNotes() {
+        localStorage.setItem(`special_note_1_${CURRENT_VERSION}`, specialNote1.value);
+        localStorage.setItem(`special_note_2_${CURRENT_VERSION}`, specialNote2.value);
+    }
+    specialNote1.addEventListener('change', saveSpecialNotes);
+    specialNote2.addEventListener('change', saveSpecialNotes);
+    specialNote1.addEventListener('input', saveSpecialNotes);
+    specialNote2.addEventListener('input', saveSpecialNotes);
+
+    // ---------- TRADUZIONI (generiche) ----------
+    async function translateText(text, fromLang, toLang) {
+        if (!text || text.trim() === "") return "";
+        if (fromLang === toLang) return text;
         try {
-            const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(frenchText)}&langpair=fr|it`;
+            const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=${fromLang}|${toLang}`;
             const resp = await fetch(url);
             const data = await resp.json();
             if (data && data.responseData && data.responseData.translatedText) return data.responseData.translatedText;
         } catch(e) { console.warn(e); }
-        return frenchText + " (traduzione fallita)";
+        return text;
     }
 
-    // ---------- RICONOSCIMENTO VOCALE 15s ----------
-    function initRecognition() {
+    // ---------- RILEVAMENTO LINGUA PAESE DA COORDINATE ----------
+    async function detectCountryLanguage(lat, lng) {
+        try {
+            const url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=10&accept-language=it`;
+            const resp = await fetch(url, {headers:{'User-Agent':'SOSDrive/1.0'}});
+            const data = await resp.json();
+            const countryCode = data.address?.country_code?.toLowerCase() || "it";
+            // Mappa paese -> lingua principale
+            const langMap = {
+                "it": "it", "fr": "fr", "de": "de", "es": "es", "pt": "pt", "en": "en",
+                "nl": "nl", "pl": "pl", "ru": "ru", "zh": "zh", "ja": "ja", "ar": "ar"
+            };
+            return langMap[countryCode] || "en";
+        } catch(e) { return "it"; }
+    }
+
+    // ---------- RICONOSCIMENTO VOCALE (con rilevamento lingua) ----------
+    function initRecognition(langCode = 'fr-FR') {
         if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
             transcribeStatus.innerText = "❌ Riconoscimento non supportato";
             return false;
@@ -448,13 +483,26 @@
         recognition = new SpeechRecognition();
         recognition.continuous = true;
         recognition.interimResults = false;
-        recognition.lang = 'fr-FR';
+        recognition.lang = langCode;
         return true;
     }
-    async function startListening15s() {
-        if (!recognition && !initRecognition()) return;
+
+    async function startListeningAuto() {
+        let targetLang = "fr-FR";
+        try {
+            if (currentLat && currentLng) {
+                const detected = await detectCountryLanguage(currentLat, currentLng);
+                if (detected === 'fr') targetLang = "fr-FR";
+                else if (detected === 'en') targetLang = "en-US";
+                else if (detected === 'de') targetLang = "de-DE";
+                else if (detected === 'es') targetLang = "es-ES";
+                else targetLang = "fr-FR";
+            }
+        } catch(e) { targetLang = "fr-FR"; }
+        if (!recognition) initRecognition(targetLang);
+        else recognition.lang = targetLang;
         if (recognitionTimeout) clearTimeout(recognitionTimeout);
-        transcribeStatus.innerText = "🎤 Ascolto francese per 15 secondi...";
+        transcribeStatus.innerText = `🎤 Ascolto in ${targetLang} per 15 secondi...`;
         recognition.start();
         let finalTranscript = "";
         recognition.onresult = (event) => {
@@ -465,11 +513,11 @@
         recognition.onerror = (e) => { transcribeStatus.innerText = "❌ Errore microfono: " + e.error; };
         recognition.onend = async () => {
             if (finalTranscript.trim() !== "") {
-                transcribeStatus.innerText = "⏳ Traduzione...";
-                const italian = await translateFrenchToItalian(finalTranscript.trim());
+                transcribeStatus.innerText = "⏳ Traduzione in italiano...";
+                const italian = await translateText(finalTranscript.trim(), targetLang.split('-')[0], 'it');
                 if (operatorResponse.value.trim()) operatorResponse.value += "\n---\n" + italian;
                 else operatorResponse.value = italian;
-                transcribeStatus.innerText = "✅ Testo tradotto (15s)";
+                transcribeStatus.innerText = "✅ Testo tradotto in italiano";
             } else transcribeStatus.innerText = "⏹️ Nessun parlato";
             setTimeout(() => { if (transcribeStatus.innerText.includes("Tradotto") || transcribeStatus.innerText.includes("Nessun parlato")) transcribeStatus.innerText = ""; }, 4000);
         };
@@ -481,7 +529,7 @@
         const services = ["ambulanza", "polizia", "veterinario", "clinica"];
         for (let s of services) {
             if (localStorage.getItem(`sos_notes_${s}_${CURRENT_VERSION}`)) continue;
-            for (let ver of ["0153","0152","0036"]) {
+            for (let ver of ["0154","0153","0152"]) {
                 let old = localStorage.getItem(`sos_notes_${s}_${ver}`);
                 if (old) {
                     try {
@@ -514,14 +562,19 @@
             } catch(e) { notesArray = []; selectedNoteId = null; }
         } else { notesArray = []; selectedNoteId = null; }
         renderNotes();
-        editNoteArea.style.display = 'none';
-        currentEditingNoteId = null;
+        // Mostra modifica se c'è nota selezionata
+        if (selectedNoteId && !selectedSpecialMode) {
+            let n = notesArray.find(x => x.id === selectedNoteId);
+            if (n) { editNoteText.value = n.text; editNoteArea.style.display = 'block'; currentEditingNoteId = selectedNoteId; }
+        } else {
+            editNoteArea.style.display = 'none';
+            currentEditingNoteId = null;
+        }
     }
     function renderNotes() {
         if (!notesArray.length) {
             notesListArea.innerHTML = `<div style="font-size:0.7rem;">Nessuna nota. Aggiungine una.</div>`;
             selectedNoteId = null;
-            editNoteArea.style.display = 'none';
             return;
         }
         let html = '<div><strong>📋 Seleziona nota normale:</strong></div>';
@@ -558,6 +611,7 @@
                 else { let n = notesArray.find(x => x.id === selectedNoteId); if (n) { editNoteText.value = n.text; editNoteArea.style.display = 'block'; currentEditingNoteId = selectedNoteId; } }
             });
         });
+        // Se c'è nota selezionata ma area modifica non visibile, mostrala
         if (selectedNoteId && !selectedSpecialMode && editNoteArea.style.display === 'none') {
             let n = notesArray.find(x => x.id === selectedNoteId);
             if (n) { editNoteText.value = n.text; editNoteArea.style.display = 'block'; currentEditingNoteId = selectedNoteId; }
@@ -599,46 +653,34 @@
         normalNoteInfo.style.display = 'none';
     }
 
-    // ---------- COPIA BILINGUE (con nuovi testi) ----------
-    async function getBilingualCopy() {
-        let noteIT = getSelectedNoteText() || "nessuna nota";
-        let coord = (currentLat && currentLng) ? `${currentLat.toFixed(6)}, ${currentLng.toFixed(6)}` : "non disponibili";
-        let addr = currentAddress || "non disponibile";
-        let refA = currentRefA || "non disponibile";
-        let refB = currentRefB || "non disponibile";
-        let refC = currentRefC || "non disponibile";
-        let introIT = "Attenzione Emergenza sono italiano uso il traduttore mi trovo in Emergenza";
-        let domandaIT = "il il tuo messaggio di risposta verrà tradotto parla piano";
-        let italian = `${introIT}\n\n${noteIT}\n\nCoordinate: ${coord}\nIndirizzo: ${addr}\nSono vicino a (1): ${refA}\nSono vicino a (2): ${refB}\nSono vicino a (3): ${refC}\n\n${domandaIT}`;
-        let introFR = await translateToFrench(introIT);
-        let noteFR = await translateToFrench(noteIT);
-        let addrFR = addr === "non disponibile" ? "non disponible" : await translateToFrench(addr);
-        let refAFR = refA === "non disponibile" ? "non disponible" : await translateToFrench(refA);
-        let refBFR = refB === "non disponibile" ? "non disponible" : await translateToFrench(refB);
-        let refCFR = refC === "non disponibile" ? "non disponible" : await translateToFrench(refC);
-        let domandaFR = await translateToFrench(domandaIT);
-        let french = `${introFR}\n\n${noteFR}\n\nCoordonnées: ${coord}\nAdresse: ${addrFR}\nJe suis près de (1): ${refAFR}\nJe suis près de (2): ${refBFR}\nJe suis près de (3): ${refCFR}\n\n${domandaFR}`;
-        return french + "\n\n-----\n\n" + italian;
-    }
-    async function copyBilingual() {
-        gpsStatus.innerHTML = "⏳ Preparazione copia...";
-        let txt = await getBilingualCopy();
-        try {
-            await navigator.clipboard.writeText(txt);
-            gpsStatus.innerHTML = "📋 Copiato! (FR+IT)";
-            setTimeout(()=> gpsStatus.innerHTML = "✅ Pronto.", 2000);
-        } catch(e) {
-            let ta = document.createElement('textarea');
-            ta.value = txt;
-            document.body.appendChild(ta);
-            ta.select();
-            document.execCommand('copy');
-            document.body.removeChild(ta);
-            gpsStatus.innerHTML = "📋 Copiato manualmente";
+    // ---------- CORREZIONE INDIRIZZO (rimuovi autostrada) ----------
+    function fixHighwayAddress(rawAddress, ref1, ref2) {
+        if (!rawAddress) return rawAddress;
+        const lower = rawAddress.toLowerCase();
+        if (lower.includes("autostrada") && !lower.includes("casello")) {
+            // Cerca un riferimento che sia una via normale (non autostrada, non "Nessun riferimento")
+            let normalStreet = null;
+            if (ref1 && !ref1.toLowerCase().includes("autostrada") && !ref1.includes("Nessun riferimento")) {
+                const match = ref1.match(/^([^,]+)/);
+                if (match) normalStreet = match[1];
+            }
+            if (!normalStreet && ref2 && !ref2.toLowerCase().includes("autostrada") && !ref2.includes("Nessun riferimento")) {
+                const match = ref2.match(/^([^,]+)/);
+                if (match) normalStreet = match[1];
+            }
+            if (normalStreet) {
+                // Mantieni la parte dopo la prima virgola (località, provincia, CAP)
+                let parts = rawAddress.split(',');
+                if (parts.length > 1) {
+                    let newAddress = normalStreet + "," + parts.slice(1).join(',');
+                    return newAddress;
+                }
+            }
         }
+        return rawAddress;
     }
 
-    // ---------- GEOLOCALIZZAZIONE + RICERCA ESTESA A TUTTI GLI ELEMENTI CON NOME ----------
+    // ---------- GEOLOCALIZZAZIONE + RICERCA LUOGHI CON NOME ----------
     function haversine(lat1,lng1,lat2,lng2) {
         const R = 6371e3;
         const φ1 = lat1 * Math.PI/180, φ2 = lat2 * Math.PI/180;
@@ -659,11 +701,8 @@
             return {lat,lng};
         } catch(e) { return {lat,lng}; }
     }
-    // NUOVA FUNZIONE: ricerca di TUTTI i nodi e vie che hanno un nome, entro 300m
     async function fetchAllNamedPlaces(lat, lng) {
-        // Escludiamo solo categorie chiaramente inutili
         const excludeTags = ["information", "bench", "waste_basket", "toilets", "telephone", "recycling", "fountain", "drinking_water"];
-        // Query: prende qualsiasi nodo o way che abbia un tag "name" (non vuoto) entro 300 metri
         let query = `[out:json];(node(around:300,${lat},${lng})[name];way(around:300,${lat},${lng})[name];);out center;`;
         let url = `https://overpass-api.de/api/interpreter?data=${encodeURIComponent(query)}`;
         try {
@@ -678,11 +717,9 @@
                 let tags = el.tags || {};
                 let name = tags.name;
                 if (!name || name.trim() === "") continue;
-                // Escludi tag inutili se presenti (ma se il luogo ha un nome, di solito non sono panchine)
                 let cat = tags.amenity || tags.shop || tags.tourism || tags.office || tags.leisure || tags.historic || tags.place || tags.aeroway || tags.railway;
                 if (cat && excludeTags.includes(cat)) continue;
                 let dist = haversine(lat, lng, latEl, lonEl);
-                // Crea un display significativo: nome + eventuale categoria tra parentesi
                 let display = name;
                 if (cat) {
                     let catMap = {
@@ -696,23 +733,18 @@
                     let readable = catMap[cat] || (cat.charAt(0).toUpperCase() + cat.slice(1));
                     display = `${name} (${readable})`;
                 }
-                items.push({ display, dist });
+                items.push({ display, dist, rawName: name });
             }
-            // Deduplica per nome (primo più vicino)
             const unique = new Map();
             for (let item of items) {
-                if (!unique.has(item.display.split(' (')[0])) unique.set(item.display.split(' (')[0], item);
+                if (!unique.has(item.rawName)) unique.set(item.rawName, item);
             }
             let uniqueItems = Array.from(unique.values());
             uniqueItems.sort((a,b) => a.dist - b.dist);
-            // Prendi i primi 3 risultati
             let refs = uniqueItems.slice(0,3).map(i => `${i.display} a ${Math.round(i.dist)} metri`);
             while(refs.length < 3) refs.push("Nessun riferimento");
             return refs;
-        } catch(e) {
-            console.warn("Errore ricerca nomi", e);
-            return ["Nessun riferimento","Nessun riferimento","Nessun riferimento"];
-        }
+        } catch(e) { return ["Nessun riferimento","Nessun riferimento","Nessun riferimento"]; }
     }
     async function reverseGeocode(lat,lng) {
         try {
@@ -752,12 +784,15 @@
             gpsStatus.innerHTML = "📍 Elaborazione map matching...";
             let snapped = await snapToRoad(avg.lat, avg.lng);
             let finalLat = snapped.lat, finalLng = snapped.lng;
-            let address = await reverseGeocode(finalLat, finalLng);
+            let rawAddress = await reverseGeocode(finalLat, finalLng);
             gpsStatus.innerHTML = "🔍 Ricerca luoghi con nome entro 300m...";
             let [ref1, ref2, ref3] = await fetchAllNamedPlaces(finalLat, finalLng);
-            currentLat = finalLat; currentLng = finalLng; currentAddress = address; currentRefA = ref1; currentRefB = ref2; currentRefC = ref3;
+            // Correggi indirizzo se contiene autostrada
+            let correctedAddress = fixHighwayAddress(rawAddress, ref1, ref2);
+            currentLat = finalLat; currentLng = finalLng; currentAddress = correctedAddress; 
+            currentRefA = ref1; currentRefB = ref2; currentRefC = ref3;
             latLonDisplay.innerText = `${finalLat.toFixed(6)}, ${finalLng.toFixed(6)}`;
-            addressDisplay.innerText = address;
+            addressDisplay.innerText = correctedAddress;
             refADisplay.innerText = ref1;
             refBDisplay.innerText = ref2;
             refCDisplay.innerText = ref3;
@@ -771,7 +806,46 @@
         gpsStatus.innerHTML = "";
     }
 
-    // ---------- LETTURA VOCALE (pausa 0.2s, coordinate 2s) ----------
+    // ---------- COPIA BILINGUE (FR+IT) con nuovi testi ----------
+    async function getBilingualCopy() {
+        let noteIT = getSelectedNoteText() || "nessuna nota";
+        let coord = (currentLat && currentLng) ? `${currentLat.toFixed(6)}, ${currentLng.toFixed(6)}` : "non disponibili";
+        let addr = currentAddress || "non disponibile";
+        let refA = currentRefA || "non disponibile";
+        let refB = currentRefB || "non disponibile";
+        let refC = currentRefC || "non disponibile";
+        let introIT = "Attenzione Emergenza sono italiano uso il traduttore mi trovo in Emergenza";
+        let domandaIT = "il il tuo messaggio di risposta verrà tradotto parla piano";
+        let italian = `${introIT}\n\n${noteIT}\n\nCoordinate: ${coord}\nIndirizzo: ${addr}\nSono vicino a (1): ${refA}\nSono vicino a (2): ${refB}\nSono vicino a (3): ${refC}\n\n${domandaIT}`;
+        let introFR = await translateText(introIT, 'it', 'fr');
+        let noteFR = await translateText(noteIT, 'it', 'fr');
+        let addrFR = addr === "non disponibile" ? "non disponible" : await translateText(addr, 'it', 'fr');
+        let refAFR = refA === "non disponibile" ? "non disponible" : await translateText(refA, 'it', 'fr');
+        let refBFR = refB === "non disponibile" ? "non disponible" : await translateText(refB, 'it', 'fr');
+        let refCFR = refC === "non disponibile" ? "non disponible" : await translateText(refC, 'it', 'fr');
+        let domandaFR = await translateText(domandaIT, 'it', 'fr');
+        let french = `${introFR}\n\n${noteFR}\n\nCoordonnées: ${coord}\nAdresse: ${addrFR}\nJe suis près de (1): ${refAFR}\nJe suis près de (2): ${refBFR}\nJe suis près de (3): ${refCFR}\n\n${domandaFR}`;
+        return french + "\n\n-----\n\n" + italian;
+    }
+    async function copyBilingual() {
+        gpsStatus.innerHTML = "⏳ Preparazione copia...";
+        let txt = await getBilingualCopy();
+        try {
+            await navigator.clipboard.writeText(txt);
+            gpsStatus.innerHTML = "📋 Copiato! (FR+IT)";
+            setTimeout(()=> gpsStatus.innerHTML = "✅ Pronto.", 2000);
+        } catch(e) {
+            let ta = document.createElement('textarea');
+            ta.value = txt;
+            document.body.appendChild(ta);
+            ta.select();
+            document.execCommand('copy');
+            document.body.removeChild(ta);
+            gpsStatus.innerHTML = "📋 Copiato manualmente";
+        }
+    }
+
+    // ---------- LETTURA VOCALE GENERICA (lingua qualsiasi) ----------
     function playBeep() {
         try {
             let ctx = new (window.AudioContext || window.webkitAudioContext)();
@@ -788,11 +862,11 @@
             ctx.resume();
         } catch(e) { console.warn("beep fallito", e); }
     }
-    async function speakWords(msg, langCode, rate=1.0, wordPauseMs=200) {
+    async function speakWords(msg, langCode, wordPauseMs=200) {
         let words = msg.split(/\s+/);
         for (let w of words) {
             let u = new SpeechSynthesisUtterance(w);
-            u.lang = langCode; u.rate = rate;
+            u.lang = langCode; u.rate = 1.0;
             speechSynthesis.speak(u);
             await new Promise(r=>setTimeout(r, wordPauseMs));
         }
@@ -808,59 +882,88 @@
             await new Promise(r=>setTimeout(r, 2000));
         }
     }
-    async function speakFull(lang) {
-        if (!window.speechSynthesis) { alert(lang==='it'?"Sintesi non supportata":"Synthèse non supportée"); return; }
+
+    async function speakFull(lang, targetLangCode) {
+        if (!window.speechSynthesis) { alert("Sintesi non supportata"); return; }
         speechSynthesis.cancel();
 
         if (selectedSpecialMode) {
             let specialText = getSelectedNoteText();
             if (!specialText) { gpsStatus.innerHTML = "Nota speciale vuota"; return; }
-            gpsStatus.innerHTML = `🔊 Lettura solo nota (${lang==='it'?'IT':'FR'})...`;
+            gpsStatus.innerHTML = `🔊 Lettura solo nota (${targetLangCode})...`;
             let textToRead = specialText;
-            if (lang === 'fr') textToRead = await translateToFrench(specialText);
-            await speakWords(textToRead, lang==='it'?'it-IT':'fr-FR', 1.0, 200);
+            if (lang !== targetLangCode) {
+                textToRead = await translateText(specialText, lang, targetLangCode);
+            }
+            await speakWords(textToRead, targetLangCode, 200);
             gpsStatus.innerHTML = "✅ Solo nota letta";
             return;
         }
 
         let note = getSelectedNoteText() || (lang==='it'?"nessuna nota":"aucune note");
-        let addr = currentAddress || (lang==='it'?"non disponibile":"non disponible");
-        let refA = currentRefA || (lang==='it'?"non disponibile":"non disponible");
-        let refB = currentRefB || (lang==='it'?"non disponibile":"non disponible");
-        let refC = currentRefC || (lang==='it'?"non disponibile":"non disponible");
-        let coord = (currentLat && currentLng) ? `${currentLat.toFixed(6)}, ${currentLng.toFixed(6)}` : (lang==='it'?"non disponibili":"non disponibles");
-        if (lang === 'fr') {
-            gpsStatus.innerHTML = "⏳ Traduzione FR...";
-            note = await translateToFrench(note);
-            if (currentAddress && currentAddress !== "non disponibile") addr = await translateToFrench(currentAddress);
-            if (currentRefA && currentRefA !== "non disponibile") refA = await translateToFrench(currentRefA);
-            if (currentRefB && currentRefB !== "non disponibile") refB = await translateToFrench(currentRefB);
-            if (currentRefC && currentRefC !== "non disponibile") refC = await translateToFrench(currentRefC);
-            gpsStatus.innerHTML = "🔊 Lettura FR...";
-        } else gpsStatus.innerHTML = "🔊 Lettura IT...";
+        let addr = currentAddress || "non disponibile";
+        let refA = currentRefA || "non disponibile";
+        let refB = currentRefB || "non disponibile";
+        let refC = currentRefC || "non disponibile";
+        let coord = (currentLat && currentLng) ? `${currentLat.toFixed(6)}, ${currentLng.toFixed(6)}` : "non disponibili";
         
-        let intro = (lang==='it') ? "Attenzione Emergenza sono italiano uso il traduttore mi trovo in Emergenza" : await translateToFrench("Attenzione Emergenza sono italiano uso il traduttore mi trovo in Emergenza");
-        await speakWords(intro, lang==='it'?'it-IT':'fr-FR', 1.0, 200);
-        await speakWords(note, lang==='it'?'it-IT':'fr-FR', 1.0, 200);
-        await speakWords("Coordinate", lang==='it'?'it-IT':'fr-FR', 1.0, 200);
-        await speakCoords(coord, lang==='it'?'it-IT':'fr-FR');
-        await speakWords("Indirizzo", lang==='it'?'it-IT':'fr-FR', 1.0, 200);
-        await speakWords(addr, lang==='it'?'it-IT':'fr-FR', 1.0, 200);
-        await speakWords("Sono vicino a 1", lang==='it'?'it-IT':'fr-FR', 1.0, 200);
-        await speakWords(refA, lang==='it'?'it-IT':'fr-FR', 1.0, 200);
-        await speakWords("Sono vicino a 2", lang==='it'?'it-IT':'fr-FR', 1.0, 200);
-        await speakWords(refB, lang==='it'?'it-IT':'fr-FR', 1.0, 200);
-        await speakWords("Sono vicino a 3", lang==='it'?'it-IT':'fr-FR', 1.0, 200);
-        await speakWords(refC, lang==='it'?'it-IT':'fr-FR', 1.0, 200);
-        let domanda = (lang==='it') ? "il il tuo messaggio di risposta verrà tradotto parla piano" : await translateToFrench("il il tuo messaggio di risposta verrà tradotto parla piano");
-        await speakWords(domanda, lang==='it'?'it-IT':'fr-FR', 1.0, 200);
+        // Traduci tutto se necessario
+        if (lang !== targetLangCode) {
+            gpsStatus.innerHTML = `⏳ Traduzione in ${targetLangCode}...`;
+            note = await translateText(note, lang, targetLangCode);
+            if (currentAddress && currentAddress !== "non disponibile") addr = await translateText(currentAddress, lang, targetLangCode);
+            if (currentRefA && currentRefA !== "non disponibile") refA = await translateText(currentRefA, lang, targetLangCode);
+            if (currentRefB && currentRefB !== "non disponibile") refB = await translateText(currentRefB, lang, targetLangCode);
+            if (currentRefC && currentRefC !== "non disponibile") refC = await translateText(currentRefC, lang, targetLangCode);
+            // coordinate non vengono tradotte (sono numeri)
+        }
+        
+        gpsStatus.innerHTML = `🔊 Lettura in ${targetLangCode}...`;
+        let intro = (targetLangCode === 'it') ? "Attenzione Emergenza sono italiano uso il traduttore mi trovo in Emergenza" : 
+                     (targetLangCode === 'fr') ? "Attention Urgence je suis italien j'utilise le traducteur je suis en Urgence" :
+                     await translateText("Attenzione Emergenza sono italiano uso il traduttore mi trovo in Emergenza", 'it', targetLangCode);
+        await speakWords(intro, targetLangCode, 200);
+        await speakWords(note, targetLangCode, 200);
+        let coordLabel = (targetLangCode === 'it') ? "Coordinate" : (targetLangCode === 'fr') ? "Coordonnées" : "Coordinates";
+        await speakWords(coordLabel, targetLangCode, 200);
+        await speakCoords(coord, targetLangCode);
+        let addrLabel = (targetLangCode === 'it') ? "Indirizzo" : (targetLangCode === 'fr') ? "Adresse" : "Address";
+        await speakWords(addrLabel, targetLangCode, 200);
+        await speakWords(addr, targetLangCode, 200);
+        await speakWords("Sono vicino a 1", targetLangCode, 200);
+        await speakWords(refA, targetLangCode, 200);
+        await speakWords("Sono vicino a 2", targetLangCode, 200);
+        await speakWords(refB, targetLangCode, 200);
+        await speakWords("Sono vicino a 3", targetLangCode, 200);
+        await speakWords(refC, targetLangCode, 200);
+        let domanda = (targetLangCode === 'it') ? "il tuo messaggio di risposta verrà tradotto parla piano" :
+                      (targetLangCode === 'fr') ? "votre message de réponse sera traduit parlez lentement" :
+                      await translateText("il tuo messaggio di risposta verrà tradotto parla piano", 'it', targetLangCode);
+        await speakWords(domanda, targetLangCode, 200);
         playBeep();
         await new Promise(r=>setTimeout(r,800));
-        gpsStatus.innerHTML = "✅ Messaggio completo. Avvio ascolto operatore (15 secondi)...";
-        setTimeout(() => startListening15s(), 500);
+        gpsStatus.innerHTML = "✅ Messaggio completo. Avvio ascolto operatore...";
+        setTimeout(() => startListeningAuto(), 500);
     }
-    function speakItalian() { speakFull('it'); }
-    function speakFrench() { speakFull('fr'); }
+
+    async function speakItalian() { 
+        let noteLang = 'it';
+        speakFull(noteLang, 'it'); 
+    }
+    async function speakFrench() { 
+        let noteLang = 'it';
+        speakFull(noteLang, 'fr'); 
+    }
+    async function speakDetectedLanguage() {
+        if (!currentLat || !currentLng) {
+            gpsStatus.innerHTML = "⚠️ Prima carica la posizione per rilevare la lingua del paese";
+            return;
+        }
+        let targetLang = await detectCountryLanguage(currentLat, currentLng);
+        gpsStatus.innerHTML = `🌍 Lingua rilevata: ${targetLang.toUpperCase()}`;
+        let noteLang = 'it'; // la nota è in italiano
+        speakFull(noteLang, targetLang);
+    }
 
     // ---------- EXPORT/IMPORT TXT ----------
     function exportTxt() {
@@ -899,6 +1002,7 @@
         emergencyPage.classList.remove("hidden");
         phoneSaveMsg.innerText = "";
         requestWakeLock();
+        loadSpecialNotes();
     }
     function onRegisterNumber() {
         let n = phoneInput.value.trim();
@@ -915,6 +1019,7 @@
         renderNotes();
         editNoteArea.style.display = 'none';
         releaseWakeLock();
+        saveSpecialNotes();
     }
 
     function init() {
@@ -928,22 +1033,23 @@
         copyBtn.addEventListener('click', copyBilingual);
         audioItBtn.addEventListener('click', speakItalian);
         audioFrBtn.addEventListener('click', speakFrench);
+        audioLangBtn.addEventListener('click', speakDetectedLanguage);
         backHomeBtn.addEventListener('click', backHome);
         exportNotesBtn.addEventListener('click', exportTxt);
         importNotesBtn.addEventListener('click', () => importFileInput.click());
         importFileInput.addEventListener('change', (e) => { if (e.target.files.length) importTxt(e.target.files[0]); importFileInput.value = ''; });
         saveNoteEditBtn.addEventListener('click', saveEdit);
         cancelNoteEditBtn.addEventListener('click', cancelEdit);
-        listenResponseBtn.addEventListener('click', startListening15s);
+        listenResponseBtn.addEventListener('click', startListeningAuto);
         clearResponseBtn.addEventListener('click', () => { operatorResponse.value = ""; transcribeStatus.innerText = ""; });
         selectSpecial1Btn.addEventListener('click', () => selectSpecialNote(1));
         selectSpecial2Btn.addEventListener('click', () => selectSpecialNote(2));
         initRecognition();
         renderNotes();
         normalNoteInfo.style.display = 'none';
+        loadSpecialNotes();
     }
     init();
 </script>
 </body>
 </html>
-```
