@@ -8,7 +8,7 @@
     <link rel="apple-touch-icon" href="icon-sos-192.png">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
-    <title>SOS Drive - Emergenza v0174</title>
+    <title>SOS Drive - Emergenza v0175</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body { font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, sans-serif; background: #e9ecef; padding: 16px; min-height: 100vh; display: flex; justify-content: center; align-items: center; }
@@ -67,7 +67,7 @@
 <body>
 <div class="container">
     <div id="homePage" class="page">
-        <div class="version-header">📟 SOS Drive v0174 - Indirizzo completo e funzionante</div>
+        <div class="version-header">📟 SOS Drive v0175 - Indirizzo completo</div>
         <h1>🆘 SOS EMERGENZA</h1>
         <div class="grid-2">
             <button class="big-btn" data-service="ambulanza">🚑 AMBULANZA</button>
@@ -76,11 +76,11 @@
             <button class="big-btn" data-service="clinica">🏥 CLINICA</button>
         </div>
         <p style="text-align:center; font-size:0.75rem; color:#555;">Ogni servizio ha note normali e note speciali.<br>📍 Tocco breve: seleziona nota | Long press 2s: modifica | 5s: elimina<br>🔊 Ascolto automatico 15 secondi</p>
-        <div class="version-footer">versione 0174 – indirizzo completo (via, civico, paese, città, regione) – tasti matita e cestino funzionanti</div>
+        <div class="version-footer">versione 0175 – indirizzo completo via/civico/paese/città/regione</div>
     </div>
 
     <div id="emergencyPage" class="page hidden">
-        <div class="version-header">📟 SOS Drive v0174 – Indirizzo completo</div>
+        <div class="version-header">📟 SOS Drive v0175 – Indirizzo completo</div>
         <h2 id="serviceTitle">AMBULANZA</h2>
         <label>📞 Numero servizio</label>
         <div class="flex-row">
@@ -126,12 +126,12 @@
             <button id="audioFrBtn" class="small-btn btn-audio">🔊 LEGGI FR</button>
         </div>
         <button id="backHomeBtn" class="small-btn back-home" style="width:100%;">◀ TORNA INDIETRO</button>
-        <div class="version-footer">versione 0174 – tasti matita e cestino funzionanti, indirizzo completo con Nominatim</div>
+        <div class="version-footer">versione 0175 – indirizzo completo via/civico/paese/città/regione</div>
     </div>
 </div>
 
 <script>
-    const CURRENT_VERSION = "0174";
+    const CURRENT_VERSION = "0175";
     let currentService = "ambulanza";
     let currentLat = null, currentLng = null;
     let currentAddress = "";
@@ -189,7 +189,7 @@
     const defaultPhone = { ambulanza:"118", polizia:"113", veterinario:"800123456", clinica:"800987654" };
 
     function migrateNotes() {
-        const versions = ["0173", "0172", "0171", "0170", "0169"];
+        const versions = ["0174", "0173", "0172", "0171", "0170"];
         for (let s of ["ambulanza", "polizia", "veterinario", "clinica"]) {
             if (!localStorage.getItem(`normalNotes_${s}_${CURRENT_VERSION}`)) {
                 for (let ver of versions) {
@@ -326,7 +326,7 @@
                 selectedNoteId = id;
                 selectedNoteType = 'normal';
                 gpsStatus.innerHTML = `✅ Nota normale selezionata: ${title}`;
-                setTimeout(() => { if(gpsStatus.innerHTML.includes("selezionata")) gpsStatus.innerHTML = "✅ Pronto."; }, 2000);
+                setTimeout(() => { if(gpsStatus.innerHTML.includes("selezionata")) gpsStatus.innerHTML = "✅ Pronto.", 2000); }
             }
             let pressTimer = null, pressStart = 0;
             const startPress = (e) => {
@@ -405,7 +405,7 @@
                 selectedNoteId = id;
                 selectedNoteType = 'special';
                 gpsStatus.innerHTML = `✅ Nota speciale selezionata: ${title}`;
-                setTimeout(() => { if(gpsStatus.innerHTML.includes("selezionata")) gpsStatus.innerHTML = "✅ Pronto."; }, 2000);
+                setTimeout(() => { if(gpsStatus.innerHTML.includes("selezionata")) gpsStatus.innerHTML = "✅ Pronto.", 2000); }
             }
             let pressTimer = null, pressStart = 0;
             const startPress = (e) => {
@@ -638,3 +638,4 @@
 </script>
 </body>
 </html>
+```
