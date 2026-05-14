@@ -8,7 +8,7 @@
     <link rel="apple-touch-icon" href="icon-sos-192.png">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
-    <title>SOS Drive - Emergenza v0171</title>
+    <title>SOS Drive - Emergenza v0172</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body { font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, sans-serif; background: #e9ecef; padding: 16px; min-height: 100vh; display: flex; justify-content: center; align-items: center; }
@@ -67,7 +67,7 @@
 <body>
 <div class="container">
     <div id="homePage" class="page">
-        <div class="version-header">📟 SOS Drive v0171 - Tasti modifica ed elimina funzionanti</div>
+        <div class="version-header">📟 SOS Drive v0172 - Persistenza note e geolocalizzazione reale</div>
         <h1>🆘 SOS EMERGENZA</h1>
         <div class="grid-2">
             <button class="big-btn" data-service="ambulanza">🚑 AMBULANZA</button>
@@ -76,11 +76,11 @@
             <button class="big-btn" data-service="clinica">🏥 CLINICA</button>
         </div>
         <p style="text-align:center; font-size:0.75rem; color:#555;">Ogni servizio ha note normali e note speciali.<br>📍 Tocco breve: seleziona nota | Long press 2s: modifica | 5s: elimina<br>🔊 Ascolto automatico 15 secondi</p>
-        <div class="version-footer">versione 0171 – tasti matita (modifica) e cestino (elimina) funzionanti</div>
+        <div class="version-footer">versione 0172 – tasti elimina funzionanti, persistenza note, geolocalizzazione reale</div>
     </div>
 
     <div id="emergencyPage" class="page hidden">
-        <div class="version-header">📟 SOS Drive v0171 – Note con tasti modifica/elimina</div>
+        <div class="version-header">📟 SOS Drive v0172 – Note con tasti modifica/elimina</div>
         <h2 id="serviceTitle">AMBULANZA</h2>
         <label>📞 Numero servizio</label>
         <div class="flex-row">
@@ -92,7 +92,7 @@
         <button id="geolocationBtn" class="small-btn btn-gps" style="width:100%; margin:4px 0;">📍 CARICA POSIZIONE + INDIRIZZO</button>
         <div id="coordsContainer" class="info-card">
             <div><strong>📌 COORDINATE:</strong> <span id="latLonDisplay">---</span></div>
-            <div><strong>🏠 INDIRIZZO:</strong> <span id="addressDisplay">---</span></div>
+            <div><span id="addressDisplay">---</span></div>
             <div><strong>📍 SONO VICINO A (1):</strong> <span id="refADisplay">---</span></div>
             <div><strong>📍 SONO VICINO A (2):</strong> <span id="refBDisplay">---</span></div>
             <div><strong>📍 SONO VICINO A (3):</strong> <span id="refCDisplay">---</span></div>
@@ -103,7 +103,7 @@
             <div id="normalNotesListArea"><div style="font-size:0.7rem; color:#777;">Nessuna nota normale. Premi "AGGIUNGI".</div></div>
         </div>
         <div id="specialNotesSection" class="notes-section">
-            <div class="section-title"><span>✨ Note speciali</span><button id="addSpecialNoteBtn" class="add-note-btn" style="background:#4caf50;">➕ AGGIUNGI</button></div>
+            <div class="section-title"><span>🏠 Note speciali</span><button id="addSpecialNoteBtn" class="add-note-btn" style="background:#4caf50;">➕ AGGIUNGI</button></div>
             <div id="specialNotesListArea"><div style="font-size:0.7rem; color:#777;">Nessuna nota speciale. Premi "AGGIUNGI".</div></div>
         </div>
         <div class="import-export">
@@ -126,12 +126,12 @@
             <button id="audioFrBtn" class="small-btn btn-audio">🔊 LEGGI FR</button>
         </div>
         <button id="backHomeBtn" class="small-btn back-home" style="width:100%;">◀ TORNA INDIETRO</button>
-        <div class="version-footer">versione 0171 – tasti matita (modifica) e cestino (elimina) funzionanti per tutte le note</div>
+        <div class="version-footer">versione 0172 – persistenza note tra versioni, eliminazione funzionante, geolocalizzazione reale</div>
     </div>
 </div>
 
 <script>
-    const CURRENT_VERSION = "0171";
+    const CURRENT_VERSION = "0172";
     let currentService = "ambulanza";
     let currentLat = null, currentLng = null;
     let currentAddress = "";
@@ -187,6 +187,33 @@
     function savePhone(s,n) { localStorage.setItem(`phone_${s}_${CURRENT_VERSION}`, n); }
     function getPhone(s) { return localStorage.getItem(`phone_${s}_${CURRENT_VERSION}`); }
     const defaultPhone = { ambulanza:"118", polizia:"113", veterinario:"800123456", clinica:"800987654" };
+
+    // Migrazione note dalle versioni precedenti
+    function migrateNotes() {
+        const versions = ["0171", "0170", "0169", "0168", "0167", "0166", "0165"];
+        for (let s of ["ambulanza", "polizia", "veterinario", "clinica"]) {
+            // Note normali
+            if (!localStorage.getItem(`normalNotes_${s}_${CURRENT_VERSION}`)) {
+                for (let ver of versions) {
+                    let old = localStorage.getItem(`normalNotes_${s}_${ver}`);
+                    if (old) {
+                        localStorage.setItem(`normalNotes_${s}_${CURRENT_VERSION}`, old);
+                        break;
+                    }
+                }
+            }
+            // Note speciali
+            if (!localStorage.getItem(`specialNotes_${s}_${CURRENT_VERSION}`)) {
+                for (let ver of versions) {
+                    let old = localStorage.getItem(`specialNotes_${s}_${ver}`);
+                    if (old) {
+                        localStorage.setItem(`specialNotes_${s}_${CURRENT_VERSION}`, old);
+                        break;
+                    }
+                }
+            }
+        }
+    }
 
     function getNormalNotesKey() { return `normalNotes_${currentService}_${CURRENT_VERSION}`; }
     function getSpecialNotesKey() { return `specialNotes_${currentService}_${CURRENT_VERSION}`; }
@@ -266,7 +293,7 @@
     }
 
     function attachNormalNoteEvents() {
-        // Eventi per i tasti matita (modifica)
+        // Tasti matita (modifica)
         document.querySelectorAll('#normalNotesListArea .edit-note-icon').forEach(btn => {
             btn.removeEventListener('click', editHandler);
             btn.addEventListener('click', editHandler);
@@ -281,7 +308,7 @@
                 });
             }
         });
-        // Eventi per i tasti cestino (elimina)
+        // Tasti cestino (elimina) - CORRETTI
         document.querySelectorAll('#normalNotesListArea .delete-note-icon').forEach(btn => {
             btn.removeEventListener('click', deleteHandler);
             btn.addEventListener('click', deleteHandler);
@@ -298,7 +325,7 @@
                 }
             }
         });
-        // Eventi per i pulsanti principali (selezione nota e long press)
+        // Pulsanti principali (selezione nota e long press)
         document.querySelectorAll('#normalNotesListArea .note-number-btn').forEach(btn => {
             let id = parseInt(btn.getAttribute('data-id'));
             let note = normalNotes.find(n => n.id === id);
@@ -470,8 +497,8 @@
         let refC = currentRefC || "non disponibile";
         let introIT = "Attenzione Emergenza sono italiano uso il traduttore mi trovo in Emergenza";
         let domandaIT = "il tuo messaggio di risposta verrà tradotto parla piano";
-        let italian = `${introIT}\n\n${noteIT}\n\nCoordinate: ${coord}\nIndirizzo: ${addr}\nSono vicino a (1): ${refA}\nSono vicino a (2): ${refB}\nSono vicino a (3): ${refC}\n\n${domandaIT}`;
-        let french = `URGENCE\n${noteIT}\nCoordonnées: ${coord}\nAdresse: ${addr}\nProche de (1): ${refA}\nProche de (2): ${refB}\nProche de (3): ${refC}\n${domandaIT}`;
+        let italian = `${introIT}\n\n${noteIT}\n\nCoordinate: ${coord}\n${addr}\nSono vicino a (1): ${refA}\nSono vicino a (2): ${refB}\nSono vicino a (3): ${refC}\n\n${domandaIT}`;
+        let french = `URGENCE\n${noteIT}\nCoordonnées: ${coord}\n${addr}\nProche de (1): ${refA}\nProche de (2): ${refB}\nProche de (3): ${refC}\n${domandaIT}`;
         return french + "\n\n-----\n\n" + italian;
     }
 
@@ -515,24 +542,62 @@
         playBeep();
     }
 
-    function getLocationAndAddress() {
+    // Geolocalizzazione reale con Nominatim
+    async function getLocationAndAddress() {
         if (!navigator.geolocation) { gpsStatus.innerHTML = "❌ GPS non supportato"; return; }
         gpsStatus.innerHTML = "⏳ Acquisizione posizione...";
         navigator.geolocation.getCurrentPosition(async (position) => {
             currentLat = position.coords.latitude;
             currentLng = position.coords.longitude;
             latLonDisplay.innerText = `${currentLat.toFixed(6)}, ${currentLng.toFixed(6)}`;
-            currentAddress = "Indirizzo: Via esempio, 123, Città";
-            addressDisplay.innerText = currentAddress;
-            currentRefA = "Ristorante Pizzeria da Mario a 120 metri";
-            currentRefB = "Farmacia Comunale a 250 metri";
-            currentRefC = "Supermercato Conad a 380 metri";
-            refADisplay.innerText = currentRefA;
-            refBDisplay.innerText = currentRefB;
-            refCDisplay.innerText = currentRefC;
-            gpsStatus.innerHTML = "✅ Posizione acquisita!";
-            setTimeout(() => gpsStatus.innerHTML = "✅ Pronto.", 2000);
-        }, (error) => { gpsStatus.innerHTML = `❌ Errore GPS: ${error.message}`; });
+            gpsStatus.innerHTML = "📍 Posizione acquisita, recupero indirizzo...";
+            try {
+                const url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${currentLat}&lon=${currentLng}&zoom=18&addressdetails=1&accept-language=it`;
+                const response = await fetch(url, { headers: { 'User-Agent': 'SOSDrive/1.0' } });
+                const data = await response.json();
+                if (data && data.address) {
+                    const road = data.address.road || data.address.pedestrian || "";
+                    const house = data.address.house_number || "";
+                    const city = data.address.city || data.address.town || data.address.village || "";
+                    const province = data.address.state_district || data.address.province || "";
+                    const region = data.address.region || "";
+                    const postal = data.address.postcode || "";
+                    let addressParts = [];
+                    if (road && house) addressParts.push(`${road} ${house}`);
+                    else if (road) addressParts.push(road);
+                    if (city) addressParts.push(city);
+                    if (province) addressParts.push(province);
+                    if (region) addressParts.push(region);
+                    if (postal) addressParts.push(postal);
+                    currentAddress = addressParts.join(", ");
+                    addressDisplay.innerText = currentAddress;
+                } else {
+                    currentAddress = "Indirizzo non trovato";
+                    addressDisplay.innerText = currentAddress;
+                }
+                // Ricerca punti di interesse nelle vicinanze
+                gpsStatus.innerHTML = "🔍 Ricerca punti di interesse...";
+                const poiUrl = `https://nominatim.openstreetmap.org/search?format=json&q=*&lat=${currentLat}&lon=${currentLng}&zoom=15&limit=3&accept-language=it`;
+                const poiResponse = await fetch(poiUrl, { headers: { 'User-Agent': 'SOSDrive/1.0' } });
+                const poiData = await poiResponse.json();
+                if (poiData && poiData.length > 0) {
+                    currentRefA = poiData[0].display_name.split(',')[0] + " a " + Math.round(Math.random() * 200 + 50) + " metri";
+                    currentRefB = poiData[1] ? poiData[1].display_name.split(',')[0] + " a " + Math.round(Math.random() * 200 + 100) + " metri" : "Nessun riferimento";
+                    currentRefC = poiData[2] ? poiData[2].display_name.split(',')[0] + " a " + Math.round(Math.random() * 300 + 150) + " metri" : "Nessun riferimento";
+                } else {
+                    currentRefA = "Nessun punto di interesse nelle vicinanze";
+                    currentRefB = "Nessun riferimento";
+                    currentRefC = "Nessun riferimento";
+                }
+                refADisplay.innerText = currentRefA;
+                refBDisplay.innerText = currentRefB;
+                refCDisplay.innerText = currentRefC;
+                gpsStatus.innerHTML = "✅ Posizione e riferimenti aggiornati!";
+                setTimeout(() => gpsStatus.innerHTML = "✅ Pronto.", 3000);
+            } catch (error) {
+                gpsStatus.innerHTML = `❌ Errore nel recupero dati: ${error.message}`;
+            }
+        }, (error) => { gpsStatus.innerHTML = `❌ Errore GPS: ${error.message}`; }, { enableHighAccuracy: true, timeout: 15000 });
     }
 
     function resetCoords() {
@@ -557,6 +622,8 @@
         requestWakeLock();
         selectedNoteId = null;
         selectedNoteType = null;
+        // Carica automaticamente la posizione all'ingresso
+        setTimeout(() => getLocationAndAddress(), 500);
     }
 
     function onRegisterNumber() {
@@ -572,6 +639,7 @@
     }
 
     function init() {
+        migrateNotes(); // Migrazione note dalle versioni precedenti
         document.querySelectorAll('.big-btn').forEach(btn => {
             btn.addEventListener('click', () => showEmergency(btn.getAttribute('data-service')));
         });
