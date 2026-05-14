@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
-    <title>SOS Drive - Emergenza v0167</title>
+    <title>SOS Drive - Emergenza v0168</title>
     <style>
         * {
             margin: 0;
@@ -188,7 +188,6 @@
             background: white;
             font-size: 0.85rem;
         }
-        /* MODALE per nuova nota */
         .modal {
             position: fixed;
             top: 0;
@@ -250,7 +249,7 @@
 <div class="container">
     <!-- HOME PAGE -->
     <div id="homePage" class="page">
-        <div class="version-header">📟 SOS Drive v0167 - Dialogo CREA/ANNULLA per nuova nota</div>
+        <div class="version-header">📟 SOS Drive v0168 - Fix pulsanti Modifica/Cancella (delegazione eventi)</div>
         <h1>🆘 SOS EMERGENZA</h1>
         <div class="grid-2">
             <button class="big-btn" data-service="ambulanza">🚑 AMBULANZA</button>
@@ -259,12 +258,12 @@
             <button class="big-btn" data-service="clinica">🏥 CLINICA</button>
         </div>
         <p style="text-align:center; font-size:0.75rem; color:#555;">Ogni servizio ha il proprio archivio note.<br>📍 Ricerca entro 300m di TUTTI i luoghi con nome (negozi, aziende, uffici, piazze)<br>🔊 Ascolto automatico 15 secondi dopo il messaggio</p>
-        <div class="version-footer">versione 0167 – Dialogo modale per creare nota (Titolo + Descrizione) con pulsanti CREA/ANNULLA</div>
+        <div class="version-footer">versione 0168 – Delegazione eventi per note, pulsanti Modifica/Cancella funzionanti</div>
     </div>
 
     <!-- EMERGENCY PAGE -->
     <div id="emergencyPage" class="page hidden">
-        <div class="version-header">📟 SOS Drive v0167 – Gestione note</div>
+        <div class="version-header">📟 SOS Drive v0168 – Gestione note</div>
         <h2 id="serviceTitle">AMBULANZA</h2>
 
         <label>📞 Numero servizio</label>
@@ -286,7 +285,6 @@
             <div id="gpsStatus" class="status-msg"></div>
         </div>
 
-        <!-- PULSANTE AGGIUNGI NOTA -->
         <button id="addNoteBtn" class="small-btn" style="background:#ff9800; width:100%; margin:8px 0;">➕ AGGIUNGI NOTA</button>
         
         <div id="normalNoteInfo" class="status-msg" style="color:#2e7d32; font-weight:500; background:#e8f5e9; padding:6px 12px; border-radius:20px; margin-bottom:8px; display:none;">
@@ -333,10 +331,10 @@
         </div>
 
         <button id="backHomeBtn" class="small-btn back-home" style="width:100%;">◀ TORNA INDIETRO</button>
-        <div class="version-footer">versione 0167 – dialogo modale per nuova nota</div>
+        <div class="version-footer">versione 0168 – Fix eventi modifica/cancella, delegazione su notesListArea</div>
     </div>
 
-    <!-- MODALE per aggiunta nota (inizialmente nascosto) -->
+    <!-- MODALE per aggiunta nota -->
     <div id="noteModal" class="modal" style="display:none;">
         <div class="modal-content">
             <h3>➕ Nuova Nota Normale</h3>
@@ -353,17 +351,17 @@
 </div>
 
 <script>
-    // ==================== VERSIONE 0167 ====================
-    // - Dialogo modale (CREA/ANNULLA) per aggiungere nota normale
-    // - Tutto il resto invariato dalla 0166 (geolocalizzazione, POI, WakeLock, ascolto, velocità, bip, ecc.)
+    // ==================== VERSIONE 0168 ====================
+    // - Fix pulsanti Modifica e Cancella delle note normali usando DELEGAZIONE EVENTI
+    // - Tutto il resto invariato rispetto alla 0167 (coordinate, geolocalizzazione, POI, WakeLock, ecc.)
     // =================================================================
 
-    const CURRENT_VERSION = "0167";
+    const CURRENT_VERSION = "0168";
     let currentService = "ambulanza";
     let currentLat = null, currentLng = null;
     let currentAddress = "";
     let currentRefA = "", currentRefB = "", currentRefC = "";
-    let notesArray = [];          // array di { id, title, description }
+    let notesArray = [];
     let selectedNoteId = null;
     let selectedSpecialMode = false;
     let selectedSpecialText = "";
@@ -403,7 +401,6 @@
     const selectSpecial2Btn = document.getElementById('selectSpecial2Btn');
     const specialNoteStatus = document.getElementById('specialNoteStatus');
     const normalNoteInfo = document.getElementById('normalNoteInfo');
-    // MODALE
     const modal = document.getElementById('noteModal');
     const modalTitle = document.getElementById('modalTitle');
     const modalDesc = document.getElementById('modalDesc');
@@ -428,7 +425,7 @@
     // ---------- ARCHIVIO NUMERI ----------
     function migratePhoneNumbers() {
         const services = ["ambulanza", "polizia", "veterinario", "clinica"];
-        const oldVersions = ["0166", "0165", "0154"];
+        const oldVersions = ["0167", "0166", "0165"];
         for (let s of services) {
             if (localStorage.getItem(`phone_${s}_${CURRENT_VERSION}`)) continue;
             for (let ver of oldVersions) {
@@ -501,12 +498,12 @@
         recognitionTimeout = setTimeout(() => { if (recognition && recognition.stop) recognition.stop(); }, 15000);
     }
 
-    // ---------- GESTIONE NOTE NORMALI (con titolo e descrizione) ----------
+    // ---------- GESTIONE NOTE NORMALI (con delegazione eventi) ----------
     function migrateOldNotes() {
         const services = ["ambulanza", "polizia", "veterinario", "clinica"];
         for (let s of services) {
             if (localStorage.getItem(`sos_notes_${s}_${CURRENT_VERSION}`)) continue;
-            let old = localStorage.getItem(`sos_notes_${s}_0166`);
+            let old = localStorage.getItem(`sos_notes_${s}_0167`);
             if (old) {
                 try {
                     let arr = JSON.parse(old);
@@ -569,9 +566,14 @@
             `;
         });
         notesListArea.innerHTML = html;
-        // Radio button
-        document.querySelectorAll('input[name="noteSelect"]').forEach(r => {
-            r.addEventListener('change', (e) => {
+        // Non attacco più listener diretti qui: userò delegazione su notesListArea
+    }
+
+    // DELEGAZIONE EVENTI per pulsanti Modifica e Cancella (e anche per i radio)
+    function attachDelegatedEvents() {
+        // Gestione cambio radio (selezione nota)
+        notesListArea.addEventListener('change', (e) => {
+            if (e.target && e.target.type === 'radio' && e.target.name === 'noteSelect') {
                 selectedNoteId = parseInt(e.target.value);
                 selectedSpecialMode = false;
                 selectedSpecialText = "";
@@ -579,13 +581,16 @@
                 normalNoteInfo.style.display = 'block';
                 setTimeout(() => { normalNoteInfo.style.display = 'none'; }, 10000);
                 specialNoteStatus.innerText = "";
-            });
+            }
         });
-        // Modifica
-        document.querySelectorAll('.edit-note-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => {
+
+        // Gestione click su pulsanti Modifica e Cancella (delegazione)
+        notesListArea.addEventListener('click', (e) => {
+            const btn = e.target;
+            if (btn.classList && btn.classList.contains('edit-note-btn')) {
                 e.stopPropagation();
                 const parentDiv = btn.closest('.note-item');
+                if (!parentDiv) return;
                 const noteId = parseInt(parentDiv.getAttribute('data-id'));
                 const note = notesArray.find(n => n.id === noteId);
                 if (note) {
@@ -602,13 +607,10 @@
                         }
                     }
                 }
-            });
-        });
-        // Cancella
-        document.querySelectorAll('.delete-note-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => {
+            } else if (btn.classList && btn.classList.contains('delete-note-btn')) {
                 e.stopPropagation();
                 const parentDiv = btn.closest('.note-item');
+                if (!parentDiv) return;
                 const noteId = parseInt(parentDiv.getAttribute('data-id'));
                 notesArray = notesArray.filter(n => n.id !== noteId);
                 if (selectedNoteId === noteId) selectedNoteId = notesArray.length ? notesArray[0].id : null;
@@ -617,17 +619,11 @@
                 if (!notesArray.length) normalNoteInfo.style.display = 'none';
                 gpsStatus.innerHTML = "✅ Nota eliminata";
                 setTimeout(()=> gpsStatus.innerHTML = "✅ Pronto.", 2000);
-            });
+            }
         });
     }
-    // Nuova nota con modale
-    function showAddNoteModal() {
-        modalTitle.value = "";
-        modalDesc.value = "";
-        modal.style.display = "flex";
-    }
-    function closeModal() { modal.style.display = "none"; }
-    function createNoteFromModal() {
+
+    function addNewNoteFromModal() {
         let title = modalTitle.value.trim();
         if (title === "") title = "Senza titolo";
         let description = modalDesc.value.trim() || "";
@@ -641,6 +637,9 @@
         selectedSpecialMode = false;
         closeModal();
     }
+    function showAddNoteModal() { modal.style.display = "flex"; }
+    function closeModal() { modal.style.display = "none"; }
+
     function getSelectedNoteDescription() {
         if (selectedSpecialMode) return selectedSpecialText;
         const note = notesArray.find(n => n.id === selectedNoteId);
@@ -960,6 +959,8 @@
         emergencyPage.classList.remove("hidden");
         phoneSaveMsg.innerText = "";
         requestWakeLock();
+        // Ricollega eventi delegati dopo ogni ricaricamento dell'area note
+        attachDelegatedEvents();
     }
     function onRegisterNumber() {
         let n = phoneInput.value.trim();
@@ -996,13 +997,12 @@
         clearResponseBtn.addEventListener('click', () => { operatorResponse.value = ""; transcribeStatus.innerText = ""; });
         selectSpecial1Btn.addEventListener('click', () => selectSpecialNote(1));
         selectSpecial2Btn.addEventListener('click', () => selectSpecialNote(2));
-        // Modale eventi
-        modalCreateBtn.addEventListener('click', createNoteFromModal);
+        modalCreateBtn.addEventListener('click', addNewNoteFromModal);
         modalCancelBtn.addEventListener('click', closeModal);
-        // Chiudi modale se clicca fuori (sullo sfondo)
         modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
         initRecognition();
         renderNotes();
+        attachDelegatedEvents(); // Attacca la delegazione fin dall'inizio
         normalNoteInfo.style.display = 'none';
     }
     init();
