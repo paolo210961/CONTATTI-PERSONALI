@@ -1,14 +1,9 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-    <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#ff0000">
-   meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <link rel="apple-touch-icon" href="icon-sos-192.png">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
-    <title>SOS Drive - Emergenza v0164 - Dati persistenti</title>
+    <title>SOS Drive - Emergenza v0165</title>
     <style>
         * {
             margin: 0;
@@ -176,7 +171,6 @@
             border-radius: 24px;
             padding: 14px;
             margin: 12px 0;
-            display: block;
         }
         .special-note-area {
             background: #e8f5e9;
@@ -233,7 +227,7 @@
 <div class="container">
     <!-- HOME PAGE -->
     <div id="homePage" class="page">
-        <div class="version-header">📟 SOS Drive v0164 - Dati persistenti</div>
+        <div class="version-header">📟 SOS Drive v0165 - Ricerca estesa a tutte le attività con nome</div>
         <h1>🆘 SOS EMERGENZA</h1>
         <div class="grid-2">
             <button class="big-btn" data-service="ambulanza">🚑 AMBULANZA</button>
@@ -241,13 +235,13 @@
             <button class="big-btn" data-service="veterinario">🐾 VETERINARIO</button>
             <button class="big-btn" data-service="clinica">🏥 CLINICA</button>
         </div>
-        <p style="text-align:center; font-size:0.75rem; color:#555;">Ogni servizio ha il proprio archivio note.<br>📍 Ricerca luoghi con nome (esclude autostrade generiche)<br>🔊 Ascolto automatico 15 secondi</p>
-        <div class="version-footer">versione 0164 – chiavi fisse: i dati non si perdono più tra le versioni</div>
+        <p style="text-align:center; font-size:0.75rem; color:#555;">Ogni servizio ha il proprio archivio note.<br>📍 Ricerca entro 300m di TUTTI i luoghi con nome (negozi, aziende, uffici, piazze, uscite autostradali)<br>🔊 Ascolto automatico 15 secondi dopo il messaggio</p>
+        <div class="version-footer">versione 0165 – ricerca ampliata a qualunque elemento con nome (es. Dardanelli, BS Autotrasporti, Rea Trasport)</div>
     </div>
 
     <!-- EMERGENCY PAGE -->
     <div id="emergencyPage" class="page hidden">
-        <div class="version-header">📟 SOS Drive v0164 – Dati permanenti</div>
+        <div class="version-header">📟 SOS Drive v0165 – Ricerca estesa</div>
         <h2 id="serviceTitle">AMBULANZA</h2>
 
         <label>📞 Numero servizio</label>
@@ -281,8 +275,7 @@
             <div style="font-size:0.7rem; color:#777;">Nessuna nota. Aggiungine una.</div>
         </div>
 
-        <!-- Area modifica nota normale - sempre visibile -->
-        <div id="editNoteArea" class="edit-note-area">
+        <div id="editNoteArea" class="edit-note-area" style="display:none;">
             <label>✏️ Modifica nota (normale):</label>
             <textarea id="editNoteText" rows="2"></textarea>
             <div class="flex-row">
@@ -291,7 +284,6 @@
             </div>
         </div>
 
-        <!-- NOTE SPECIALI -->
         <div id="specialNotesArea" class="special-note-area">
             <label>📌 NOTE SPECIALI (solo testo - ignorano coordinate)</label>
             <div class="flex-row">
@@ -328,22 +320,25 @@
         </div>
 
         <button id="backHomeBtn" class="small-btn back-home" style="width:100%;">◀ TORNA INDIETRO</button>
-        <div class="version-footer">versione 0164 – chiavi di memorizzazione fisse, migrazione robusta, nessuna perdita di dati</div>
+        <div class="version-footer">versione 0165 – tutti i luoghi con nome entro 300m (esclude solo panchine/fontane/toilette)</div>
     </div>
 </div>
 
 <script>
-    // ==================== VERSIONE 0164 ====================
-    // CHIAVI FISSE PER I DATI (indipendenti dalla versione):
-    // - Numeri telefono: "sos_phone_<servizio>"
-    // - Note speciali: "sos_special_note1", "sos_special_note2"
-    // - Note normali: "sos_notes_<servizio>" (array di oggetti con id e text)
-    // - Nota selezionata: "sos_selected_note_<servizio>" (id)
-    // Migrazione: al primo avvio cerca i dati nelle versioni precedenti (0159-0163)
-    //              e li copia nelle nuove chiavi fisse, poi cancella le vecchie chiavi.
+    // ==================== VERSIONE 0165 ====================
+    // Basata sulla 0154 con le seguenti caratteristiche:
+    // - Ricerca di TUTTI gli elementi (nodi/ways) che hanno un nome entro 300m
+    // - Esclusione solo delle categorie inutili: information, bench, waste_basket, toilets, telephone, recycling, fountain, drinking_water
+    // - WakeLock (schermo sempre acceso)
+    // - Archivio numeri persistente
+    // - Testi personalizzati: "Attenzione Emergenza sono italiano uso il traduttore mi trovo in Emergenza"
+    //   e "il il tuo messaggio di risposta verrà tradotto parla piano"
+    // - Velocità lettura: pausa 0.2s tra parole, 2s tra caratteri coordinate
+    // - Ascolto automatico 15 secondi dopo il bip
+    // - Due note speciali che leggono solo il testo
     // =================================================================
 
-    const CURRENT_VERSION = "0164";
+    const CURRENT_VERSION = "0165";
     let currentService = "ambulanza";
     let currentLat = null, currentLng = null;
     let currentAddress = "";
@@ -398,120 +393,6 @@
     let recognition = null;
     let recognitionTimeout = null;
 
-    // ---------- MIGRAZIONE DATI VERSO CHIAVI FISSE ----------
-    function migrateAllData() {
-        // Migrazione numeri di telefono
-        const services = ["ambulanza", "polizia", "veterinario", "clinica"];
-        const oldVersions = ["0163", "0162", "0161", "0160", "0159"];
-        for (let s of services) {
-            const fixedKey = `sos_phone_${s}`;
-            if (localStorage.getItem(fixedKey) === null) {
-                // Cerca nelle versioni precedenti
-                for (let ver of oldVersions) {
-                    let oldKey = `phone_${s}_${ver}`;
-                    let oldVal = localStorage.getItem(oldKey);
-                    if (oldVal !== null) {
-                        localStorage.setItem(fixedKey, oldVal);
-                        break;
-                    }
-                }
-                // Se ancora null, imposta default
-                if (localStorage.getItem(fixedKey) === null) {
-                    const defaults = { ambulanza:"118", polizia:"113", veterinario:"800123456", clinica:"800987654" };
-                    localStorage.setItem(fixedKey, defaults[s]);
-                }
-            }
-            // Pulisci vecchie chiavi (opzionale, per non lasciare sporco)
-            for (let ver of oldVersions) {
-                localStorage.removeItem(`phone_${s}_${ver}`);
-            }
-        }
-
-        // Migrazione note speciali
-        if (localStorage.getItem('sos_special_note1') === null) {
-            for (let ver of oldVersions) {
-                let old = localStorage.getItem(`specialNote1_${ver}`);
-                if (old !== null) { localStorage.setItem('sos_special_note1', old); break; }
-            }
-        }
-        if (localStorage.getItem('sos_special_note2') === null) {
-            for (let ver of oldVersions) {
-                let old = localStorage.getItem(`specialNote2_${ver}`);
-                if (old !== null) { localStorage.setItem('sos_special_note2', old); break; }
-            }
-        }
-
-        // Migrazione note normali per ogni servizio
-        for (let s of services) {
-            const fixedNotesKey = `sos_notes_${s}`;
-            const fixedSelectedKey = `sos_selected_note_${s}`;
-            if (localStorage.getItem(fixedNotesKey) === null) {
-                let found = false;
-                for (let ver of oldVersions) {
-                    let oldKey = `sos_notes_${s}_${ver}`;
-                    let oldNotes = localStorage.getItem(oldKey);
-                    if (oldNotes) {
-                        try {
-                            let parsed = JSON.parse(oldNotes);
-                            if (Array.isArray(parsed) && parsed.length) {
-                                localStorage.setItem(fixedNotesKey, JSON.stringify(parsed));
-                                found = true;
-                                // Migra anche l'id selezionato
-                                let oldSelKey = `sos_selected_note_${s}_${ver}`;
-                                let oldSel = localStorage.getItem(oldSelKey);
-                                if (oldSel) localStorage.setItem(fixedSelectedKey, oldSel);
-                                break;
-                            }
-                        } catch(e) {}
-                    }
-                }
-                if (!found) localStorage.setItem(fixedNotesKey, JSON.stringify([]));
-            }
-            // Pulisci vecchie chiavi
-            for (let ver of oldVersions) {
-                localStorage.removeItem(`sos_notes_${s}_${ver}`);
-                localStorage.removeItem(`sos_selected_note_${s}_${ver}`);
-            }
-        }
-    }
-
-    // ---------- FUNZIONI DI ACCESSO AI DATI (usano chiavi fisse) ----------
-    function savePhone(s,n) { localStorage.setItem(`sos_phone_${s}`, n); }
-    function getPhone(s) { return localStorage.getItem(`sos_phone_${s}`); }
-    const defaultPhone = { ambulanza:"118", polizia:"113", veterinario:"800123456", clinica:"800987654" };
-
-    function saveSpecialNotes() {
-        localStorage.setItem('sos_special_note1', specialNote1.value);
-        localStorage.setItem('sos_special_note2', specialNote2.value);
-    }
-    function loadSpecialNotes() {
-        let s1 = localStorage.getItem('sos_special_note1');
-        let s2 = localStorage.getItem('sos_special_note2');
-        if (s1 !== null) specialNote1.value = s1;
-        if (s2 !== null) specialNote2.value = s2;
-    }
-
-    function saveNotes() {
-        if (!currentService) return;
-        localStorage.setItem(`sos_notes_${currentService}`, JSON.stringify(notesArray));
-        if (selectedNoteId) localStorage.setItem(`sos_selected_note_${currentService}`, selectedNoteId);
-        else localStorage.removeItem(`sos_selected_note_${currentService}`);
-    }
-    function loadNotes(s) {
-        let stored = localStorage.getItem(`sos_notes_${s}`);
-        if (stored) {
-            try {
-                notesArray = JSON.parse(stored);
-                let savedId = localStorage.getItem(`sos_selected_note_${s}`);
-                if (savedId && notesArray.some(n => n.id == savedId)) selectedNoteId = parseInt(savedId);
-                else if (notesArray.length) selectedNoteId = notesArray[0].id;
-                else selectedNoteId = null;
-            } catch(e) { notesArray = []; selectedNoteId = null; }
-        } else { notesArray = []; selectedNoteId = null; }
-        renderNotes();
-        updateEditField();
-    }
-
     // ---------- WakeLock ----------
     async function requestWakeLock() {
         if ('wakeLock' in navigator) {
@@ -523,6 +404,22 @@
         }
     }
     function releaseWakeLock() { if (wakeLock) { wakeLock.release(); wakeLock = null; } }
+
+    // ---------- ARCHIVIO NUMERI ----------
+    function migratePhoneNumbers() {
+        const services = ["ambulanza", "polizia", "veterinario", "clinica"];
+        const oldVersions = ["0154", "0153", "0152"];
+        for (let s of services) {
+            if (localStorage.getItem(`phone_${s}_${CURRENT_VERSION}`)) continue;
+            for (let ver of oldVersions) {
+                let old = localStorage.getItem(`phone_${s}_${ver}`);
+                if (old) { localStorage.setItem(`phone_${s}_${CURRENT_VERSION}`, old); break; }
+            }
+        }
+    }
+    function savePhone(s,n) { localStorage.setItem(`phone_${s}_${CURRENT_VERSION}`, n); }
+    function getPhone(s) { return localStorage.getItem(`phone_${s}_${CURRENT_VERSION}`); }
+    const defaultPhone = { ambulanza:"118", polizia:"113", veterinario:"800123456", clinica:"800987654" };
 
     // ---------- TRADUZIONI ----------
     async function translateToFrench(italianText) {
@@ -585,129 +482,129 @@
     }
 
     // ---------- GESTIONE NOTE NORMALI ----------
-    function updateEditField() {
-        if (selectedNoteId && !selectedSpecialMode) {
-            let note = notesArray.find(n => n.id === selectedNoteId);
-            if (note) {
-                editNoteText.value = note.text;
-                currentEditingNoteId = selectedNoteId;
-            } else {
-                editNoteText.value = "";
-                currentEditingNoteId = null;
+    function migrateOldNotes() {
+        const services = ["ambulanza", "polizia", "veterinario", "clinica"];
+        for (let s of services) {
+            if (localStorage.getItem(`sos_notes_${s}_${CURRENT_VERSION}`)) continue;
+            for (let ver of ["0154","0153","0152"]) {
+                let old = localStorage.getItem(`sos_notes_${s}_${ver}`);
+                if (old) {
+                    try {
+                        let arr = JSON.parse(old);
+                        let norm = arr.map(n => ({ id: n.id || Date.now()+Math.random(), text: n.text || n.textIT || "" })).filter(n => n.text);
+                        if (norm.length) localStorage.setItem(`sos_notes_${s}_${CURRENT_VERSION}`, JSON.stringify(norm));
+                        break;
+                    } catch(e) {}
+                }
             }
-        } else {
-            editNoteText.value = "";
-            currentEditingNoteId = null;
         }
+    }
+    function getNoteKey(s) { return `sos_notes_${s}_${CURRENT_VERSION}`; }
+    function getSelectedKey(s) { return `sos_selected_note_${s}_${CURRENT_VERSION}`; }
+    function saveNotes() {
+        if (!currentService) return;
+        localStorage.setItem(getNoteKey(currentService), JSON.stringify(notesArray));
+        if (selectedNoteId) localStorage.setItem(getSelectedKey(currentService), selectedNoteId);
+        else localStorage.removeItem(getSelectedKey(currentService));
+    }
+    function loadNotes(s) {
+        let stored = localStorage.getItem(getNoteKey(s));
+        if (stored) {
+            try {
+                notesArray = JSON.parse(stored);
+                let savedId = localStorage.getItem(getSelectedKey(s));
+                if (savedId && notesArray.some(n => n.id == savedId)) selectedNoteId = parseInt(savedId);
+                else if (notesArray.length) selectedNoteId = notesArray[0].id;
+                else selectedNoteId = null;
+            } catch(e) { notesArray = []; selectedNoteId = null; }
+        } else { notesArray = []; selectedNoteId = null; }
+        renderNotes();
+        editNoteArea.style.display = 'none';
+        currentEditingNoteId = null;
     }
     function renderNotes() {
         if (!notesArray.length) {
             notesListArea.innerHTML = `<div style="font-size:0.7rem;">Nessuna nota. Aggiungine una.</div>`;
+            selectedNoteId = null;
+            editNoteArea.style.display = 'none';
             return;
         }
         let html = '<div><strong>📋 Seleziona nota normale:</strong></div>';
         notesArray.forEach(n => {
             html += `
                 <div class="note-item">
-                    <input type="radio" name="noteSelect" value="${n.id}" class="radio-note" ${selectedNoteId===n.id && !selectedSpecialMode ? 'checked' : ''}>
+                    <input type="radio" name="noteSelect" value="${n.id}" class="radio-note" ${selectedNoteId===n.id ? 'checked' : ''}>
                     <span class="note-text">${escapeHtml(n.text)}</span>
                     <button class="delete-note" data-id="${n.id}">🗑️</button>
                 </div>
             `;
         });
         notesListArea.innerHTML = html;
-        // Evento selezione nota normale
-        document.querySelectorAll('input[name="noteSelect"]').forEach(radio => {
-            radio.addEventListener('change', (e) => {
+        document.querySelectorAll('input[name="noteSelect"]').forEach(r => {
+            r.addEventListener('change', (e) => {
                 selectedNoteId = parseInt(e.target.value);
                 selectedSpecialMode = false;
                 selectedSpecialText = "";
                 saveNotes();
-                updateEditField();
+                let n = notesArray.find(x => x.id === selectedNoteId);
+                if (n) { editNoteText.value = n.text; editNoteArea.style.display = 'block'; currentEditingNoteId = selectedNoteId; }
                 normalNoteInfo.style.display = 'block';
                 setTimeout(() => { normalNoteInfo.style.display = 'none'; }, 10000);
                 specialNoteStatus.innerText = "";
-                selectSpecial1Btn.style.backgroundColor = "#4caf50";
-                selectSpecial2Btn.style.backgroundColor = "#4caf50";
             });
         });
-        // Evento eliminazione nota
         document.querySelectorAll('.delete-note').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 let id = parseInt(btn.getAttribute('data-id'));
                 notesArray = notesArray.filter(n => n.id !== id);
                 if (selectedNoteId === id) selectedNoteId = notesArray.length ? notesArray[0].id : null;
-                renderNotes();
-                saveNotes();
-                updateEditField();
+                renderNotes(); saveNotes();
+                if (!selectedNoteId) { editNoteArea.style.display = 'none'; currentEditingNoteId = null; }
+                else { let n = notesArray.find(x => x.id === selectedNoteId); if (n) { editNoteText.value = n.text; editNoteArea.style.display = 'block'; currentEditingNoteId = selectedNoteId; } }
             });
         });
+        if (selectedNoteId && !selectedSpecialMode && editNoteArea.style.display === 'none') {
+            let n = notesArray.find(x => x.id === selectedNoteId);
+            if (n) { editNoteText.value = n.text; editNoteArea.style.display = 'block'; currentEditingNoteId = selectedNoteId; }
+        }
     }
     function saveEdit() {
-        if (!currentEditingNoteId) {
-            gpsStatus.innerHTML = "Nessuna nota selezionata";
-            return;
-        }
+        if (!currentEditingNoteId) return;
         let newText = editNoteText.value.trim();
         if (!newText) { gpsStatus.innerHTML = "Nota vuota"; return; }
         let idx = notesArray.findIndex(n => n.id === currentEditingNoteId);
-        if (idx !== -1) {
-            notesArray[idx].text = newText;
-            saveNotes();
-            renderNotes();
-            updateEditField();
-            gpsStatus.innerHTML = "✅ Nota salvata";
-            setTimeout(()=> gpsStatus.innerHTML = "✅ Pronto.", 2000);
-        }
+        if (idx !== -1) { notesArray[idx].text = newText; saveNotes(); renderNotes(); gpsStatus.innerHTML = "✅ Nota salvata"; setTimeout(()=> gpsStatus.innerHTML = "✅ Pronto.", 2000); }
     }
-    function cancelEdit() {
-        updateEditField();
-        gpsStatus.innerHTML = "Modifica annullata";
-        setTimeout(()=> gpsStatus.innerHTML = "✅ Pronto.", 1500);
-    }
+    function cancelEdit() { editNoteArea.style.display = 'none'; currentEditingNoteId = null; }
     function addNote() {
         let text = newNoteInput.value.trim();
         if (!text) { alert("Scrivi una nota"); return; }
         let newId = Date.now() + Math.random()*10000;
         notesArray.push({ id: newId, text: text });
         if (notesArray.length === 1) selectedNoteId = newId;
-        renderNotes(); 
-        saveNotes(); 
-        newNoteInput.value = '';
+        renderNotes(); saveNotes(); newNoteInput.value = '';
+        if (selectedNoteId) { let n = notesArray.find(x => x.id === selectedNoteId); if (n) { editNoteText.value = n.text; editNoteArea.style.display = 'block'; currentEditingNoteId = selectedNoteId; } }
         selectedSpecialMode = false;
-        updateEditField();
     }
     function getSelectedNoteText() {
         if (selectedSpecialMode) return selectedSpecialText;
-        let note = notesArray.find(n => n.id === selectedNoteId);
-        return note ? note.text : null;
+        return notesArray.find(n => n.id === selectedNoteId)?.text || null;
     }
     function escapeHtml(str) { return str.replace(/[&<>]/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;' }[m])); }
 
-    // ---------- GESTIONE NOTE SPECIALI ----------
     function selectSpecialNote(index) {
         let text = (index === 1) ? specialNote1.value.trim() : specialNote2.value.trim();
         if (!text) { specialNoteStatus.innerText = "⚠️ Scrivi prima la nota speciale"; return; }
         selectedSpecialMode = true;
         selectedSpecialText = text;
         selectedNoteId = null;
-        editNoteText.value = "";
-        currentEditingNoteId = null;
-        document.querySelectorAll('input[name="noteSelect"]').forEach(r => r.checked = false);
-        saveSpecialNotes();
+        editNoteArea.style.display = 'none';
         specialNoteStatus.innerText = `✅ Nota speciale ${index} selezionata (solo testo)`;
         setTimeout(()=> specialNoteStatus.innerText="", 10000);
         normalNoteInfo.style.display = 'none';
-        if (index === 1) {
-            selectSpecial1Btn.style.backgroundColor = "#1976d2";
-            selectSpecial2Btn.style.backgroundColor = "#4caf50";
-        } else {
-            selectSpecial2Btn.style.backgroundColor = "#1976d2";
-            selectSpecial1Btn.style.backgroundColor = "#4caf50";
-        }
     }
 
-    // ---------- COPIA BILINGUE ----------
+    // ---------- COPIA BILINGUE (con nuovi testi) ----------
     async function getBilingualCopy() {
         let noteIT = getSelectedNoteText() || "nessuna nota";
         let coord = (currentLat && currentLng) ? `${currentLat.toFixed(6)}, ${currentLng.toFixed(6)}` : "non disponibili";
@@ -746,7 +643,7 @@
         }
     }
 
-    // ---------- GEOLOCALIZZAZIONE + RICERCA LUOGHI + INDIRIZZO PULITO ----------
+    // ---------- GEOLOCALIZZAZIONE + RICERCA ESTESA A TUTTI GLI ELEMENTI CON NOME ----------
     function haversine(lat1,lng1,lat2,lng2) {
         const R = 6371e3;
         const φ1 = lat1 * Math.PI/180, φ2 = lat2 * Math.PI/180;
@@ -767,55 +664,15 @@
             return {lat,lng};
         } catch(e) { return {lat,lng}; }
     }
-    function isGenericHighway(name) {
-        if (!name) return false;
-        const lower = name.toLowerCase();
-        if (lower.includes("autostrada") || lower.includes("tangenziale") || lower.includes("raccordo")) {
-            if (lower.includes("casello") || lower.includes("uscita") || lower.includes("exit")) return false;
-            return true;
-        }
-        return false;
-    }
-    function cleanAddress(address) {
-        if (!address) return address;
-        const blacklist = /\b(Autostrada del Sole|Autostrada A1|Tangenziale|Raccordo|Strada Statale)\b/gi;
-        let cleaned = address.replace(blacklist, '').replace(/,\s*,/g, ',').replace(/^,\s*/, '').replace(/,\s*$/, '');
-        if (cleaned.trim() === "") return address;
-        return cleaned;
-    }
-    async function reverseGeocode(lat,lng) {
-        try {
-            let url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1&accept-language=it`;
-            let resp = await fetch(url, {headers:{'User-Agent':'SOSDrive/1.0'}});
-            let data = await resp.json();
-            if (data && data.address) {
-                let road = data.address.road || data.address.pedestrian || "";
-                let house = data.address.house_number || "";
-                let city = data.address.city || data.address.town || data.address.village || "";
-                let province = data.address.state_district || data.address.province || "";
-                let postal = data.address.postcode || "";
-                let parts = [];
-                if (road && house) parts.push(`${road} ${house}`);
-                else if (road) parts.push(road);
-                if (city) parts.push(city);
-                if (province) parts.push(province);
-                if (postal) parts.push(postal);
-                let addr = parts.join(", ");
-                addr = cleanAddress(addr);
-                if (addr === "") addr = "Indirizzo non trovato";
-                return addr;
-            }
-            let full = data.display_name || "Indirizzo non trovato";
-            return cleanAddress(full);
-        } catch(e) { return "Indirizzo non disponibile"; }
-    }
+    // NUOVA FUNZIONE: ricerca di TUTTI i nodi e vie che hanno un nome, entro 300m
     async function fetchAllNamedPlaces(lat, lng) {
+        const excludeTags = ["information", "bench", "waste_basket", "toilets", "telephone", "recycling", "fountain", "drinking_water"];
         let query = `[out:json];(node(around:300,${lat},${lng})[name];way(around:300,${lat},${lng})[name];);out center;`;
         let url = `https://overpass-api.de/api/interpreter?data=${encodeURIComponent(query)}`;
         try {
             let resp = await fetch(url);
             let data = await resp.json();
-            if (!data.elements?.length) return ["Nessun riferimento","Nessun riferimento","Nessun riferimento"];
+            if (!data.elements?.length) return [];
             let items = [];
             for (let el of data.elements) {
                 let latEl = el.lat || el.center?.lat;
@@ -824,8 +681,9 @@
                 let tags = el.tags || {};
                 let name = tags.name;
                 if (!name || name.trim() === "") continue;
-                if (isGenericHighway(name)) continue;
-                let cat = tags.amenity || tags.shop || tags.tourism || tags.office || tags.leisure || tags.historic || tags.place || tags.aeroway || tags.railway || tags.industrial || tags.craft;
+                let cat = tags.amenity || tags.shop || tags.tourism || tags.office || tags.leisure || tags.historic || tags.place || tags.aeroway || tags.railway;
+                if (cat && excludeTags.includes(cat)) continue;
+                let dist = haversine(lat, lng, latEl, lonEl);
                 let display = name;
                 if (cat) {
                     let catMap = {
@@ -834,17 +692,16 @@
                         "cafe":"Bar","restaurant":"Ristorante","pub":"Pub","fast_food":"Fast food","museum":"Museo","monument":"Monumento",
                         "attraction":"Attrazione","square":"Piazza","garden":"Giardino","park":"Parco","bus_station":"Stazione bus","train_station":"Stazione",
                         "church":"Chiesa","services":"Area di servizio","motorway_junction":"Uscita autostradale","aeroway":"Aeroporto","railway":"Stazione",
-                        "shop":"Negozio","office":"Ufficio","leisure":"Tempo libero","historic":"Sito storico","place":"Luogo","industrial":"Azienda","craft":"Laboratorio"
+                        "shop":"Negozio","office":"Ufficio","leisure":"Tempo libero","historic":"Sito storico","place":"Luogo","industrial":"Azienda"
                     };
                     let readable = catMap[cat] || (cat.charAt(0).toUpperCase() + cat.slice(1));
                     display = `${name} (${readable})`;
                 }
-                let dist = haversine(lat, lng, latEl, lonEl);
-                items.push({ display, dist, name });
+                items.push({ display, dist });
             }
             const unique = new Map();
             for (let item of items) {
-                if (!unique.has(item.name)) unique.set(item.name, item);
+                if (!unique.has(item.display.split(' (')[0])) unique.set(item.display.split(' (')[0], item);
             }
             let uniqueItems = Array.from(unique.values());
             uniqueItems.sort((a,b) => a.dist - b.dist);
@@ -855,6 +712,14 @@
             console.warn("Errore ricerca nomi", e);
             return ["Nessun riferimento","Nessun riferimento","Nessun riferimento"];
         }
+    }
+    async function reverseGeocode(lat,lng) {
+        try {
+            let url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1&accept-language=it`;
+            let resp = await fetch(url, {headers:{'User-Agent':'SOSDrive/1.0'}});
+            let data = await resp.json();
+            return data.display_name || "Indirizzo non trovato";
+        } catch(e) { return "Indirizzo non disponibile"; }
     }
     async function getAveragePosition() {
         return new Promise((resolve,reject) => {
@@ -905,7 +770,7 @@
         gpsStatus.innerHTML = "";
     }
 
-    // ---------- LETTURA VOCALE ----------
+    // ---------- LETTURA VOCALE (pausa 0.2s tra parole, 2s coordinate) ----------
     function playBeep() {
         try {
             let ctx = new (window.AudioContext || window.webkitAudioContext)();
@@ -1027,19 +892,12 @@
         currentService = s;
         let label = {ambulanza:"🚑 AMBULANZA", polizia:"👮 POLIZIA", veterinario:"🐾 VETERINARIO", clinica:"🏥 CLINICA"}[s];
         serviceTitleSpan.innerText = label;
-        let savedPhone = getPhone(s);
-        phoneInput.value = (savedPhone !== null) ? savedPhone : defaultPhone[s];
+        phoneInput.value = getPhone(s) || defaultPhone[s];
         loadNotes(s); resetCoords();
         homePage.classList.add("hidden");
         emergencyPage.classList.remove("hidden");
         phoneSaveMsg.innerText = "";
         requestWakeLock();
-        loadSpecialNotes();
-        selectedSpecialMode = false;
-        selectedSpecialText = "";
-        selectSpecial1Btn.style.backgroundColor = "#4caf50";
-        selectSpecial2Btn.style.backgroundColor = "#4caf50";
-        updateEditField();
     }
     function onRegisterNumber() {
         let n = phoneInput.value.trim();
@@ -1054,18 +912,13 @@
         selectedNoteId = null;
         selectedSpecialMode = false;
         renderNotes();
+        editNoteArea.style.display = 'none';
         releaseWakeLock();
-        saveSpecialNotes();
     }
 
     function init() {
-        // Prima di tutto, migra i dati dalle versioni precedenti alle chiavi fisse
-        migrateAllData();
-
-        // Carica le note speciali e i numeri di telefono (già migrati)
-        loadSpecialNotes();
-        
-        // Inizializza il resto
+        migrateOldNotes();
+        migratePhoneNumbers();
         document.querySelectorAll('.big-btn').forEach(btn => btn.addEventListener('click', () => showEmergency(btn.getAttribute('data-service'))));
         registerNumberBtn.addEventListener('click', onRegisterNumber);
         googleMapsBtn.addEventListener('click', () => window.open("https://maps.google.com", "_blank"));
@@ -1085,11 +938,10 @@
         selectSpecial1Btn.addEventListener('click', () => selectSpecialNote(1));
         selectSpecial2Btn.addEventListener('click', () => selectSpecialNote(2));
         initRecognition();
-        // Non chiamiamo renderNotes qui perché showEmergency lo farà per il servizio selezionato
+        renderNotes();
         normalNoteInfo.style.display = 'none';
     }
     init();
 </script>
 </body>
 </html>
-```
