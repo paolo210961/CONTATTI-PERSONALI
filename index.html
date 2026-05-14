@@ -8,7 +8,7 @@
     <link rel="apple-touch-icon" href="icon-sos-192.png">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
-    <title>SOS Drive - Emergenza v0171</title>
+    <title>SOS Drive - Emergenza v0169</title>
     <style>
         * {
             margin: 0;
@@ -25,21 +25,21 @@
             justify-content: center;
             align-items: center;
         }
-      .container {
+        .container {
             max-width: 600px;
             width: 100%;
             margin: 0 auto;
         }
-      .page {
+        .page {
             background: white;
             border-radius: 32px;
             padding: 24px 20px 32px;
             box-shadow: 0 8px 24px rgba(0,0,0,0.05);
         }
-      .hidden {
-            display: none!important;
+        .hidden {
+            display: none !important;
         }
-      .version-header {
+        .version-header {
             font-size: 0.7rem;
             text-align: center;
             color: #6c757d;
@@ -61,13 +61,13 @@
             margin: 12px 0;
             font-weight: 600;
         }
-      .grid-2 {
+        .grid-2 {
             display: flex;
             flex-direction: column;
             gap: 14px;
             margin: 24px 0;
         }
-      .big-btn {
+        .big-btn {
             background: #d32f2f;
             border: none;
             border-radius: 60px;
@@ -80,25 +80,23 @@
             cursor: pointer;
             transition: 0.05s linear;
             box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-            touch-action: none;
-            user-select: none;
         }
-      .big-btn:active {
+        .big-btn:active {
             transform: scale(0.97);
         }
-      .btn-secondary {
+        .btn-secondary {
             background: #1976d2;
         }
-      .btn-copy {
+        .btn-copy {
             background: #f57c00;
         }
-      .btn-audio {
+        .btn-audio {
             background: #8e24aa;
         }
-      .btn-gps {
+        .btn-gps {
             background: #2e7d32;
         }
-      .small-btn {
+        .small-btn {
             padding: 10px 14px;
             font-size: 0.9rem;
             border-radius: 40px;
@@ -109,14 +107,20 @@
             flex: 1;
             text-align: center;
             background: #5f7f9e;
-            touch-action: manipulation;
         }
-      .flex-row {
+        .flex-row {
             display: flex;
             gap: 10px;
             align-items: center;
             flex-wrap: wrap;
             margin: 12px 0;
+        }
+        .flex-between {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            gap: 8px;
+            flex-wrap: wrap;
         }
         input, textarea {
             width: 100%;
@@ -127,7 +131,7 @@
             background: #fff;
             font-family: monospace;
         }
-      .info-card {
+        .info-card {
             background: #f8f9fa;
             border-radius: 24px;
             padding: 14px;
@@ -136,16 +140,16 @@
             word-break: break-word;
             border: 1px solid #e9ecef;
         }
-      .info-card div {
+        .info-card div {
             margin: 6px 0;
         }
-      .notes-section {
+        .notes-section {
             margin-top: 24px;
             margin-bottom: 24px;
             border-radius: 24px;
             padding: 4px 0;
         }
-      .section-title {
+        .section-title {
             font-weight: bold;
             margin-bottom: 12px;
             font-size: 1rem;
@@ -153,7 +157,7 @@
             justify-content: space-between;
             align-items: center;
         }
-      .add-note-btn {
+        .add-note-btn {
             background: #ff9800;
             border: none;
             border-radius: 40px;
@@ -162,9 +166,8 @@
             color: white;
             cursor: pointer;
             font-size: 0.8rem;
-            touch-action: manipulation;
         }
-      .note-item {
+        .note-item {
             background: #fff3e0;
             border-left: 6px solid #ffb300;
             border-radius: 48px;
@@ -176,14 +179,11 @@
             flex-wrap: wrap;
             overflow: hidden;
         }
-      .note-item.special {
+        .note-item.special {
             background: #e8f5e9;
             border-left: 6px solid #4caf50;
         }
-      .note-item.selected {
-            box-shadow: 0 0 0 3px #2196f3;
-        }
-      .note-number-btn {
+        .note-number-btn {
             flex: 1;
             background: transparent;
             border: none;
@@ -198,16 +198,14 @@
             display: flex;
             align-items: center;
             gap: 12px;
-            touch-action: none;
-            user-select: none;
         }
-      .note-item.special.note-number-btn {
+        .note-item.special .note-number-btn {
             color: #1b5e20;
         }
-      .note-number-btn:active {
+        .note-number-btn:active {
             background: #ffe0b2;
         }
-      .note-number {
+        .note-number {
             font-weight: bold;
             background: #ffb300;
             color: #3e2723;
@@ -217,18 +215,18 @@
             min-width: 45px;
             text-align: center;
         }
-      .note-item.special.note-number {
+        .note-item.special .note-number {
             background: #4caf50;
             color: white;
         }
-      .note-title-preview {
+        .note-title-preview {
             flex: 1;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
             font-weight: normal;
         }
-      .delete-note {
+        .delete-note {
             background: #e57373;
             border: none;
             border-radius: 30px;
@@ -238,34 +236,32 @@
             cursor: pointer;
             font-size: 0.75rem;
             margin-right: 8px;
-            touch-action: manipulation;
         }
-      .back-home {
+        .back-home {
             background: #607d8b;
             margin-top: 20px;
         }
-      .status-msg {
+        .status-msg {
             font-size: 0.7rem;
             color: #2c3e66;
             margin-top: 6px;
-            min-height: 18px;
         }
-      .import-export {
+        .import-export {
             display: flex;
             gap: 10px;
             margin: 16px 0;
         }
-      .response-area {
+        .response-area {
             background: #e3f2fd;
             border-radius: 24px;
             padding: 14px;
             margin: 16px 0;
         }
-      .response-area textarea {
+        .response-area textarea {
             background: white;
             font-size: 0.85rem;
         }
-      .modal {
+        .modal {
             position: fixed;
             top: 0;
             left: 0;
@@ -277,8 +273,9 @@
             justify-content: center;
             z-index: 1000;
             backdrop-filter: blur(4px);
+            touch-action: manipulation;
         }
-      .modal-content {
+        .modal-content {
             background: white;
             border-radius: 32px;
             padding: 24px;
@@ -286,28 +283,32 @@
             max-width: 500px;
             box-shadow: 0 20px 40px rgba(0,0,0,0.3);
         }
-      .modal-content h3 {
+        .modal-content h3 {
             margin-bottom: 16px;
             color: #c62828;
         }
-      .modal-content input,.modal-content textarea {
+        .modal-content input, .modal-content textarea {
             margin: 8px 0;
         }
-      .modal-buttons {
+        .modal-buttons {
             display: flex;
             gap: 12px;
             margin-top: 20px;
             justify-content: flex-end;
         }
+        .modal-content button {
+            touch-action: manipulation;
+        }
         @media (max-width: 480px) {
             body { padding: 8px; }
-         .page { padding: 16px 12px 24px; }
-         .big-btn { font-size: 1.2rem; padding: 14px 12px; }
-         .small-btn { padding: 8px 12px; font-size: 0.8rem; }
+            .page { padding: 16px 12px 24px; }
+            .big-btn { font-size: 1.2rem; padding: 14px 12px; }
+            .small-btn { padding: 8px 12px; font-size: 0.8rem; }
             h1 { font-size: 1.6rem; }
             h2 { font-size: 1.3rem; }
         }
-      .version-footer {
+        .id-badge { display: none; }
+        .version-footer {
             text-align: center;
             font-size: 0.65rem;
             color: #adb5bd;
@@ -321,7 +322,7 @@
 <div class="container">
     <!-- HOME PAGE -->
     <div id="homePage" class="page">
-        <div class="version-header">📟 SOS Drive v0171 - Tasti servizi editabili</div>
+        <div class="version-header">📟 SOS Drive v0169 - Servizi e note funzionanti</div>
         <h1>🆘 SOS EMERGENZA</h1>
         <div class="grid-2">
             <button class="big-btn" data-service="ambulanza">🚑 AMBULANZA</button>
@@ -329,13 +330,13 @@
             <button class="big-btn" data-service="veterinario">🐾 VETERINARIO</button>
             <button class="big-btn" data-service="clinica">🏥 CLINICA</button>
         </div>
-        <p style="text-align:center; font-size:0.75rem; color:#555;">Tocco breve: entra | Long press 2s: modifica nome/numero | 5s: reset<br>📍 Note: tocco breve seleziona | Long press 2s: modifica | 5s: elimina</p>
-        <div class="version-footer">versione 0171 – servizi editabili, escapeHtml fix, long press mobile</div>
+        <p style="text-align:center; font-size:0.75rem; color:#555;">Ogni servizio ha note normali e note speciali.<br>📍 Tocco breve: seleziona nota | Long press 2s: modifica | 5s: elimina<br>🔊 Ascolto automatico 15 secondi</p>
+        <div class="version-footer">versione 0169 – pulsanti servizi attivi, tasto CREA funzionante, long press attiva</div>
     </div>
 
     <!-- EMERGENCY PAGE -->
     <div id="emergencyPage" class="page hidden">
-        <div class="version-header">📟 SOS Drive v0171 – Note dinamiche</div>
+        <div class="version-header">📟 SOS Drive v0169 – Note dinamiche</div>
         <h2 id="serviceTitle">AMBULANZA</h2>
 
         <label>📞 Numero servizio</label>
@@ -357,6 +358,7 @@
             <div id="gpsStatus" class="status-msg"></div>
         </div>
 
+        <!-- SEZIONE NOTE NORMALI -->
         <div id="normalNotesSection" class="notes-section">
             <div class="section-title">
                 <span>📋 Note normali</span>
@@ -367,6 +369,7 @@
             </div>
         </div>
 
+        <!-- SEZIONE NOTE SPECIALI -->
         <div id="specialNotesSection" class="notes-section">
             <div class="section-title">
                 <span>✨ Note speciali</span>
@@ -400,12 +403,20 @@
         </div>
 
         <button id="backHomeBtn" class="small-btn back-home" style="width:100%;">◀ TORNA INDIETRO</button>
-        <div class="version-footer">versione 0171 – servizi editabili, note aggiungibili, modificabili, eliminabili</div>
+        <div class="version-footer">versione 0169 – servizi attivi, note aggiungibili, modificabili, eliminabili</div>
     </div>
 </div>
 
 <script>
-    const CURRENT_VERSION = "0171";
+    // ==================== VERSIONE 0169 ====================
+    // Ripristinata dalla 0165 con tutte le correzioni:
+    // - Pulsanti servizi (ambulanza, polizia, veterinario, clinica) attivi
+    // - Pulsante "CREA" funzionante in entrambe le sezioni note
+    // - Long press 2s modifica, 5s elimina
+    // - Gestione memoria per servizio separata
+    // =================================================================
+
+    const CURRENT_VERSION = "0169";
     let currentService = "ambulanza";
     let currentLat = null, currentLng = null;
     let currentAddress = "";
@@ -415,8 +426,8 @@
     let selectedNoteId = null;
     let selectedNoteType = null;
     let wakeLock = null;
-    let noteIdCounter = 0;
 
+    // DOM elements
     const homePage = document.getElementById('homePage');
     const emergencyPage = document.getElementById('emergencyPage');
     const serviceTitleSpan = document.getElementById('serviceTitle');
@@ -450,96 +461,26 @@
     let recognition = null;
     let recognitionTimeout = null;
 
-    function escapeHtml(text) {
-        const div = document.createElement('div');
-        div.textContent = text;
-        return div.innerHTML;
-    }
-
-    function generateNoteId() {
-        return Date.now() + (noteIdCounter++);
-    }
-
+    // ---------- WakeLock ----------
     async function requestWakeLock() {
         if ('wakeLock' in navigator) {
             try {
                 wakeLock = await navigator.wakeLock.request('screen');
+                console.log('WakeLock attivo');
             } catch(err) { console.warn('WakeLock non supportato:', err); }
         }
     }
     function releaseWakeLock() { if (wakeLock) { wakeLock.release(); wakeLock = null; } }
 
-    // ---------- GESTIONE SERVIZI EDITABILI ----------
-    const defaultServices = {
-        ambulanza: { name: "🚑 AMBULANZA", number: "118" },
-        polizia: { name: "👮 POLIZIA", number: "113" },
-        veterinario: { name: "🐾 VETERINARIO", number: "800123456" },
-        clinica: { name: "🏥 CLINICA", number: "800987654" }
-    };
+    // ---------- ARCHIVIO NUMERI ----------
+    function savePhone(s,n) { localStorage.setItem(`phone_${s}_${CURRENT_VERSION}`, n); }
+    function getPhone(s) { return localStorage.getItem(`phone_${s}_${CURRENT_VERSION}`); }
+    const defaultPhone = { ambulanza:"118", polizia:"113", veterinario:"800123456", clinica:"800987654" };
 
-    function getServiceKey(s) { return `service_${s}_${CURRENT_VERSION}`; }
-    function saveService(s, data) { localStorage.setItem(getServiceKey(s), JSON.stringify(data)); }
-    function getService(s) {
-        let stored = localStorage.getItem(getServiceKey(s));
-        if (stored) {
-            try { return JSON.parse(stored); } catch(e) {}
-        }
-        return defaultServices[s];
-    }
-
-    function loadServiceButtons() {
-        document.querySelectorAll('.big-btn').forEach(btn => {
-            let service = btn.getAttribute('data-service');
-            let data = getService(service);
-            btn.textContent = data.name;
-        });
-    }
-
-    function openServiceEditModal(service) {
-        let data = getService(service);
-        const modalDiv = document.createElement('div');
-        modalDiv.className = 'modal';
-        modalDiv.innerHTML = `
-            <div class="modal-content">
-                <h3>✏️ Modifica servizio</h3>
-                <label>Nome pulsante:</label>
-                <input type="text" class="edit-name" value="${escapeHtml(data.name)}" style="margin-bottom:12px;">
-                <label>Numero telefono:</label>
-                <input type="tel" class="edit-number" value="${escapeHtml(data.number)}">
-                <div class="modal-buttons">
-                    <button class="small-btn save-service-btn" style="background:#4caf50;">💾 SALVA</button>
-                    <button class="small-btn cancel-service-btn" style="background:#9e9e;">ANNULLA</button>
-                </div>
-            </div>
-        `;
-        document.body.appendChild(modalDiv);
-
-        const saveBtn = modalDiv.querySelector('.save-service-btn');
-        const cancelBtn = modalDiv.querySelector('.cancel-service-btn');
-
-        saveBtn.onclick = () => {
-            let newName = modalDiv.querySelector('.edit-name').value.trim();
-            let newNumber = modalDiv.querySelector('.edit-number').value.trim();
-            if (!newName) { alert("Il nome è obbligatorio"); return; }
-            saveService(service, { name: newName, number: newNumber || "" });
-            loadServiceButtons();
-            modalDiv.remove();
-        };
-        cancelBtn.onclick = () => modalDiv.remove();
-        modalDiv.addEventListener('click', (e) => { if (e.target === modalDiv) modalDiv.remove(); });
-        setTimeout(() => modalDiv.querySelector('.edit-name').focus(), 100);
-    }
-
-    function resetService(service) {
-        if (confirm(`Ripristinare "${defaultServices[service].name}" ai valori originali?`)) {
-            localStorage.removeItem(getServiceKey(service));
-            loadServiceButtons();
-        }
-    }
-
-    // ---------- FUNZIONI NOTE ----------
+    // ---------- FUNZIONI NOTE PER SERVIZIO ----------
     function getNormalNotesKey() { return `normalNotes_${currentService}_${CURRENT_VERSION}`; }
     function getSpecialNotesKey() { return `specialNotes_${currentService}_${CURRENT_VERSION}`; }
+
     function saveNormalNotes() { localStorage.setItem(getNormalNotesKey(), JSON.stringify(normalNotes)); }
     function saveSpecialNotes() { localStorage.setItem(getSpecialNotesKey(), JSON.stringify(specialNotes)); }
 
@@ -571,10 +512,9 @@
         }
         let html = '';
         normalNotes.forEach(note => {
-            const isSelected = selectedNoteId === note.id && selectedNoteType === 'normal';
             html += `
-                <div class="note-item ${isSelected? 'selected' : ''}" data-id="${note.id}" data-type="normal">
-                    <button class="note-number-btn" data-id="${note.id}">
+                <div class="note-item" data-id="${note.id}" data-type="normal">
+                    <button class="note-number-btn" data-id="${note.id}" data-title="${escapeHtml(note.titolo)}" data-desc="${escapeHtml(note.descrizione)}">
                         <span class="note-number">${note.numero}</span>
                         <span class="note-title-preview">${escapeHtml(note.titolo)}</span>
                     </button>
@@ -593,10 +533,9 @@
         }
         let html = '';
         specialNotes.forEach(note => {
-            const isSelected = selectedNoteId === note.id && selectedNoteType === 'special';
             html += `
-                <div class="note-item special ${isSelected? 'selected' : ''}" data-id="${note.id}" data-type="special">
-                    <button class="note-number-btn" data-id="${note.id}">
+                <div class="note-item special" data-id="${note.id}" data-type="special">
+                    <button class="note-number-btn" data-id="${note.id}" data-title="${escapeHtml(note.titolo)}" data-desc="${escapeHtml(note.descrizione)}">
                         <span class="note-number">${note.numero}</span>
                         <span class="note-title-preview">${escapeHtml(note.titolo)}</span>
                     </button>
@@ -609,43 +548,42 @@
     }
 
     function attachNoteEvents(type) {
-        const container = (type === 'normal')? normalNotesListArea : specialNotesListArea;
-        const notesArray = (type === 'normal')? normalNotes : specialNotes;
-
+        const container = (type === 'normal') ? normalNotesListArea : specialNotesListArea;
+        const notesArray = (type === 'normal') ? normalNotes : specialNotes;
+        
         container.querySelectorAll('.note-number-btn').forEach(btn => {
             let id = parseInt(btn.getAttribute('data-id'));
             let note = notesArray.find(n => n.id === id);
             if (!note) return;
             let title = note.titolo;
             let desc = note.descrizione;
-
+            
+            // Tocco breve -> selezione nota (per lettura vocale)
             btn.addEventListener('click', (e) => {
                 e.stopPropagation();
                 selectedNoteId = id;
                 selectedNoteType = type;
-                renderNormalNotes();
-                renderSpecialNotes();
-                gpsStatus.innerHTML = `✅ Nota ${type === 'normal'? 'normale' : 'speciale'} selezionata: ${title}`;
+                gpsStatus.innerHTML = `✅ Nota ${type === 'normal' ? 'normale' : 'speciale'} selezionata: ${title}`;
                 setTimeout(() => { if(gpsStatus.innerHTML.includes("selezionata")) gpsStatus.innerHTML = "✅ Pronto."; }, 2000);
             });
-
+            
+            // Long press con timer
             let pressTimer = null;
             let pressStart = 0;
-            let longPressTriggered = false;
-
+            
             const startPress = (e) => {
-                longPressTriggered = false;
+                e.preventDefault();
                 pressStart = Date.now();
                 pressTimer = setTimeout(() => {
-                    longPressTriggered = true;
-                    if (confirm(`⚠️ Eliminare la nota ${type === 'normal'? 'normale' : 'speciale'} "${title}"?`)) {
+                    // 5 secondi -> elimina (con conferma)
+                    if (confirm(`⚠️ Eliminare la nota ${type === 'normal' ? 'normale' : 'speciale'} "${title}"?`)) {
                         if (type === 'normal') {
-                            normalNotes = normalNotes.filter(n => n.id!== id);
+                            normalNotes = normalNotes.filter(n => n.id !== id);
                             if (selectedNoteId === id && selectedNoteType === 'normal') selectedNoteId = null;
                             saveNormalNotes();
                             renderNormalNotes();
                         } else {
-                            specialNotes = specialNotes.filter(n => n.id!== id);
+                            specialNotes = specialNotes.filter(n => n.id !== id);
                             if (selectedNoteId === id && selectedNoteType === 'special') selectedNoteId = null;
                             saveSpecialNotes();
                             renderSpecialNotes();
@@ -656,39 +594,192 @@
                     pressTimer = null;
                 }, 5000);
             };
-
+            
             const endPress = () => {
                 const duration = Date.now() - pressStart;
                 clearTimeout(pressTimer);
                 pressTimer = null;
-                if (!longPressTriggered && duration >= 2000 && duration < 5000) {
+                // 2 secondi -> modifica
+                if (duration >= 2000 && duration < 5000) {
                     openEditModal(type, id, title, desc);
                 }
             };
-
+            
             const cancelPress = () => {
                 clearTimeout(pressTimer);
                 pressTimer = null;
             };
-
-            btn.addEventListener('touchstart', startPress, {passive: false});
+            
+            btn.addEventListener('touchstart', startPress);
             btn.addEventListener('mousedown', startPress);
             btn.addEventListener('touchend', endPress);
             btn.addEventListener('mouseup', endPress);
-            btn.addEventListener('touchcancel', cancelPress);
             btn.addEventListener('mouseleave', cancelPress);
         });
-
+        
+        // Pulsanti elimina diretti
         container.querySelectorAll('.delete-note').forEach(btn => {
-            btn.onclick = (e) => {
+            btn.removeEventListener('click', deleteHandler);
+            btn.addEventListener('click', deleteHandler);
+            function deleteHandler(e) {
                 e.stopPropagation();
                 let id = parseInt(btn.getAttribute('data-id'));
                 if (confirm("Eliminare questa nota?")) {
-                    if (type === '
-                                return true;
+                    if (type === 'normal') {
+                        normalNotes = normalNotes.filter(n => n.id !== id);
+                        if (selectedNoteId === id && selectedNoteType === 'normal') selectedNoteId = null;
+                        saveNormalNotes();
+                        renderNormalNotes();
+                    } else {
+                        specialNotes = specialNotes.filter(n => n.id !== id);
+                        if (selectedNoteId === id && selectedNoteType === 'special') selectedNoteId = null;
+                        saveSpecialNotes();
+                        renderSpecialNotes();
+                    }
+                    gpsStatus.innerHTML = "🗑️ Nota eliminata";
+                    setTimeout(() => gpsStatus.innerHTML = "✅ Pronto.", 2000);
+                }
+            }
+        });
+    }
+
+    function openEditModal(type, id, currentTitle, currentDesc) {
+        const modalDiv = document.createElement('div');
+        modalDiv.className = 'modal';
+        modalDiv.innerHTML = `
+            <div class="modal-content">
+                <h3>✏️ Modifica nota ${type === 'normal' ? 'normale' : 'speciale'}</h3>
+                <label>Titolo:</label>
+                <input type="text" class="edit-title" value="${escapeHtml(currentTitle)}" style="margin-bottom:12px;">
+                <label>Descrizione:</label>
+                <textarea class="edit-desc" rows="4">${escapeHtml(currentDesc)}</textarea>
+                <div class="modal-buttons">
+                    <button class="small-btn save-edit-btn" style="background:#4caf50;">💾 SALVA</button>
+                    <button class="small-btn cancel-edit-btn" style="background:#9e9e9e;">ANNULLA</button>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modalDiv);
+        
+        const saveBtn = modalDiv.querySelector('.save-edit-btn');
+        const cancelBtn = modalDiv.querySelector('.cancel-edit-btn');
+        
+        saveBtn.onclick = () => {
+            let newTitle = modalDiv.querySelector('.edit-title').value.trim();
+            let newDesc = modalDiv.querySelector('.edit-desc').value.trim();
+            if (!newTitle) { alert("Il titolo è obbligatorio"); return; }
+            if (type === 'normal') {
+                let note = normalNotes.find(n => n.id === id);
+                if (note) {
+                    note.titolo = newTitle;
+                    note.descrizione = newDesc;
+                    saveNormalNotes();
+                    renderNormalNotes();
+                }
+            } else {
+                let note = specialNotes.find(n => n.id === id);
+                if (note) {
+                    note.titolo = newTitle;
+                    note.descrizione = newDesc;
+                    saveSpecialNotes();
+                    renderSpecialNotes();
+                }
+            }
+            modalDiv.remove();
+            gpsStatus.innerHTML = "✅ Nota modificata";
+            setTimeout(() => gpsStatus.innerHTML = "✅ Pronto.", 2000);
+        };
+        cancelBtn.onclick = () => modalDiv.remove();
+        modalDiv.addEventListener('click', (e) => { if (e.target === modalDiv) modalDiv.remove(); });
+    }
+
+    // AGGIUNTA NOTA CORRETTA - pulsante CREA funzionante
+    function addNewNote(type) {
+        const modalDiv = document.createElement('div');
+        modalDiv.className = 'modal';
+        modalDiv.innerHTML = `
+            <div class="modal-content">
+                <h3>➕ Nuova nota ${type === 'normal' ? 'normale' : 'speciale'}</h3>
+                <label>Titolo:</label>
+                <input type="text" class="new-title" placeholder="Titolo breve" style="margin-bottom:12px;">
+                <label>Descrizione:</label>
+                <textarea class="new-desc" rows="4" placeholder="Testo completo della nota..."></textarea>
+                <div class="modal-buttons">
+                    <button class="small-btn create-btn" style="background:#4caf50;">✅ CREA</button>
+                    <button class="small-btn cancel-btn" style="background:#9e9e9e;">ANNULLA</button>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modalDiv);
+        
+        const createBtn = modalDiv.querySelector('.create-btn');
+        const cancelBtn = modalDiv.querySelector('.cancel-btn');
+        
+        createBtn.addEventListener('click', () => {
+            const title = modalDiv.querySelector('.new-title').value.trim();
+            const desc = modalDiv.querySelector('.new-desc').value.trim();
+            if (!title) { alert("Inserisci un titolo"); return; }
+            const newNote = {
+                id: Date.now() + Math.random() * 10000,
+                numero: (type === 'normal' ? normalNotes.length + 1 : specialNotes.length + 1),
+                titolo: title,
+                descrizione: desc || ""
+            };
+            if (type === 'normal') {
+                normalNotes.push(newNote);
+                saveNormalNotes();
+                renderNormalNotes();
+            } else {
+                specialNotes.push(newNote);
+                saveSpecialNotes();
+                renderSpecialNotes();
+            }
+            modalDiv.remove();
+            gpsStatus.innerHTML = "✅ Nota aggiunta";
+            setTimeout(() => gpsStatus.innerHTML = "✅ Pronto.", 2000);
+        });
+        
+        cancelBtn.addEventListener('click', () => modalDiv.remove());
+        modalDiv.addEventListener('click', (e) => { if (e.target === modalDiv) modalDiv.remove(); });
+    }
+
+    // ---------- TRADUZIONI ----------
+    async function translateToFrench(italianText) {
+        if (!italianText || italianText.trim() === "") return "";
+        try {
+            const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(italianText)}&langpair=it|fr`;
+            const resp = await fetch(url);
+            const data = await resp.json();
+            if (data && data.responseData && data.responseData.translatedText) return data.responseData.translatedText;
+        } catch(e) { console.warn(e); }
+        return italianText;
+    }
+    async function translateFrenchToItalian(frenchText) {
+        if (!frenchText || frenchText.trim() === "") return "";
+        try {
+            const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(frenchText)}&langpair=fr|it`;
+            const resp = await fetch(url);
+            const data = await resp.json();
+            if (data && data.responseData && data.responseData.translatedText) return data.responseData.translatedText;
+        } catch(e) { console.warn(e); }
+        return frenchText + " (traduzione fallita)";
+    }
+
+    // ---------- RICONOSCIMENTO VOCALE ----------
+    function initRecognition() {
+        if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+            transcribeStatus.innerText = "❌ Riconoscimento non supportato";
+            return false;
+        }
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        recognition = new SpeechRecognition();
+        recognition.continuous = true;
+        recognition.interimResults = false;
+        recognition.lang = 'fr-FR';
+        return true;
     }
     async function startListening15s() {
-        if (!recognition &&!initRecognition()) return;
+        if (!recognition && !initRecognition()) return;
         if (recognitionTimeout) clearTimeout(recognitionTimeout);
         transcribeStatus.innerText = "🎤 Ascolto francese per 15 secondi...";
         recognition.start();
@@ -700,7 +791,7 @@
         };
         recognition.onerror = (e) => { transcribeStatus.innerText = "❌ Errore microfono: " + e.error; };
         recognition.onend = async () => {
-            if (finalTranscript.trim()!== "") {
+            if (finalTranscript.trim() !== "") {
                 transcribeStatus.innerText = "⏳ Traduzione...";
                 const italian = await translateFrenchToItalian(finalTranscript.trim());
                 if (operatorResponse.value.trim()) operatorResponse.value += "\n---\n" + italian;
@@ -716,17 +807,18 @@
         if (selectedNoteId === null) return null;
         if (selectedNoteType === 'normal') {
             let note = normalNotes.find(n => n.id === selectedNoteId);
-            return note? `${note.titolo}\n\n${note.descrizione}` : null;
+            return note ? `${note.titolo}\n\n${note.descrizione}` : null;
         } else if (selectedNoteType === 'special') {
             let note = specialNotes.find(n => n.id === selectedNoteId);
-            return note? `${note.titolo}\n\n${note.descrizione}` : null;
+            return note ? `${note.titolo}\n\n${note.descrizione}` : null;
         }
         return null;
     }
 
+    // ---------- COPIA BILINGUE ----------
     async function getBilingualCopy() {
         let noteIT = getSelectedNoteText() || "nessuna nota selezionata";
-        let coord = (currentLat && currentLng)? `${currentLat.toFixed(6)}, ${currentLng.toFixed(6)}` : "non disponibili";
+        let coord = (currentLat && currentLng) ? `${currentLat.toFixed(6)}, ${currentLng.toFixed(6)}` : "non disponibili";
         let addr = currentAddress || "non disponibile";
         let refA = currentRefA || "non disponibile";
         let refB = currentRefB || "non disponibile";
@@ -736,10 +828,10 @@
         let italian = `${introIT}\n\n${noteIT}\n\nCoordinate: ${coord}\nIndirizzo: ${addr}\nSono vicino a (1): ${refA}\nSono vicino a (2): ${refB}\nSono vicino a (3): ${refC}\n\n${domandaIT}`;
         let introFR = await translateToFrench(introIT);
         let noteFR = await translateToFrench(noteIT);
-        let addrFR = addr === "non disponibile"? "non disponible" : await translateToFrench(addr);
-        let refAFR = refA === "non disponibile"? "non disponible" : await translateToFrench(refA);
-        let refBFR = refB === "non disponibile"? "non disponible" : await translateToFrench(refB);
-        let refCFR = refC === "non disponibile"? "non disponible" : await translateToFrench(refC);
+        let addrFR = addr === "non disponibile" ? "non disponible" : await translateToFrench(addr);
+        let refAFR = refA === "non disponibile" ? "non disponible" : await translateToFrench(refA);
+        let refBFR = refB === "non disponibile" ? "non disponible" : await translateToFrench(refB);
+        let refCFR = refC === "non disponibile" ? "non disponible" : await translateToFrench(refC);
         let domandaFR = await translateToFrench(domandaIT);
         let french = `${introFR}\n\n${noteFR}\n\nCoordonnées: ${coord}\nAdresse: ${addrFR}\nJe suis près de (1): ${refAFR}\nJe suis près de (2): ${refBFR}\nJe suis près de (3): ${refCFR}\n\n${domandaFR}`;
         return french + "\n\n-----\n\n" + italian;
@@ -762,6 +854,7 @@
         }
     }
 
+    // ---------- GEOLOCALIZZAZIONE ----------
     function haversine(lat1,lng1,lat2,lng2) {
         const R = 6371e3;
         const φ1 = lat1 * Math.PI/180, φ2 = lat2 * Math.PI/180;
@@ -920,6 +1013,7 @@
         gpsStatus.innerHTML = "";
     }
 
+    // ---------- LETTURA VOCALE ----------
     function playBeep() {
         try {
             let ctx = new (window.AudioContext || window.webkitAudioContext)();
@@ -949,7 +1043,7 @@
         let chars = text.split('');
         for (let ch of chars) {
             if (ch === ' ') continue;
-            let word = (ch === '.')? "punto" : (ch === ',')? "virgola" : ch;
+            let word = (ch === '.') ? "punto" : (ch === ',') ? "virgola" : ch;
             let u = new SpeechSynthesisUtterance(word);
             u.lang = langCode; u.rate = 1.0;
             speechSynthesis.speak(u);
@@ -965,18 +1059,18 @@
         let refA = currentRefA || (lang==='it'?"non disponibile":"non disponible");
         let refB = currentRefB || (lang==='it'?"non disponibile":"non disponible");
         let refC = currentRefC || (lang==='it'?"non disponibile":"non disponible");
-        let coord = (currentLat && currentLng)? `${currentLat.toFixed(6)}, ${currentLng.toFixed(6)}` : (lang==='it'?"non disponibili":"non disponibles");
+        let coord = (currentLat && currentLng) ? `${currentLat.toFixed(6)}, ${currentLng.toFixed(6)}` : (lang==='it'?"non disponibili":"non disponibles");
         if (lang === 'fr') {
             gpsStatus.innerHTML = "⏳ Traduzione FR...";
             note = await translateToFrench(note);
-            if (currentAddress && currentAddress!== "non disponibile") addr = await translateToFrench(currentAddress);
-            if (currentRefA && currentRefA!== "non disponibile") refA = await translateToFrench(currentRefA);
-            if (currentRefB && currentRefB!== "non disponibile") refB = await translateToFrench(currentRefB);
-            if (currentRefC && currentRefC!== "non disponibile") refC = await translateToFrench(currentRefC);
+            if (currentAddress && currentAddress !== "non disponibile") addr = await translateToFrench(currentAddress);
+            if (currentRefA && currentRefA !== "non disponibile") refA = await translateToFrench(currentRefA);
+            if (currentRefB && currentRefB !== "non disponibile") refB = await translateToFrench(currentRefB);
+            if (currentRefC && currentRefC !== "non disponibile") refC = await translateToFrench(currentRefC);
             gpsStatus.innerHTML = "🔊 Lettura FR...";
         } else gpsStatus.innerHTML = "🔊 Lettura IT...";
-
-        let intro = (lang==='it')? "Attenzione Emergenza sono italiano uso il traduttore mi trovo in Emergenza" : await translateToFrench("Attenzione Emergenza sono italiano uso il traduttore mi trovo in Emergenza");
+        
+        let intro = (lang==='it') ? "Attenzione Emergenza sono italiano uso il traduttore mi trovo in Emergenza" : await translateToFrench("Attenzione Emergenza sono italiano uso il traduttore mi trovo in Emergenza");
         await speakWords(intro, lang==='it'?'it-IT':'fr-FR', 1.0, 200);
         await speakWords(note, lang==='it'?'it-IT':'fr-FR', 1.0, 200);
         await speakWords("Coordinate", lang==='it'?'it-IT':'fr-FR', 1.0, 200);
@@ -989,7 +1083,7 @@
         await speakWords(refB, lang==='it'?'it-IT':'fr-FR', 1.0, 200);
         await speakWords("Sono vicino a 3", lang==='it'?'it-IT':'fr-FR', 1.0, 200);
         await speakWords(refC, lang==='it'?'it-IT':'fr-FR', 1.0, 200);
-        let domanda = (lang==='it')? "il il tuo messaggio di risposta verrà tradotto parla piano" : await translateToFrench("il il tuo messaggio di risposta verrà tradotto parla piano");
+        let domanda = (lang==='it') ? "il il tuo messaggio di risposta verrà tradotto parla piano" : await translateToFrench("il il tuo messaggio di risposta verrà tradotto parla piano");
         await speakWords(domanda, lang==='it'?'it-IT':'fr-FR', 1.0, 200);
         playBeep();
         await new Promise(r=>setTimeout(r,800));
@@ -999,6 +1093,7 @@
     function speakItalian() { speakFull('it'); }
     function speakFrench() { speakFull('fr'); }
 
+    // ---------- EXPORT/IMPORT TXT ----------
     function exportTxt() {
         let content = "";
         if (normalNotes.length) {
@@ -1037,8 +1132,8 @@
                     }
                     currentTitle = line.replace(/^\d+\.\s+/, '');
                     currentDesc = "";
-                } else if (line!== "" && currentTitle) {
-                    currentDesc += (currentDesc? "\n" : "") + line;
+                } else if (line !== "" && currentTitle) {
+                    currentDesc += (currentDesc ? "\n" : "") + line;
                 }
             }
             if (currentTitle) {
@@ -1052,38 +1147,36 @@
         reader.readAsText(file,"UTF-8");
     }
 
+    // ---------- UTILITIES ----------
     function showEmergency(service) {
         currentService = service;
-        let data = getService(service);
-        serviceTitleSpan.innerText = data.name;
-        phoneInput.value = data.number;
-
+        let label = { ambulanza:"🚑 AMBULANZA", polizia:"👮 POLIZIA", veterinario:"🐾 VETERINARIO", clinica:"🏥 CLINICA" }[service];
+        serviceTitleSpan.innerText = label;
+        
+        let savedPhone = getPhone(service);
+        phoneInput.value = (savedPhone !== null) ? savedPhone : defaultPhone[service];
+        
         loadNormalNotes();
         loadSpecialNotes();
         resetCoords();
-
+        
         homePage.classList.add("hidden");
         emergencyPage.classList.remove("hidden");
         phoneSaveMsg.innerText = "";
         requestWakeLock();
         selectedNoteId = null;
         selectedNoteType = null;
-
+        
+        // Avvia geolocalizzazione automatica all'ingresso del servizio
         setTimeout(() => getLocationAndAddress(), 500);
     }
-
+    
     function onRegisterNumber() {
         let n = phoneInput.value.trim();
-        if (n) {
-            let data = getService(currentService);
-            data.number = n;
-            saveService(currentService, data);
-            phoneSaveMsg.innerText = "✅ Numero salvato nell'archivio";
-            setTimeout(()=>phoneSaveMsg.innerText="",2000);
-        }
+        if (n) { savePhone(currentService, n); phoneSaveMsg.innerText = "✅ Numero salvato nell'archivio"; setTimeout(()=>phoneSaveMsg.innerText="",2000); }
         else phoneSaveMsg.innerText = "⚠️ Inserisci un numero valido";
     }
-
+    
     function backHome() {
         emergencyPage.classList.add("hidden");
         homePage.classList.remove("hidden");
@@ -1092,50 +1185,11 @@
     }
 
     function init() {
-        loadServiceButtons();
-
+        // Attiva i pulsanti dei servizi
         document.querySelectorAll('.big-btn').forEach(btn => {
-            let service = btn.getAttribute('data-service');
-            let pressTimer = null;
-            let pressStart = 0;
-            let longPressTriggered = false;
-
-            btn.addEventListener('click', () => {
-                showEmergency(service);
-            });
-
-            const startPress = (e) => {
-                longPressTriggered = false;
-                pressStart = Date.now();
-                pressTimer = setTimeout(() => {
-                    longPressTriggered = true;
-                    resetService(service);
-                    pressTimer = null;
-                }, 5000);
-            };
-
-            const endPress = () => {
-                const duration = Date.now() - pressStart;
-                clearTimeout(pressTimer);
-                pressTimer = null;
-                if (!longPressTriggered && duration >= 2000 && duration < 5000) {
-                    openServiceEditModal(service);
-                }
-            };
-
-            const cancelPress = () => {
-                clearTimeout(pressTimer);
-                pressTimer = null;
-            };
-
-            btn.addEventListener('touchstart', startPress, {passive: false});
-            btn.addEventListener('mousedown', startPress);
-            btn.addEventListener('touchend', endPress);
-            btn.addEventListener('mouseup', endPress);
-            btn.addEventListener('touchcancel', cancelPress);
-            btn.addEventListener('mouseleave', cancelPress);
+            btn.addEventListener('click', () => showEmergency(btn.getAttribute('data-service')));
         });
-
+        
         registerNumberBtn.addEventListener('click', onRegisterNumber);
         googleMapsBtn.addEventListener('click', () => window.open("https://maps.google.com", "_blank"));
         geolocationBtn.addEventListener('click', getLocationAndAddress);
@@ -1149,10 +1203,11 @@
         listenResponseBtn.addEventListener('click', startListening15s);
         clearResponseBtn.addEventListener('click', () => { operatorResponse.value = ""; transcribeStatus.innerText = ""; });
         initRecognition();
-
+        
         addNormalNoteBtn.addEventListener('click', () => addNewNote('normal'));
         addSpecialNoteBtn.addEventListener('click', () => addNewNote('special'));
-
+        
+        // Inizializza vuoto
         normalNotes = [];
         specialNotes = [];
         renderNormalNotes();
@@ -1162,3 +1217,4 @@
 </script>
 </body>
 </html>
+```
