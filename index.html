@@ -8,7 +8,7 @@
     <link rel="apple-touch-icon" href="icon-sos-192.png">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
-    <title>SOS Drive - Emergenza v0167</title>
+    <title>SOS Drive - Emergenza v0168</title>
     <style>
         * {
             margin: 0;
@@ -323,7 +323,7 @@
 <div class="container">
     <!-- HOME PAGE -->
     <div id="homePage" class="page">
-        <div class="version-header">📟 SOS Drive v0167 - Pulsante CREA funzionante</div>
+        <div class="version-header">📟 SOS Drive v0168 - Pulsante CREA funzionante</div>
         <h1>🆘 SOS EMERGENZA</h1>
         <div class="grid-2">
             <button class="big-btn" data-service="ambulanza">🚑 AMBULANZA</button>
@@ -332,12 +332,12 @@
             <button class="big-btn" data-service="clinica">🏥 CLINICA</button>
         </div>
         <p style="text-align:center; font-size:0.75rem; color:#555;">Ogni servizio ha note normali e note speciali.<br>📍 Long press 2s modifica / 5s elimina<br>🔊 Ascolto automatico 15 secondi</p>
-        <div class="version-footer">versione 0167 – pulsanti CREA funzionanti, note aggiungibili correttamente</div>
+        <div class="version-footer">versione 0168 – pulsanti CREA funzionanti, note aggiungibili correttamente</div>
     </div>
 
     <!-- EMERGENCY PAGE -->
     <div id="emergencyPage" class="page hidden">
-        <div class="version-header">📟 SOS Drive v0167 – Note dinamiche</div>
+        <div class="version-header">📟 SOS Drive v0168 – Note dinamiche</div>
         <h2 id="serviceTitle">AMBULANZA</h2>
 
         <label>📞 Numero servizio</label>
@@ -404,12 +404,12 @@
         </div>
 
         <button id="backHomeBtn" class="small-btn back-home" style="width:100%;">◀ TORNA INDIETRO</button>
-        <div class="version-footer">versione 0167 – pulsanti CREA funzionanti, aggiunta note corretta</div>
+        <div class="version-footer">versione 0168 – pulsanti CREA funzionanti, aggiunta note corretta</div>
     </div>
 </div>
 
 <script>
-    // ==================== VERSIONE 0167 ====================
+    // ==================== VERSIONE 0168 ====================
     // CORREZIONE: pulsanti "CREA" nei modali di aggiunta nota ora funzionano correttamente.
     // Utilizzo di querySelector locale all'interno del modale, evitando conflitti di ID.
     // Il resto (long press, geolocalizzazione, lettura vocale) invariato.
@@ -474,7 +474,7 @@
     // ---------- ARCHIVIO NUMERI ----------
     function migratePhoneNumbers() {
         const services = ["ambulanza", "polizia", "veterinario", "clinica"];
-        const oldVersions = ["0166", "0165", "0164", "0163"];
+        const oldVersions = ["0167", "0166", "0165", "0164"];
         for (let s of services) {
             if (localStorage.getItem(`phone_${s}_${CURRENT_VERSION}`)) continue;
             for (let ver of oldVersions) {
@@ -703,7 +703,7 @@
         modalDiv.addEventListener('click', (e) => { if (e.target === modalDiv) modalDiv.remove(); });
     }
 
-    // FUNZIONE AGGIUNTA NOTA CORRETTA: usa querySelector locale, senza ID globali
+    // FUNZIONE AGGIUNTA NOTA CORRETTA: ora il pulsante CREA funziona
     function addNewNote(type) {
         const modalDiv = document.createElement('div');
         modalDiv.className = 'modal';
