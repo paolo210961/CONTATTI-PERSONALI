@@ -548,8 +548,8 @@
                     description: n.description || n.text || ""
                 }));
                 let savedId = localStorage.getItem(getSelectedKey(s));
-                if (savedId && notesArray.some(n => n.id == savedId)) selectedNoteId = parseInt(savedId);
-                else if (notesArray.length) selectedNoteId = notesArray[0].id;
+                if (savedId && notesArray.some(n => String(n.id) === savedId)) selectedNoteId = savedId;
+                else if (notesArray.length) selectedNoteId = String(notesArray[0].id);
                 else selectedNoteId = null;
             } catch(e) { notesArray = []; selectedNoteId = null; }
         } else { notesArray = []; selectedNoteId = null; }
@@ -563,7 +563,7 @@
         }
         let html = '<div><strong>📋 Seleziona nota normale:</strong></div>';
         notesArray.forEach((note, idx) => {
-            const isChecked = (selectedNoteId === note.id) ? 'checked' : '';
+            const isChecked = (String(selectedNoteId) === String(note.id)) ? 'checked' : '';
             html += `
                 <div class="note-item" data-id="${note.id}">
                     <input type="radio" name="noteSelect" value="${note.id}" class="radio-note" ${isChecked}>
@@ -582,7 +582,7 @@
     function attachDelegatedEvents() {
         notesListArea.addEventListener('change', (e) => {
             if (e.target && e.target.type === 'radio' && e.target.name === 'noteSelect') {
-                selectedNoteId = parseInt(e.target.value);
+                selectedNoteId = e.target.value; // mantieni come stringa, confronto con String()
                 selectedSpecialMode = false;
                 selectedSpecialText = "";
                 saveNotes();
@@ -598,8 +598,8 @@
                 e.stopPropagation();
                 const parentDiv = btn.closest('.note-item');
                 if (!parentDiv) return;
-                const noteId = parseInt(parentDiv.getAttribute('data-id'));
-                const note = notesArray.find(n => n.id === noteId);
+                const noteId = parentDiv.getAttribute('data-id');
+                const note = notesArray.find(n => String(n.id) === noteId);
                 if (note) {
                     let newTitle = prompt("Modifica titolo:", note.title);
                     if (newTitle !== null) {
@@ -618,9 +618,9 @@
                 e.stopPropagation();
                 const parentDiv = btn.closest('.note-item');
                 if (!parentDiv) return;
-                const noteId = parseInt(parentDiv.getAttribute('data-id'));
-                notesArray = notesArray.filter(n => n.id !== noteId);
-                if (selectedNoteId === noteId) selectedNoteId = notesArray.length ? notesArray[0].id : null;
+                const noteId = parentDiv.getAttribute('data-id');
+                notesArray = notesArray.filter(n => String(n.id) !== noteId);
+                if (String(selectedNoteId) === noteId) selectedNoteId = notesArray.length ? notesArray[0].id : null;
                 saveNotes();
                 renderNotes();
                 if (!notesArray.length) normalNoteInfo.style.display = 'none';
@@ -637,7 +637,7 @@
         // FIX 3: usa Math.floor per evitare ID float
         let newId = Date.now() + Math.floor(Math.random() * 10000);
         notesArray.push({ id: newId, title: title, description: description });
-        if (notesArray.length === 1) selectedNoteId = newId;
+        if (notesArray.length === 1) selectedNoteId = String(newId);
         saveNotes();
         renderNotes();
         gpsStatus.innerHTML = "✅ Nota aggiunta";
@@ -655,7 +655,7 @@
 
     function getSelectedNoteDescription() {
         if (selectedSpecialMode) return selectedSpecialText;
-        const note = notesArray.find(n => n.id === selectedNoteId);
+        const note = notesArray.find(n => String(n.id) === String(selectedNoteId));
         return note ? note.description : null;
     }
     function escapeHtml(str) { return str.replace(/[&<>]/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;' }[m])); }
