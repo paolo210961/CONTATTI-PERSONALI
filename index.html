@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
-    <title>SOS Drive - Emergenza v0166</title>
+    <title>SOS Drive - Emergenza v0167</title>
     <style>
         * {
             margin: 0;
@@ -138,7 +138,6 @@
         .info-card div {
             margin: 6px 0;
         }
-        /* NOTE NORMALI (giallo) */
         .note-item {
             background: #fff3e0;
             padding: 10px 14px;
@@ -150,24 +149,6 @@
             flex-wrap: wrap;
             border-left: 6px solid #ff9800;
         }
-        .note-text {
-            flex: 1;
-            font-size: 0.85rem;
-        }
-        .delete-note {
-            background: #e57373;
-            border: none;
-            border-radius: 30px;
-            padding: 5px 14px;
-            color: white;
-            font-weight: bold;
-            cursor: pointer;
-            font-size: 0.75rem;
-        }
-        .radio-note {
-            transform: scale(1.1);
-            margin-right: 4px;
-        }
         .note-title {
             font-weight: bold;
             font-size: 0.9rem;
@@ -176,24 +157,12 @@
             padding: 0;
             margin-right: 8px;
         }
-        /* NOTE SPECIALI (verde) */
         .special-note-area {
             background: #e8f5e9;
             border-radius: 24px;
             padding: 14px;
             margin: 12px 0;
             border-left: 4px solid #4caf50;
-        }
-        .special-note-item {
-            background: #e8f5e9;
-            padding: 10px 14px;
-            margin: 8px 0;
-            border-radius: 48px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            flex-wrap: wrap;
-            border-left: 6px solid #2e7d32;
         }
         .back-home {
             background: #607d8b;
@@ -219,6 +188,44 @@
             background: white;
             font-size: 0.85rem;
         }
+        /* MODALE per nuova nota */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .modal-content {
+            background: white;
+            border-radius: 32px;
+            padding: 24px;
+            width: 90%;
+            max-width: 400px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        .modal-content h3 {
+            margin-bottom: 16px;
+            color: #c62828;
+        }
+        .modal-content label {
+            font-weight: bold;
+            margin-top: 12px;
+            display: block;
+        }
+        .modal-content input, .modal-content textarea {
+            margin-top: 4px;
+        }
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
         @media (max-width: 480px) {
             body { padding: 8px; }
             .page { padding: 16px 12px 24px; }
@@ -243,7 +250,7 @@
 <div class="container">
     <!-- HOME PAGE -->
     <div id="homePage" class="page">
-        <div class="version-header">📟 SOS Drive v0166 - Gestione note con titolo e descrizione</div>
+        <div class="version-header">📟 SOS Drive v0167 - Dialogo CREA/ANNULLA per nuova nota</div>
         <h1>🆘 SOS EMERGENZA</h1>
         <div class="grid-2">
             <button class="big-btn" data-service="ambulanza">🚑 AMBULANZA</button>
@@ -252,12 +259,12 @@
             <button class="big-btn" data-service="clinica">🏥 CLINICA</button>
         </div>
         <p style="text-align:center; font-size:0.75rem; color:#555;">Ogni servizio ha il proprio archivio note.<br>📍 Ricerca entro 300m di TUTTI i luoghi con nome (negozi, aziende, uffici, piazze)<br>🔊 Ascolto automatico 15 secondi dopo il messaggio</p>
-        <div class="version-footer">versione 0166 – Note normali con titolo/descrizione, pulsanti modifica/cancella, rimosso campo aggiunta testo</div>
+        <div class="version-footer">versione 0167 – Dialogo modale per creare nota (Titolo + Descrizione) con pulsanti CREA/ANNULLA</div>
     </div>
 
     <!-- EMERGENCY PAGE -->
     <div id="emergencyPage" class="page hidden">
-        <div class="version-header">📟 SOS Drive v0166 – Gestione note</div>
+        <div class="version-header">📟 SOS Drive v0167 – Gestione note</div>
         <h2 id="serviceTitle">AMBULANZA</h2>
 
         <label>📞 Numero servizio</label>
@@ -279,7 +286,7 @@
             <div id="gpsStatus" class="status-msg"></div>
         </div>
 
-        <!-- PULSANTE AGGIUNGI (senza campo input) -->
+        <!-- PULSANTE AGGIUNGI NOTA -->
         <button id="addNoteBtn" class="small-btn" style="background:#ff9800; width:100%; margin:8px 0;">➕ AGGIUNGI NOTA</button>
         
         <div id="normalNoteInfo" class="status-msg" style="color:#2e7d32; font-weight:500; background:#e8f5e9; padding:6px 12px; border-radius:20px; margin-bottom:8px; display:none;">
@@ -326,24 +333,32 @@
         </div>
 
         <button id="backHomeBtn" class="small-btn back-home" style="width:100%;">◀ TORNA INDIETRO</button>
-        <div class="version-footer">versione 0166 – note normali con titolo, modifica/cancella, stessa grafica delle speciali (giallo)</div>
+        <div class="version-footer">versione 0167 – dialogo modale per nuova nota</div>
+    </div>
+
+    <!-- MODALE per aggiunta nota (inizialmente nascosto) -->
+    <div id="noteModal" class="modal" style="display:none;">
+        <div class="modal-content">
+            <h3>➕ Nuova Nota Normale</h3>
+            <label>Titolo</label>
+            <input type="text" id="modalTitle" placeholder="Inserisci il titolo">
+            <label>Descrizione (sarà letta in emergenza)</label>
+            <textarea id="modalDesc" rows="3" placeholder="Inserisci la descrizione"></textarea>
+            <div class="modal-buttons">
+                <button id="modalCreateBtn" class="small-btn" style="background:#4caf50;">✅ CREA</button>
+                <button id="modalCancelBtn" class="small-btn" style="background:#757575;">❌ ANNULLA</button>
+            </div>
+        </div>
     </div>
 </div>
 
 <script>
-    // ==================== VERSIONE 0166 ====================
-    // Modifiche:
-    // - Rimossa input "Nuova nota (italiano)"
-    // - Pulsante "AGGIUNGI" che chiede titolo e descrizione (prompt)
-    // - Note normali: oggetti con {id, title, description}
-    // - Visualizzazione: numero progressivo + titolo, pulsanti Modifica (prompt) e Cancella
-    // - Eliminata editNoteArea
-    // - Stesso layout note speciali (verde)
-    // - Note normali: sfondo giallo con bordo arancione
-    // - Tutto il resto invariato (geolocalizzazione, POI, WakeLock, ascolto 15s, velocità, bip)
+    // ==================== VERSIONE 0167 ====================
+    // - Dialogo modale (CREA/ANNULLA) per aggiungere nota normale
+    // - Tutto il resto invariato dalla 0166 (geolocalizzazione, POI, WakeLock, ascolto, velocità, bip, ecc.)
     // =================================================================
 
-    const CURRENT_VERSION = "0166";
+    const CURRENT_VERSION = "0167";
     let currentService = "ambulanza";
     let currentLat = null, currentLng = null;
     let currentAddress = "";
@@ -388,6 +403,12 @@
     const selectSpecial2Btn = document.getElementById('selectSpecial2Btn');
     const specialNoteStatus = document.getElementById('specialNoteStatus');
     const normalNoteInfo = document.getElementById('normalNoteInfo');
+    // MODALE
+    const modal = document.getElementById('noteModal');
+    const modalTitle = document.getElementById('modalTitle');
+    const modalDesc = document.getElementById('modalDesc');
+    const modalCreateBtn = document.getElementById('modalCreateBtn');
+    const modalCancelBtn = document.getElementById('modalCancelBtn');
 
     let recognition = null;
     let recognitionTimeout = null;
@@ -407,7 +428,7 @@
     // ---------- ARCHIVIO NUMERI ----------
     function migratePhoneNumbers() {
         const services = ["ambulanza", "polizia", "veterinario", "clinica"];
-        const oldVersions = ["0165", "0154", "0153"];
+        const oldVersions = ["0166", "0165", "0154"];
         for (let s of services) {
             if (localStorage.getItem(`phone_${s}_${CURRENT_VERSION}`)) continue;
             for (let ver of oldVersions) {
@@ -483,23 +504,21 @@
     // ---------- GESTIONE NOTE NORMALI (con titolo e descrizione) ----------
     function migrateOldNotes() {
         const services = ["ambulanza", "polizia", "veterinario", "clinica"];
-        // Tentativo di migrazione da versione 0165 (note normali con solo campo text)
         for (let s of services) {
             if (localStorage.getItem(`sos_notes_${s}_${CURRENT_VERSION}`)) continue;
-            let old = localStorage.getItem(`sos_notes_${s}_0165`);
+            let old = localStorage.getItem(`sos_notes_${s}_0166`);
             if (old) {
                 try {
                     let arr = JSON.parse(old);
-                    // Se arr contiene oggetti con {text}, li convertiamo in {title, description}
-                    if (arr.length && arr[0].text !== undefined) {
+                    if (arr.length && arr[0].title !== undefined) {
+                        localStorage.setItem(`sos_notes_${s}_${CURRENT_VERSION}`, JSON.stringify(arr));
+                    } else {
                         let newArr = arr.map((n, idx) => ({
                             id: n.id || Date.now() + idx,
                             title: `Nota ${idx+1}`,
-                            description: n.text || ""
+                            description: n.description || n.text || ""
                         }));
                         localStorage.setItem(`sos_notes_${s}_${CURRENT_VERSION}`, JSON.stringify(newArr));
-                    } else {
-                        localStorage.setItem(`sos_notes_${s}_${CURRENT_VERSION}`, JSON.stringify(arr));
                     }
                 } catch(e) {}
             }
@@ -518,7 +537,6 @@
         if (stored) {
             try {
                 notesArray = JSON.parse(stored);
-                // Verifica che ogni nota abbia title e description (per backward compatibility)
                 notesArray = notesArray.map(n => ({
                     id: n.id,
                     title: n.title || "Nota senza titolo",
@@ -551,7 +569,7 @@
             `;
         });
         notesListArea.innerHTML = html;
-        // Eventi per radio button
+        // Radio button
         document.querySelectorAll('input[name="noteSelect"]').forEach(r => {
             r.addEventListener('change', (e) => {
                 selectedNoteId = parseInt(e.target.value);
@@ -563,7 +581,7 @@
                 specialNoteStatus.innerText = "";
             });
         });
-        // Eventi per modifica
+        // Modifica
         document.querySelectorAll('.edit-note-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 e.stopPropagation();
@@ -586,7 +604,7 @@
                 }
             });
         });
-        // Eventi per cancellazione
+        // Cancella
         document.querySelectorAll('.delete-note-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 e.stopPropagation();
@@ -602,14 +620,17 @@
             });
         });
     }
-    function addNewNote() {
-        let title = prompt("Inserisci il titolo della nota:");
-        if (title === null) return;
-        title = title.trim();
+    // Nuova nota con modale
+    function showAddNoteModal() {
+        modalTitle.value = "";
+        modalDesc.value = "";
+        modal.style.display = "flex";
+    }
+    function closeModal() { modal.style.display = "none"; }
+    function createNoteFromModal() {
+        let title = modalTitle.value.trim();
         if (title === "") title = "Senza titolo";
-        let description = prompt("Inserisci la descrizione (sarà letta in emergenza):");
-        if (description === null) return;
-        description = description.trim() || "";
+        let description = modalDesc.value.trim() || "";
         let newId = Date.now() + Math.random() * 10000;
         notesArray.push({ id: newId, title: title, description: description });
         if (notesArray.length === 1) selectedNoteId = newId;
@@ -618,6 +639,7 @@
         gpsStatus.innerHTML = "✅ Nota aggiunta";
         setTimeout(()=> gpsStatus.innerHTML = "✅ Pronto.", 2000);
         selectedSpecialMode = false;
+        closeModal();
     }
     function getSelectedNoteDescription() {
         if (selectedSpecialMode) return selectedSpecialText;
@@ -638,7 +660,7 @@
         normalNoteInfo.style.display = 'none';
     }
 
-    // ---------- COPIA BILINGUE (usa la descrizione per la nota normale) ----------
+    // ---------- COPIA BILINGUE ----------
     async function getBilingualCopy() {
         let noteIT = getSelectedNoteDescription() || "nessuna nota";
         let coord = (currentLat && currentLng) ? `${currentLat.toFixed(6)}, ${currentLng.toFixed(6)}` : "non disponibili";
@@ -677,7 +699,7 @@
         }
     }
 
-    // ---------- GEOLOCALIZZAZIONE + RICERCA ESTESA (invariata dalla 0165) ----------
+    // ---------- GEOLOCALIZZAZIONE + RICERCA ESTESA (invariata) ----------
     function haversine(lat1,lng1,lat2,lng2) {
         const R = 6371e3;
         const φ1 = lat1 * Math.PI/180, φ2 = lat2 * Math.PI/180;
@@ -894,7 +916,7 @@
     function speakItalian() { speakFull('it'); }
     function speakFrench() { speakFull('fr'); }
 
-    // ---------- EXPORT/IMPORT TXT (esporta titolo e descrizione?) manteniamo solo descrizione per compatibilità ----------
+    // ---------- EXPORT/IMPORT TXT ----------
     function exportTxt() {
         if (!notesArray.length) { gpsStatus.innerHTML = "Nessuna nota."; return; }
         let txt = notesArray.map(n => n.description).join('\n');
@@ -962,7 +984,7 @@
         registerNumberBtn.addEventListener('click', onRegisterNumber);
         googleMapsBtn.addEventListener('click', () => window.open("https://maps.google.com", "_blank"));
         geolocationBtn.addEventListener('click', getLocationAndAddress);
-        addNoteBtn.addEventListener('click', addNewNote);
+        addNoteBtn.addEventListener('click', showAddNoteModal);
         copyBtn.addEventListener('click', copyBilingual);
         audioItBtn.addEventListener('click', speakItalian);
         audioFrBtn.addEventListener('click', speakFrench);
@@ -974,6 +996,11 @@
         clearResponseBtn.addEventListener('click', () => { operatorResponse.value = ""; transcribeStatus.innerText = ""; });
         selectSpecial1Btn.addEventListener('click', () => selectSpecialNote(1));
         selectSpecial2Btn.addEventListener('click', () => selectSpecialNote(2));
+        // Modale eventi
+        modalCreateBtn.addEventListener('click', createNoteFromModal);
+        modalCancelBtn.addEventListener('click', closeModal);
+        // Chiudi modale se clicca fuori (sullo sfondo)
+        modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
         initRecognition();
         renderNotes();
         normalNoteInfo.style.display = 'none';
