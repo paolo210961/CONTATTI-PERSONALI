@@ -351,6 +351,21 @@
 </div>
 
 <script>
+/* =====================================================
+   BLOCCO 1 — HOME / NAVIGAZIONE
+===================================================== */
+
+/* =====================================================
+   BLOCCO 2 — GPS / MAPPE / POSIZIONE
+===================================================== */
+
+/* =====================================================
+   BLOCCO 3 — NOTE / ARCHIVIO
+===================================================== */
+
+/* =====================================================
+   BLOCCO 4 — AUDIO / TRADUZIONI / VOCE
+===================================================== */
     // ==================== VERSIONE 0169 ====================
     // FIX rispetto a 0168:
     // 1. attachDelegatedEvents() chiamata SOLO UNA VOLTA in init() — niente più listener duplicati
@@ -712,6 +727,10 @@
         }
     }
 
+    /* =====================================================
+       BLOCCO 2 — GPS / MAPPE / POSIZIONE
+    ===================================================== */
+    
     // ---------- GEOLOCALIZZAZIONE + RICERCA ESTESA ----------
     function haversine(lat1,lng1,lat2,lng2) {
         const R = 6371e3;
@@ -961,7 +980,11 @@
         reader.readAsText(file,"UTF-8");
     }
 
-    // ---------- SHOW EMERGENCY ----------
+    /* =====================================================
+         BLOCCO 1 — HOME / NAVIGAZIONE
+    ===================================================== */
+    
+    // ---------- SHOW EMERGENCY ----------    
     function showEmergency(s) {
         currentService = s;
         let label = {ambulanza:"🚑 AMBULANZA", polizia:"👮 POLIZIA", veterinario:"🐾 VETERINARIO", clinica:"🏥 CLINICA"}[s];
@@ -992,6 +1015,10 @@
         releaseWakeLock();
     }
 
+    /* =====================================================
+       BLOCCO 1 — HOME / NAVIGAZIONE
+    ===================================================== */
+    
     function init() {
         migrateOldNotes();
         migratePhoneNumbers();
