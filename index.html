@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
-    <title>SOS Drive - Emergenza v0168</title>
+    <title>SOS Drive - Emergenza v0169</title>
     <style>
         * {
             margin: 0;
@@ -249,7 +249,7 @@
 <div class="container">
     <!-- HOME PAGE -->
     <div id="homePage" class="page">
-        <div class="version-header">📟 SOS Drive v0168 - Fix pulsanti Modifica/Cancella (delegazione eventi)</div>
+        <div class="version-header">📟 SOS Drive v0169 - Fix bug: listener duplicati, modal reset, ID float, testo duplicato</div>
         <h1>🆘 SOS EMERGENZA</h1>
         <div class="grid-2">
             <button class="big-btn" data-service="ambulanza">🚑 AMBULANZA</button>
@@ -258,12 +258,12 @@
             <button class="big-btn" data-service="clinica">🏥 CLINICA</button>
         </div>
         <p style="text-align:center; font-size:0.75rem; color:#555;">Ogni servizio ha il proprio archivio note.<br>📍 Ricerca entro 300m di TUTTI i luoghi con nome (negozi, aziende, uffici, piazze)<br>🔊 Ascolto automatico 15 secondi dopo il messaggio</p>
-        <div class="version-footer">versione 0168 – Delegazione eventi per note, pulsanti Modifica/Cancella funzionanti</div>
+        <div class="version-footer">versione 0169 – Fix bug multipli</div>
     </div>
 
     <!-- EMERGENCY PAGE -->
     <div id="emergencyPage" class="page hidden">
-        <div class="version-header">📟 SOS Drive v0168 – Gestione note</div>
+        <div class="version-header">📟 SOS Drive v0169 – Gestione note</div>
         <h2 id="serviceTitle">AMBULANZA</h2>
 
         <label>📞 Numero servizio</label>
@@ -331,7 +331,7 @@
         </div>
 
         <button id="backHomeBtn" class="small-btn back-home" style="width:100%;">◀ TORNA INDIETRO</button>
-        <div class="version-footer">versione 0168 – Fix eventi modifica/cancella, delegazione su notesListArea</div>
+        <div class="version-footer">versione 0169 – Fix bug multipli</div>
     </div>
 
     <!-- MODALE per aggiunta nota -->
@@ -351,12 +351,16 @@
 </div>
 
 <script>
-    // ==================== VERSIONE 0168 ====================
-    // - Fix pulsanti Modifica e Cancella delle note normali usando DELEGAZIONE EVENTI
-    // - Tutto il resto invariato rispetto alla 0167 (coordinate, geolocalizzazione, POI, WakeLock, ecc.)
+    // ==================== VERSIONE 0169 ====================
+    // FIX rispetto a 0168:
+    // 1. attachDelegatedEvents() chiamata SOLO UNA VOLTA in init() — niente più listener duplicati
+    // 2. Modal resetta i campi dopo la creazione
+    // 3. newId usa Math.floor() per evitare ID float
+    // 4. Rimosso doppio "il il" nel testo del messaggio di emergenza
+    // 5. backHome() non chiama più renderNotes() con array vuoto (solo reset variabili)
     // =================================================================
 
-    const CURRENT_VERSION = "0168";
+    const CURRENT_VERSION = "0169";
     let currentService = "ambulanza";
     let currentLat = null, currentLng = null;
     let currentAddress = "";
@@ -425,7 +429,7 @@
     // ---------- ARCHIVIO NUMERI ----------
     function migratePhoneNumbers() {
         const services = ["ambulanza", "polizia", "veterinario", "clinica"];
-        const oldVersions = ["0167", "0166", "0165"];
+        const oldVersions = ["0168", "0167", "0166", "0165"];
         for (let s of services) {
             if (localStorage.getItem(`phone_${s}_${CURRENT_VERSION}`)) continue;
             for (let ver of oldVersions) {
@@ -498,26 +502,30 @@
         recognitionTimeout = setTimeout(() => { if (recognition && recognition.stop) recognition.stop(); }, 15000);
     }
 
-    // ---------- GESTIONE NOTE NORMALI (con delegazione eventi) ----------
+    // ---------- GESTIONE NOTE NORMALI ----------
     function migrateOldNotes() {
         const services = ["ambulanza", "polizia", "veterinario", "clinica"];
+        const oldVersions = ["0168", "0167"];
         for (let s of services) {
             if (localStorage.getItem(`sos_notes_${s}_${CURRENT_VERSION}`)) continue;
-            let old = localStorage.getItem(`sos_notes_${s}_0167`);
-            if (old) {
-                try {
-                    let arr = JSON.parse(old);
-                    if (arr.length && arr[0].title !== undefined) {
-                        localStorage.setItem(`sos_notes_${s}_${CURRENT_VERSION}`, JSON.stringify(arr));
-                    } else {
-                        let newArr = arr.map((n, idx) => ({
-                            id: n.id || Date.now() + idx,
-                            title: `Nota ${idx+1}`,
-                            description: n.description || n.text || ""
-                        }));
-                        localStorage.setItem(`sos_notes_${s}_${CURRENT_VERSION}`, JSON.stringify(newArr));
-                    }
-                } catch(e) {}
+            for (let ver of oldVersions) {
+                let old = localStorage.getItem(`sos_notes_${s}_${ver}`);
+                if (old) {
+                    try {
+                        let arr = JSON.parse(old);
+                        if (arr.length && arr[0].title !== undefined) {
+                            localStorage.setItem(`sos_notes_${s}_${CURRENT_VERSION}`, JSON.stringify(arr));
+                        } else {
+                            let newArr = arr.map((n, idx) => ({
+                                id: Date.now() + idx,
+                                title: `Nota ${idx+1}`,
+                                description: n.description || n.text || ""
+                            }));
+                            localStorage.setItem(`sos_notes_${s}_${CURRENT_VERSION}`, JSON.stringify(newArr));
+                        }
+                        break;
+                    } catch(e) {}
+                }
             }
         }
     }
@@ -566,12 +574,12 @@
             `;
         });
         notesListArea.innerHTML = html;
-        // Non attacco più listener diretti qui: userò delegazione su notesListArea
     }
 
-    // DELEGAZIONE EVENTI per pulsanti Modifica e Cancella (e anche per i radio)
+    // FIX 1: attachDelegatedEvents chiamata UNA SOLA VOLTA in init()
+    // I listener sono sul container notesListArea che non viene mai ricreato,
+    // quindi sopravvivono a ogni renderNotes() che riscrive solo il contenuto interno.
     function attachDelegatedEvents() {
-        // Gestione cambio radio (selezione nota)
         notesListArea.addEventListener('change', (e) => {
             if (e.target && e.target.type === 'radio' && e.target.name === 'noteSelect') {
                 selectedNoteId = parseInt(e.target.value);
@@ -584,7 +592,6 @@
             }
         });
 
-        // Gestione click su pulsanti Modifica e Cancella (delegazione)
         notesListArea.addEventListener('click', (e) => {
             const btn = e.target;
             if (btn.classList && btn.classList.contains('edit-note-btn')) {
@@ -627,7 +634,8 @@
         let title = modalTitle.value.trim();
         if (title === "") title = "Senza titolo";
         let description = modalDesc.value.trim() || "";
-        let newId = Date.now() + Math.random() * 10000;
+        // FIX 3: usa Math.floor per evitare ID float
+        let newId = Date.now() + Math.floor(Math.random() * 10000);
         notesArray.push({ id: newId, title: title, description: description });
         if (notesArray.length === 1) selectedNoteId = newId;
         saveNotes();
@@ -638,7 +646,12 @@
         closeModal();
     }
     function showAddNoteModal() { modal.style.display = "flex"; }
-    function closeModal() { modal.style.display = "none"; }
+    function closeModal() {
+        modal.style.display = "none";
+        // FIX 2: resetta i campi del modale dopo chiusura
+        modalTitle.value = "";
+        modalDesc.value = "";
+    }
 
     function getSelectedNoteDescription() {
         if (selectedSpecialMode) return selectedSpecialText;
@@ -667,8 +680,9 @@
         let refA = currentRefA || "non disponibile";
         let refB = currentRefB || "non disponibile";
         let refC = currentRefC || "non disponibile";
+        // FIX 4: rimosso doppio "il il"
         let introIT = "Attenzione Emergenza sono italiano uso il traduttore mi trovo in Emergenza";
-        let domandaIT = "il il tuo messaggio di risposta verrà tradotto parla piano";
+        let domandaIT = "il tuo messaggio di risposta verrà tradotto parla piano";
         let italian = `${introIT}\n\n${noteIT}\n\nCoordinate: ${coord}\nIndirizzo: ${addr}\nSono vicino a (1): ${refA}\nSono vicino a (2): ${refB}\nSono vicino a (3): ${refC}\n\n${domandaIT}`;
         let introFR = await translateToFrench(introIT);
         let noteFR = await translateToFrench(noteIT);
@@ -698,7 +712,7 @@
         }
     }
 
-    // ---------- GEOLOCALIZZAZIONE + RICERCA ESTESA (invariata) ----------
+    // ---------- GEOLOCALIZZAZIONE + RICERCA ESTESA ----------
     function haversine(lat1,lng1,lat2,lng2) {
         const R = 6371e3;
         const φ1 = lat1 * Math.PI/180, φ2 = lat2 * Math.PI/180;
@@ -824,7 +838,7 @@
         gpsStatus.innerHTML = "";
     }
 
-    // ---------- LETTURA VOCALE (pausa 0.2s tra parole, 2s coordinate) ----------
+    // ---------- LETTURA VOCALE ----------
     function playBeep() {
         try {
             let ctx = new (window.AudioContext || window.webkitAudioContext)();
@@ -892,6 +906,7 @@
             gpsStatus.innerHTML = "🔊 Lettura FR...";
         } else gpsStatus.innerHTML = "🔊 Lettura IT...";
         
+        // FIX 4: testo corretto senza doppio "il il"
         let intro = (lang==='it') ? "Attenzione Emergenza sono italiano uso il traduttore mi trovo in Emergenza" : await translateToFrench("Attenzione Emergenza sono italiano uso il traduttore mi trovo in Emergenza");
         await speakWords(intro, lang==='it'?'it-IT':'fr-FR', 1.0, 200);
         await speakWords(note, lang==='it'?'it-IT':'fr-FR', 1.0, 200);
@@ -905,7 +920,7 @@
         await speakWords(refB, lang==='it'?'it-IT':'fr-FR', 1.0, 200);
         await speakWords("Sono vicino a 3", lang==='it'?'it-IT':'fr-FR', 1.0, 200);
         await speakWords(refC, lang==='it'?'it-IT':'fr-FR', 1.0, 200);
-        let domanda = (lang==='it') ? "il il tuo messaggio di risposta verrà tradotto parla piano" : await translateToFrench("il il tuo messaggio di risposta verrà tradotto parla piano");
+        let domanda = (lang==='it') ? "il tuo messaggio di risposta verrà tradotto parla piano" : await translateToFrench("il tuo messaggio di risposta verrà tradotto parla piano");
         await speakWords(domanda, lang==='it'?'it-IT':'fr-FR', 1.0, 200);
         playBeep();
         await new Promise(r=>setTimeout(r,800));
@@ -935,7 +950,7 @@
             lines.forEach((line, idx) => {
                 line = line.trim();
                 if (line) newNotes.push({
-                    id: Date.now() + Math.random()*10000 + idx,
+                    id: Date.now() + Math.floor(Math.random()*10000) + idx,
                     title: `Nota ${idx+1}`,
                     description: line
                 });
@@ -946,21 +961,19 @@
         reader.readAsText(file,"UTF-8");
     }
 
-    // ---------- UTILITIES ----------
-    function loadCounter() { let c = localStorage.getItem(`sos_counter_${CURRENT_VERSION}`); return c ? parseInt(c) : 1; }
-    function incCounter() { let c = loadCounter(); localStorage.setItem(`sos_counter_${CURRENT_VERSION}`, c+1); return c; }
+    // ---------- SHOW EMERGENCY ----------
     function showEmergency(s) {
         currentService = s;
         let label = {ambulanza:"🚑 AMBULANZA", polizia:"👮 POLIZIA", veterinario:"🐾 VETERINARIO", clinica:"🏥 CLINICA"}[s];
         serviceTitleSpan.innerText = label;
         phoneInput.value = getPhone(s) || defaultPhone[s];
-        loadNotes(s); resetCoords();
+        loadNotes(s);
+        resetCoords();
         homePage.classList.add("hidden");
         emergencyPage.classList.remove("hidden");
         phoneSaveMsg.innerText = "";
         requestWakeLock();
-        // Ricollega eventi delegati dopo ogni ricaricamento dell'area note
-        attachDelegatedEvents();
+        // FIX 1: NON si chiama più attachDelegatedEvents() qui — già chiamata una sola volta in init()
     }
     function onRegisterNumber() {
         let n = phoneInput.value.trim();
@@ -970,11 +983,12 @@
     function backHome() {
         emergencyPage.classList.add("hidden");
         homePage.classList.remove("hidden");
+        // FIX 5: reset variabili senza chiamare renderNotes() con array vuoto
         currentService = null;
         notesArray = [];
         selectedNoteId = null;
         selectedSpecialMode = false;
-        renderNotes();
+        selectedSpecialText = "";
         releaseWakeLock();
     }
 
@@ -1002,11 +1016,11 @@
         modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
         initRecognition();
         renderNotes();
-        attachDelegatedEvents(); // Attacca la delegazione fin dall'inizio
+        // FIX 1: attachDelegatedEvents chiamata UNA SOLA VOLTA qui
+        attachDelegatedEvents();
         normalNoteInfo.style.display = 'none';
     }
     init();
 </script>
 </body>
 </html>
-```
