@@ -8,7 +8,7 @@
     <link rel="apple-touch-icon" href="icon-sos-192.png">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
-    <title>SOS Drive - Emergenza v0166</title>
+    <title>SOS Drive - Emergenza v0167</title>
     <style>
         * {
             margin: 0;
@@ -199,6 +199,7 @@
             display: flex;
             align-items: center;
             gap: 12px;
+            touch-action: manipulation;
         }
         .note-item.special .note-number-btn {
             color: #1b5e20;
@@ -237,6 +238,7 @@
             cursor: pointer;
             font-size: 0.75rem;
             margin-right: 8px;
+            touch-action: manipulation;
         }
         .back-home {
             background: #607d8b;
@@ -274,6 +276,7 @@
             justify-content: center;
             z-index: 1000;
             backdrop-filter: blur(4px);
+            touch-action: manipulation;
         }
         .modal-content {
             background: white;
@@ -295,6 +298,9 @@
             gap: 12px;
             margin-top: 20px;
             justify-content: flex-end;
+        }
+        .modal-buttons button {
+            touch-action: manipulation;
         }
         @media (max-width: 480px) {
             body { padding: 8px; }
@@ -319,7 +325,7 @@
 <div class="container">
     <!-- HOME PAGE -->
     <div id="homePage" class="page">
-        <div class="version-header">📟 SOS Drive v0166 - Note normali e speciali funzionanti</div>
+        <div class="version-header">📟 SOS Drive v0167 - Pulsanti CREA funzionanti, long press migliorata</div>
         <h1>🆘 SOS EMERGENZA</h1>
         <div class="grid-2">
             <button class="big-btn" data-service="ambulanza">🚑 AMBULANZA</button>
@@ -328,12 +334,12 @@
             <button class="big-btn" data-service="clinica">🏥 CLINICA</button>
         </div>
         <p style="text-align:center; font-size:0.75rem; color:#555;">Ogni servizio ha note normali e note speciali.<br>📍 Long press 2s modifica / 5s elimina<br>🔊 Ascolto automatico 15 secondi</p>
-        <div class="version-footer">versione 0166 – pulsanti "CREA" funzionanti, aggiunta note corretta</div>
+        <div class="version-footer">versione 0167 – pulsanti CREA fissati, long press senza conflitti, touch ottimizzato</div>
     </div>
 
     <!-- EMERGENCY PAGE -->
     <div id="emergencyPage" class="page hidden">
-        <div class="version-header">📟 SOS Drive v0166 – Note dinamiche</div>
+        <div class="version-header">📟 SOS Drive v0167 – Note dinamiche corrette</div>
         <h2 id="serviceTitle">AMBULANZA</h2>
 
         <label>📞 Numero servizio</label>
@@ -400,15 +406,16 @@
         </div>
 
         <button id="backHomeBtn" class="small-btn back-home" style="width:100%;">◀ TORNA INDIETRO</button>
-        <div class="version-footer">versione 0166 – pulsanti CREA funzionanti, long press 2s modifica, 5s elimina</div>
+        <div class="version-footer">versione 0167 – pulsanti CREA funzionanti, long press 2s/5s stabili</div>
     </div>
 </div>
 
 <script>
-    // ==================== VERSIONE 0166 ====================
-    // - CORREZIONE: i pulsanti "CREA" nei modali di aggiunta note funzionano correttamente.
-    // - Note normali e speciali gestite in modo identico con array separati.
-    // - Long press 2s -> modale di modifica, 5s -> elimina.
+    // ==================== VERSIONE 0167 ====================
+    // - CORREZIONE: pulsanti "CREA" ora funzionano (usando querySelector locale, nessun ID globale)
+    // - Long press migliorata: distinzione 2 secondi (modifica) / 5 secondi (elimina) senza conflitti
+    // - Aggiunta touch-action: manipulation su bottoni e modali per evitare zoom su mobile
+    // - Note normali e speciali persistenti con chiavi fisse
     // =================================================================
 
     const CURRENT_VERSION = "stable";
@@ -470,7 +477,7 @@
     // ---------- ARCHIVIO NUMERI ----------
     function migratePhoneNumbers() {
         const services = ["ambulanza", "polizia", "veterinario", "clinica"];
-        const oldVersions = ["0165", "0164", "0163", "0162"];
+        const oldVersions = ["0166", "0165", "0164", "0163"];
         for (let s of services) {
             if (localStorage.getItem(`phone_${s}_${CURRENT_VERSION}`)) continue;
             for (let ver of oldVersions) {
@@ -570,12 +577,13 @@
                 gpsStatus.innerHTML = `✅ Nota ${type === 'normal' ? 'normale' : 'speciale'} selezionata: ${title}`;
                 setTimeout(() => { if(gpsStatus.innerHTML.includes("selezionata")) gpsStatus.innerHTML = "✅ Pronto."; }, 2000);
             });
-            // Long press gestione con timer
-            let pressTimerLong = null;
+            // Long press migliorata: misura la durata della pressione
+            let pressStart = 0;
+            let pressTimer = null;
             const startPress = (e) => {
                 e.preventDefault();
-                if (pressTimerLong) clearTimeout(pressTimerLong);
-                pressTimerLong = setTimeout(() => {
+                pressStart = Date.now();
+                pressTimer = setTimeout(() => {
                     // 5 secondi -> elimina
                     if (confirm(`⚠️ Eliminare la nota ${type === 'normal' ? 'normale' : 'speciale'} "${title}"?`)) {
                         if (type === 'normal') {
@@ -592,27 +600,32 @@
                         gpsStatus.innerHTML = "🗑️ Nota eliminata";
                         setTimeout(() => gpsStatus.innerHTML = "✅ Pronto.", 2000);
                     }
-                    pressTimerLong = null;
+                    pressTimer = null;
                 }, 5000);
-                // 2 secondi -> modifica
-                setTimeout(() => {
-                    if (pressTimerLong) {
-                        clearTimeout(pressTimerLong);
-                        pressTimerLong = null;
-                        openEditModal(type, id, title, desc);
-                    }
-                }, 2000);
             };
-            const clearPress = () => {
-                if (pressTimerLong) {
-                    clearTimeout(pressTimerLong);
-                    pressTimerLong = null;
+            const endPress = (e) => {
+                if (pressTimer) {
+                    clearTimeout(pressTimer);
+                    pressTimer = null;
                 }
+                const duration = Date.now() - pressStart;
+                if (duration >= 2000 && duration < 5000) {
+                    openEditModal(type, id, title, desc);
+                }
+                pressStart = 0;
+            };
+            const cancelPress = () => {
+                if (pressTimer) {
+                    clearTimeout(pressTimer);
+                    pressTimer = null;
+                }
+                pressStart = 0;
             };
             btn.addEventListener('touchstart', startPress);
             btn.addEventListener('mousedown', startPress);
-            btn.addEventListener('touchend', clearPress);
-            btn.addEventListener('mouseup', clearPress);
+            btn.addEventListener('touchend', endPress);
+            btn.addEventListener('mouseup', endPress);
+            btn.addEventListener('mouseleave', cancelPress);
         });
         // Pulsanti elimina
         container.querySelectorAll('.delete-note').forEach(btn => {
@@ -647,21 +660,21 @@
             <div class="modal-content">
                 <h3>✏️ Modifica nota ${type === 'normal' ? 'normale' : 'speciale'}</h3>
                 <label>Titolo:</label>
-                <input type="text" id="editTitle" value="${escapeHtml(currentTitle)}" style="margin-bottom:12px;">
+                <input type="text" class="edit-title" value="${escapeHtml(currentTitle)}" style="margin-bottom:12px;">
                 <label>Descrizione:</label>
-                <textarea id="editDesc" rows="4">${escapeHtml(currentDesc)}</textarea>
+                <textarea class="edit-desc" rows="4">${escapeHtml(currentDesc)}</textarea>
                 <div class="modal-buttons">
-                    <button id="modalSaveBtn" class="small-btn" style="background:#4caf50;">💾 SALVA</button>
-                    <button id="modalCancelBtn" class="small-btn" style="background:#9e9e9e;">ANNULLA</button>
+                    <button class="small-btn save-btn" style="background:#4caf50;">💾 SALVA</button>
+                    <button class="small-btn cancel-btn" style="background:#9e9e9e;">ANNULLA</button>
                 </div>
             </div>
         `;
         document.body.appendChild(modalDiv);
-        const saveBtn = document.getElementById('modalSaveBtn');
-        const cancelBtn = document.getElementById('modalCancelBtn');
+        const saveBtn = modalDiv.querySelector('.save-btn');
+        const cancelBtn = modalDiv.querySelector('.cancel-btn');
         saveBtn.onclick = () => {
-            let newTitle = document.getElementById('editTitle').value.trim();
-            let newDesc = document.getElementById('editDesc').value.trim();
+            let newTitle = modalDiv.querySelector('.edit-title').value.trim();
+            let newDesc = modalDiv.querySelector('.edit-desc').value.trim();
             if (!newTitle) { alert("Il titolo è obbligatorio"); return; }
             if (type === 'normal') {
                 let note = normalNotes.find(n => n.id === id);
@@ -685,9 +698,10 @@
             setTimeout(() => gpsStatus.innerHTML = "✅ Pronto.", 2000);
         };
         cancelBtn.onclick = () => modalDiv.remove();
+        modalDiv.addEventListener('click', (e) => { if (e.target === modalDiv) modalDiv.remove(); });
     }
 
-    // Funzione per aggiungere nuova nota - CORRETTA: il pulsante CREA funziona
+    // Funzione per aggiungere nuova nota - versione corretta con querySelector locale
     function addNewNote(type) {
         const modalDiv = document.createElement('div');
         modalDiv.className = 'modal';
@@ -695,39 +709,43 @@
             <div class="modal-content">
                 <h3>➕ Nuova nota ${type === 'normal' ? 'normale' : 'speciale'}</h3>
                 <label>Titolo:</label>
-                <input type="text" id="newTitle" placeholder="Titolo breve" style="margin-bottom:12px;">
+                <input type="text" class="new-title" placeholder="Titolo breve" style="margin-bottom:12px;">
                 <label>Descrizione:</label>
-                <textarea id="newDesc" rows="4" placeholder="Testo completo della nota..."></textarea>
+                <textarea class="new-desc" rows="4" placeholder="Testo completo della nota..."></textarea>
                 <div class="modal-buttons">
-                    <button id="modalCreateBtn" class="small-btn" style="background:#4caf50;">✅ CREA</button>
-                    <button id="modalCancelBtn" class="small-btn" style="background:#9e9e9e;">ANNULLA</button>
+                    <button class="small-btn create-btn" style="background:#4caf50;">✅ CREA</button>
+                    <button class="small-btn cancel-btn" style="background:#9e9e9e;">ANNULLA</button>
                 </div>
             </div>
         `;
         document.body.appendChild(modalDiv);
-        const createBtn = document.getElementById('modalCreateBtn');
-        const cancelBtn = document.getElementById('modalCancelBtn');
-        createBtn.onclick = () => {
-            let title = document.getElementById('newTitle').value.trim();
-            let desc = document.getElementById('newDesc').value.trim();
+        const createBtn = modalDiv.querySelector('.create-btn');
+        const cancelBtn = modalDiv.querySelector('.cancel-btn');
+        createBtn.addEventListener('click', () => {
+            const title = modalDiv.querySelector('.new-title').value.trim();
+            const desc = modalDiv.querySelector('.new-desc').value.trim();
             if (!title) { alert("Inserisci un titolo"); return; }
-            let newId = Date.now() + Math.random()*10000;
+            const newNote = {
+                id: Date.now(),
+                numero: (type === 'normal' ? normalNotes.length : specialNotes.length) + 1,
+                titolo: title,
+                descrizione: desc || ""
+            };
             if (type === 'normal') {
-                let newNumber = normalNotes.length + 1;
-                normalNotes.push({ id: newId, numero: newNumber, titolo: title, descrizione: desc || "" });
+                normalNotes.push(newNote);
                 saveNormalNotes();
                 renderNormalNotes();
             } else {
-                let newNumber = specialNotes.length + 1;
-                specialNotes.push({ id: newId, numero: newNumber, titolo: title, descrizione: desc || "" });
+                specialNotes.push(newNote);
                 saveSpecialNotes();
                 renderSpecialNotes();
             }
             modalDiv.remove();
             gpsStatus.innerHTML = "✅ Nota aggiunta";
             setTimeout(() => gpsStatus.innerHTML = "✅ Pronto.", 2000);
-        };
-        cancelBtn.onclick = () => modalDiv.remove();
+        });
+        cancelBtn.addEventListener('click', () => modalDiv.remove());
+        modalDiv.addEventListener('click', (e) => { if (e.target === modalDiv) modalDiv.remove(); });
     }
 
     // ---------- TRADUZIONI ----------
@@ -790,7 +808,6 @@
         recognitionTimeout = setTimeout(() => { if (recognition && recognition.stop) recognition.stop(); }, 15000);
     }
 
-    // Funzione per ottenere il testo della nota selezionata
     function getSelectedNoteText() {
         if (selectedNoteId === null) return null;
         if (selectedNoteType === 'normal') {
@@ -842,7 +859,7 @@
         }
     }
 
-    // ---------- GEOLOCALIZZAZIONE ----------
+    // ---------- GEOLOCALIZZAZIONE (invariata, già funzionante) ----------
     function haversine(lat1,lng1,lat2,lng2) {
         const R = 6371e3;
         const φ1 = lat1 * Math.PI/180, φ2 = lat2 * Math.PI/180;
@@ -1189,4 +1206,3 @@
 </script>
 </body>
 </html>
-```
