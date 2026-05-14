@@ -8,7 +8,7 @@
     <link rel="apple-touch-icon" href="icon-sos-192.png">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
-    <title>SOS Drive - Emergenza v0168</title>
+    <title>SOS Drive - Emergenza v0165</title>
     <style>
         * {
             margin: 0;
@@ -143,6 +143,7 @@
         .info-card div {
             margin: 6px 0;
         }
+        /* Stile comune per tutte le note (normali e speciali) */
         .notes-section {
             margin-top: 24px;
             margin-bottom: 24px;
@@ -274,7 +275,6 @@
             justify-content: center;
             z-index: 1000;
             backdrop-filter: blur(4px);
-            touch-action: manipulation;
         }
         .modal-content {
             background: white;
@@ -296,9 +296,6 @@
             gap: 12px;
             margin-top: 20px;
             justify-content: flex-end;
-        }
-        .modal-content button {
-            touch-action: manipulation;
         }
         @media (max-width: 480px) {
             body { padding: 8px; }
@@ -323,7 +320,7 @@
 <div class="container">
     <!-- HOME PAGE -->
     <div id="homePage" class="page">
-        <div class="version-header">📟 SOS Drive v0168 - Pulsante CREA funzionante</div>
+        <div class="version-header">📟 SOS Drive v0165 - Note normali e speciali a pulsanti numerati</div>
         <h1>🆘 SOS EMERGENZA</h1>
         <div class="grid-2">
             <button class="big-btn" data-service="ambulanza">🚑 AMBULANZA</button>
@@ -332,12 +329,12 @@
             <button class="big-btn" data-service="clinica">🏥 CLINICA</button>
         </div>
         <p style="text-align:center; font-size:0.75rem; color:#555;">Ogni servizio ha note normali e note speciali.<br>📍 Long press 2s modifica / 5s elimina<br>🔊 Ascolto automatico 15 secondi</p>
-        <div class="version-footer">versione 0168 – pulsanti CREA funzionanti, note aggiungibili correttamente</div>
+        <div class="version-footer">versione 0165 – note speciali dinamiche, stesso comportamento delle normali</div>
     </div>
 
     <!-- EMERGENCY PAGE -->
     <div id="emergencyPage" class="page hidden">
-        <div class="version-header">📟 SOS Drive v0168 – Note dinamiche</div>
+        <div class="version-header">📟 SOS Drive v0165 – Note dinamiche</div>
         <h2 id="serviceTitle">AMBULANZA</h2>
 
         <label>📞 Numero servizio</label>
@@ -370,7 +367,7 @@
             </div>
         </div>
 
-        <!-- SEZIONE NOTE SPECIALI -->
+        <!-- SEZIONE NOTE SPECIALI (dinamiche, stile verde) -->
         <div id="specialNotesSection" class="notes-section">
             <div class="section-title">
                 <span>✨ Note speciali</span>
@@ -404,15 +401,18 @@
         </div>
 
         <button id="backHomeBtn" class="small-btn back-home" style="width:100%;">◀ TORNA INDIETRO</button>
-        <div class="version-footer">versione 0168 – pulsanti CREA funzionanti, aggiunta note corretta</div>
+        <div class="version-footer">versione 0165 – note normali e speciali: aggiungi, modifica (2s), elimina (5s)</div>
     </div>
 </div>
 
 <script>
-    // ==================== VERSIONE 0168 ====================
-    // CORREZIONE: pulsanti "CREA" nei modali di aggiunta nota ora funzionano correttamente.
-    // Utilizzo di querySelector locale all'interno del modale, evitando conflitti di ID.
-    // Il resto (long press, geolocalizzazione, lettura vocale) invariato.
+    // ==================== VERSIONE 0165 ====================
+    // - Note normali e note speciali gestite in modo identico: array di { id, numero, titolo, descrizione }
+    // - Sezioni separate con pulsanti "AGGIUNGI" dedicati
+    // - Long press 2s -> modale di modifica (titolo+descrizione, pulsante SALVA)
+    // - Long press 5s -> elimina nota (con conferma)
+    // - Click breve -> seleziona nota (per la lettura vocale)
+    // - Persistenza con localStorage chiavi fisse: "normalNotes_<servizio>_stable" e "specialNotes_<servizio>_stable"
     // =================================================================
 
     const CURRENT_VERSION = "stable";
@@ -420,10 +420,12 @@
     let currentLat = null, currentLng = null;
     let currentAddress = "";
     let currentRefA = "", currentRefB = "", currentRefC = "";
-    let normalNotes = [];
-    let specialNotes = [];
-    let selectedNoteId = null;
-    let selectedNoteType = null;
+    let normalNotes = [];      // array di oggetti: { id, numero, titolo, descrizione }
+    let specialNotes = [];     // array di oggetti: { id, numero, titolo, descrizione }
+    let selectedNoteId = null;     // id della nota selezionata (normale o speciale)
+    let selectedNoteType = null;    // "normal" o "special"
+    let selectedSpecialMode = false; // legacy, non usato ma mantenuto per compatibilità (sempre false)
+    let selectedSpecialText = "";
     let wakeLock = null;
 
     // DOM elements
@@ -452,6 +454,7 @@
     const listenResponseBtn = document.getElementById('listenResponseBtn');
     const clearResponseBtn = document.getElementById('clearResponseBtn');
     const transcribeStatus = document.getElementById('transcribeStatus');
+
     const normalNotesListArea = document.getElementById('normalNotesListArea');
     const specialNotesListArea = document.getElementById('specialNotesListArea');
     const addNormalNoteBtn = document.getElementById('addNormalNoteBtn');
@@ -459,6 +462,7 @@
 
     let recognition = null;
     let recognitionTimeout = null;
+    let pressTimer = null;
 
     // ---------- WakeLock ----------
     async function requestWakeLock() {
@@ -474,7 +478,7 @@
     // ---------- ARCHIVIO NUMERI ----------
     function migratePhoneNumbers() {
         const services = ["ambulanza", "polizia", "veterinario", "clinica"];
-        const oldVersions = ["0167", "0166", "0165", "0164"];
+        const oldVersions = ["0164", "0163", "0162", "0161"];
         for (let s of services) {
             if (localStorage.getItem(`phone_${s}_${CURRENT_VERSION}`)) continue;
             for (let ver of oldVersions) {
@@ -487,13 +491,16 @@
     function getPhone(s) { return localStorage.getItem(`phone_${s}_${CURRENT_VERSION}`); }
     const defaultPhone = { ambulanza:"118", polizia:"113", veterinario:"800123456", clinica:"800987654" };
 
-    // ---------- FUNZIONI NOTE ----------
+    // ---------- FUNZIONI NOTE GENERICHE ----------
     function getNormalNotesKey() { return `normalNotes_${currentService}_${CURRENT_VERSION}`; }
     function getSpecialNotesKey() { return `specialNotes_${currentService}_${CURRENT_VERSION}`; }
 
-    function saveNormalNotes() { localStorage.setItem(getNormalNotesKey(), JSON.stringify(normalNotes)); }
-    function saveSpecialNotes() { localStorage.setItem(getSpecialNotesKey(), JSON.stringify(specialNotes)); }
-
+    function saveNormalNotes() {
+        localStorage.setItem(getNormalNotesKey(), JSON.stringify(normalNotes));
+    }
+    function saveSpecialNotes() {
+        localStorage.setItem(getSpecialNotesKey(), JSON.stringify(specialNotes));
+    }
     function loadNormalNotes() {
         let stored = localStorage.getItem(getNormalNotesKey());
         if (stored) {
@@ -515,6 +522,7 @@
         renderSpecialNotes();
     }
 
+    // Render note normali
     function renderNormalNotes() {
         if (!normalNotes.length) {
             normalNotesListArea.innerHTML = `<div style="font-size:0.7rem; color:#777;">Nessuna nota normale. Premi "AGGIUNGI".</div>`;
@@ -536,6 +544,7 @@
         attachNoteEvents('normal');
     }
 
+    // Render note speciali
     function renderSpecialNotes() {
         if (!specialNotes.length) {
             specialNotesListArea.innerHTML = `<div style="font-size:0.7rem; color:#777;">Nessuna nota speciale. Premi "AGGIUNGI".</div>`;
@@ -557,34 +566,32 @@
         attachNoteEvents('special');
     }
 
+    // Attacca eventi a tutti i pulsanti di una sezione
     function attachNoteEvents(type) {
         const container = (type === 'normal') ? normalNotesListArea : specialNotesListArea;
         const notesArray = (type === 'normal') ? normalNotes : specialNotes;
-        
+        // Eventi sui pulsanti principali (note-number-btn)
         container.querySelectorAll('.note-number-btn').forEach(btn => {
             let id = parseInt(btn.getAttribute('data-id'));
             let note = notesArray.find(n => n.id === id);
             if (!note) return;
             let title = note.titolo;
             let desc = note.descrizione;
-            
-            // Click breve -> selezione nota
+            // Click breve -> seleziona nota
             btn.addEventListener('click', (e) => {
                 e.stopPropagation();
                 selectedNoteId = id;
                 selectedNoteType = type;
+                selectedSpecialMode = false;
                 gpsStatus.innerHTML = `✅ Nota ${type === 'normal' ? 'normale' : 'speciale'} selezionata: ${title}`;
                 setTimeout(() => { if(gpsStatus.innerHTML.includes("selezionata")) gpsStatus.innerHTML = "✅ Pronto."; }, 2000);
             });
-            
-            // Long press con timer migliorato
-            let pressStart = 0;
-            let pressTimer = null;
-            
+            // Long press gestione con timer
+            let pressTimerLong = null;
             const startPress = (e) => {
                 e.preventDefault();
-                pressStart = Date.now();
-                pressTimer = setTimeout(() => {
+                if (pressTimerLong) clearTimeout(pressTimerLong);
+                pressTimerLong = setTimeout(() => {
                     // 5 secondi -> elimina
                     if (confirm(`⚠️ Eliminare la nota ${type === 'normal' ? 'normale' : 'speciale'} "${title}"?`)) {
                         if (type === 'normal') {
@@ -601,33 +608,29 @@
                         gpsStatus.innerHTML = "🗑️ Nota eliminata";
                         setTimeout(() => gpsStatus.innerHTML = "✅ Pronto.", 2000);
                     }
-                    pressTimer = null;
+                    pressTimerLong = null;
                 }, 5000);
-            };
-            
-            const endPress = () => {
-                const duration = Date.now() - pressStart;
-                clearTimeout(pressTimer);
-                pressTimer = null;
                 // 2 secondi -> modifica
-                if (duration >= 2000 && duration < 5000) {
-                    openEditModal(type, id, title, desc);
+                setTimeout(() => {
+                    if (pressTimerLong) {
+                        clearTimeout(pressTimerLong);
+                        pressTimerLong = null;
+                        openEditModal(type, id, title, desc);
+                    }
+                }, 2000);
+            };
+            const clearPress = () => {
+                if (pressTimerLong) {
+                    clearTimeout(pressTimerLong);
+                    pressTimerLong = null;
                 }
             };
-            
-            const cancelPress = () => {
-                clearTimeout(pressTimer);
-                pressTimer = null;
-            };
-            
             btn.addEventListener('touchstart', startPress);
             btn.addEventListener('mousedown', startPress);
-            btn.addEventListener('touchend', endPress);
-            btn.addEventListener('mouseup', endPress);
-            btn.addEventListener('mouseleave', cancelPress);
+            btn.addEventListener('touchend', clearPress);
+            btn.addEventListener('mouseup', clearPress);
         });
-        
-        // Pulsanti elimina (già presenti)
+        // Eventi sui pulsanti elimina (già presenti)
         container.querySelectorAll('.delete-note').forEach(btn => {
             btn.removeEventListener('click', deleteHandler);
             btn.addEventListener('click', deleteHandler);
@@ -653,6 +656,7 @@
         });
     }
 
+    // Modale di modifica (usato sia per normali che speciali)
     function openEditModal(type, id, currentTitle, currentDesc) {
         const modalDiv = document.createElement('div');
         modalDiv.className = 'modal';
@@ -660,23 +664,21 @@
             <div class="modal-content">
                 <h3>✏️ Modifica nota ${type === 'normal' ? 'normale' : 'speciale'}</h3>
                 <label>Titolo:</label>
-                <input type="text" class="edit-title" value="${escapeHtml(currentTitle)}" style="margin-bottom:12px;">
+                <input type="text" id="editTitle" value="${escapeHtml(currentTitle)}" style="margin-bottom:12px;">
                 <label>Descrizione:</label>
-                <textarea class="edit-desc" rows="4">${escapeHtml(currentDesc)}</textarea>
+                <textarea id="editDesc" rows="4">${escapeHtml(currentDesc)}</textarea>
                 <div class="modal-buttons">
-                    <button class="small-btn save-edit-btn" style="background:#4caf50;">💾 SALVA</button>
-                    <button class="small-btn cancel-edit-btn" style="background:#9e9e9e;">ANNULLA</button>
+                    <button id="modalSaveBtn" class="small-btn" style="background:#4caf50;">💾 SALVA</button>
+                    <button id="modalCancelBtn" class="small-btn" style="background:#9e9e9e;">ANNULLA</button>
                 </div>
             </div>
         `;
         document.body.appendChild(modalDiv);
-        
-        const saveBtn = modalDiv.querySelector('.save-edit-btn');
-        const cancelBtn = modalDiv.querySelector('.cancel-edit-btn');
-        
+        const saveBtn = document.getElementById('modalSaveBtn');
+        const cancelBtn = document.getElementById('modalCancelBtn');
         saveBtn.onclick = () => {
-            let newTitle = modalDiv.querySelector('.edit-title').value.trim();
-            let newDesc = modalDiv.querySelector('.edit-desc').value.trim();
+            let newTitle = document.getElementById('editTitle').value.trim();
+            let newDesc = document.getElementById('editDesc').value.trim();
             if (!newTitle) { alert("Il titolo è obbligatorio"); return; }
             if (type === 'normal') {
                 let note = normalNotes.find(n => n.id === id);
@@ -700,10 +702,9 @@
             setTimeout(() => gpsStatus.innerHTML = "✅ Pronto.", 2000);
         };
         cancelBtn.onclick = () => modalDiv.remove();
-        modalDiv.addEventListener('click', (e) => { if (e.target === modalDiv) modalDiv.remove(); });
     }
 
-    // FUNZIONE AGGIUNTA NOTA CORRETTA: ora il pulsante CREA funziona
+    // Aggiunta nuova nota (normale o speciale)
     function addNewNote(type) {
         const modalDiv = document.createElement('div');
         modalDiv.className = 'modal';
@@ -711,49 +712,42 @@
             <div class="modal-content">
                 <h3>➕ Nuova nota ${type === 'normal' ? 'normale' : 'speciale'}</h3>
                 <label>Titolo:</label>
-                <input type="text" class="new-title" placeholder="Titolo breve" style="margin-bottom:12px;">
+                <input type="text" id="newTitle" placeholder="Titolo breve" style="margin-bottom:12px;">
                 <label>Descrizione:</label>
-                <textarea class="new-desc" rows="4" placeholder="Testo completo della nota..."></textarea>
+                <textarea id="newDesc" rows="4" placeholder="Testo completo della nota..."></textarea>
                 <div class="modal-buttons">
-                    <button class="small-btn create-btn" style="background:#4caf50;">✅ CREA</button>
-                    <button class="small-btn cancel-btn" style="background:#9e9e9e;">ANNULLA</button>
+                    <button id="modalCreateBtn" class="small-btn" style="background:#4caf50;">✅ CREA</button>
+                    <button id="modalCancelBtn" class="small-btn" style="background:#9e9e9e;">ANNULLA</button>
                 </div>
             </div>
         `;
         document.body.appendChild(modalDiv);
-        
-        const createBtn = modalDiv.querySelector('.create-btn');
-        const cancelBtn = modalDiv.querySelector('.cancel-btn');
-        
-        createBtn.addEventListener('click', () => {
-            const title = modalDiv.querySelector('.new-title').value.trim();
-            const desc = modalDiv.querySelector('.new-desc').value.trim();
+        const createBtn = document.getElementById('modalCreateBtn');
+        const cancelBtn = document.getElementById('modalCancelBtn');
+        createBtn.onclick = () => {
+            let title = document.getElementById('newTitle').value.trim();
+            let desc = document.getElementById('newDesc').value.trim();
             if (!title) { alert("Inserisci un titolo"); return; }
-            const newNote = {
-                id: Date.now(),
-                numero: (type === 'normal' ? normalNotes.length + 1 : specialNotes.length + 1),
-                titolo: title,
-                descrizione: desc || ""
-            };
+            let newId = Date.now() + Math.random()*10000;
             if (type === 'normal') {
-                normalNotes.push(newNote);
+                let newNumber = normalNotes.length + 1;
+                normalNotes.push({ id: newId, numero: newNumber, titolo: title, descrizione: desc || "" });
                 saveNormalNotes();
                 renderNormalNotes();
             } else {
-                specialNotes.push(newNote);
+                let newNumber = specialNotes.length + 1;
+                specialNotes.push({ id: newId, numero: newNumber, titolo: title, descrizione: desc || "" });
                 saveSpecialNotes();
                 renderSpecialNotes();
             }
             modalDiv.remove();
             gpsStatus.innerHTML = "✅ Nota aggiunta";
             setTimeout(() => gpsStatus.innerHTML = "✅ Pronto.", 2000);
-        });
-        
-        cancelBtn.addEventListener('click', () => modalDiv.remove());
-        modalDiv.addEventListener('click', (e) => { if (e.target === modalDiv) modalDiv.remove(); });
+        };
+        cancelBtn.onclick = () => modalDiv.remove();
     }
 
-    // ---------- TRADUZIONI ----------
+    // ---------- TRADUZIONI, RICONOSCIMENTO VOCALE (invariati) ----------
     async function translateToFrench(italianText) {
         if (!italianText || italianText.trim() === "") return "";
         try {
@@ -775,7 +769,6 @@
         return frenchText + " (traduzione fallita)";
     }
 
-    // ---------- RICONOSCIMENTO VOCALE ----------
     function initRecognition() {
         if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
             transcribeStatus.innerText = "❌ Riconoscimento non supportato";
@@ -813,6 +806,7 @@
         recognitionTimeout = setTimeout(() => { if (recognition && recognition.stop) recognition.stop(); }, 15000);
     }
 
+    // Funzione per ottenere il testo della nota selezionata (per copia e lettura)
     function getSelectedNoteText() {
         if (selectedNoteId === null) return null;
         if (selectedNoteType === 'normal') {
@@ -864,7 +858,7 @@
         }
     }
 
-    // ---------- GEOLOCALIZZAZIONE ----------
+    // ---------- GEOLOCALIZZAZIONE (come prima, invariata) ----------
     function haversine(lat1,lng1,lat2,lng2) {
         const R = 6371e3;
         const φ1 = lat1 * Math.PI/180, φ2 = lat2 * Math.PI/180;
@@ -1023,7 +1017,7 @@
         gpsStatus.innerHTML = "";
     }
 
-    // ---------- LETTURA VOCALE ----------
+    // ---------- LETTURA VOCALE (usa la nota selezionata) ----------
     function playBeep() {
         try {
             let ctx = new (window.AudioContext || window.webkitAudioContext)();
@@ -1103,16 +1097,20 @@
     function speakItalian() { speakFull('it'); }
     function speakFrench() { speakFull('fr'); }
 
-    // ---------- EXPORT/IMPORT TXT ----------
+    // ---------- EXPORT/IMPORT TXT (esporta tutte le note) ----------
     function exportTxt() {
         let content = "";
         if (normalNotes.length) {
             content += "=== NOTE NORMALI ===\n";
-            normalNotes.forEach(n => content += `${n.numero}. ${n.titolo}\n${n.descrizione}\n\n`);
+            normalNotes.forEach(n => {
+                content += `${n.numero}. ${n.titolo}\n${n.descrizione}\n\n`;
+            });
         }
         if (specialNotes.length) {
             content += "=== NOTE SPECIALI ===\n";
-            specialNotes.forEach(n => content += `${n.numero}. ${n.titolo}\n${n.descrizione}\n\n`);
+            specialNotes.forEach(n => {
+                content += `${n.numero}. ${n.titolo}\n${n.descrizione}\n\n`;
+            });
         }
         if (!content) { gpsStatus.innerHTML = "Nessuna nota."; return; }
         let blob = new Blob([content], {type:'text/plain'});
@@ -1128,13 +1126,15 @@
         reader.onload = (e) => {
             let content = e.target.result;
             let lines = content.split(/\r?\n/);
-            let newNormal = [], newSpecial = [];
+            let newNormal = [];
+            let newSpecial = [];
             let currentSection = null;
-            let currentTitle = "", currentDesc = "";
+            let currentTitle = "";
+            let currentDesc = "";
             for (let line of lines) {
                 line = line.trim();
-                if (line === "=== NOTE NORMALI ===") { currentSection = "normal"; continue; }
-                if (line === "=== NOTE SPECIALI ===") { currentSection = "special"; continue; }
+                if (line.startsWith("=== NOTE NORMALI ===")) { currentSection = "normal"; continue; }
+                if (line.startsWith("=== NOTE SPECIALI ===")) { currentSection = "special"; continue; }
                 if (line.match(/^\d+\.\s+/) && currentSection) {
                     if (currentTitle) {
                         if (currentSection === "normal") newNormal.push({ id: Date.now()+Math.random(), titolo: currentTitle, descrizione: currentDesc });
@@ -1211,4 +1211,3 @@
 </script>
 </body>
 </html>
-```
