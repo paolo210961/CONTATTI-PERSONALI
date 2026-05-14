@@ -149,14 +149,6 @@
             flex-wrap: wrap;
             border-left: 6px solid #ff9800;
         }
-        .note-title {
-            font-weight: bold;
-            font-size: 0.9rem;
-            background: none;
-            border: none;
-            padding: 0;
-            margin-right: 8px;
-        }
         .special-note-item {
             background: #e8f5e9;
             padding: 10px 14px;
@@ -167,6 +159,14 @@
             gap: 10px;
             flex-wrap: wrap;
             border-left: 6px solid #2e7d32;
+        }
+        .note-title {
+            font-weight: bold;
+            font-size: 0.9rem;
+            background: none;
+            border: none;
+            padding: 0;
+            margin-right: 8px;
         }
         .back-home {
             background: #607d8b;
@@ -253,7 +253,7 @@
 <div class="container">
     <!-- HOME PAGE -->
     <div id="homePage" class="page">
-        <div class="version-header">📟 SOS Drive v0170 - Note speciali dinamiche (come le normali)</div>
+        <div class="version-header">📟 SOS Drive v0170 - Note speciali con stesso layout note normali</div>
         <h1>🆘 SOS EMERGENZA</h1>
         <div class="grid-2">
             <button class="big-btn" data-service="ambulanza">🚑 AMBULANZA</button>
@@ -262,7 +262,7 @@
             <button class="big-btn" data-service="clinica">🏥 CLINICA</button>
         </div>
         <p style="text-align:center; font-size:0.75rem; color:#555;">Ogni servizio ha il proprio archivio note.<br>📍 Ricerca entro 300m di TUTTI i luoghi con nome (negozi, aziende, uffici, piazze)<br>🔊 Ascolto automatico 15 secondi dopo il messaggio</p>
-        <div class="version-footer">versione 0170 – Note speciali: lista dinamica, aggiunta/modifica/cancella, selezione radio</div>
+        <div class="version-footer">versione 0170 – Note speciali: stessa gestione delle normali (aggiunta modale, modifica, cancella, radio)</div>
     </div>
 
     <!-- EMERGENCY PAGE -->
@@ -289,7 +289,7 @@
             <div id="gpsStatus" class="status-msg"></div>
         </div>
 
-        <!-- NOTE NORMALI -->
+        <!-- NOTE NORMALI (identiche alla 0169) -->
         <button id="addNoteBtn" class="small-btn" style="background:#ff9800; width:100%; margin:8px 0;">➕ AGGIUNGI NOTA NORMALE</button>
         <div id="normalNoteInfo" class="status-msg" style="color:#2e7d32; font-weight:500; background:#e8f5e9; padding:6px 12px; border-radius:20px; margin-bottom:8px; display:none;">
             📌 Nota normale selezionata: verrà letto l'intero messaggio di emergenza
@@ -298,11 +298,11 @@
             <div style="font-size:0.7rem; color:#777;">Nessuna nota normale. Aggiungine una.</div>
         </div>
 
-        <!-- NOTE SPECIALI -->
+        <!-- NOTE SPECIALI (esatta copia del layout e logica delle note normali, con stile verde) -->
         <div id="specialNotesContainer" style="margin-top: 20px;">
             <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px;">
                 <strong style="color:#2e7d32;">⭐ NOTE SPECIALI (solo testo - ignorano coordinate)</strong>
-                <button id="addSpecialNoteBtn" class="small-btn" style="background:#4caf50; width:auto; padding:4px 12px;">➕ AGGIUNGI</button>
+                <button id="addSpecialNoteBtn" class="small-btn" style="background:#4caf50; width:auto; padding:4px 12px;">AGGIUNGI NOTA SPECIALE</button>
             </div>
             <div id="specialNotesListArea">
                 <div style="font-size:0.7rem; color:#777;">Nessuna nota speciale. Aggiungine una.</div>
@@ -332,7 +332,7 @@
         </div>
 
         <button id="backHomeBtn" class="small-btn back-home" style="width:100%;">◀ TORNA INDIETRO</button>
-        <div class="version-footer">versione 0170 – Note speciali dinamiche, stessa gestione delle normali</div>
+        <div class="version-footer">versione 0170 – Note speciali: stessa identica gestione delle normali</div>
     </div>
 
     <!-- MODALE per aggiunta nota normale -->
@@ -350,7 +350,7 @@
         </div>
     </div>
 
-    <!-- MODALE per aggiunta nota speciale -->
+    <!-- MODALE per aggiunta nota speciale (identico a quello normale) -->
     <div id="specialNoteModal" class="modal" style="display:none;">
         <div class="modal-content">
             <h3>➕ Nuova Nota Speciale</h3>
@@ -368,10 +368,9 @@
 
 <script>
     // ==================== VERSIONE 0170 ====================
-    // - Note normali: stesse della 0169, non toccate
-    // - Note speciali: trasformate in lista dinamica con titolo/descrizione, aggiunta modale, modifica, cancellazione, radio per selezione
-    // - Quando selezionata una nota speciale, la sua descrizione viene usata per la lettura (ignora coordinate, riferimenti, ecc.)
-    // - Persistenza separata per note normali e note speciali (due array distinti nel localStorage)
+    // - Note normali: identiche alla 0169 (non toccate)
+    // - Note speciali: copia esatta del layout e della logica delle note normali,
+    //   con unico adattamento: colore verde e pulsante "AGGIUNGI NOTA SPECIALE"
     // - Tutto il resto (coordinate, geolocalizzazione, POI, WakeLock, copia, lettura, ascolto, bip) invariato
     // =================================================================
 
@@ -416,7 +415,7 @@
     const clearResponseBtn = document.getElementById('clearResponseBtn');
     const transcribeStatus = document.getElementById('transcribeStatus');
     const normalNoteInfo = document.getElementById('normalNoteInfo');
-    const specialNoteInfo = document.createElement('div'); // per mostrare selezione nota speciale
+    const specialNoteInfo = document.createElement('div'); // per feedback selezione nota speciale
     specialNoteInfo.className = "status-msg";
     specialNoteInfo.style.cssText = "color:#2e7d32; font-weight:500; background:#e8f5e9; padding:6px 12px; border-radius:20px; margin-bottom:8px; display:none;";
     document.getElementById('specialNotesContainer').insertBefore(specialNoteInfo, document.getElementById('specialNotesListArea'));
@@ -436,7 +435,7 @@
     let recognition = null;
     let recognitionTimeout = null;
 
-    // ---------- WakeLock ----------
+    // ---------- WakeLock (identico) ----------
     async function requestWakeLock() {
         if ('wakeLock' in navigator) {
             try {
@@ -448,7 +447,7 @@
     }
     function releaseWakeLock() { if (wakeLock) { wakeLock.release(); wakeLock = null; } }
 
-    // ---------- ARCHIVIO NUMERI ----------
+    // ---------- ARCHIVIO NUMERI (identico) ----------
     function migratePhoneNumbers() {
         const services = ["ambulanza", "polizia", "veterinario", "clinica"];
         const oldVersions = ["0169", "0168", "0167"];
@@ -464,7 +463,7 @@
     function getPhone(s) { return localStorage.getItem(`phone_${s}_${CURRENT_VERSION}`); }
     const defaultPhone = { ambulanza:"118", polizia:"113", veterinario:"800123456", clinica:"800987654" };
 
-    // ---------- TRADUZIONI ----------
+    // ---------- TRADUZIONI (identiche) ----------
     async function translateToFrench(italianText) {
         if (!italianText || italianText.trim() === "") return "";
         try {
@@ -486,7 +485,7 @@
         return frenchText + " (traduzione fallita)";
     }
 
-    // ---------- RICONOSCIMENTO VOCALE 15s ----------
+    // ---------- RICONOSCIMENTO VOCALE 15s (identico) ----------
     function initRecognition() {
         if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
             transcribeStatus.innerText = "❌ Riconoscimento non supportato";
@@ -524,7 +523,7 @@
         recognitionTimeout = setTimeout(() => { if (recognition && recognition.stop) recognition.stop(); }, 15000);
     }
 
-    // ---------- NOTE NORMALI (identiche alla 0169) ----------
+    // ==================== NOTE NORMALI (IDENTICHE ALLA 0169) ====================
     function getNormalNoteKey(s) { return `sos_notes_${s}_${CURRENT_VERSION}`; }
     function getSelectedNormalKey(s) { return `sos_selected_normal_${s}_${CURRENT_VERSION}`; }
     function saveNormalNotes() {
@@ -589,7 +588,7 @@
     function showNormalModal() { normalModal.style.display = "flex"; }
     function closeNormalModal() { normalModal.style.display = "none"; normalModalTitle.value = ""; normalModalDesc.value = ""; }
 
-    // ---------- NOTE SPECIALI (dinamiche, stesso schema) ----------
+    // ==================== NOTE SPECIALI (ESATTA COPIA DELLE NORMALI, CON COLORI E PULSANTE DIVERSO) ====================
     function getSpecialNoteKey(s) { return `sos_special_notes_${s}_${CURRENT_VERSION}`; }
     function getSelectedSpecialKey(s) { return `sos_selected_special_${s}_${CURRENT_VERSION}`; }
     function saveSpecialNotes() {
@@ -655,12 +654,12 @@
     function showSpecialModal() { specialModal.style.display = "flex"; }
     function closeSpecialModal() { specialModal.style.display = "none"; specialModalTitle.value = ""; specialModalDesc.value = ""; }
 
-    // Delegazione eventi per note normali
+    // Delegazione eventi per note normali (identica a 0169)
     function attachNormalEvents() {
         notesListArea.addEventListener('change', (e) => {
             if (e.target && e.target.type === 'radio' && e.target.name === 'noteSelect') {
                 selectedNoteId = e.target.value;
-                selectedSpecialNoteId = null; // deseleziona speciale
+                selectedSpecialNoteId = null;
                 if (specialNoteInfo) specialNoteInfo.style.display = 'none';
                 saveNormalNotes();
                 normalNoteInfo.style.display = 'block';
@@ -705,12 +704,12 @@
         });
     }
 
-    // Delegazione eventi per note speciali
+    // Delegazione eventi per note speciali (stessa struttura)
     function attachSpecialEvents() {
         specialNotesListArea.addEventListener('change', (e) => {
             if (e.target && e.target.type === 'radio' && e.target.name === 'specialNoteSelect') {
                 selectedSpecialNoteId = e.target.value;
-                selectedNoteId = null; // deseleziona normale
+                selectedNoteId = null;
                 normalNoteInfo.style.display = 'none';
                 saveSpecialNotes();
                 specialNoteInfo.innerText = "⭐ Nota speciale selezionata: verrà letto solo il testo (ignora coordinate)";
@@ -893,7 +892,7 @@
         gpsStatus.innerHTML = "";
     }
 
-    // ---------- LETTURA VOCALE (con supporto note speciali) ----------
+    // ---------- LETTURA VOCALE (identica, ma con supporto note speciali) ----------
     function playBeep() {
         try {
             let ctx = new (window.AudioContext || window.webkitAudioContext)();
@@ -934,7 +933,7 @@
         if (!window.speechSynthesis) { alert(lang==='it'?"Sintesi non supportata":"Synthèse non supportée"); return; }
         speechSynthesis.cancel();
 
-        // Verifica se è selezionata una nota speciale
+        // Se è selezionata una nota speciale, leggi solo la sua descrizione
         if (selectedSpecialNoteId) {
             const specialNote = specialNotesArray.find(n => String(n.id) === String(selectedSpecialNoteId));
             let textToRead = specialNote ? specialNote.description : null;
@@ -946,7 +945,7 @@
             return;
         }
 
-        // Altrimenti, nota normale (con coordinate, indirizzi, riferimenti)
+        // Altrimenti nota normale (con coordinate, indirizzi, riferimenti)
         let note = getSelectedTextForReading() || (lang==='it'?"nessuna nota":"aucune note");
         let addr = currentAddress || (lang==='it'?"non disponibile":"non disponible");
         let refA = currentRefA || (lang==='it'?"non disponibile":"non disponible");
@@ -1017,7 +1016,7 @@
         reader.readAsText(file,"UTF-8");
     }
 
-    // ---------- SHOW EMERGENCY ----------
+    // ---------- SHOW EMERGENCY (carica entrambi i tipi di note) ----------
     function showEmergency(s) {
         currentService = s;
         let label = {ambulanza:"🚑 AMBULANZA", polizia:"👮 POLIZIA", veterinario:"🐾 VETERINARIO", clinica:"🏥 CLINICA"}[s];
@@ -1049,37 +1048,13 @@
 
     function init() {
         migratePhoneNumbers();
-        // Migrazione note normali da versioni precedenti se necessario
-        // (le note speciali saranno vuote all'inizio)
         document.querySelectorAll('.big-btn').forEach(btn => btn.addEventListener('click', () => showEmergency(btn.getAttribute('data-service'))));
         registerNumberBtn.addEventListener('click', onRegisterNumber);
         googleMapsBtn.addEventListener('click', () => window.open("https://maps.google.com", "_blank"));
         geolocationBtn.addEventListener('click', getLocationAndAddress);
         addNoteBtn.addEventListener('click', showNormalModal);
         document.getElementById('addSpecialNoteBtn').addEventListener('click', showSpecialModal);
-        copyBtn.addEventListener('click', copyBilingual);
-        audioItBtn.addEventListener('click', speakItalian);
-        audioFrBtn.addEventListener('click', speakFrench);
-        backHomeBtn.addEventListener('click', backHome);
-        exportNotesBtn.addEventListener('click', exportTxt);
-        importNotesBtn.addEventListener('click', () => importFileInput.click());
-        importFileInput.addEventListener('change', (e) => { if (e.target.files.length) importTxt(e.target.files[0]); importFileInput.value = ''; });
-        listenResponseBtn.addEventListener('click', startListening15s);
-        clearResponseBtn.addEventListener('click', () => { operatorResponse.value = ""; transcribeStatus.innerText = ""; });
-        normalModalCreate.addEventListener('click', addNormalNoteFromModal);
-        normalModalCancel.addEventListener('click', closeNormalModal);
-        normalModal.addEventListener('click', (e) => { if (e.target === normalModal) closeNormalModal(); });
-        specialModalCreate.addEventListener('click', addSpecialNoteFromModal);
-        specialModalCancel.addEventListener('click', closeSpecialModal);
-        specialModal.addEventListener('click', (e) => { if (e.target === specialModal) closeSpecialModal(); });
-        initRecognition();
-        attachNormalEvents();
-        attachSpecialEvents();
-        // Carica eventuali dati già esistenti (per servizio di default ambulanza)
-        loadNormalNotes('ambulanza');
-        loadSpecialNotes('ambulanza');
-        // Dummy per la copia bilingue (necessita funzione)
-        async function copyBilingual() {
+        copyBtn.addEventListener('click', async () => {
             let noteIT = getSelectedTextForReading() || "nessuna nota";
             let coord = (currentLat && currentLng) ? `${currentLat.toFixed(6)}, ${currentLng.toFixed(6)}` : "non disponibili";
             let addr = currentAddress || "non disponibile";
@@ -1111,10 +1086,26 @@
                 document.body.removeChild(ta);
                 gpsStatus.innerHTML = "📋 Copiato manualmente";
             }
-        }
-        window.copyBilingual = copyBilingual; // rendi globale per i listener
-        copyBtn.removeEventListener('click', copyBtn.click); // pulisci eventuali duplicati
-        copyBtn.addEventListener('click', copyBilingual);
+        });
+        audioItBtn.addEventListener('click', speakItalian);
+        audioFrBtn.addEventListener('click', speakFrench);
+        backHomeBtn.addEventListener('click', backHome);
+        exportNotesBtn.addEventListener('click', exportTxt);
+        importNotesBtn.addEventListener('click', () => importFileInput.click());
+        importFileInput.addEventListener('change', (e) => { if (e.target.files.length) importTxt(e.target.files[0]); importFileInput.value = ''; });
+        listenResponseBtn.addEventListener('click', startListening15s);
+        clearResponseBtn.addEventListener('click', () => { operatorResponse.value = ""; transcribeStatus.innerText = ""; });
+        normalModalCreate.addEventListener('click', addNormalNoteFromModal);
+        normalModalCancel.addEventListener('click', closeNormalModal);
+        normalModal.addEventListener('click', (e) => { if (e.target === normalModal) closeNormalModal(); });
+        specialModalCreate.addEventListener('click', addSpecialNoteFromModal);
+        specialModalCancel.addEventListener('click', closeSpecialModal);
+        specialModal.addEventListener('click', (e) => { if (e.target === specialModal) closeSpecialModal(); });
+        initRecognition();
+        attachNormalEvents();
+        attachSpecialEvents();
+        loadNormalNotes('ambulanza');
+        loadSpecialNotes('ambulanza');
         normalNoteInfo.style.display = 'none';
     }
     init();
