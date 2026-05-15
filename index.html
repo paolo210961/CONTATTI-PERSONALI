@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
-    <title>SOS Drive - Emergenza v0171</title>
+    <title>SOS Drive - Emergenza v0172</title>
     <style>
         * {
             margin: 0;
@@ -262,7 +262,7 @@
 <div class="container">
     <!-- HOME PAGE -->
     <div id="homePage" class="page">
-        <div class="version-header">📟 SOS Drive v0171 - Rimossa dicitura superflua</div>
+        <div class="version-header">📟 SOS Drive v0172 - Emoji note normali 🚑</div>
         <h1>🆘 SOS EMERGENZA</h1>
         <div class="grid-2">
             <button class="big-btn" data-service="ambulanza">🚑 AMBULANZA</button>
@@ -271,12 +271,12 @@
             <button class="big-btn" data-service="clinica">🏥 CLINICA</button>
         </div>
         <p style="text-align:center; font-size:0.75rem; color:#555;">Ogni servizio ha il proprio archivio note.<br>📍 Ricerca entro 300m di TUTTI i luoghi con nome (negozi, aziende, uffici, piazze)<br>🔊 Ascolto automatico 15 secondi dopo il messaggio</p>
-        <div class="version-footer">versione 0171 – solo rimozione testo descrittivo note speciali</div>
+        <div class="version-footer">versione 0172 – emoji note normali cambiata in 🚑</div>
     </div>
 
     <!-- EMERGENCY PAGE -->
     <div id="emergencyPage" class="page hidden">
-        <div class="version-header">📟 SOS Drive v0171 – Note speciali</div>
+        <div class="version-header">📟 SOS Drive v0172 – Note speciali</div>
         <h2 id="serviceTitle">AMBULANZA</h2>
 
         <label>📞 Numero servizio</label>
@@ -298,7 +298,7 @@
             <div id="gpsStatus" class="status-msg"></div>
         </div>
 
-        <!-- NOTE NORMALI -->
+        <!-- NOTE NORMALI con emoji 🚑 -->
         <button id="addNoteBtn" class="small-btn" style="background:#ff9800; width:100%; margin:8px 0;">➕ AGGIUNGI NOTA NORMALE</button>
         <div id="normalNoteInfo" class="status-msg" style="color:#2e7d32; font-weight:500; background:#e8f5e9; padding:6px 12px; border-radius:20px; margin-bottom:8px; display:none;">
             📌 Nota normale selezionata: verrà letto l'intero messaggio di emergenza
@@ -307,7 +307,7 @@
             <div style="font-size:0.7rem; color:#777;">Nessuna nota normale. Aggiungine una.</div>
         </div>
 
-        <!-- NOTE SPECIALI (testo descrittivo rimosso) -->
+        <!-- NOTE SPECIALI -->
         <div style="margin-top: 24px;">
             <label>📌 NOTE SPECIALI</label>
             <button id="addSpecialNoteBtn" class="small-btn" style="background:#4caf50; width:100%; margin:8px 0;">➕ AGGIUNGI NOTA SPECIALE</button>
@@ -342,7 +342,7 @@
         </div>
 
         <button id="backHomeBtn" class="small-btn back-home" style="width:100%;">◀ TORNA INDIETRO</button>
-        <div class="version-footer">versione 0171 – rimossa dicitura superflua nelle note speciali</div>
+        <div class="version-footer">versione 0172 – emoji note normali 🚑</div>
     </div>
 
     <!-- MODALE per aggiunta nota normale -->
@@ -377,12 +377,12 @@
 </div>
 
 <script>
-    // ==================== VERSIONE 0171 ====================
-    // - Solo rimozione della frase "(solo testo - ignorano coordinate)" accanto a "NOTE SPECIALI"
-    // - Nessuna altra modifica
+    // ==================== VERSIONE 0172 ====================
+    // - Solo cambio emoji note normali da 📋 a 🚑
+    // - Nessun'altra modifica
     // =================================================================
 
-    const CURRENT_VERSION = "0171";
+    const CURRENT_VERSION = "0172";
     let currentService = "ambulanza";
     let currentLat = null, currentLng = null;
     let currentAddress = "";
@@ -455,7 +455,7 @@
     // ---------- ARCHIVIO NUMERI ----------
     function migratePhoneNumbers() {
         const services = ["ambulanza", "polizia", "veterinario", "clinica"];
-        const oldVersions = ["0170", "0169", "0168", "0167"];
+        const oldVersions = ["0171", "0170", "0169", "0168"];
         for (let s of services) {
             if (localStorage.getItem(`phone_${s}_${CURRENT_VERSION}`)) continue;
             for (let ver of oldVersions) {
@@ -531,7 +531,7 @@
     // ---------- GESTIONE NOTE NORMALI ----------
     function migrateOldNotes() {
         const services = ["ambulanza", "polizia", "veterinario", "clinica"];
-        const oldVersions = ["0170", "0169"];
+        const oldVersions = ["0171", "0170"];
         for (let s of services) {
             if (localStorage.getItem(`normalNotes_${s}_${CURRENT_VERSION}`)) continue;
             for (let ver of oldVersions) {
@@ -1182,3 +1182,4 @@
 </script>
 </body>
 </html>
+```
