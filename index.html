@@ -395,7 +395,6 @@
     const refCDisplay = document.getElementById('refCDisplay');
     const gpsStatus = document.getElementById('gpsStatus');
     const addNoteBtn = document.getElementById('addNoteBtn');
-    const addSpecialNoteBtn = document.getElementById('addSpecialNoteBtn');
     const notesListArea = document.getElementById('notesListArea');
     const addSpecialNoteBtn = document.getElementById('addSpecialNoteBtn');
     const specialNotesListArea = document.getElementById('specialNotesListArea');
@@ -889,21 +888,63 @@ function loadSpecialNotes(service) {
 
 // ---------- NOTE SPECIALI ----------
 
-}
 
 function renderSpecialNotes() {
 
     const area = document.getElementById('specialNotesListArea');
 
     if (!specialNotesArray.length) {
+
         area.innerHTML = `
             <div style="font-size:0.7rem; color:#777;">
                 Nessuna nota speciale.
             </div>
         `;
+
         return;
     }
 
+    let html = '';
+
+    specialNotesArray.forEach((note, idx) => {
+
+        const checked =
+            String(selectedSpecialNoteId) === String(note.id)
+            ? 'checked'
+            : '';
+
+        html += `
+            <div class="note-item"
+                 data-special-id="${note.id}">
+
+                <input
+                    type="radio"
+                    name="specialNoteSelect"
+                    value="${note.id}"
+                    ${checked}>
+
+                <span class="note-title">
+                    ⭐ ${idx + 1} - ${escapeHtml(note.title)}
+                </span>
+
+                <button
+                    class="edit-special-note-btn small-btn"
+                    style="background:#66bb6a;">
+                    ✏️
+                </button>
+
+                <button
+                    class="delete-special-note-btn small-btn"
+                    style="background:#ef5350;">
+                    🗑️
+                </button>
+
+            </div>
+        `;
+    });
+
+    area.innerHTML = html;
+}
 
 function addSpecialNote() {
 
@@ -1278,7 +1319,6 @@ function addSpecialNote() {
         geolocationBtn.addEventListener('click', getLocationAndAddress);
         addNoteBtn.addEventListener('click', showAddNoteModal);
         addSpecialNoteBtn.addEventListener('click', addSpecialNote);
-        addSpecialNoteBtn.addEventListener('click', addSpecialNote);
         copyBtn.addEventListener('click', copyBilingual);
         audioItBtn.addEventListener('click', speakItalian);
         audioFrBtn.addEventListener('click', speakFrench);
@@ -1288,8 +1328,6 @@ function addSpecialNote() {
         importFileInput.addEventListener('change', (e) => { if (e.target.files.length) importTxt(e.target.files[0]); importFileInput.value = ''; });
         listenResponseBtn.addEventListener('click', startListening15s);
         clearResponseBtn.addEventListener('click', () => { operatorResponse.value = ""; transcribeStatus.innerText = ""; });
-        selectSpecial1Btn.addEventListener('click', () => selectSpecialNote(1));
-        selectSpecial2Btn.addEventListener('click', () => selectSpecialNote(2));
         modalCreateBtn.addEventListener('click', addNewNoteFromModal);
         modalCancelBtn.addEventListener('click', closeModal);
         modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
