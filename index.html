@@ -181,7 +181,8 @@
         .info-card div {
             margin: 6px 0;
         }
-        .note-item {
+        /* STILE PER LE NOTE NORMALI E SPECIALI (layout orizzontale con testo, pallino, modifica, cancella) */
+        .note-item, .special-note-item {
             background: #fff3e0;
             padding: 10px 14px;
             margin: 8px 0;
@@ -192,33 +193,38 @@
             flex-wrap: wrap;
             border-left: 6px solid #ff9800;
         }
-        .note-title {
+        .special-note-item {
+            border-left-color: #4caf50;
+        }
+        .note-title, .special-note-title {
             font-weight: bold;
             font-size: 0.9rem;
             background: none;
             border: none;
             padding: 0;
-            margin-right: 8px;
-        }
-        .special-note-item {
-            background: #e8f5e9;
-            padding: 10px 14px;
-            margin: 8px 0;
-            border-radius: 48px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            flex-wrap: wrap;
-            border-left: 6px solid #4caf50;
+            margin-right: auto;  /* Spinge gli elementi successivi a destra */
+            flex: 1;
         }
         .special-note-title {
-            font-weight: bold;
-            font-size: 0.9rem;
-            background: none;
-            border: none;
-            padding: 0;
-            margin-right: 8px;
             color: #1b5e20;
+        }
+        .radio-note {
+            margin: 0 4px;
+            transform: scale(1.1);
+        }
+        .edit-note-btn {
+            background: #e67e22 !important; /* arancione scuro */
+            color: white;
+        }
+        .delete-note-btn {
+            background: #8e44ad !important; /* viola */
+            color: white;
+        }
+        .add-note-btn {
+            background: #283593 !important; /* blu indaco */
+            color: white;
+            width: 100%;
+            margin-bottom: 12px;
         }
         .back-home {
             background: #607d8b;
@@ -284,6 +290,7 @@
             h1 { font-size: 1.6rem; }
             .info-card { padding: 10px; font-size: 0.85rem; }
             .dark-card { padding: 12px; }
+            .note-item, .special-note-item { gap: 6px; }
         }
         .id-badge { display: none; }
         .version-footer {
@@ -303,9 +310,9 @@
             background: #283593 !important;  /* blu indaco */
         }
         #googleMapsBtn {
-            background: white !important;
-            color: black !important;
-            border: 2px solid black !important;
+            background: black !important;
+            color: white !important;
+            border: none !important;
             font-weight: bold !important;
             box-shadow: none !important;
             margin: 4px 0;
@@ -334,9 +341,8 @@
         <div class="version-footer">versione 0182 – nome file backup indicato, intestazione aggiornata</div>
     </div>
 
-    <!-- EMERGENCY PAGE (senza version-header, con blocchi dark-card) -->
+    <!-- EMERGENCY PAGE (senza version-header) -->
     <div id="emergencyPage" class="page hidden">
-        <!-- RIMOSSO IL DIV .version-header -->
         <div id="currentServiceDeco" class="current-service-deco">🚑 AMBULANZA</div>
 
         <!-- BLOCCO 1: NUMERO SERVIZIO + TELEFONO + SALVA -->
@@ -364,20 +370,28 @@
             </div>
         </div>
 
-        <button id="addNoteBtn" class="small-btn" style="background:#ff9800; width:100%; margin:8px 0;">🚑 AGGIUNGI NOTA NORMALE</button>
-        <div id="normalNoteInfo" class="status-msg" style="color:#2e7d32; font-weight:500; background:#e8f5e9; padding:6px 12px; border-radius:20px; margin-bottom:8px; display:none;">
-            📌 Nota normale selezionata: verrà letto l'intero messaggio di emergenza
-        </div>
-        <div id="notesListArea">
-            <div style="font-size:0.7rem; color:#777;">Nessuna nota normale. Aggiungine una.</div>
+        <!-- BLOCCO NOTE NORMALI -->
+        <div class="dark-card">
+            <button id="addNoteBtn" class="small-btn add-note-btn">🚑 AGGIUNGI NOTA NORMALE</button>
+            <div id="normalNoteInfo" class="status-msg" style="color:#2e7d32; font-weight:500; background:#e8f5e9; padding:6px 12px; border-radius:20px; margin-bottom:8px; display:none;">
+                📌 Nota normale selezionata: verrà letto l'intero messaggio di emergenza
+            </div>
+            <div><strong>Seleziona nota normale:</strong></div>
+            <div id="notesListArea">
+                <div style="font-size:0.7rem; color:#777;">Nessuna nota normale. Aggiungine una.</div>
+            </div>
         </div>
 
-        <button id="addSpecialNoteBtn" class="small-btn" style="background:#4caf50; width:100%; margin:8px 0;">🏠 AGGIUNGI NOTA SPECIALE</button>
-        <div id="specialNoteInfo" class="status-msg" style="color:#1b5e20; font-weight:500; background:#e8f5e9; padding:6px 12px; border-radius:20px; margin-bottom:8px; display:none;">
-            ✨ Nota speciale selezionata: verrà letto solo il testo (ignora coordinate)
-        </div>
-        <div id="specialNotesListArea">
-            <div style="font-size:0.7rem; color:#777;">Nessuna nota speciale. Aggiungine una.</div>
+        <!-- BLOCCO NOTE SPECIALI -->
+        <div class="dark-card">
+            <button id="addSpecialNoteBtn" class="small-btn add-note-btn">🏠 AGGIUNGI NOTA SPECIALE</button>
+            <div id="specialNoteInfo" class="status-msg" style="color:#1b5e20; font-weight:500; background:#e8f5e9; padding:6px 12px; border-radius:20px; margin-bottom:8px; display:none;">
+                ✨ Nota speciale selezionata: verrà letto solo il testo (ignora coordinate)
+            </div>
+            <div><strong>Seleziona nota speciale:</strong></div>
+            <div id="specialNotesListArea">
+                <div style="font-size:0.7rem; color:#777;">Nessuna nota speciale. Aggiungine una.</div>
+            </div>
         </div>
 
         <div class="response-area">
@@ -397,7 +411,7 @@
         </div>
 
         <button id="backHomeBtn" class="small-btn back-home" style="width:100%;">◀ TORNA INDIETRO</button>
-        <div class="version-footer">versione 0182 – layout con blocchi grigi</div>
+        <div class="version-footer">versione 0182 – layout con blocchi grigi, geolocalizzazione manuale</div>
     </div>
 
     <!-- MODALI per aggiunta note (invariate) -->
@@ -431,11 +445,12 @@
 
 <script>
     // ==================== VERSIONE 0182 MODIFICATA ====================
-    // - Rimossa intestazione nella pagina emergenza
-    // - Blocchi con sfondo grigio scuro e bordo sinistro scuro per:
-    //   1) Numero servizio + telefono + SALVA
-    //   2) Pulsante CARICA POSIZIONE + informazioni coordinate
-    // - Tutte le funzionalità precedenti invariate
+    // - Geolocalizzazione solo manuale (rimossa chiamata automatica all'apertura)
+    // - Tasto Google Maps: sfondo nero, testo bianco
+    // - Blocchi dark-card per note normali e speciali
+    // - Layout note: testo nota, radio button, modifica (arancione), cancella (viola)
+    // - Colore aggiungi blu indaco
+    // - Esportazione/importazione include numeri di telefono
     // =================================================================
 
     const CURRENT_VERSION = "0182";
@@ -634,15 +649,15 @@
             notesListArea.innerHTML = `<div style="font-size:0.7rem;">Nessuna nota normale. Aggiungine una.</div>`;
             return;
         }
-        let html = '<div><strong>Seleziona nota normale:</strong></div>';
+        let html = '';
         notes.forEach((note, idx) => {
             const isChecked = (String(selectedNormalNoteId) === String(note.id)) ? 'checked' : '';
             html += `
                 <div class="note-item" data-id="${note.id}">
-                    <input type="radio" name="noteSelect" value="${note.id}" class="radio-note" ${isChecked}>
                     <span class="note-title">${idx+1} - ${escapeHtml(note.title)}</span>
-                    <button class="edit-note-btn small-btn" style="background:#ffa726; margin:0 2px;">✏️ Modifica</button>
-                    <button class="delete-note-btn small-btn" style="background:#e57373; margin:0 2px;">🗑️ Cancella</button>
+                    <input type="radio" name="noteSelect" value="${note.id}" class="radio-note" ${isChecked}>
+                    <button class="edit-note-btn small-btn" style="background:#e67e22;">✏️ Modifica</button>
+                    <button class="delete-note-btn small-btn" style="background:#8e44ad;">🗑️ Cancella</button>
                 </div>
             `;
         });
@@ -654,15 +669,15 @@
             specialNotesListArea.innerHTML = `<div style="font-size:0.7rem;">Nessuna nota speciale. Aggiungine una.</div>`;
             return;
         }
-        let html = '<div><strong>Seleziona nota speciale:</strong></div>';
+        let html = '';
         notes.forEach((note, idx) => {
             const isChecked = (String(selectedSpecialNoteId) === String(note.id)) ? 'checked' : '';
             html += `
                 <div class="special-note-item" data-id="${note.id}">
-                    <input type="radio" name="specialNoteSelect" value="${note.id}" class="radio-note" ${isChecked}>
                     <span class="special-note-title">${idx+1} - ${escapeHtml(note.title)}</span>
-                    <button class="edit-special-note-btn small-btn" style="background:#81c784; margin:0 2px;">✏️ Modifica</button>
-                    <button class="delete-special-note-btn small-btn" style="background:#e57373; margin:0 2px;">🗑️ Cancella</button>
+                    <input type="radio" name="specialNoteSelect" value="${note.id}" class="radio-note" ${isChecked}>
+                    <button class="edit-special-note-btn small-btn" style="background:#e67e22;">✏️ Modifica</button>
+                    <button class="delete-special-note-btn small-btn" style="background:#8e44ad;">🗑️ Cancella</button>
                 </div>
             `;
         });
@@ -690,6 +705,17 @@
             else radio.checked = false;
         });
         selectedSpecialMode = (selectedSpecialNoteId !== null);
+        // Aggiorna visibilità messaggi informativi
+        if (selectedNormalNoteId) {
+            normalNoteInfo.style.display = 'block';
+            specialNoteInfo.style.display = 'none';
+        } else if (selectedSpecialNoteId) {
+            specialNoteInfo.style.display = 'block';
+            normalNoteInfo.style.display = 'none';
+        } else {
+            normalNoteInfo.style.display = 'none';
+            specialNoteInfo.style.display = 'none';
+        }
     }
 
     // ---------- EVENTI NOTE ----------
@@ -702,7 +728,7 @@
                 saveSelectedIds();
                 enforceMutualExclusion();
                 normalNoteInfo.style.display = 'block';
-                setTimeout(() => { normalNoteInfo.style.display = 'none'; }, 10000);
+                setTimeout(() => { if (selectedNormalNoteId) normalNoteInfo.style.display = 'block'; }, 100);
                 specialNoteInfo.style.display = 'none';
             }
         });
@@ -755,7 +781,7 @@
                 saveSelectedIds();
                 enforceMutualExclusion();
                 specialNoteInfo.style.display = 'block';
-                setTimeout(() => { specialNoteInfo.style.display = 'none'; }, 10000);
+                setTimeout(() => { if (selectedSpecialNoteId) specialNoteInfo.style.display = 'block'; }, 100);
                 normalNoteInfo.style.display = 'none';
             }
         });
@@ -896,7 +922,7 @@
         }
     }
 
-    // ---------- GEOLOCALIZZAZIONE (invariata) ----------
+    // ---------- GEOLOCALIZZAZIONE (solo manuale) ----------
     function haversine(lat1,lng1,lat2,lng2) {
         const R = 6371e3;
         const φ1 = lat1 * Math.PI/180, φ2 = lat2 * Math.PI/180;
@@ -1240,13 +1266,13 @@
         phoneInput.value = getPhone(s) || defaultPhone[s];
         loadCurrentServiceNotes();
         enforceMutualExclusion();
-        resetCoords();
+        resetCoords();  // azzera coordinate all'apertura (non più caricate automaticamente)
         homePage.classList.add("hidden");
         emergencyPage.classList.remove("hidden");
         phoneSaveMsg.innerText = "";
         requestWakeLock();
         selectedSpecialMode = false;
-        setTimeout(() => getLocationAndAddress(), 500);
+        // NON chiamare più getLocationAndAddress automaticamente
     }
     function onSaveNumber() {
         let n = phoneInput.value.trim();
