@@ -114,12 +114,6 @@
         .btn-secondary {
             background: #1976d2;
         }
-        .btn-copy {
-            background: #f57c00;
-        }
-        .btn-audio {
-            background: #8e24aa;
-        }
         .small-btn {
             padding: 8px 12px;
             font-size: 0.85rem;
@@ -142,10 +136,11 @@
             padding: 16px;
             margin: 16px 0;
         }
-        .service-label-styled {
+        /* Stile per titoli interni ai blocchi (es. "Numero servizio", "Seleziona nota normale:") */
+        .section-title {
             font-weight: bold;
             font-size: 0.9rem;
-            color: #c62828;
+            color: #1e2a3a;
             margin-bottom: 8px;
             display: block;
         }
@@ -172,21 +167,9 @@
             background: #fff;
             font-family: monospace;
         }
-        .info-card {
-            background: #f8f9fa;
-            border-radius: 24px;
-            padding: 14px;
-            margin: 16px 0;
-            font-size: 0.9rem;
-            word-break: break-word;
-            border: 1px solid #e9ecef;
-        }
-        .info-card div {
-            margin: 6px 0;
-        }
         /* STILE PER LE NOTE (senza sfondo arancione, direttamente su dark-card) */
         .note-item, .special-note-item {
-            background: transparent;  /* rimuove sfondo arancione */
+            background: transparent;
             padding: 10px 0;
             margin: 12px 0;
             display: flex;
@@ -201,7 +184,7 @@
             background: none;
             border: none;
             padding: 0;
-            margin-right: auto;  /* spinge i pulsanti a destra */
+            margin-right: auto;
             flex: 1;
             color: #1e1e2f;
         }
@@ -226,17 +209,16 @@
             justify-content: center;
             gap: 8px;
         }
-        /* pallino centrale per il pulsante CONFERMA */
         .confirm-note-btn .dot {
             width: 12px;
             height: 12px;
             border-radius: 50%;
-            background-color: #283593; /* stesso colore del bottone quando non selezionato (invisibile) */
+            background-color: #283593;
             display: inline-block;
             transition: background-color 0.1s;
         }
         .confirm-note-btn.selected .dot {
-            background-color: white; /* pallino bianco quando selezionato */
+            background-color: white;
         }
         .add-note-btn {
             background: #283593 !important;
@@ -244,9 +226,22 @@
             width: 100%;
             margin-bottom: 12px;
         }
+        /* Pulsante Torna Indietro */
         .back-home {
-            background: #607d8b;
-            margin-top: 20px;
+            background: #283593 !important; /* blu indaco */
+        }
+        /* Pulsanti area risposta operatore */
+        .listen-btn {
+            background: #283593 !important; /* blu indaco */
+        }
+        .clear-btn {
+            background: #8e44ad !important; /* viola */
+        }
+        .copy-btn {
+            background: #283593 !important; /* blu indaco */
+        }
+        .audio-lang-btn {
+            background: #6b8e23 !important; /* verde oliva */
         }
         .status-msg {
             font-size: 0.7rem;
@@ -254,14 +249,14 @@
             margin-top: 6px;
         }
         .response-area {
-            background: #e3f2fd;
+            background: #f8f9fa;
             border-radius: 24px;
-            padding: 14px;
-            margin: 16px 0;
+            padding: 0;  /* ora gestito internamente */
         }
         .response-area textarea {
             background: white;
             font-size: 0.85rem;
+            margin-top: 8px;
         }
         .modal {
             position: fixed;
@@ -306,12 +301,10 @@
             .big-btn { font-size: 1.2rem; padding: 14px 12px; }
             .small-btn { padding: 6px 10px; font-size: 0.75rem; }
             h1 { font-size: 1.6rem; }
-            .info-card { padding: 10px; font-size: 0.85rem; }
             .dark-card { padding: 12px; }
             .note-item, .special-note-item { gap: 8px; }
             .confirm-note-btn .dot { width: 10px; height: 10px; }
         }
-        .id-badge { display: none; }
         .version-footer {
             text-align: center;
             font-size: 0.65rem;
@@ -321,7 +314,7 @@
             border-top: 1px solid #e9ecef;
         }
 
-        /* MODIFICHE RICHIESTE */
+        /* MODIFICHE SPECIFICHE */
         #saveNumberBtn {
             background: #283593 !important;
         }
@@ -335,6 +328,21 @@
             font-weight: bold !important;
             box-shadow: none !important;
             margin: 4px 0;
+        }
+        /* Messaggi informativi temporanei */
+        .info-message {
+            background: #e8f5e9;
+            padding: 6px 12px;
+            border-radius: 20px;
+            margin-bottom: 8px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            color: #2e7d32;
+            display: none;
+        }
+        .info-message.special {
+            background: #e8f5e9;
+            color: #1b5e20;
         }
     </style>
 </head>
@@ -366,7 +374,7 @@
 
         <!-- BLOCCO 1: NUMERO SERVIZIO + TELEFONO + SALVA -->
         <div class="dark-card">
-            <div class="service-label-styled">Numero servizio</div>
+            <div class="section-title">Numero servizio</div>
             <div class="flex-row">
                 <input type="tel" id="phoneNumber" placeholder="Numero" style="flex:2;">
                 <button id="saveNumberBtn" class="small-btn" style="flex:0.4;">SALVA</button>
@@ -392,8 +400,8 @@
         <!-- BLOCCO NOTE NORMALI -->
         <div class="dark-card">
             <button id="addNoteBtn" class="small-btn add-note-btn">🚑 AGGIUNGI NOTA NORMALE</button>
-            <!-- RIMOSSO div normalNoteInfo -->
-            <div><strong>Seleziona nota normale:</strong></div>
+            <div id="normalNoteInfo" class="info-message">📌 Nota normale selezionata: verrà letto l'intero messaggio di emergenza</div>
+            <div class="section-title">Seleziona nota normale:</div>
             <div id="notesListArea">
                 <div style="font-size:0.7rem; color:#777;">Nessuna nota normale. Aggiungine una.</div>
             </div>
@@ -402,27 +410,31 @@
         <!-- BLOCCO NOTE SPECIALI -->
         <div class="dark-card">
             <button id="addSpecialNoteBtn" class="small-btn add-note-btn">🏠 AGGIUNGI NOTA SPECIALE</button>
-            <!-- RIMOSSO div specialNoteInfo -->
-            <div><strong>Seleziona nota speciale:</strong></div>
+            <div id="specialNoteInfo" class="info-message special">✨ Nota speciale selezionata: verrà letto solo il testo (ignora coordinate)</div>
+            <div class="section-title">Seleziona nota speciale:</div>
             <div id="specialNotesListArea">
                 <div style="font-size:0.7rem; color:#777;">Nessuna nota speciale. Aggiungine una.</div>
             </div>
         </div>
 
-        <div class="response-area">
-            <label>🎧 RISPOSTA OPERATORE (traduzione IT)</label>
+        <!-- BLOCCO RISPOSTA OPERATORE (nuovo contenitore) -->
+        <div class="dark-card">
+            <div class="section-title">🎧 RISPOSTA OPERATORE in ITALIANO</div>
             <textarea id="operatorResponse" rows="3" readonly placeholder="Traduzione italiana"></textarea>
             <div class="flex-row">
-                <button id="listenResponseBtn" class="small-btn" style="background:#3f51b5;">🎤 ASCOLTA OPERATORE 15s</button>
-                <button id="clearResponseBtn" class="small-btn" style="background:#757575;">🗑️ CANCELLA</button>
+                <button id="listenResponseBtn" class="small-btn listen-btn">🎤 ASCOLTA OPERATORE 15s</button>
+                <button id="clearResponseBtn" class="small-btn clear-btn">🗑️ CANCELLA</button>
             </div>
             <div id="transcribeStatus" class="status-msg"></div>
         </div>
 
-        <div class="flex-row">
-            <button id="copyBtn" class="small-btn btn-copy">📋 COPIA (FR+IT)</button>
-            <button id="audioItBtn" class="small-btn btn-audio">🔊 LEGGI IT</button>
-            <button id="audioFrBtn" class="small-btn btn-audio">🔊 LEGGI FR</button>
+        <!-- BLOCCO TASTI COPIA E LETTURA -->
+        <div class="dark-card">
+            <div class="flex-row">
+                <button id="copyBtn" class="small-btn copy-btn">📋 COPIA (FR+IT)</button>
+                <button id="audioItBtn" class="small-btn audio-lang-btn">🔊 LEGGI IT</button>
+                <button id="audioFrBtn" class="small-btn audio-lang-btn">🔊 LEGGI FR</button>
+            </div>
         </div>
 
         <button id="backHomeBtn" class="small-btn back-home" style="width:100%;">◀ TORNA INDIETRO</button>
@@ -460,13 +472,11 @@
 
 <script>
     // ==================== VERSIONE 0182 MODIFICATA ====================
-    // - Rimossi sfondi arancioni delle note (ora trasparenti su dark-card)
-    // - Rimossi messaggi informativi normalNoteInfo e specialNoteInfo
-    // - Geolocalizzazione solo manuale
-    // - Tasto Google Maps: sfondo nero, testo bianco
-    // - Blocchi dark-card per note normali e speciali
-    // - Ogni nota: testo + pulsanti Modifica (verde oliva), Cancella (viola), Conferma (blu indaco con pallino centrale)
-    // - Esportazione/importazione include numeri di telefono
+    // - Messaggi informativi ripristinati e visibili 15 secondi
+    // - "Numero servizio" stile section-title
+    // - Torna indietro blu indaco
+    // - Nuovo blocco per risposta operatore e pulsanti con colori
+    // - Tutte le funzionalità precedenti mantenute
     // =================================================================
 
     const CURRENT_VERSION = "0182";
@@ -514,6 +524,8 @@
     const listenResponseBtn = document.getElementById('listenResponseBtn');
     const clearResponseBtn = document.getElementById('clearResponseBtn');
     const transcribeStatus = document.getElementById('transcribeStatus');
+    const normalNoteInfo = document.getElementById('normalNoteInfo');
+    const specialNoteInfo = document.getElementById('specialNoteInfo');
     const modal = document.getElementById('noteModal');
     const modalTitle = document.getElementById('modalTitle');
     const modalDesc = document.getElementById('modalDesc');
@@ -530,6 +542,16 @@
 
     let recognition = null;
     let recognitionTimeout = null;
+
+    // Funzione per mostrare messaggio temporaneo (15 secondi)
+    function showTemporaryMessage(element, duration = 15000) {
+        if (!element) return;
+        element.style.display = 'block';
+        if (element._hideTimeout) clearTimeout(element._hideTimeout);
+        element._hideTimeout = setTimeout(() => {
+            element.style.display = 'none';
+        }, duration);
+    }
 
     // ---------- WakeLock ----------
     async function requestWakeLock() {
@@ -677,14 +699,18 @@
             `;
         });
         notesListArea.innerHTML = html;
-        // Aggiungi event listener per i pulsanti conferma
+        // Event listener per pulsanti conferma normali
         document.querySelectorAll('.confirm-note-btn[data-type="normal"]').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                const noteId = btn.getAttribute('data-id');
-                selectNormalNote(noteId);
-            });
+            btn.removeEventListener('click', handleNormalConfirm);
+            btn.addEventListener('click', handleNormalConfirm);
         });
+    }
+
+    function handleNormalConfirm(e) {
+        e.stopPropagation();
+        const btn = e.currentTarget;
+        const noteId = btn.getAttribute('data-id');
+        selectNormalNote(noteId);
     }
 
     function renderSpecialNotes() {
@@ -709,12 +735,16 @@
         });
         specialNotesListArea.innerHTML = html;
         document.querySelectorAll('.confirm-note-btn[data-type="special"]').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                const noteId = btn.getAttribute('data-id');
-                selectSpecialNote(noteId);
-            });
+            btn.removeEventListener('click', handleSpecialConfirm);
+            btn.addEventListener('click', handleSpecialConfirm);
         });
+    }
+
+    function handleSpecialConfirm(e) {
+        e.stopPropagation();
+        const btn = e.currentTarget;
+        const noteId = btn.getAttribute('data-id');
+        selectSpecialNote(noteId);
     }
 
     function selectNormalNote(noteId) {
@@ -723,6 +753,11 @@
         selectedSpecialMode = false;
         saveSelectedIds();
         renderCurrentNotes();
+        // Mostra messaggio informativo per 15 secondi
+        if (normalNoteInfo) {
+            showTemporaryMessage(normalNoteInfo, 15000);
+        }
+        if (specialNoteInfo) specialNoteInfo.style.display = 'none';
     }
 
     function selectSpecialNote(noteId) {
@@ -731,6 +766,10 @@
         selectedSpecialMode = true;
         saveSelectedIds();
         renderCurrentNotes();
+        if (specialNoteInfo) {
+            showTemporaryMessage(specialNoteInfo, 15000);
+        }
+        if (normalNoteInfo) normalNoteInfo.style.display = 'none';
     }
 
     function renderCurrentNotes() {
@@ -1257,6 +1296,9 @@
         phoneSaveMsg.innerText = "";
         requestWakeLock();
         selectedSpecialMode = false;
+        // Nascondere eventuali messaggi informativi residui
+        if (normalNoteInfo) normalNoteInfo.style.display = 'none';
+        if (specialNoteInfo) specialNoteInfo.style.display = 'none';
     }
     function onSaveNumber() {
         let n = phoneInput.value.trim();
