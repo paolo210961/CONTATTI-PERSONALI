@@ -121,19 +121,22 @@
             background: #8e24aa;
         }
         .small-btn {
-            padding: 10px 14px;
-            font-size: 0.9rem;
+            padding: 8px 12px;
+            font-size: 0.85rem;
             border-radius: 40px;
             font-weight: bold;
             cursor: pointer;
             color: white;
             border: none;
-            flex: 1;
             text-align: center;
+            transition: 0.05s linear;
+        }
+        .small-btn:active {
+            transform: scale(0.97);
         }
         /* NUOVI STILI PER I BLOCCHI CON SFONDO GRIGIO SCURO E BAFFO SINISTRO */
         .dark-card {
-            background: #d2d6dc;  /* tonalità grigio più scura */
+            background: #d2d6dc;
             border-left: 6px solid #2c3e50;
             border-radius: 24px;
             padding: 16px;
@@ -181,11 +184,11 @@
         .info-card div {
             margin: 6px 0;
         }
-        /* STILE PER LE NOTE NORMALI E SPECIALI (layout orizzontale con testo, pallino, modifica, cancella) */
+        /* STILE PER LE NOTE NORMALI E SPECIALI (layout con testo e tre pulsanti) */
         .note-item, .special-note-item {
             background: #fff3e0;
             padding: 10px 14px;
-            margin: 8px 0;
+            margin: 12px 0;
             border-radius: 48px;
             display: flex;
             align-items: center;
@@ -202,26 +205,48 @@
             background: none;
             border: none;
             padding: 0;
-            margin-right: auto;  /* Spinge gli elementi successivi a destra */
+            margin-right: auto;  /* spinge i pulsanti a destra */
             flex: 1;
         }
         .special-note-title {
             color: #1b5e20;
         }
-        .radio-note {
-            margin: 0 4px;
-            transform: scale(1.1);
-        }
+        /* PULSANTI NOTE */
         .edit-note-btn {
-            background: #e67e22 !important; /* arancione scuro */
+            background: #6b8e23; /* verde oliva */
             color: white;
         }
         .delete-note-btn {
-            background: #8e44ad !important; /* viola */
+            background: #8e44ad; /* viola */
             color: white;
         }
+        .confirm-note-btn {
+            background: #283593; /* blu indaco */
+            color: white;
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        /* pallino centrale per il pulsante CONFERMA */
+        .confirm-note-btn .dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background-color: #283593; /* stesso colore del bottone quando non selezionato (invisibile) */
+            display: inline-block;
+            transition: background-color 0.1s;
+        }
+        .confirm-note-btn.selected .dot {
+            background-color: white; /* pallino bianco quando selezionato */
+        }
+        /* per garantire che il testo del bottone sia visibile */
+        .confirm-note-btn {
+            gap: 6px;
+        }
         .add-note-btn {
-            background: #283593 !important; /* blu indaco */
+            background: #283593 !important;
             color: white;
             width: 100%;
             margin-bottom: 12px;
@@ -286,11 +311,12 @@
             body { padding: 8px; }
             .page { padding: 16px 12px 24px; }
             .big-btn { font-size: 1.2rem; padding: 14px 12px; }
-            .small-btn { padding: 8px 12px; font-size: 0.8rem; }
+            .small-btn { padding: 6px 10px; font-size: 0.75rem; }
             h1 { font-size: 1.6rem; }
             .info-card { padding: 10px; font-size: 0.85rem; }
             .dark-card { padding: 12px; }
-            .note-item, .special-note-item { gap: 6px; }
+            .note-item, .special-note-item { gap: 8px; }
+            .confirm-note-btn .dot { width: 10px; height: 10px; }
         }
         .id-badge { display: none; }
         .version-footer {
@@ -304,10 +330,10 @@
 
         /* MODIFICHE RICHIESTE */
         #saveNumberBtn {
-            background: #283593 !important;  /* blu indaco */
+            background: #283593 !important;
         }
         #geolocationBtn {
-            background: #283593 !important;  /* blu indaco */
+            background: #283593 !important;
         }
         #googleMapsBtn {
             background: black !important;
@@ -341,7 +367,7 @@
         <div class="version-footer">versione 0182 – nome file backup indicato, intestazione aggiornata</div>
     </div>
 
-    <!-- EMERGENCY PAGE (senza version-header) -->
+    <!-- EMERGENCY PAGE -->
     <div id="emergencyPage" class="page hidden">
         <div id="currentServiceDeco" class="current-service-deco">🚑 AMBULANZA</div>
 
@@ -414,7 +440,7 @@
         <div class="version-footer">versione 0182 – layout con blocchi grigi, geolocalizzazione manuale</div>
     </div>
 
-    <!-- MODALI per aggiunta note (invariate) -->
+    <!-- MODALI per aggiunta note -->
     <div id="noteModal" class="modal" style="display:none;">
         <div class="modal-content">
             <h3>➕ Nuova Nota Normale</h3>
@@ -445,11 +471,11 @@
 
 <script>
     // ==================== VERSIONE 0182 MODIFICATA ====================
-    // - Geolocalizzazione solo manuale (rimossa chiamata automatica all'apertura)
+    // - Geolocalizzazione solo manuale
     // - Tasto Google Maps: sfondo nero, testo bianco
     // - Blocchi dark-card per note normali e speciali
-    // - Layout note: testo nota, radio button, modifica (arancione), cancella (viola)
-    // - Colore aggiungi blu indaco
+    // - Ogni nota: testo + pulsanti Modifica (verde oliva), Cancella (viola), Conferma (blu indaco con pallino centrale)
+    // - Il pulsante Conferma ha pallino che diventa bianco quando la nota è selezionata
     // - Esportazione/importazione include numeri di telefono
     // =================================================================
 
@@ -651,18 +677,31 @@
         }
         let html = '';
         notes.forEach((note, idx) => {
-            const isChecked = (String(selectedNormalNoteId) === String(note.id)) ? 'checked' : '';
+            const isSelected = (String(selectedNormalNoteId) === String(note.id));
             html += `
                 <div class="note-item" data-id="${note.id}">
                     <span class="note-title">${idx+1} - ${escapeHtml(note.title)}</span>
-                    <input type="radio" name="noteSelect" value="${note.id}" class="radio-note" ${isChecked}>
-                    <button class="edit-note-btn small-btn" style="background:#e67e22;">✏️ Modifica</button>
+                    <button class="edit-note-btn small-btn" style="background:#6b8e23;">✏️ Modifica</button>
                     <button class="delete-note-btn small-btn" style="background:#8e44ad;">🗑️ Cancella</button>
+                    <button class="confirm-note-btn small-btn ${isSelected ? 'selected' : ''}" data-id="${note.id}" data-type="normal">
+                        <span class="dot"></span> Conferma
+                    </button>
                 </div>
             `;
         });
         notesListArea.innerHTML = html;
+        // Aggiungi event listener per i pulsanti conferma (dinamici)
+        document.querySelectorAll('.confirm-note-btn[data-type="normal"]').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const noteId = btn.getAttribute('data-id');
+                selectNormalNote(noteId);
+            });
+        });
+        // Event listener per modifica e cancella (delegazione)
+        attachNormalNoteEvents();
     }
+
     function renderSpecialNotes() {
         const notes = specialNotes[currentService] || [];
         if (!notes.length) {
@@ -671,41 +710,60 @@
         }
         let html = '';
         notes.forEach((note, idx) => {
-            const isChecked = (String(selectedSpecialNoteId) === String(note.id)) ? 'checked' : '';
+            const isSelected = (String(selectedSpecialNoteId) === String(note.id));
             html += `
                 <div class="special-note-item" data-id="${note.id}">
                     <span class="special-note-title">${idx+1} - ${escapeHtml(note.title)}</span>
-                    <input type="radio" name="specialNoteSelect" value="${note.id}" class="radio-note" ${isChecked}>
-                    <button class="edit-special-note-btn small-btn" style="background:#e67e22;">✏️ Modifica</button>
+                    <button class="edit-special-note-btn small-btn" style="background:#6b8e23;">✏️ Modifica</button>
                     <button class="delete-special-note-btn small-btn" style="background:#8e44ad;">🗑️ Cancella</button>
+                    <button class="confirm-note-btn small-btn ${isSelected ? 'selected' : ''}" data-id="${note.id}" data-type="special">
+                        <span class="dot"></span> Conferma
+                    </button>
                 </div>
             `;
         });
         specialNotesListArea.innerHTML = html;
+        document.querySelectorAll('.confirm-note-btn[data-type="special"]').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const noteId = btn.getAttribute('data-id');
+                selectSpecialNote(noteId);
+            });
+        });
+        attachSpecialNoteEvents();
     }
-    function renderCurrentNotes() {
-        renderNormalNotes();
-        renderSpecialNotes();
+
+    function selectNormalNote(noteId) {
+        selectedNormalNoteId = noteId;
+        selectedSpecialNoteId = null;
+        selectedSpecialMode = false;
+        saveSelectedIds();
+        renderCurrentNotes();
+        enforceMutualExclusion();
+        normalNoteInfo.style.display = 'block';
+        specialNoteInfo.style.display = 'none';
+        setTimeout(() => { if (selectedNormalNoteId) normalNoteInfo.style.display = 'block'; }, 100);
+    }
+
+    function selectSpecialNote(noteId) {
+        selectedSpecialNoteId = noteId;
+        selectedNormalNoteId = null;
+        selectedSpecialMode = true;
+        saveSelectedIds();
+        renderCurrentNotes();
+        enforceMutualExclusion();
+        specialNoteInfo.style.display = 'block';
+        normalNoteInfo.style.display = 'none';
+        setTimeout(() => { if (selectedSpecialNoteId) specialNoteInfo.style.display = 'block'; }, 100);
     }
 
     function enforceMutualExclusion() {
-        if (!currentService) return;
-        if (selectedNormalNoteId !== null && selectedSpecialNoteId !== null) {
+        // già gestita dalle select
+        if (selectedNormalNoteId && selectedSpecialNoteId) {
             selectedSpecialNoteId = null;
             saveSelectedIds();
         }
-        const normalRadios = document.querySelectorAll('#notesListArea input[type="radio"]');
-        const specialRadios = document.querySelectorAll('#specialNotesListArea input[type="radio"]');
-        normalRadios.forEach(radio => {
-            if (selectedNormalNoteId && radio.value === selectedNormalNoteId) radio.checked = true;
-            else radio.checked = false;
-        });
-        specialRadios.forEach(radio => {
-            if (selectedSpecialNoteId && radio.value === selectedSpecialNoteId) radio.checked = true;
-            else radio.checked = false;
-        });
-        selectedSpecialMode = (selectedSpecialNoteId !== null);
-        // Aggiorna visibilità messaggi informativi
+        // Aggiorna visibilità messaggi
         if (selectedNormalNoteId) {
             normalNoteInfo.style.display = 'block';
             specialNoteInfo.style.display = 'none';
@@ -718,20 +776,14 @@
         }
     }
 
-    // ---------- EVENTI NOTE ----------
+    function renderCurrentNotes() {
+        renderNormalNotes();
+        renderSpecialNotes();
+    }
+
+    // ---------- EVENTI NOTE (modifica e cancella) ----------
     function attachNormalNoteEvents() {
-        notesListArea.addEventListener('change', (e) => {
-            if (e.target && e.target.type === 'radio' && e.target.name === 'noteSelect') {
-                selectedNormalNoteId = e.target.value;
-                selectedSpecialNoteId = null;
-                selectedSpecialMode = false;
-                saveSelectedIds();
-                enforceMutualExclusion();
-                normalNoteInfo.style.display = 'block';
-                setTimeout(() => { if (selectedNormalNoteId) normalNoteInfo.style.display = 'block'; }, 100);
-                specialNoteInfo.style.display = 'none';
-            }
-        });
+        // Usa delega sugli elementi statici notesListArea
         notesListArea.addEventListener('click', (e) => {
             const btn = e.target;
             if (btn.classList && btn.classList.contains('edit-note-btn')) {
@@ -772,19 +824,8 @@
             }
         });
     }
+
     function attachSpecialNoteEvents() {
-        specialNotesListArea.addEventListener('change', (e) => {
-            if (e.target && e.target.type === 'radio' && e.target.name === 'specialNoteSelect') {
-                selectedSpecialNoteId = e.target.value;
-                selectedNormalNoteId = null;
-                selectedSpecialMode = true;
-                saveSelectedIds();
-                enforceMutualExclusion();
-                specialNoteInfo.style.display = 'block';
-                setTimeout(() => { if (selectedSpecialNoteId) specialNoteInfo.style.display = 'block'; }, 100);
-                normalNoteInfo.style.display = 'none';
-            }
-        });
         specialNotesListArea.addEventListener('click', (e) => {
             const btn = e.target;
             if (btn.classList && btn.classList.contains('edit-special-note-btn')) {
@@ -1133,7 +1174,6 @@
     // ---------- ESPORTA / IMPORTA (tutti i servizi + numeri) ----------
     function exportAllNotes() {
         let content = "";
-        // ESPORTA NUMERI DI TELEFONO
         content += "[NUMERI TELEFONO]\n";
         for (let s of services) {
             let phone = getPhone(s) || defaultPhone[s];
@@ -1249,7 +1289,6 @@
             if (currentService) {
                 loadCurrentServiceNotes();
                 enforceMutualExclusion();
-                // Aggiorna il campo telefono visualizzato
                 phoneInput.value = getPhone(currentService) || defaultPhone[currentService];
             }
             gpsStatus.innerHTML = "✅ Note e numeri ripristinati da file.";
@@ -1266,13 +1305,12 @@
         phoneInput.value = getPhone(s) || defaultPhone[s];
         loadCurrentServiceNotes();
         enforceMutualExclusion();
-        resetCoords();  // azzera coordinate all'apertura (non più caricate automaticamente)
+        resetCoords();
         homePage.classList.add("hidden");
         emergencyPage.classList.remove("hidden");
         phoneSaveMsg.innerText = "";
         requestWakeLock();
         selectedSpecialMode = false;
-        // NON chiamare più getLocationAndAddress automaticamente
     }
     function onSaveNumber() {
         let n = phoneInput.value.trim();
@@ -1314,8 +1352,7 @@
             globalImportFileInput.value = '';
         });
         initRecognition();
-        attachNormalNoteEvents();
-        attachSpecialNoteEvents();
+        // Le funzioni attach saranno chiamate dai render, ma assicuriamo che i listener principali siano attivi
         normalNoteInfo.style.display = 'none';
         specialNoteInfo.style.display = 'none';
     }
