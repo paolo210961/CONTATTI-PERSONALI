@@ -546,7 +546,6 @@ function getSelectedSpecialKey(s) {
     return `sos_selected_special_note_${s}_${CURRENT_VERSION}`;
 }
     function saveNotes() {
-        function saveSpecialNotes() {
 
     if (!currentService) return;
 
@@ -616,10 +615,32 @@ function loadSpecialNotes(service) {
         selectedSpecialNoteId = null;
     }
 
-    renderSpecialNotes();
+renderSpecialNotes();
 }
-        if (!currentService) return;
-        localStorage.setItem(getNoteKey(currentService), JSON.stringify(notesArray));
+
+function saveNotes() {
+
+    if (!currentService) return;
+
+    localStorage.setItem(
+        getNoteKey(currentService),
+        JSON.stringify(notesArray)
+    );
+
+    if (selectedNoteId) {
+
+        localStorage.setItem(
+            getSelectedKey(currentService),
+            selectedNoteId
+        );
+
+    } else {
+
+        localStorage.removeItem(
+            getSelectedKey(currentService)
+        );
+    }
+}        localStorage.setItem(getNoteKey(currentService), JSON.stringify(notesArray));
         if (selectedNoteId) localStorage.setItem(getSelectedKey(currentService), selectedNoteId);
         else localStorage.removeItem(getSelectedKey(currentService));
     }
@@ -968,7 +989,6 @@ function addSpecialNote() {
 
     saveSpecialNotes();
     renderSpecialNotes();
-    saveSpecialNotes();
 
     specialNoteStatus.innerText =
         "✅ Nota speciale aggiunta";
