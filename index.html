@@ -163,7 +163,7 @@
             background: #fff;
             font-family: monospace;
         }
-        /* LAYOUT NOTE: riga pulsanti + pulsante titolo bianco sottostante */
+        /* LAYOUT NOTE: riga pulsanti + riga titolo (badge + campo) */
         .note-item, .special-note-item {
             background: transparent;
             margin: 16px 0;
@@ -199,26 +199,36 @@
         .note-btn-confirm.selected .dot {
             background-color: white;
         }
-        /* Pulsante titolo (bianco, disabilitato) */
-        .note-title-btn {
-            background: white;
-            color: black;
-            cursor: default;
-            opacity: 1;
+        /* Riga titolo: badge rosa fisso + campo flessibile */
+        .note-title-row {
+            display: flex;
+            gap: 10px;
+            align-items: center;
             width: 100%;
-            text-align: left;
-            padding: 10px 12px;
+        }
+        .title-badge {
+            background: #e91e63;  /* rosa forte */
+            color: white;
+            font-weight: bold;
+            font-size: 0.85rem;
+            padding: 8px 12px;
+            border-radius: 32px;
+            white-space: nowrap;
+            flex-shrink: 0;
+            text-align: center;
+        }
+        .title-field {
+            background: white;
             border: 1px solid #ced4da;
             border-radius: 32px;
-            font-weight: normal;
+            padding: 8px 12px;
+            flex: 1;
             font-size: 0.9rem;
-            margin-top: 4px;
+            color: black;
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
-        }
-        .note-title-btn:active {
-            transform: none;
+            cursor: default;
         }
         .edit-note-btn, .edit-special-note-btn {
             background: #6b8e23;
@@ -287,35 +297,47 @@
             color: #2c3e66;
             margin-top: 6px;
         }
-        /* MODAL FULLSCREEN per textarea */
-        .fullscreen-modal {
+        /* MODAL ADATTIVA PER TEXTAREA */
+        .adaptive-modal {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: white;
+            background: rgba(0,0,0,0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
             z-index: 2000;
+        }
+        .adaptive-modal-content {
+            background: white;
+            border-radius: 32px;
+            padding: 20px;
+            max-width: 90%;
+            max-height: 80%;
+            width: auto;
+            height: auto;
             display: flex;
             flex-direction: column;
-            padding: 20px;
-            box-sizing: border-box;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
         }
-        .fullscreen-modal textarea {
-            flex: 1;
+        .adaptive-modal-content textarea {
             width: 100%;
-            font-size: 1.2rem;
-            padding: 16px;
-            border-radius: 24px;
-            margin-bottom: 20px;
-            resize: none;
+            min-width: 300px;
+            min-height: 200px;
+            max-width: 80vw;
+            max-height: 60vh;
+            font-size: 1rem;
+            margin-bottom: 16px;
+            resize: both;
         }
-        .fullscreen-modal button {
+        .adaptive-modal-content button {
             background: #283593;
             color: white;
-            padding: 14px;
+            padding: 12px;
             border-radius: 40px;
-            font-size: 1.1rem;
+            font-size: 1rem;
             font-weight: bold;
             border: none;
             cursor: pointer;
@@ -368,7 +390,9 @@
             .note-row-buttons { gap: 6px; }
             .note-btn-confirm { width: 40px; }
             .note-btn-confirm .dot { width: 16px; height: 16px; }
-            .note-title-btn { font-size: 0.8rem; padding: 8px 10px; white-space: normal; }
+            .title-badge { font-size: 0.7rem; padding: 6px 10px; }
+            .title-field { font-size: 0.8rem; padding: 6px 10px; white-space: normal; }
+            .adaptive-modal-content textarea { min-width: 260px; min-height: 150px; }
         }
         .version-footer {
             text-align: center;
@@ -469,7 +493,7 @@
             </div>
         </div>
 
-        <!-- BLOCCO NOTE NORMALI con nuovo layout -->
+        <!-- BLOCCO NOTE NORMALI -->
         <div class="dark-card">
             <button id="addNoteBtn" class="small-btn add-note-btn">
                 <span>🚑 AGGIUNGI NOTA NORMALE</span>
@@ -484,7 +508,7 @@
         <!-- PULSANTE TORNA INDIETRO -->
         <button id="backHomeBtn" class="small-btn back-home" style="width:100%;">◀ TORNA INDIETRO</button>
 
-        <!-- BLOCCO NOTE SPECIALI con nuovo layout -->
+        <!-- BLOCCO NOTE SPECIALI -->
         <div class="dark-card">
             <button id="addSpecialNoteBtn" class="small-btn add-note-btn">
                 <span>🏠 AGGIUNGI NOTA SPECIALE</span>
@@ -520,10 +544,12 @@
         <div class="version-footer">versione 0182 – ascolto 30s, traduzione persistente, layout operatore ridisegnato</div>
     </div>
 
-    <!-- MODAL FULLSCREEN PER TEXTAREA -->
-    <div id="fullscreenModal" class="fullscreen-modal" style="display:none;">
-        <textarea id="fullscreenTextarea" readonly></textarea>
-        <button id="closeFullscreenBtn">CHIUDI</button>
+    <!-- MODAL ADATTIVA PER TEXTAREA -->
+    <div id="adaptiveModal" class="adaptive-modal" style="display:none;">
+        <div class="adaptive-modal-content">
+            <textarea id="modalTextarea" readonly></textarea>
+            <button id="closeAdaptiveBtn">CHIUDI</button>
+        </div>
     </div>
 
     <!-- MODALI per aggiunta note -->
@@ -556,9 +582,9 @@
 </div>
 
 <script>
-    // ==================== VERSIONE 0182 FINALE (corretta) ====================
-    // - Layout note: riga con Modifica, Cancella, Conferma (fisso) + pulsante titolo bianco sottostante
-    // - Textarea traduzione cliccabile apre fullscreen
+    // ==================== VERSIONE 0182 FINALE ====================
+    // - Layout titolo orizzontale: badge "Titolo" rosa a sinistra, campo bianco a destra (flessibile)
+    // - Modale adattiva per textarea
     // - Tutte le funzionalità precedenti invariate
     // =================================================================
 
@@ -624,22 +650,26 @@
     const exportAllBtn = document.getElementById('exportAllBtn');
     const importAllBtn = document.getElementById('importAllBtn');
     const globalImportFileInput = document.getElementById('globalImportFileInput');
-    const fullscreenModal = document.getElementById('fullscreenModal');
-    const fullscreenTextarea = document.getElementById('fullscreenTextarea');
-    const closeFullscreenBtn = document.getElementById('closeFullscreenBtn');
+    // Modale adattiva
+    const adaptiveModal = document.getElementById('adaptiveModal');
+    const modalTextarea = document.getElementById('modalTextarea');
+    const closeAdaptiveBtn = document.getElementById('closeAdaptiveBtn');
 
     let recognition = null;
     let recognitionTimeout = null;
 
-    function openFullscreen() {
-        fullscreenTextarea.value = operatorResponse.value;
-        fullscreenModal.style.display = 'flex';
+    function openAdaptiveModal() {
+        modalTextarea.value = operatorResponse.value;
+        adaptiveModal.style.display = 'flex';
     }
-    function closeFullscreen() {
-        fullscreenModal.style.display = 'none';
+    function closeAdaptiveModal() {
+        adaptiveModal.style.display = 'none';
     }
-    operatorResponse.addEventListener('click', openFullscreen);
-    closeFullscreenBtn.addEventListener('click', closeFullscreen);
+    operatorResponse.addEventListener('click', openAdaptiveModal);
+    closeAdaptiveBtn.addEventListener('click', closeAdaptiveModal);
+    adaptiveModal.addEventListener('click', (e) => {
+        if (e.target === adaptiveModal) closeAdaptiveModal();
+    });
 
     function showTemporaryMessage(element, message, duration = 15000) {
         if (!element) return;
@@ -784,7 +814,7 @@
         renderCurrentNotes();
     }
 
-    // Render note con pulsante titolo bianco disabilitato
+    // Render note con layout titolo orizzontale: badge rosa + campo flessibile
     function renderNormalNotes() {
         const notes = normalNotes[currentService] || [];
         if (!notes.length) {
@@ -804,7 +834,10 @@
                             <span class="dot"></span>
                         </button>
                     </div>
-                    <button class="note-title-btn" disabled title="${escapeHtml(titleText)}">${escapeHtml(titleText)}</button>
+                    <div class="note-title-row">
+                        <div class="title-badge">Titolo</div>
+                        <div class="title-field">${escapeHtml(titleText)}</div>
+                    </div>
                 </div>
             `;
         });
@@ -841,7 +874,10 @@
                             <span class="dot"></span>
                         </button>
                     </div>
-                    <button class="note-title-btn" disabled title="${escapeHtml(titleText)}">${escapeHtml(titleText)}</button>
+                    <div class="note-title-row">
+                        <div class="title-badge">Titolo</div>
+                        <div class="title-field">${escapeHtml(titleText)}</div>
+                    </div>
                 </div>
             `;
         });
