@@ -249,10 +249,11 @@
         }
         .listen-btn {
             background: #283593 !important;
-            width: 100%;
+            flex: 1;
         }
         .clear-btn {
             background: #8e44ad !important;
+            flex-shrink: 0;
         }
         .copy-btn {
             background: #283593 !important;
@@ -263,25 +264,21 @@
         .operator-header-btn {
             background: #283593;
             color: white;
-            flex: 1;
+            width: 100%;
             cursor: default;
             opacity: 1;
             font-weight: bold;
             text-align: center;
             padding: 10px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
         }
         .operator-header-btn:active {
             transform: none;
         }
-        /* Riga con intestazione e tasto cancella: fissa su mobile */
-        .header-row {
+        /* Riga con tasti ASCOLTA e CANCELLA */
+        .listen-row {
             display: flex;
             gap: 10px;
-            align-items: center;
-            flex-wrap: nowrap;
+            align-items: stretch;
             margin-bottom: 12px;
         }
         .status-msg {
@@ -338,20 +335,8 @@
             .confirm-note-btn { width: 36px; }
             .confirm-note-btn .dot { width: 12px; height: 12px; }
             .note-title-btn { font-size: 0.75rem; padding: 6px 8px; min-width: 80px; }
-            /* Compatta la riga header su mobile */
-            .header-row {
-                gap: 6px;
-            }
-            .operator-header-btn {
-                font-size: 0.7rem;
-                padding: 8px 6px;
-                white-space: normal;
-                word-break: break-word;
-            }
-            .clear-btn {
-                padding: 8px 10px;
-                font-size: 0.7rem;
-            }
+            .listen-row { gap: 6px; }
+            .clear-btn { padding: 12px 10px; }
         }
         .version-footer {
             text-align: center;
@@ -390,6 +375,19 @@
             font-size: 0.75rem;
             margin-top: 8px;
             color: #1a237e;
+        }
+        /* Riga tre pulsanti con ordine: LEGGI in IT (sinistra), COPIA (centro), LEGGI in FR (destra) */
+        .action-row {
+            display: flex;
+            gap: 10px;
+            justify-content: space-between;
+        }
+        .action-row .copy-btn {
+            flex: 1;
+            margin: 0;
+        }
+        .action-row .audio-lang-btn {
+            flex: 1;
         }
     </style>
 </head>
@@ -462,17 +460,25 @@
             </div>
         </div>
 
+        <!-- NUOVO LAYOUT PER OPERATORE -->
         <div class="dark-card">
-            <div class="header-row">
-                <button class="small-btn operator-header-btn" disabled>🎧 RISPOSTA OPERATORE tradotto in ITALIANO</button>
-                <button id="clearResponseBtn" class="small-btn clear-btn">🗑️ CANCELLA</button>
+            <!-- Riga 1: ASCOLTA OPERATORE (sinistra, doppia altezza) e CANCELLA (destra, doppia altezza) -->
+            <div class="listen-row">
+                <button id="listenResponseBtn" class="small-btn listen-btn double-height">🎤 ASCOLTA OPERATORE</button>
+                <button id="clearResponseBtn" class="small-btn clear-btn double-height">🗑️ CANCELLA</button>
             </div>
-            <button id="listenResponseBtn" class="small-btn listen-btn double-height">🎤 ASCOLTA OPERATORE</button>
             <div id="listenInfoMsg" class="temp-message" style="display:none;"></div>
+
+            <!-- Riga 2: pulsante disabilitato "RISPOSTA OPERATORE tradotto in ITALIANO" (larghezza piena) -->
+            <button class="small-btn operator-header-btn" disabled>🎧 RISPOSTA OPERATORE tradotto in ITALIANO</button>
+
+            <!-- Riga 3: textarea -->
             <textarea id="operatorResponse" rows="3" readonly placeholder="Traduzione italiana"></textarea>
-            <div class="flex-row">
-                <button id="copyBtn" class="small-btn copy-btn double-height">COPIA</button>
+
+            <!-- Riga 4: tre pulsanti con ordine: LEGGI in IT (sinistra), COPIA (centro), LEGGI in FR (destra) -->
+            <div class="action-row">
                 <button id="audioItBtn" class="small-btn audio-lang-btn double-height">LEGGI in IT</button>
+                <button id="copyBtn" class="small-btn copy-btn double-height">COPIA</button>
                 <button id="audioFrBtn" class="small-btn audio-lang-btn double-height">LEGGI in FR</button>
             </div>
             <div id="copyInfoMsg" class="temp-message" style="display:none;"></div>
@@ -480,9 +486,10 @@
         </div>
 
         <button id="backHomeBtn" class="small-btn back-home" style="width:100%;">◀ TORNA INDIETRO</button>
-        <div class="version-footer">versione 0182 – ascolto 30s, traduzione persistente, layout migliorato</div>
+        <div class="version-footer">versione 0182 – ascolto 30s, traduzione persistente, layout operatore ridisegnato</div>
     </div>
 
+    <!-- MODALI per aggiunta note (invariati) -->
     <div id="noteModal" class="modal" style="display:none;">
         <div class="modal-content">
             <h3>➕ Nuova Nota Normale</h3>
@@ -513,9 +520,12 @@
 
 <script>
     // ==================== VERSIONE 0182 FINALE ====================
-    // - Testi pulsanti senza emoji: "COPIA", "LEGGI in IT", "LEGGI in FR"
-    // - Layout header con tasto CANCELLA ora corretto su mobile (flex-wrap: nowrap)
-    // - Tutte le funzionalità precedenti invariate
+    // - Layout operatore ridisegnato:
+    //   * Riga1: ASCOLTA OPERATORE (doppia altezza) + CANCELLA (doppia altezza)
+    //   * Riga2: pulsante disabilitato "🎧 RISPOSTA OPERATORE tradotto in ITALIANO"
+    //   * Riga3: textarea
+    //   * Riga4: LEGGI in IT (sinistra), COPIA (centro), LEGGI in FR (destra) tutti doppia altezza
+    // - Tutte le funzionalità invariate
     // =================================================================
 
     const CURRENT_VERSION = "0182";
