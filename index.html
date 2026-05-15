@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
-    <title>SOS Drive - Emergenza v0180</title>
+    <title>SOS Drive - Emergenza v0182</title>
     <style>
         * {
             margin: 0;
@@ -49,7 +49,6 @@
             margin: 0 0 8px 0;
             font-weight: 700;
         }
-        /* Pulsante decorativo singolo per il servizio corrente */
         .current-service-deco {
             background: #d32f2f;
             border: none;
@@ -93,8 +92,6 @@
         }
         .export-import-row button {
             flex: 1;
-            background: #283593;
-            color: white;
             border: none;
             border-radius: 60px;
             padding: 14px 8px;
@@ -103,9 +100,16 @@
             cursor: pointer;
             transition: 0.05s linear;
             text-align: center;
+            color: white;
         }
         .export-import-row button:active {
             transform: scale(0.97);
+        }
+        #exportAllBtn {
+            background: #283593;
+        }
+        #importAllBtn {
+            background: #558b2f;
         }
         .btn-secondary {
             background: #1976d2;
@@ -130,7 +134,6 @@
             flex: 1;
             text-align: center;
         }
-        /* Stile personalizzato per l'etichetta "Numero servizio" (simile a note normali) */
         .service-label-styled {
             background: #fff3e0;
             border-left: 6px solid #ff9800;
@@ -224,11 +227,6 @@
             color: #2c3e66;
             margin-top: 6px;
         }
-        .import-export {
-            display: flex;
-            gap: 10px;
-            margin: 16px 0;
-        }
         .response-area {
             background: #e3f2fd;
             border-radius: 24px;
@@ -299,7 +297,7 @@
 <div class="container">
     <!-- HOME PAGE -->
     <div id="homePage" class="page">
-        <div class="version-header">📟 SOS Drive v0180 - Logo singolo per servizio</div>
+        <div class="version-header">📟 SOS-EMERGENZE v0182 - Layout home aggiornato</div>
         <h1>🆘 SOS EMERGENZA</h1>
         <div class="grid-2">
             <button class="big-btn" data-service="ambulanza">🚑 AMBULANZA</button>
@@ -307,22 +305,22 @@
             <button class="big-btn" data-service="veterinario">🐾 VETERINARIO</button>
             <button class="big-btn" data-service="clinica">🏥 CLINICA</button>
         </div>
+        <p style="text-align:center; font-size:0.75rem; color:#555;">Ogni servizio ha il proprio archivio note.<br>📍 Ricerca entro 300m di TUTTI i luoghi con nome<br>🔊 Ascolto automatico 15 secondi dopo il messaggio</p>
+        <!-- Informazione aggiuntiva sul nome del file di backup -->
+        <p style="text-align:center; font-size:0.7rem; color:#2c3e66; margin-top:8px;">💾 Il file SALVA NOTE si chiama: sos_notes_backup_0182.txt</p>
         <div class="export-import-row">
             <button id="exportAllBtn">💾 SALVA NOTE</button>
             <button id="importAllBtn">📂 RIPRISTINA NOTE</button>
         </div>
         <input type="file" id="globalImportFileInput" accept=".txt" style="display:none;">
-        <p style="text-align:center; font-size:0.75rem; color:#555; margin-top:16px;">Ogni servizio ha il proprio archivio note.<br>📍 Ricerca entro 300m di TUTTI i luoghi con nome<br>🔊 Ascolto automatico 15 secondi dopo il messaggio</p>
-        <div class="version-footer">versione 0180 – logo singolo del servizio corrente nella pagina di emergenza</div>
+        <div class="version-footer">versione 0182 – nome file backup indicato, intestazione aggiornata</div>
     </div>
 
-    <!-- EMERGENCY PAGE -->
+    <!-- EMERGENCY PAGE (identica alla versione 0181) -->
     <div id="emergencyPage" class="page hidden">
-        <div class="version-header">📟 SOS Drive v0180 – Logo singolo</div>
-        <!-- Pulsante decorativo singolo: verrà riempito dinamicamente in base al servizio -->
+        <div class="version-header">📟 SOS-EMERGENZE v0182 – Logo singolo</div>
         <div id="currentServiceDeco" class="current-service-deco">🚑 AMBULANZA</div>
 
-        <!-- Sezione Numero servizio con stile note normali -->
         <div class="service-label-styled">Numero servizio</div>
         <div class="flex-row">
             <input type="tel" id="phoneNumber" placeholder="Numero" style="flex:2;">
@@ -375,7 +373,7 @@
         </div>
 
         <button id="backHomeBtn" class="small-btn back-home" style="width:100%;">◀ TORNA INDIETRO</button>
-        <div class="version-footer">versione 0180 – logo singolo del servizio corrente, etichetta "Numero servizio" in stile note normali</div>
+        <div class="version-footer">versione 0182 – logo singolo, etichetta Numero servizio in stile note normali</div>
     </div>
 
     <!-- MODALI per aggiunta note -->
@@ -408,15 +406,14 @@
 </div>
 
 <script>
-    // ==================== VERSIONE 0180 ====================
-    // - Nella emergency page: un solo logo decorativo corrispondente al servizio corrente
-    // - Etichetta "Numero servizio" con stile note normali (bordo arancione sinistro, sfondo chiaro)
-    // - Pulsante "SALVA" al posto di "REGISTRA NUMERO"
-    // - Testo "Attenzione Emergenza..." mantenuto (non rimosso)
-    // - Mutua esclusione note già funzionante
+    // ==================== VERSIONE 0182 ====================
+    // - Home: intestazione "SOS-EMERGENZE"
+    // - Aggiunta riga informativa con nome file backup
+    // - Pulsanti SALVA NOTE (blu indaco) e RIPRISTINA NOTE (verde oliva) sotto il testo
+    // - Emergency invariata
     // =================================================================
 
-    const CURRENT_VERSION = "0180";
+    const CURRENT_VERSION = "0182";
     let currentService = "ambulanza";
     let currentLat = null, currentLng = null;
     let currentAddress = "";
@@ -494,7 +491,7 @@
 
     // ---------- ARCHIVIO NUMERI ----------
     function migratePhoneNumbers() {
-        const oldVersions = ["0179", "0178", "0177"];
+        const oldVersions = ["0181", "0180", "0179"];
         for (let s of services) {
             if (localStorage.getItem(`phone_${s}_${CURRENT_VERSION}`)) continue;
             for (let ver of oldVersions) {
@@ -835,7 +832,7 @@
     }
     function escapeHtml(str) { return str.replace(/[&<>]/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;' }[m])); }
 
-    // ---------- COPIA BILINGUE (con testo introduttivo mantenuto) ----------
+    // ---------- COPIA BILINGUE ----------
     async function getBilingualCopy() {
         let noteIT = getSelectedNoteDescription() || "nessuna nota";
         let coord = (currentLat && currentLng) ? `${currentLat.toFixed(6)}, ${currentLng.toFixed(6)}` : "non disponibili";
@@ -1000,7 +997,7 @@
         gpsStatus.innerHTML = "";
     }
 
-    // ---------- LETTURA VOCALE (testo introduttivo mantenuto) ----------
+    // ---------- LETTURA VOCALE ----------
     function playBeep() {
         try {
             let ctx = new (window.AudioContext || window.webkitAudioContext)();
@@ -1189,7 +1186,6 @@
     function showEmergency(s) {
         currentService = s;
         let label = {ambulanza:"🚑 AMBULANZA", polizia:"👮 POLIZIA", veterinario:"🐾 VETERINARIO", clinica:"🏥 CLINICA"}[s];
-        // Aggiorna il logo decorativo singolo
         currentServiceDeco.innerText = label;
         phoneInput.value = getPhone(s) || defaultPhone[s];
         loadCurrentServiceNotes();
@@ -1251,4 +1247,3 @@
 </script>
 </body>
 </html>
-```
