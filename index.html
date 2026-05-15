@@ -126,6 +126,11 @@
         .small-btn:active {
             transform: scale(0.97);
         }
+        /* Altezza raddoppiata per alcuni pulsanti */
+        .double-height {
+            padding: 16px 12px;
+            font-size: 1rem;
+        }
         /* BLOCCHI GRIGI CON BAFFO SINISTRO */
         .dark-card {
             background: #d2d6dc;
@@ -148,6 +153,9 @@
             flex-wrap: wrap;
             margin: 12px 0;
         }
+        .full-width {
+            width: 100%;
+        }
         input, textarea {
             width: 100%;
             padding: 12px 16px;
@@ -157,7 +165,7 @@
             background: #fff;
             font-family: monospace;
         }
-        /* STILE PER LE NOTE - Nuovo ordine: Modifica, Cancella, Titolo, Conferma */
+        /* STILE PER LE NOTE */
         .note-item, .special-note-item {
             background: transparent;
             padding: 10px 0;
@@ -181,22 +189,14 @@
             flex: 1;
             justify-content: flex-end;
         }
-        /* Nuovo ordine: prima titolo (flessibile), poi conferma (fisso) */
-        .note-right-group {
-            display: flex;
-            gap: 8px;
-            align-items: center;
-            flex: 1;
-            justify-content: flex-end;
-        }
         .edit-note-btn, .edit-special-note-btn {
-            background: #6b8e23; /* verde oliva */
+            background: #6b8e23;
         }
         .delete-note-btn, .delete-special-note-btn {
-            background: #8e44ad; /* viola */
+            background: #8e44ad;
         }
         .confirm-note-btn {
-            background: #283593; /* blu indaco */
+            background: #283593;
             width: 40px;
             display: inline-flex;
             align-items: center;
@@ -214,7 +214,6 @@
         .confirm-note-btn.selected .dot {
             background-color: white;
         }
-        /* Pulsante Titolo Nota: sfondo bianco, testo nero, non editabile */
         .note-title-btn {
             background: white;
             color: black;
@@ -230,10 +229,6 @@
             border: 1px solid #ced4da;
             font-weight: normal;
         }
-        .note-title-btn:active {
-            transform: none;
-        }
-        /* Pulsanti Aggiungi Nota con pallino bianco */
         .add-note-btn {
             background: #283593 !important;
             color: white;
@@ -257,6 +252,7 @@
         }
         .listen-btn {
             background: #283593 !important;
+            width: 100%;
         }
         .clear-btn {
             background: #8e44ad !important;
@@ -267,12 +263,10 @@
         .audio-lang-btn {
             background: #6b8e23 !important;
         }
-        /* Pulsante intestazione operatore (non editabile, blu) */
         .operator-header-btn {
             background: #283593;
             color: white;
-            width: 100%;
-            margin-bottom: 12px;
+            flex: 1;
             cursor: default;
             opacity: 1;
             font-weight: bold;
@@ -329,6 +323,7 @@
             .page { padding: 16px 12px 24px; }
             .big-btn { font-size: 1.2rem; padding: 14px 12px; }
             .small-btn { padding: 6px 10px; font-size: 0.75rem; }
+            .double-height { padding: 12px 10px; font-size: 0.9rem; }
             h1 { font-size: 1.6rem; }
             .dark-card { padding: 12px; }
             .note-item, .special-note-item { gap: 8px; }
@@ -365,6 +360,22 @@
             color: #2e7d32;
             display: none;
         }
+        .temp-message {
+            background: #e3f2fd;
+            border-left: 4px solid #283593;
+            padding: 8px 12px;
+            border-radius: 16px;
+            font-size: 0.75rem;
+            margin-top: 8px;
+            color: #1a237e;
+        }
+        /* Riga con intestazione e tasto cancella */
+        .header-row {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 12px;
+        }
     </style>
 </head>
 <body>
@@ -379,14 +390,14 @@
             <button class="big-btn" data-service="veterinario">🐾 VETERINARIO</button>
             <button class="big-btn" data-service="clinica">🏥 CLINICA</button>
         </div>
-        <p style="text-align:center; font-size:0.75rem; color:#555;">Ogni servizio ha il proprio archivio note.<br>📍 Ricerca entro 300m di TUTTI i luoghi con nome<br>🔊 Ascolto automatico 15 secondi dopo il messaggio</p>
+        <p style="text-align:center; font-size:0.75rem; color:#555;">Ogni servizio ha il proprio archivio note.<br>📍 Ricerca entro 300m di TUTTI i luoghi con nome<br>🔊 Ascolto automatico 30 secondi dopo il messaggio</p>
         <p style="text-align:center; font-size:0.7rem; color:#2c3e66; margin-top:8px;">💾 Il file SALVA NOTE si chiama: sos_notes_backup_0182.txt</p>
         <div class="export-import-row">
             <button id="exportAllBtn">💾 SALVA NOTE</button>
             <button id="importAllBtn">📂 RIPRISTINA NOTE</button>
         </div>
         <input type="file" id="globalImportFileInput" accept=".txt" style="display:none;">
-        <div class="version-footer">versione 0182 – nome file backup indicato, intestazione aggiornata</div>
+        <div class="version-footer">versione 0182 – ascolto 30s, layout operatore ridisegnato</div>
     </div>
 
     <!-- EMERGENCY PAGE -->
@@ -442,24 +453,30 @@
             </div>
         </div>
 
-        <!-- BLOCCO UNICO: RISPOSTA OPERATORE + TASTI -->
+        <!-- BLOCCO UNICO: RISPOSTA OPERATORE (nuovo layout) -->
         <div class="dark-card">
-            <button class="small-btn operator-header-btn" disabled>🎧 RISPOSTA OPERATORE tradotto in ITALIANO</button>
-            <textarea id="operatorResponse" rows="3" readonly placeholder="Traduzione italiana"></textarea>
-            <div class="flex-row">
-                <button id="listenResponseBtn" class="small-btn listen-btn">🎤 ASCOLTA OPERATORE 15s</button>
+            <!-- Riga con intestazione e tasto CANCELLA -->
+            <div class="header-row">
+                <button class="small-btn operator-header-btn" disabled>🎧 RISPOSTA OPERATORE tradotto in ITALIANO</button>
                 <button id="clearResponseBtn" class="small-btn clear-btn">🗑️ CANCELLA</button>
             </div>
+            <!-- Pulsante ASCOLTA OPERATORE (larghezza piena, altezza doppia) -->
+            <button id="listenResponseBtn" class="small-btn listen-btn double-height">🎤 ASCOLTA OPERATORE</button>
+            <div id="listenInfoMsg" class="temp-message" style="display:none;"></div>
+            <!-- Textarea traduzione -->
+            <textarea id="operatorResponse" rows="3" readonly placeholder="Traduzione italiana"></textarea>
+            <!-- Riga con COPIA, LEGGI IT, LEGGI FR (ciascuno altezza doppia) -->
             <div class="flex-row">
-                <button id="copyBtn" class="small-btn copy-btn">📋 COPIA (FR+IT)</button>
-                <button id="audioItBtn" class="small-btn audio-lang-btn">🔊 LEGGI IT</button>
-                <button id="audioFrBtn" class="small-btn audio-lang-btn">🔊 LEGGI FR</button>
+                <button id="copyBtn" class="small-btn copy-btn double-height">📋 COPIA</button>
+                <button id="audioItBtn" class="small-btn audio-lang-btn double-height">🔊 LEGGI IT</button>
+                <button id="audioFrBtn" class="small-btn audio-lang-btn double-height">🔊 LEGGI FR</button>
             </div>
+            <div id="copyInfoMsg" class="temp-message" style="display:none;"></div>
             <div id="transcribeStatus" class="status-msg"></div>
         </div>
 
         <button id="backHomeBtn" class="small-btn back-home" style="width:100%;">◀ TORNA INDIETRO</button>
-        <div class="version-footer">versione 0182 – layout unificato operatore</div>
+        <div class="version-footer">versione 0182 – ascolto 30s, traduzione persistente, layout migliorato</div>
     </div>
 
     <!-- MODALI per aggiunta note -->
@@ -493,10 +510,11 @@
 
 <script>
     // ==================== VERSIONE 0182 MODIFICATA ====================
-    // - Pulsanti "AGGIUNGI NOTA" con pallino bianco al posto del trattino
-    // - Ordine note: Modifica, Cancella, Titolo, Conferma (pallino)
-    // - Pulsante Titolo: sfondo bianco, testo nero
-    // - Unificati i due blocchi inferiori in un unico dark-card con intestazione a pulsante blu non editabile
+    // - Tasto ASCOLTA: durata 30 secondi, nessuna scritta "15s", messaggio info temporaneo, altezza doppia
+    // - Tasto COPIA: messaggio differenziato (normale/speciale) per 15 secondi
+    // - Tasto CANCELLA spostato accanto all'intestazione del blocco operatore
+    // - Altezza raddoppiata per ASCOLTA OPERATORE, COPIA, LEGGI IT, LEGGI FR
+    // - Persistenza traduzione operatore in localStorage
     // =================================================================
 
     const CURRENT_VERSION = "0182";
@@ -544,6 +562,8 @@
     const listenResponseBtn = document.getElementById('listenResponseBtn');
     const clearResponseBtn = document.getElementById('clearResponseBtn');
     const transcribeStatus = document.getElementById('transcribeStatus');
+    const listenInfoMsg = document.getElementById('listenInfoMsg');
+    const copyInfoMsg = document.getElementById('copyInfoMsg');
     const normalNoteInfo = document.getElementById('normalNoteInfo');
     const specialNoteInfo = document.getElementById('specialNoteInfo');
     const modal = document.getElementById('noteModal');
@@ -563,13 +583,37 @@
     let recognition = null;
     let recognitionTimeout = null;
 
-    function showTemporaryMessage(element, duration = 15000) {
+    function showTemporaryMessage(element, message, duration = 15000) {
         if (!element) return;
+        element.innerText = message;
         element.style.display = 'block';
         if (element._hideTimeout) clearTimeout(element._hideTimeout);
         element._hideTimeout = setTimeout(() => {
             element.style.display = 'none';
         }, duration);
+    }
+
+    // Persistenza traduzione operatore
+    function saveOperatorTranslation(text) {
+        if (currentService) {
+            localStorage.setItem(`operatorResponse_${currentService}_${CURRENT_VERSION}`, text);
+        }
+    }
+    function loadOperatorTranslation() {
+        if (currentService) {
+            const saved = localStorage.getItem(`operatorResponse_${currentService}_${CURRENT_VERSION}`);
+            if (saved !== null) {
+                operatorResponse.value = saved;
+            } else {
+                operatorResponse.value = "";
+            }
+        }
+    }
+    function clearOperatorTranslation() {
+        if (currentService) {
+            localStorage.removeItem(`operatorResponse_${currentService}_${CURRENT_VERSION}`);
+            operatorResponse.value = "";
+        }
     }
 
     // ---------- WakeLock ----------
@@ -621,7 +665,7 @@
         return frenchText + " (traduzione fallita)";
     }
 
-    // ---------- RICONOSCIMENTO VOCALE ----------
+    // ---------- RICONOSCIMENTO VOCALE (30 secondi) ----------
     function initRecognition() {
         if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
             transcribeStatus.innerText = "❌ Riconoscimento non supportato";
@@ -634,10 +678,13 @@
         recognition.lang = 'fr-FR';
         return true;
     }
-    async function startListening15s() {
+    async function startListening30s() {
         if (!recognition && !initRecognition()) return;
         if (recognitionTimeout) clearTimeout(recognitionTimeout);
-        transcribeStatus.innerText = "🎤 Ascolto francese per 15 secondi...";
+        
+        showTemporaryMessage(listenInfoMsg, "🎤 Ascolto in corso per 30 secondi. La risposta dell'operatore verrà tradotta in italiano.", 15000);
+        
+        transcribeStatus.innerText = "🎤 Ascolto francese per 30 secondi...";
         recognition.start();
         let finalTranscript = "";
         recognition.onresult = (event) => {
@@ -652,11 +699,12 @@
                 const italian = await translateFrenchToItalian(finalTranscript.trim());
                 if (operatorResponse.value.trim()) operatorResponse.value += "\n---\n" + italian;
                 else operatorResponse.value = italian;
-                transcribeStatus.innerText = "✅ Testo tradotto (15s)";
+                saveOperatorTranslation(operatorResponse.value);
+                transcribeStatus.innerText = "✅ Testo tradotto (30s) e salvato permanentemente";
             } else transcribeStatus.innerText = "⏹️ Nessun parlato";
             setTimeout(() => { if (transcribeStatus.innerText.includes("Tradotto") || transcribeStatus.innerText.includes("Nessun parlato")) transcribeStatus.innerText = ""; }, 4000);
         };
-        recognitionTimeout = setTimeout(() => { if (recognition && recognition.stop) recognition.stop(); }, 15000);
+        recognitionTimeout = setTimeout(() => { if (recognition && recognition.stop) recognition.stop(); }, 30000);
     }
 
     // ---------- PERSISTENZA NOTE ----------
@@ -696,7 +744,7 @@
         }
     }
 
-    // ---------- GESTIONE INTERFACCIA (nuovo ordine note) ----------
+    // ---------- GESTIONE INTERFACCIA ----------
     function renderNormalNotes() {
         const notes = normalNotes[currentService] || [];
         if (!notes.length) {
@@ -781,7 +829,7 @@
         selectedSpecialMode = false;
         saveSelectedIds();
         renderCurrentNotes();
-        if (normalNoteInfo) showTemporaryMessage(normalNoteInfo, 15000);
+        if (normalNoteInfo) showTemporaryMessage(normalNoteInfo, "📌 Nota normale selezionata: verrà letto l'intero messaggio di emergenza", 15000);
         if (specialNoteInfo) specialNoteInfo.style.display = 'none';
     }
 
@@ -791,7 +839,7 @@
         selectedSpecialMode = true;
         saveSelectedIds();
         renderCurrentNotes();
-        if (specialNoteInfo) showTemporaryMessage(specialNoteInfo, 15000);
+        if (specialNoteInfo) showTemporaryMessage(specialNoteInfo, "✨ Nota speciale selezionata: verrà letto solo il testo (ignora coordinate)", 15000);
         if (normalNoteInfo) normalNoteInfo.style.display = 'none';
     }
 
@@ -934,7 +982,7 @@
     }
     function escapeHtml(str) { return str.replace(/[&<>]/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;' }[m])); }
 
-    // ---------- COPIA BILINGUE ----------
+    // ---------- COPIA BILINGUE con messaggio differenziato ----------
     async function getBilingualCopy() {
         let noteIT = getSelectedNoteDescription() || "nessuna nota";
         let coord = (currentLat && currentLng) ? `${currentLat.toFixed(6)}, ${currentLng.toFixed(6)}` : "non disponibili";
@@ -955,12 +1003,20 @@
         let french = `${introFR}\n\n${noteFR}\n\nCoordonnées: ${coord}\nAdresse: ${addrFR}\nJe suis près de (1): ${refAFR}\nJe suis près de (2): ${refBFR}\nJe suis près de (3): ${refCFR}\n\n${domandaFR}`;
         return french + "\n\n-----\n\n" + italian;
     }
+
     async function copyBilingual() {
         gpsStatus.innerHTML = "⏳ Preparazione copia...";
         let txt = await getBilingualCopy();
         try {
             await navigator.clipboard.writeText(txt);
-            gpsStatus.innerHTML = "📋 Copiato! (FR+IT)";
+            gpsStatus.innerHTML = "📋 Copiato!";
+            let infoMessage = "";
+            if (selectedSpecialMode) {
+                infoMessage = "⚠️ ATTENZIONE: è selezionata una NOTA SPECIALE. Verrà copiato solo il testo della nota, SENZA coordinate, indirizzo e riferimenti stradali.";
+            } else {
+                infoMessage = "📋 Copiati: coordinate, indirizzo, riferimenti vicini e la nota selezionata (normale).";
+            }
+            showTemporaryMessage(copyInfoMsg, infoMessage, 15000);
             setTimeout(()=> gpsStatus.innerHTML = "✅ Pronto.", 2000);
         } catch(e) {
             let ta = document.createElement('textarea');
@@ -970,6 +1026,8 @@
             document.execCommand('copy');
             document.body.removeChild(ta);
             gpsStatus.innerHTML = "📋 Copiato manualmente";
+            let infoMessage = selectedSpecialMode ? "⚠️ NOTA SPECIALE: copiato solo il testo della nota." : "📋 Copiati tutti i dati (coordinate, indirizzo, riferimenti, nota).";
+            showTemporaryMessage(copyInfoMsg, infoMessage, 15000);
         }
     }
 
@@ -1175,8 +1233,8 @@
         await speakWords(domanda, lang==='it'?'it-IT':'fr-FR', 1.0, 200);
         playBeep();
         await new Promise(r=>setTimeout(r,800));
-        gpsStatus.innerHTML = "✅ Messaggio completo. Avvio ascolto operatore (15 secondi)...";
-        setTimeout(() => startListening15s(), 500);
+        gpsStatus.innerHTML = "✅ Messaggio completo. Avvio ascolto operatore (30 secondi)...";
+        setTimeout(() => startListening30s(), 500);
     }
     function speakItalian() { speakFull('it'); }
     function speakFrench() { speakFull('fr'); }
@@ -1313,6 +1371,7 @@
         currentServiceDeco.innerText = label;
         phoneInput.value = getPhone(s) || defaultPhone[s];
         loadCurrentServiceNotes();
+        loadOperatorTranslation();
         resetCoords();
         homePage.classList.add("hidden");
         emergencyPage.classList.remove("hidden");
@@ -1321,11 +1380,19 @@
         selectedSpecialMode = false;
         if (normalNoteInfo) normalNoteInfo.style.display = 'none';
         if (specialNoteInfo) specialNoteInfo.style.display = 'none';
+        if (listenInfoMsg) listenInfoMsg.style.display = 'none';
+        if (copyInfoMsg) copyInfoMsg.style.display = 'none';
     }
     function onSaveNumber() {
         let n = phoneInput.value.trim();
         if (n) { savePhone(currentService, n); phoneSaveMsg.innerText = "✅ Numero salvato nell'archivio"; setTimeout(()=>phoneSaveMsg.innerText="",2000); }
         else phoneSaveMsg.innerText = "⚠️ Inserisci un numero valido";
+    }
+    function onClearResponse() {
+        operatorResponse.value = "";
+        clearOperatorTranslation();
+        transcribeStatus.innerText = "🧹 Traduzione cancellata";
+        setTimeout(() => transcribeStatus.innerText = "", 2000);
     }
     function backHome() {
         emergencyPage.classList.add("hidden");
@@ -1347,8 +1414,8 @@
         audioItBtn.addEventListener('click', speakItalian);
         audioFrBtn.addEventListener('click', speakFrench);
         backHomeBtn.addEventListener('click', backHome);
-        listenResponseBtn.addEventListener('click', startListening15s);
-        clearResponseBtn.addEventListener('click', () => { operatorResponse.value = ""; transcribeStatus.innerText = ""; });
+        listenResponseBtn.addEventListener('click', startListening30s);
+        clearResponseBtn.addEventListener('click', onClearResponse);
         modalCreateBtn.addEventListener('click', addNewNormalNote);
         modalCancelBtn.addEventListener('click', closeModal);
         modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
