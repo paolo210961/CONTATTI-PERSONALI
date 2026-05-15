@@ -142,7 +142,7 @@
             margin-bottom: 8px;
             font-weight: bold;
             font-size: 0.9rem;
-            color: #b45309;
+            color: #c62828;   /* MODIFICA: colore rosso */
         }
         .flex-row {
             display: flex;
@@ -291,6 +291,22 @@
             padding-top: 12px;
             border-top: 1px solid #e9ecef;
         }
+
+        /* MODIFICHE RICHIESTE */
+        #saveNumberBtn {
+            background: #283593 !important;  /* blu indaco */
+        }
+        #geolocationBtn {
+            background: #283593 !important;  /* blu indaco */
+        }
+        #googleMapsBtn {
+            background: white !important;
+            color: black !important;
+            border: 2px solid black !important;
+            font-weight: bold !important;
+            box-shadow: none !important;
+            margin: 4px 0;
+        }
     </style>
 </head>
 <body>
@@ -324,12 +340,12 @@
         <div class="service-label-styled">Numero servizio</div>
         <div class="flex-row">
             <input type="tel" id="phoneNumber" placeholder="Numero" style="flex:2;">
-            <button id="saveNumberBtn" class="small-btn btn-secondary" style="flex:0.4;">SALVA</button>
+            <button id="saveNumberBtn" class="small-btn" style="flex:0.4;">SALVA</button>
         </div>
         <div id="phoneSaveMsg" class="status-msg"></div>
 
-        <button id="googleMapsBtn" class="small-btn btn-secondary" style="width:100%; margin:4px 0;">🗺️ APRI GOOGLE MAPS</button>
-        <button id="geolocationBtn" class="small-btn btn-gps" style="width:100%; margin:4px 0;">📍 CARICA POSIZIONE + INDIRIZZO</button>
+        <button id="googleMapsBtn" class="small-btn" style="width:100%; margin:4px 0;">🗺️ APRI GOOGLE MAPS</button>
+        <button id="geolocationBtn" class="small-btn" style="width:100%; margin:4px 0;">📍 CARICA POSIZIONE + INDIRIZZO</button>
 
         <div id="coordsContainer" class="info-card">
             <div><strong>📌 COORDINATE:</strong> <span id="latLonDisplay">---</span></div>
@@ -406,11 +422,13 @@
 </div>
 
 <script>
-    // ==================== VERSIONE 0182 ====================
-    // - Home: intestazione "SOS-EMERGENZE"
-    // - Aggiunta riga informativa con nome file backup
-    // - Pulsanti SALVA NOTE (blu indaco) e RIPRISTINA NOTE (verde oliva) sotto il testo
-    // - Emergency invariata
+    // ==================== VERSIONE 0182 MODIFICATA ====================
+    // - Esportazione include numeri di telefono
+    // - Importazione ripristina numeri di telefono
+    // - Colore rosso per "Numero servizio"
+    // - Pulsante SALVA blu indaco
+    // - Pulsante Google Maps: bordo nero, sfondo bianco, testo nero grassetto
+    // - Pulsante CARICA POSIZIONE blu indaco
     // =================================================================
 
     const CURRENT_VERSION = "0182";
@@ -1079,9 +1097,16 @@
     function speakItalian() { speakFull('it'); }
     function speakFrench() { speakFull('fr'); }
 
-    // ---------- ESPORTA / IMPORTA (tutti i servizi) ----------
+    // ---------- ESPORTA / IMPORTA (tutti i servizi + numeri) ----------
     function exportAllNotes() {
         let content = "";
+        // ESPORTA NUMERI DI TELEFONO
+        content += "[NUMERI TELEFONO]\n";
+        for (let s of services) {
+            let phone = getPhone(s) || defaultPhone[s];
+            content += `${s.toUpperCase()}=${phone}\n`;
+        }
+        content += "\n";
         for (let s of services) {
             content += `[SERVIZIO: ${s.toUpperCase()}]\n`;
             content += `--- NOTE NORMALI ---\n`;
@@ -1106,9 +1131,10 @@
         a.download = `sos_notes_backup_${CURRENT_VERSION}.txt`;
         a.click();
         URL.revokeObjectURL(a.href);
-        gpsStatus.innerHTML = "📁 Backup completo salvato (tutti i servizi).";
+        gpsStatus.innerHTML = "📁 Backup completo salvato (note + numeri).";
         setTimeout(() => gpsStatus.innerHTML = "✅ Pronto.", 2000);
     }
+
     function importAllNotes(file) {
         const reader = new FileReader();
         reader.onload = (e) => {
@@ -1122,9 +1148,24 @@
                 newSpecial[s] = [];
             }
             let currentTitle = "", currentDesc = "";
+            let inPhoneSection = false;
+
             for (let line of lines) {
                 line = line.trim();
+                if (line === "[NUMERI TELEFONO]") {
+                    inPhoneSection = true;
+                    continue;
+                }
+                if (inPhoneSection && line.match(/^[A-Z]+=/)) {
+                    let [key, value] = line.split('=');
+                    let serv = key.toLowerCase();
+                    if (services.includes(serv) && value) {
+                        savePhone(serv, value);
+                    }
+                    continue;
+                }
                 if (line.startsWith("[SERVIZIO:")) {
+                    inPhoneSection = false;
                     const match = line.match(/\[SERVIZIO:\s*(\w+)\]/i);
                     if (match) {
                         currentServiceImport = match[1].toLowerCase();
@@ -1175,8 +1216,10 @@
             if (currentService) {
                 loadCurrentServiceNotes();
                 enforceMutualExclusion();
+                // Aggiorna il campo telefono visualizzato
+                phoneInput.value = getPhone(currentService) || defaultPhone[currentService];
             }
-            gpsStatus.innerHTML = "✅ Note ripristinate da file (tutti i servizi).";
+            gpsStatus.innerHTML = "✅ Note e numeri ripristinati da file.";
             setTimeout(() => gpsStatus.innerHTML = "✅ Pronto.", 2000);
         };
         reader.readAsText(file, "UTF-8");
