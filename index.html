@@ -244,8 +244,11 @@
             margin-right: 6px;
             font-size: 1.2rem;
         }
+        /* Pulsante Torna Indietro (arancione intenso) */
         .back-home {
-            background: #283593 !important;
+            background: #e67e22 !important;
+            color: white;
+            margin: 16px 0;
         }
         .listen-btn {
             background: #283593 !important;
@@ -274,7 +277,6 @@
         .operator-header-btn:active {
             transform: none;
         }
-        /* Riga con tasti ASCOLTA e CANCELLA */
         .listen-row {
             display: flex;
             gap: 10px;
@@ -337,6 +339,7 @@
             .note-title-btn { font-size: 0.75rem; padding: 6px 8px; min-width: 80px; }
             .listen-row { gap: 6px; }
             .clear-btn { padding: 12px 10px; }
+            .back-home { margin: 12px 0; }
         }
         .version-footer {
             text-align: center;
@@ -376,7 +379,6 @@
             margin-top: 8px;
             color: #1a237e;
         }
-        /* Riga tre pulsanti con ordine: LEGGI in IT (sinistra), COPIA (centro), LEGGI in FR (destra) */
         .action-row {
             display: flex;
             gap: 10px;
@@ -438,6 +440,7 @@
             </div>
         </div>
 
+        <!-- BLOCCO NOTE NORMALI -->
         <div class="dark-card">
             <button id="addNoteBtn" class="small-btn add-note-btn">
                 <span>🚑 AGGIUNGI NOTA NORMALE</span>
@@ -449,6 +452,10 @@
             </div>
         </div>
 
+        <!-- PULSANTE TORNA INDIETRO (posizionato tra i due blocchi note) -->
+        <button id="backHomeBtn" class="small-btn back-home" style="width:100%;">◀ TORNA INDIETRO</button>
+
+        <!-- BLOCCO NOTE SPECIALI -->
         <div class="dark-card">
             <button id="addSpecialNoteBtn" class="small-btn add-note-btn">
                 <span>🏠 AGGIUNGI NOTA SPECIALE</span>
@@ -462,20 +469,16 @@
 
         <!-- NUOVO LAYOUT PER OPERATORE -->
         <div class="dark-card">
-            <!-- Riga 1: ASCOLTA OPERATORE (sinistra, doppia altezza) e CANCELLA (destra, doppia altezza) -->
             <div class="listen-row">
                 <button id="listenResponseBtn" class="small-btn listen-btn double-height">🎤 ASCOLTA OPERATORE</button>
                 <button id="clearResponseBtn" class="small-btn clear-btn double-height">🗑️ CANCELLA</button>
             </div>
             <div id="listenInfoMsg" class="temp-message" style="display:none;"></div>
 
-            <!-- Riga 2: pulsante disabilitato "RISPOSTA OPERATORE tradotto in ITALIANO" (larghezza piena) -->
             <button class="small-btn operator-header-btn" disabled>🎧 RISPOSTA OPERATORE tradotto in ITALIANO</button>
 
-            <!-- Riga 3: textarea -->
             <textarea id="operatorResponse" rows="3" readonly placeholder="Traduzione italiana"></textarea>
 
-            <!-- Riga 4: tre pulsanti con ordine: LEGGI in IT (sinistra), COPIA (centro), LEGGI in FR (destra) -->
             <div class="action-row">
                 <button id="audioItBtn" class="small-btn audio-lang-btn double-height">LEGGI in IT</button>
                 <button id="copyBtn" class="small-btn copy-btn double-height">COPIA</button>
@@ -485,7 +488,6 @@
             <div id="transcribeStatus" class="status-msg"></div>
         </div>
 
-        <button id="backHomeBtn" class="small-btn back-home" style="width:100%;">◀ TORNA INDIETRO</button>
         <div class="version-footer">versione 0182 – ascolto 30s, traduzione persistente, layout operatore ridisegnato</div>
     </div>
 
@@ -520,11 +522,9 @@
 
 <script>
     // ==================== VERSIONE 0182 FINALE ====================
-    // - Layout operatore ridisegnato:
-    //   * Riga1: ASCOLTA OPERATORE (doppia altezza) + CANCELLA (doppia altezza)
-    //   * Riga2: pulsante disabilitato "🎧 RISPOSTA OPERATORE tradotto in ITALIANO"
-    //   * Riga3: textarea
-    //   * Riga4: LEGGI in IT (sinistra), COPIA (centro), LEGGI in FR (destra) tutti doppia altezza
+    // - Pulsante TORNA INDIETRO posizionato tra blocchi NOTE NORMALI e NOTE SPECIALI
+    // - Colore arancione intenso
+    // - Layout operatore con ASCOLTA e CANCELLA in alto, poi intestazione, textarea e tre pulsanti
     // - Tutte le funzionalità invariate
     // =================================================================
 
