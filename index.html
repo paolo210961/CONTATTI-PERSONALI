@@ -120,9 +120,6 @@
         .btn-audio {
             background: #8e24aa;
         }
-        .btn-gps {
-            background: #2e7d32;
-        }
         .small-btn {
             padding: 10px 14px;
             font-size: 0.9rem;
@@ -134,15 +131,20 @@
             flex: 1;
             text-align: center;
         }
+        /* NUOVI STILI PER I BLOCCHI CON SFONDO GRIGIO SCURO E BAFFO SINISTRO */
+        .dark-card {
+            background: #d2d6dc;  /* tonalità grigio più scura */
+            border-left: 6px solid #2c3e50;
+            border-radius: 24px;
+            padding: 16px;
+            margin: 16px 0;
+        }
         .service-label-styled {
-            background: #fff3e0;
-            border-left: 6px solid #ff9800;
-            border-radius: 48px;
-            padding: 8px 16px;
-            margin-bottom: 8px;
             font-weight: bold;
             font-size: 0.9rem;
-            color: #c62828;   /* MODIFICA: colore rosso */
+            color: #c62828;
+            margin-bottom: 8px;
+            display: block;
         }
         .flex-row {
             display: flex;
@@ -281,6 +283,7 @@
             .small-btn { padding: 8px 12px; font-size: 0.8rem; }
             h1 { font-size: 1.6rem; }
             .info-card { padding: 10px; font-size: 0.85rem; }
+            .dark-card { padding: 12px; }
         }
         .id-badge { display: none; }
         .version-footer {
@@ -322,7 +325,6 @@
             <button class="big-btn" data-service="clinica">🏥 CLINICA</button>
         </div>
         <p style="text-align:center; font-size:0.75rem; color:#555;">Ogni servizio ha il proprio archivio note.<br>📍 Ricerca entro 300m di TUTTI i luoghi con nome<br>🔊 Ascolto automatico 15 secondi dopo il messaggio</p>
-        <!-- Informazione aggiuntiva sul nome del file di backup -->
         <p style="text-align:center; font-size:0.7rem; color:#2c3e66; margin-top:8px;">💾 Il file SALVA NOTE si chiama: sos_notes_backup_0182.txt</p>
         <div class="export-import-row">
             <button id="exportAllBtn">💾 SALVA NOTE</button>
@@ -332,28 +334,34 @@
         <div class="version-footer">versione 0182 – nome file backup indicato, intestazione aggiornata</div>
     </div>
 
-    <!-- EMERGENCY PAGE (identica alla versione 0181) -->
+    <!-- EMERGENCY PAGE (senza version-header, con blocchi dark-card) -->
     <div id="emergencyPage" class="page hidden">
-        <div class="version-header">📟 SOS-EMERGENZE v0182 – Logo singolo</div>
+        <!-- RIMOSSO IL DIV .version-header -->
         <div id="currentServiceDeco" class="current-service-deco">🚑 AMBULANZA</div>
 
-        <div class="service-label-styled">Numero servizio</div>
-        <div class="flex-row">
-            <input type="tel" id="phoneNumber" placeholder="Numero" style="flex:2;">
-            <button id="saveNumberBtn" class="small-btn" style="flex:0.4;">SALVA</button>
+        <!-- BLOCCO 1: NUMERO SERVIZIO + TELEFONO + SALVA -->
+        <div class="dark-card">
+            <div class="service-label-styled">Numero servizio</div>
+            <div class="flex-row">
+                <input type="tel" id="phoneNumber" placeholder="Numero" style="flex:2;">
+                <button id="saveNumberBtn" class="small-btn" style="flex:0.4;">SALVA</button>
+            </div>
+            <div id="phoneSaveMsg" class="status-msg"></div>
         </div>
-        <div id="phoneSaveMsg" class="status-msg"></div>
 
         <button id="googleMapsBtn" class="small-btn" style="width:100%; margin:4px 0;">🗺️ APRI GOOGLE MAPS</button>
-        <button id="geolocationBtn" class="small-btn" style="width:100%; margin:4px 0;">📍 CARICA POSIZIONE + INDIRIZZO</button>
 
-        <div id="coordsContainer" class="info-card">
-            <div><strong>📌 COORDINATE:</strong> <span id="latLonDisplay">---</span></div>
-            <div><strong>🏠 INDIRIZZO:</strong> <span id="addressDisplay">---</span></div>
-            <div><strong>📍 SONO VICINO A (1):</strong> <span id="refADisplay">---</span></div>
-            <div><strong>📍 SONO VICINO A (2):</strong> <span id="refBDisplay">---</span></div>
-            <div><strong>📍 SONO VICINO A (3):</strong> <span id="refCDisplay">---</span></div>
-            <div id="gpsStatus" class="status-msg"></div>
+        <!-- BLOCCO 2: CARICA POSIZIONE + INDIRIZZO + INFORMAZIONI COORDINATE -->
+        <div class="dark-card">
+            <button id="geolocationBtn" class="small-btn" style="width:100%; margin-bottom:12px;">📍 CARICA POSIZIONE + INDIRIZZO</button>
+            <div id="coordsContainer" style="margin-top:8px;">
+                <div><strong>📌 COORDINATE:</strong> <span id="latLonDisplay">---</span></div>
+                <div><strong>🏠 INDIRIZZO:</strong> <span id="addressDisplay">---</span></div>
+                <div><strong>📍 SONO VICINO A (1):</strong> <span id="refADisplay">---</span></div>
+                <div><strong>📍 SONO VICINO A (2):</strong> <span id="refBDisplay">---</span></div>
+                <div><strong>📍 SONO VICINO A (3):</strong> <span id="refCDisplay">---</span></div>
+                <div id="gpsStatus" class="status-msg"></div>
+            </div>
         </div>
 
         <button id="addNoteBtn" class="small-btn" style="background:#ff9800; width:100%; margin:8px 0;">🚑 AGGIUNGI NOTA NORMALE</button>
@@ -389,10 +397,10 @@
         </div>
 
         <button id="backHomeBtn" class="small-btn back-home" style="width:100%;">◀ TORNA INDIETRO</button>
-        <div class="version-footer">versione 0182 – logo singolo, etichetta Numero servizio in stile note normali</div>
+        <div class="version-footer">versione 0182 – layout con blocchi grigi</div>
     </div>
 
-    <!-- MODALI per aggiunta note -->
+    <!-- MODALI per aggiunta note (invariate) -->
     <div id="noteModal" class="modal" style="display:none;">
         <div class="modal-content">
             <h3>➕ Nuova Nota Normale</h3>
@@ -423,12 +431,11 @@
 
 <script>
     // ==================== VERSIONE 0182 MODIFICATA ====================
-    // - Esportazione include numeri di telefono
-    // - Importazione ripristina numeri di telefono
-    // - Colore rosso per "Numero servizio"
-    // - Pulsante SALVA blu indaco
-    // - Pulsante Google Maps: bordo nero, sfondo bianco, testo nero grassetto
-    // - Pulsante CARICA POSIZIONE blu indaco
+    // - Rimossa intestazione nella pagina emergenza
+    // - Blocchi con sfondo grigio scuro e bordo sinistro scuro per:
+    //   1) Numero servizio + telefono + SALVA
+    //   2) Pulsante CARICA POSIZIONE + informazioni coordinate
+    // - Tutte le funzionalità precedenti invariate
     // =================================================================
 
     const CURRENT_VERSION = "0182";
