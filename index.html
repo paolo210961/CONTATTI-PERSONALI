@@ -295,25 +295,18 @@
         </div>
 
         <!-- AREA NOTE SPECIALI -->
-<div id="specialNotesArea" class="special-note-area">
-
-    <label>📌 NOTE SPECIALI</label>
-
-    <button id="addSpecialNoteBtn"
-        class="small-btn"
-        style="background:#4caf50; width:100%; margin:8px 0;">
-        ➕ AGGIUNGI NOTA SPECIALE
-    </button>
-
-    <div id="specialNotesListArea">
-        <div style="font-size:0.7rem; color:#777;">
-            Nessuna nota speciale.
+        <div id="specialNotesArea" class="special-note-area">
+            <label>📌 NOTE SPECIALI (solo testo - ignorano coordinate)</label>
+            <div class="flex-row">
+                <input type="text" id="specialNote1" placeholder="Nota speciale 1" style="flex:3;">
+                <button id="selectSpecial1Btn" class="small-btn" style="background:#4caf50;">✔️ SELEZIONA 1</button>
+            </div>
+            <div class="flex-row">
+                <input type="text" id="specialNote2" placeholder="Nota speciale 2" style="flex:3;">
+                <button id="selectSpecial2Btn" class="small-btn" style="background:#4caf50;">✔️ SELEZIONA 2</button>
+            </div>
+            <div id="specialNoteStatus" class="status-msg"></div>
         </div>
-    </div>
-
-    <div id="specialNoteStatus" class="status-msg"></div>
-
-</div>    
 
         <div class="import-export">
             <button id="exportNotesBtn" class="small-btn" style="background:#4caf50;">💾 ESPORTA TXT</button>
@@ -377,8 +370,6 @@
     let selectedSpecialMode = false;
     let selectedSpecialText = "";
     let wakeLock = null;
-    let specialNotesArray = [];
-    let selectedSpecialNoteId = null;
 
     // DOM elements
     const homePage = document.getElementById('homePage');
@@ -396,8 +387,6 @@
     const gpsStatus = document.getElementById('gpsStatus');
     const addNoteBtn = document.getElementById('addNoteBtn');
     const notesListArea = document.getElementById('notesListArea');
-    const addSpecialNoteBtn = document.getElementById('addSpecialNoteBtn');
-    const specialNotesListArea = document.getElementById('specialNotesListArea');
     const copyBtn = document.getElementById('copyBtn');
     const audioItBtn = document.getElementById('audioItBtn');
     const audioFrBtn = document.getElementById('audioFrBtn');
@@ -410,6 +399,10 @@
     const listenResponseBtn = document.getElementById('listenResponseBtn');
     const clearResponseBtn = document.getElementById('clearResponseBtn');
     const transcribeStatus = document.getElementById('transcribeStatus');
+    const specialNote1 = document.getElementById('specialNote1');
+    const specialNote2 = document.getElementById('specialNote2');
+    const selectSpecial1Btn = document.getElementById('selectSpecial1Btn');
+    const selectSpecial2Btn = document.getElementById('selectSpecial2Btn');
     const specialNoteStatus = document.getElementById('specialNoteStatus');
     const normalNoteInfo = document.getElementById('normalNoteInfo');
     const modal = document.getElementById('noteModal');
@@ -538,109 +531,9 @@
     }
     function getNoteKey(s) { return `sos_notes_${s}_${CURRENT_VERSION}`; }
     function getSelectedKey(s) { return `sos_selected_note_${s}_${CURRENT_VERSION}`; }
-    function getSpecialNoteKey(s) {
-    return `sos_special_notes_${s}_${CURRENT_VERSION}`;
-}
-
-function getSelectedSpecialKey(s) {
-    return `sos_selected_special_note_${s}_${CURRENT_VERSION}`;
-}
     function saveNotes() {
-
-    if (!currentService) return;
-
-    localStorage.setItem(
-        getSpecialNoteKey(currentService),
-        JSON.stringify(specialNotesArray)
-    );
-
-    if (selectedSpecialNoteId) {
-
-        localStorage.setItem(
-            getSelectedSpecialKey(currentService),
-            selectedSpecialNoteId
-        );
-
-    } else {
-
-        localStorage.removeItem(
-            getSelectedSpecialKey(currentService)
-        );
-    }
-}
-
-function loadSpecialNotes(service) {
-
-    let stored =
-        localStorage.getItem(
-            getSpecialNoteKey(service)
-        );
-
-    if (stored) {
-
-        try {
-
-            specialNotesArray =
-                JSON.parse(stored);
-
-            let savedId =
-                localStorage.getItem(
-                    getSelectedSpecialKey(service)
-                );
-
-            if (
-                savedId &&
-                specialNotesArray.some(
-                    n => String(n.id) === savedId
-                )
-            ) {
-
-                selectedSpecialNoteId =
-                    savedId;
-
-            } else {
-
-                selectedSpecialNoteId = null;
-            }
-
-        } catch(e) {
-
-            specialNotesArray = [];
-            selectedSpecialNoteId = null;
-        }
-
-    } else {
-
-        specialNotesArray = [];
-        selectedSpecialNoteId = null;
-    }
-
-renderSpecialNotes();
-}
-
-function saveNotes() {
-
-    if (!currentService) return;
-
-    localStorage.setItem(
-        getNoteKey(currentService),
-        JSON.stringify(notesArray)
-    );
-
-    if (selectedNoteId) {
-
-        localStorage.setItem(
-            getSelectedKey(currentService),
-            selectedNoteId
-        );
-
-    } else {
-
-        localStorage.removeItem(
-            getSelectedKey(currentService)
-        );
-    }
-}        localStorage.setItem(getNoteKey(currentService), JSON.stringify(notesArray));
+        if (!currentService) return;
+        localStorage.setItem(getNoteKey(currentService), JSON.stringify(notesArray));
         if (selectedNoteId) localStorage.setItem(getSelectedKey(currentService), selectedNoteId);
         else localStorage.removeItem(getSelectedKey(currentService));
     }
@@ -735,146 +628,6 @@ function saveNotes() {
                 setTimeout(()=> gpsStatus.innerHTML = "✅ Pronto.", 2000);
             }
         });
-                // EVENTI NOTE SPECIALI
-
-        specialNotesListArea.addEventListener('change', (e) => {
-
-            if (
-                e.target &&
-                e.target.type === 'radio' &&
-                e.target.name === 'specialNoteSelect'
-            ) {
-
-                selectedSpecialMode = true;
-
-                selectedSpecialNoteId =
-                    e.target.value;
-
-                selectedNoteId = null;
-
-                const note =
-                    specialNotesArray.find(
-                        n => String(n.id) === String(selectedSpecialNoteId)
-                    );
-
-                selectedSpecialText =
-                    note
-                    ? note.description
-                    : "";
-
-                specialNoteStatus.innerText =
-                    "✅ Nota speciale selezionata";
-
-                setTimeout(() => {
-                    specialNoteStatus.innerText = "";
-                }, 3000);
-
-                normalNoteInfo.style.display = 'none';
-            }
-        });
-
-        specialNotesListArea.addEventListener('click', (e) => {
-
-            const btn = e.target;
-
-            // MODIFICA
-
-            if (
-                btn.classList &&
-                btn.classList.contains('edit-special-note-btn')
-            ) {
-
-                e.stopPropagation();
-
-                const parentDiv =
-                    btn.closest('.note-item');
-
-                if (!parentDiv) return;
-
-                const noteId =
-                    parentDiv.getAttribute('data-special-id');
-
-                const note =
-                    specialNotesArray.find(
-                        n => String(n.id) === noteId
-                    );
-
-                if (!note) return;
-
-                let newTitle =
-                    prompt(
-                        "Modifica titolo:",
-                        note.title
-                    );
-
-                if (newTitle === null) return;
-
-                let newDesc =
-                    prompt(
-                        "Modifica testo:",
-                        note.description
-                    );
-
-                if (newDesc === null) return;
-
-                note.title =
-                    newTitle.trim() || "Nota speciale";
-
-                note.description =
-                    newDesc.trim() || "";
-
-                renderSpecialNotes();
-
-                specialNoteStatus.innerText =
-                    "✅ Nota speciale modificata";
-
-                setTimeout(() => {
-                    specialNoteStatus.innerText = "";
-                }, 3000);
-            }
-
-            // CANCELLA
-
-            else if (
-                btn.classList &&
-                btn.classList.contains('delete-special-note-btn')
-            ) {
-
-                e.stopPropagation();
-
-                const parentDiv =
-                    btn.closest('.note-item');
-
-                if (!parentDiv) return;
-
-                const noteId =
-                    parentDiv.getAttribute('data-special-id');
-
-                specialNotesArray =
-                    specialNotesArray.filter(
-                        n => String(n.id) !== noteId
-                    );
-
-                if (
-                    String(selectedSpecialNoteId)
-                    === noteId
-                ) {
-
-                    selectedSpecialNoteId = null;
-                    selectedSpecialText = "";
-                    selectedSpecialMode = false;
-                }
-
-                renderSpecialNotes();
-
-                specialNoteStatus.innerText =
-                    "✅ Nota speciale eliminata";
-
-                setTimeout(() => {
-                    specialNoteStatus.innerText = "";
-                }, 3000);
-            }
-        });
     }
 
     function addNewNoteFromModal() {
@@ -907,96 +660,18 @@ function saveNotes() {
     }
     function escapeHtml(str) { return str.replace(/[&<>]/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;' }[m])); }
 
-// ---------- NOTE SPECIALI ----------
-
-
-function renderSpecialNotes() {
-
-    const area = document.getElementById('specialNotesListArea');
-
-    if (!specialNotesArray.length) {
-
-        area.innerHTML = `
-            <div style="font-size:0.7rem; color:#777;">
-                Nessuna nota speciale.
-            </div>
-        `;
-
-        return;
+    // ---------- NOTE SPECIALI ----------
+    function selectSpecialNote(index) {
+        let text = (index === 1) ? specialNote1.value.trim() : specialNote2.value.trim();
+        if (!text) { specialNoteStatus.innerText = "⚠️ Scrivi prima la nota speciale"; return; }
+        selectedSpecialMode = true;
+        selectedSpecialText = text;
+        selectedNoteId = null;
+        specialNoteStatus.innerText = `✅ Nota speciale ${index} selezionata (solo testo)`;
+        setTimeout(()=> specialNoteStatus.innerText="", 10000);
+        normalNoteInfo.style.display = 'none';
     }
 
-    let html = '';
-
-    specialNotesArray.forEach((note, idx) => {
-
-        const checked =
-            String(selectedSpecialNoteId) === String(note.id)
-            ? 'checked'
-            : '';
-
-        html += `
-            <div class="note-item"
-                 data-special-id="${note.id}">
-
-                <input
-                    type="radio"
-                    name="specialNoteSelect"
-                    value="${note.id}"
-                    ${checked}>
-
-                <span class="note-title">
-                    ⭐ ${idx + 1} - ${escapeHtml(note.title)}
-                </span>
-
-                <button
-                    class="edit-special-note-btn small-btn"
-                    style="background:#66bb6a;">
-                    ✏️
-                </button>
-
-                <button
-                    class="delete-special-note-btn small-btn"
-                    style="background:#ef5350;">
-                    🗑️
-                </button>
-
-            </div>
-        `;
-    });
-
-    area.innerHTML = html;
-}
-
-function addSpecialNote() {
-
-    let title = prompt("Titolo nota speciale:");
-
-    if (title === null) return;
-
-    let description = prompt("Testo nota speciale:");
-
-    if (description === null) return;
-
-    let newId =
-        Date.now() +
-        Math.floor(Math.random() * 10000);
-
-    specialNotesArray.push({
-        id: newId,
-        title: title.trim() || "Nota speciale",
-        description: description.trim() || ""
-    });
-
-    saveSpecialNotes();
-    renderSpecialNotes();
-
-    specialNoteStatus.innerText =
-        "✅ Nota speciale aggiunta";
-
-    setTimeout(() => {
-        specialNoteStatus.innerText = "";
-    }, 3000);
-}
     // ---------- COPIA BILINGUE ----------
     async function getBilingualCopy() {
         let noteIT = getSelectedNoteDescription() || "nessuna nota";
@@ -1037,10 +712,6 @@ function addSpecialNote() {
         }
     }
 
-    /* =====================================================
-       BLOCCO 2 — GPS / MAPPE / POSIZIONE
-    ===================================================== */
-    
     // ---------- GEOLOCALIZZAZIONE + RICERCA ESTESA ----------
     function haversine(lat1,lng1,lat2,lng2) {
         const R = 6371e3;
@@ -1290,18 +961,13 @@ function addSpecialNote() {
         reader.readAsText(file,"UTF-8");
     }
 
-    /* =====================================================
-         BLOCCO 1 — HOME / NAVIGAZIONE
-    ===================================================== */
-    
-    // ---------- SHOW EMERGENCY ----------    
+    // ---------- SHOW EMERGENCY ----------
     function showEmergency(s) {
         currentService = s;
         let label = {ambulanza:"🚑 AMBULANZA", polizia:"👮 POLIZIA", veterinario:"🐾 VETERINARIO", clinica:"🏥 CLINICA"}[s];
         serviceTitleSpan.innerText = label;
         phoneInput.value = getPhone(s) || defaultPhone[s];
         loadNotes(s);
-        loadSpecialNotes(s);
         resetCoords();
         homePage.classList.add("hidden");
         emergencyPage.classList.remove("hidden");
@@ -1326,10 +992,6 @@ function addSpecialNote() {
         releaseWakeLock();
     }
 
-    /* =====================================================
-       BLOCCO 1 — HOME / NAVIGAZIONE
-    ===================================================== */
-    
     function init() {
         migrateOldNotes();
         migratePhoneNumbers();
@@ -1338,7 +1000,6 @@ function addSpecialNote() {
         googleMapsBtn.addEventListener('click', () => window.open("https://maps.google.com", "_blank"));
         geolocationBtn.addEventListener('click', getLocationAndAddress);
         addNoteBtn.addEventListener('click', showAddNoteModal);
-        addSpecialNoteBtn.addEventListener('click', addSpecialNote);
         copyBtn.addEventListener('click', copyBilingual);
         audioItBtn.addEventListener('click', speakItalian);
         audioFrBtn.addEventListener('click', speakFrench);
@@ -1348,6 +1009,8 @@ function addSpecialNote() {
         importFileInput.addEventListener('change', (e) => { if (e.target.files.length) importTxt(e.target.files[0]); importFileInput.value = ''; });
         listenResponseBtn.addEventListener('click', startListening15s);
         clearResponseBtn.addEventListener('click', () => { operatorResponse.value = ""; transcribeStatus.innerText = ""; });
+        selectSpecial1Btn.addEventListener('click', () => selectSpecialNote(1));
+        selectSpecial2Btn.addEventListener('click', () => selectSpecialNote(2));
         modalCreateBtn.addEventListener('click', addNewNoteFromModal);
         modalCancelBtn.addEventListener('click', closeModal);
         modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
