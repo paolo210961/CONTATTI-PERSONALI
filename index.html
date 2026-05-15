@@ -111,9 +111,6 @@
         #importAllBtn {
             background: #558b2f;
         }
-        .btn-secondary {
-            background: #1976d2;
-        }
         .small-btn {
             padding: 8px 12px;
             font-size: 0.85rem;
@@ -124,6 +121,7 @@
             border: none;
             text-align: center;
             transition: 0.05s linear;
+            white-space: nowrap;
         }
         .small-btn:active {
             transform: scale(0.97);
@@ -136,7 +134,6 @@
             padding: 16px;
             margin: 16px 0;
         }
-        /* Stile per titoli interni ai blocchi (es. "Numero servizio", "Seleziona nota normale:") */
         .section-title {
             font-weight: bold;
             font-size: 0.9rem;
@@ -151,13 +148,6 @@
             flex-wrap: wrap;
             margin: 12px 0;
         }
-        .flex-between {
-            display: flex;
-            justify-content: space-between;
-            align-items: baseline;
-            gap: 8px;
-            flex-wrap: wrap;
-        }
         input, textarea {
             width: 100%;
             padding: 12px 16px;
@@ -167,7 +157,7 @@
             background: #fff;
             font-family: monospace;
         }
-        /* STILE PER LE NOTE (senza sfondo arancione, direttamente su dark-card) */
+        /* STILE PER LE NOTE - Nuovo ordine: Modifica, Cancella, Titolo, Conferma */
         .note-item, .special-note-item {
             background: transparent;
             padding: 10px 0;
@@ -178,40 +168,44 @@
             flex-wrap: wrap;
             border-bottom: 1px solid rgba(0,0,0,0.1);
         }
-        .note-title, .special-note-title {
-            font-weight: bold;
-            font-size: 0.9rem;
-            background: none;
-            border: none;
-            padding: 0;
-            margin-right: auto;
+        .note-actions-left {
+            display: flex;
+            gap: 8px;
+            flex-shrink: 0;
+        }
+        .note-actions-right {
+            display: flex;
+            gap: 8px;
+            flex-shrink: 1;
+            min-width: 0;
             flex: 1;
-            color: #1e1e2f;
+            justify-content: flex-end;
         }
-        .special-note-title {
-            color: #1b5e20;
+        /* Nuovo ordine: prima titolo (flessibile), poi conferma (fisso) */
+        .note-right-group {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex: 1;
+            justify-content: flex-end;
         }
-        /* PULSANTI NOTE */
-        .edit-note-btn {
+        .edit-note-btn, .edit-special-note-btn {
             background: #6b8e23; /* verde oliva */
-            color: white;
         }
-        .delete-note-btn {
+        .delete-note-btn, .delete-special-note-btn {
             background: #8e44ad; /* viola */
-            color: white;
         }
         .confirm-note-btn {
             background: #283593; /* blu indaco */
-            color: white;
-            position: relative;
+            width: 40px;
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            gap: 8px;
+            flex-shrink: 0;
         }
         .confirm-note-btn .dot {
-            width: 12px;
-            height: 12px;
+            width: 16px;
+            height: 16px;
             border-radius: 50%;
             background-color: #283593;
             display: inline-block;
@@ -220,43 +214,78 @@
         .confirm-note-btn.selected .dot {
             background-color: white;
         }
+        /* Pulsante Titolo Nota: sfondo bianco, testo nero, non editabile */
+        .note-title-btn {
+            background: white;
+            color: black;
+            cursor: default;
+            opacity: 1;
+            flex: 1;
+            min-width: 100px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            text-align: left;
+            padding: 8px 12px;
+            border: 1px solid #ced4da;
+            font-weight: normal;
+        }
+        .note-title-btn:active {
+            transform: none;
+        }
+        /* Pulsanti Aggiungi Nota con pallino bianco */
         .add-note-btn {
             background: #283593 !important;
             color: white;
             width: 100%;
             margin-bottom: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 16px;
         }
-        /* Pulsante Torna Indietro */
+        .add-note-btn span:first-child {
+            text-align: left;
+        }
+        .add-note-btn span:last-child::before {
+            content: "●";
+            margin-right: 6px;
+            font-size: 1.2rem;
+        }
         .back-home {
-            background: #283593 !important; /* blu indaco */
+            background: #283593 !important;
         }
-        /* Pulsanti area risposta operatore */
         .listen-btn {
-            background: #283593 !important; /* blu indaco */
+            background: #283593 !important;
         }
         .clear-btn {
-            background: #8e44ad !important; /* viola */
+            background: #8e44ad !important;
         }
         .copy-btn {
-            background: #283593 !important; /* blu indaco */
+            background: #283593 !important;
         }
         .audio-lang-btn {
-            background: #6b8e23 !important; /* verde oliva */
+            background: #6b8e23 !important;
+        }
+        /* Pulsante intestazione operatore (non editabile, blu) */
+        .operator-header-btn {
+            background: #283593;
+            color: white;
+            width: 100%;
+            margin-bottom: 12px;
+            cursor: default;
+            opacity: 1;
+            font-weight: bold;
+            text-align: center;
+            padding: 10px;
+        }
+        .operator-header-btn:active {
+            transform: none;
         }
         .status-msg {
             font-size: 0.7rem;
             color: #2c3e66;
             margin-top: 6px;
-        }
-        .response-area {
-            background: #f8f9fa;
-            border-radius: 24px;
-            padding: 0;  /* ora gestito internamente */
-        }
-        .response-area textarea {
-            background: white;
-            font-size: 0.85rem;
-            margin-top: 8px;
         }
         .modal {
             position: fixed;
@@ -303,7 +332,9 @@
             h1 { font-size: 1.6rem; }
             .dark-card { padding: 12px; }
             .note-item, .special-note-item { gap: 8px; }
-            .confirm-note-btn .dot { width: 10px; height: 10px; }
+            .confirm-note-btn { width: 36px; }
+            .confirm-note-btn .dot { width: 12px; height: 12px; }
+            .note-title-btn { font-size: 0.75rem; padding: 6px 8px; min-width: 80px; }
         }
         .version-footer {
             text-align: center;
@@ -313,12 +344,7 @@
             padding-top: 12px;
             border-top: 1px solid #e9ecef;
         }
-
-        /* MODIFICHE SPECIFICHE */
-        #saveNumberBtn {
-            background: #283593 !important;
-        }
-        #geolocationBtn {
+        #saveNumberBtn, #geolocationBtn {
             background: #283593 !important;
         }
         #googleMapsBtn {
@@ -329,7 +355,6 @@
             box-shadow: none !important;
             margin: 4px 0;
         }
-        /* Messaggi informativi temporanei */
         .info-message {
             background: #e8f5e9;
             padding: 6px 12px;
@@ -339,10 +364,6 @@
             font-weight: 500;
             color: #2e7d32;
             display: none;
-        }
-        .info-message.special {
-            background: #e8f5e9;
-            color: #1b5e20;
         }
     </style>
 </head>
@@ -399,9 +420,11 @@
 
         <!-- BLOCCO NOTE NORMALI -->
         <div class="dark-card">
-            <button id="addNoteBtn" class="small-btn add-note-btn">🚑 AGGIUNGI NOTA NORMALE</button>
+            <button id="addNoteBtn" class="small-btn add-note-btn">
+                <span>🚑 AGGIUNGI NOTA NORMALE</span>
+                <span>SELEZIONA</span>
+            </button>
             <div id="normalNoteInfo" class="info-message">📌 Nota normale selezionata: verrà letto l'intero messaggio di emergenza</div>
-            <div class="section-title">Seleziona nota normale:</div>
             <div id="notesListArea">
                 <div style="font-size:0.7rem; color:#777;">Nessuna nota normale. Aggiungine una.</div>
             </div>
@@ -409,36 +432,34 @@
 
         <!-- BLOCCO NOTE SPECIALI -->
         <div class="dark-card">
-            <button id="addSpecialNoteBtn" class="small-btn add-note-btn">🏠 AGGIUNGI NOTA SPECIALE</button>
-            <div id="specialNoteInfo" class="info-message special">✨ Nota speciale selezionata: verrà letto solo il testo (ignora coordinate)</div>
-            <div class="section-title">Seleziona nota speciale:</div>
+            <button id="addSpecialNoteBtn" class="small-btn add-note-btn">
+                <span>🏠 AGGIUNGI NOTA SPECIALE</span>
+                <span>SELEZIONA</span>
+            </button>
+            <div id="specialNoteInfo" class="info-message">✨ Nota speciale selezionata: verrà letto solo il testo (ignora coordinate)</div>
             <div id="specialNotesListArea">
                 <div style="font-size:0.7rem; color:#777;">Nessuna nota speciale. Aggiungine una.</div>
             </div>
         </div>
 
-        <!-- BLOCCO RISPOSTA OPERATORE (nuovo contenitore) -->
+        <!-- BLOCCO UNICO: RISPOSTA OPERATORE + TASTI -->
         <div class="dark-card">
-            <div class="section-title">🎧 RISPOSTA OPERATORE in ITALIANO</div>
+            <button class="small-btn operator-header-btn" disabled>🎧 RISPOSTA OPERATORE tradotto in ITALIANO</button>
             <textarea id="operatorResponse" rows="3" readonly placeholder="Traduzione italiana"></textarea>
             <div class="flex-row">
                 <button id="listenResponseBtn" class="small-btn listen-btn">🎤 ASCOLTA OPERATORE 15s</button>
                 <button id="clearResponseBtn" class="small-btn clear-btn">🗑️ CANCELLA</button>
             </div>
-            <div id="transcribeStatus" class="status-msg"></div>
-        </div>
-
-        <!-- BLOCCO TASTI COPIA E LETTURA -->
-        <div class="dark-card">
             <div class="flex-row">
                 <button id="copyBtn" class="small-btn copy-btn">📋 COPIA (FR+IT)</button>
                 <button id="audioItBtn" class="small-btn audio-lang-btn">🔊 LEGGI IT</button>
                 <button id="audioFrBtn" class="small-btn audio-lang-btn">🔊 LEGGI FR</button>
             </div>
+            <div id="transcribeStatus" class="status-msg"></div>
         </div>
 
         <button id="backHomeBtn" class="small-btn back-home" style="width:100%;">◀ TORNA INDIETRO</button>
-        <div class="version-footer">versione 0182 – layout con blocchi grigi, geolocalizzazione manuale</div>
+        <div class="version-footer">versione 0182 – layout unificato operatore</div>
     </div>
 
     <!-- MODALI per aggiunta note -->
@@ -472,11 +493,10 @@
 
 <script>
     // ==================== VERSIONE 0182 MODIFICATA ====================
-    // - Messaggi informativi ripristinati e visibili 15 secondi
-    // - "Numero servizio" stile section-title
-    // - Torna indietro blu indaco
-    // - Nuovo blocco per risposta operatore e pulsanti con colori
-    // - Tutte le funzionalità precedenti mantenute
+    // - Pulsanti "AGGIUNGI NOTA" con pallino bianco al posto del trattino
+    // - Ordine note: Modifica, Cancella, Titolo, Conferma (pallino)
+    // - Pulsante Titolo: sfondo bianco, testo nero
+    // - Unificati i due blocchi inferiori in un unico dark-card con intestazione a pulsante blu non editabile
     // =================================================================
 
     const CURRENT_VERSION = "0182";
@@ -543,7 +563,6 @@
     let recognition = null;
     let recognitionTimeout = null;
 
-    // Funzione per mostrare messaggio temporaneo (15 secondi)
     function showTemporaryMessage(element, duration = 15000) {
         if (!element) return;
         element.style.display = 'block';
@@ -677,29 +696,33 @@
         }
     }
 
-    // ---------- GESTIONE INTERFACCIA ----------
+    // ---------- GESTIONE INTERFACCIA (nuovo ordine note) ----------
     function renderNormalNotes() {
         const notes = normalNotes[currentService] || [];
         if (!notes.length) {
-            notesListArea.innerHTML = `<div style="font-size:0.7rem;">Nessuna nota normale. Aggiungine una.</div>`;
+            notesListArea.innerHTML = `<div style="font-size:0.7rem; color:#777;">Nessuna nota normale. Aggiungine una.</div>`;
             return;
         }
         let html = '';
         notes.forEach((note, idx) => {
             const isSelected = (String(selectedNormalNoteId) === String(note.id));
+            const titleText = note.title && note.title.trim() !== "" ? note.title : "titolo nota";
             html += `
                 <div class="note-item" data-id="${note.id}">
-                    <span class="note-title">${idx+1} - ${escapeHtml(note.title)}</span>
-                    <button class="edit-note-btn small-btn" style="background:#6b8e23;">✏️ Modifica</button>
-                    <button class="delete-note-btn small-btn" style="background:#8e44ad;">🗑️ Cancella</button>
-                    <button class="confirm-note-btn small-btn ${isSelected ? 'selected' : ''}" data-id="${note.id}" data-type="normal">
-                        <span class="dot"></span> Conferma
-                    </button>
+                    <div class="note-actions-left">
+                        <button class="edit-note-btn small-btn">✏️ Modifica</button>
+                        <button class="delete-note-btn small-btn">🗑️ Cancella</button>
+                    </div>
+                    <div class="note-actions-right">
+                        <button class="note-title-btn small-btn" disabled title="${escapeHtml(titleText)}">${escapeHtml(titleText)}</button>
+                        <button class="confirm-note-btn small-btn ${isSelected ? 'selected' : ''}" data-id="${note.id}" data-type="normal">
+                            <span class="dot"></span>
+                        </button>
+                    </div>
                 </div>
             `;
         });
         notesListArea.innerHTML = html;
-        // Event listener per pulsanti conferma normali
         document.querySelectorAll('.confirm-note-btn[data-type="normal"]').forEach(btn => {
             btn.removeEventListener('click', handleNormalConfirm);
             btn.addEventListener('click', handleNormalConfirm);
@@ -716,20 +739,25 @@
     function renderSpecialNotes() {
         const notes = specialNotes[currentService] || [];
         if (!notes.length) {
-            specialNotesListArea.innerHTML = `<div style="font-size:0.7rem;">Nessuna nota speciale. Aggiungine una.</div>`;
+            specialNotesListArea.innerHTML = `<div style="font-size:0.7rem; color:#777;">Nessuna nota speciale. Aggiungine una.</div>`;
             return;
         }
         let html = '';
         notes.forEach((note, idx) => {
             const isSelected = (String(selectedSpecialNoteId) === String(note.id));
+            const titleText = note.title && note.title.trim() !== "" ? note.title : "titolo nota";
             html += `
                 <div class="special-note-item" data-id="${note.id}">
-                    <span class="special-note-title">${idx+1} - ${escapeHtml(note.title)}</span>
-                    <button class="edit-special-note-btn small-btn" style="background:#6b8e23;">✏️ Modifica</button>
-                    <button class="delete-special-note-btn small-btn" style="background:#8e44ad;">🗑️ Cancella</button>
-                    <button class="confirm-note-btn small-btn ${isSelected ? 'selected' : ''}" data-id="${note.id}" data-type="special">
-                        <span class="dot"></span> Conferma
-                    </button>
+                    <div class="note-actions-left">
+                        <button class="edit-special-note-btn small-btn">✏️ Modifica</button>
+                        <button class="delete-special-note-btn small-btn">🗑️ Cancella</button>
+                    </div>
+                    <div class="note-actions-right">
+                        <button class="note-title-btn small-btn" disabled title="${escapeHtml(titleText)}">${escapeHtml(titleText)}</button>
+                        <button class="confirm-note-btn small-btn ${isSelected ? 'selected' : ''}" data-id="${note.id}" data-type="special">
+                            <span class="dot"></span>
+                        </button>
+                    </div>
                 </div>
             `;
         });
@@ -753,10 +781,7 @@
         selectedSpecialMode = false;
         saveSelectedIds();
         renderCurrentNotes();
-        // Mostra messaggio informativo per 15 secondi
-        if (normalNoteInfo) {
-            showTemporaryMessage(normalNoteInfo, 15000);
-        }
+        if (normalNoteInfo) showTemporaryMessage(normalNoteInfo, 15000);
         if (specialNoteInfo) specialNoteInfo.style.display = 'none';
     }
 
@@ -766,9 +791,7 @@
         selectedSpecialMode = true;
         saveSelectedIds();
         renderCurrentNotes();
-        if (specialNoteInfo) {
-            showTemporaryMessage(specialNoteInfo, 15000);
-        }
+        if (specialNoteInfo) showTemporaryMessage(specialNoteInfo, 15000);
         if (normalNoteInfo) normalNoteInfo.style.display = 'none';
     }
 
@@ -1296,7 +1319,6 @@
         phoneSaveMsg.innerText = "";
         requestWakeLock();
         selectedSpecialMode = false;
-        // Nascondere eventuali messaggi informativi residui
         if (normalNoteInfo) normalNoteInfo.style.display = 'none';
         if (specialNoteInfo) specialNoteInfo.style.display = 'none';
     }
