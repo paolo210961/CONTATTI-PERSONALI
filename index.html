@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
-    <title>SOS Drive - Emergenza v0172</title>
+    <title>SOS Drive - Emergenza v0180</title>
     <style>
         * {
             margin: 0;
@@ -49,12 +49,19 @@
             margin: 0 0 8px 0;
             font-weight: 700;
         }
-        h2 {
-            font-size: 1.5rem;
+        /* Pulsante decorativo singolo per il servizio corrente */
+        .current-service-deco {
+            background: #d32f2f;
+            border: none;
+            border-radius: 60px;
+            padding: 14px 12px;
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: white;
+            width: 100%;
             text-align: center;
-            color: #c62828;
-            margin: 12px 0;
-            font-weight: 600;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
         }
         .grid-2 {
             display: flex;
@@ -79,6 +86,27 @@
         .big-btn:active {
             transform: scale(0.97);
         }
+        .export-import-row {
+            display: flex;
+            gap: 12px;
+            margin-top: 16px;
+        }
+        .export-import-row button {
+            flex: 1;
+            background: #283593;
+            color: white;
+            border: none;
+            border-radius: 60px;
+            padding: 14px 8px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.05s linear;
+            text-align: center;
+        }
+        .export-import-row button:active {
+            transform: scale(0.97);
+        }
         .btn-secondary {
             background: #1976d2;
         }
@@ -101,7 +129,17 @@
             border: none;
             flex: 1;
             text-align: center;
-            background: #5f7f9e;
+        }
+        /* Stile personalizzato per l'etichetta "Numero servizio" (simile a note normali) */
+        .service-label-styled {
+            background: #fff3e0;
+            border-left: 6px solid #ff9800;
+            border-radius: 48px;
+            padding: 8px 16px;
+            margin-bottom: 8px;
+            font-weight: bold;
+            font-size: 0.9rem;
+            color: #b45309;
         }
         .flex-row {
             display: flex;
@@ -244,7 +282,6 @@
             .big-btn { font-size: 1.2rem; padding: 14px 12px; }
             .small-btn { padding: 8px 12px; font-size: 0.8rem; }
             h1 { font-size: 1.6rem; }
-            h2 { font-size: 1.3rem; }
             .info-card { padding: 10px; font-size: 0.85rem; }
         }
         .id-badge { display: none; }
@@ -262,7 +299,7 @@
 <div class="container">
     <!-- HOME PAGE -->
     <div id="homePage" class="page">
-        <div class="version-header">📟 SOS Drive v0172 - Emoji note normali 🚑</div>
+        <div class="version-header">📟 SOS Drive v0180 - Logo singolo per servizio</div>
         <h1>🆘 SOS EMERGENZA</h1>
         <div class="grid-2">
             <button class="big-btn" data-service="ambulanza">🚑 AMBULANZA</button>
@@ -270,19 +307,26 @@
             <button class="big-btn" data-service="veterinario">🐾 VETERINARIO</button>
             <button class="big-btn" data-service="clinica">🏥 CLINICA</button>
         </div>
-        <p style="text-align:center; font-size:0.75rem; color:#555;">Ogni servizio ha il proprio archivio note.<br>📍 Ricerca entro 300m di TUTTI i luoghi con nome (negozi, aziende, uffici, piazze)<br>🔊 Ascolto automatico 15 secondi dopo il messaggio</p>
-        <div class="version-footer">versione 0172 – emoji note normali cambiata in 🚑</div>
+        <div class="export-import-row">
+            <button id="exportAllBtn">💾 SALVA NOTE</button>
+            <button id="importAllBtn">📂 RIPRISTINA NOTE</button>
+        </div>
+        <input type="file" id="globalImportFileInput" accept=".txt" style="display:none;">
+        <p style="text-align:center; font-size:0.75rem; color:#555; margin-top:16px;">Ogni servizio ha il proprio archivio note.<br>📍 Ricerca entro 300m di TUTTI i luoghi con nome<br>🔊 Ascolto automatico 15 secondi dopo il messaggio</p>
+        <div class="version-footer">versione 0180 – logo singolo del servizio corrente nella pagina di emergenza</div>
     </div>
 
     <!-- EMERGENCY PAGE -->
     <div id="emergencyPage" class="page hidden">
-        <div class="version-header">📟 SOS Drive v0172 – Note speciali</div>
-        <h2 id="serviceTitle">AMBULANZA</h2>
+        <div class="version-header">📟 SOS Drive v0180 – Logo singolo</div>
+        <!-- Pulsante decorativo singolo: verrà riempito dinamicamente in base al servizio -->
+        <div id="currentServiceDeco" class="current-service-deco">🚑 AMBULANZA</div>
 
-        <label>📞 Numero servizio</label>
+        <!-- Sezione Numero servizio con stile note normali -->
+        <div class="service-label-styled">Numero servizio</div>
         <div class="flex-row">
             <input type="tel" id="phoneNumber" placeholder="Numero" style="flex:2;">
-            <button id="registerNumberBtn" class="small-btn btn-secondary" style="flex:0.4;">REGISTRA NUMERO</button>
+            <button id="saveNumberBtn" class="small-btn btn-secondary" style="flex:0.4;">SALVA</button>
         </div>
         <div id="phoneSaveMsg" class="status-msg"></div>
 
@@ -298,8 +342,7 @@
             <div id="gpsStatus" class="status-msg"></div>
         </div>
 
-        <!-- NOTE NORMALI con emoji 🚑 -->
-        <button id="addNoteBtn" class="small-btn" style="background:#ff9800; width:100%; margin:8px 0;">➕ AGGIUNGI NOTA NORMALE</button>
+        <button id="addNoteBtn" class="small-btn" style="background:#ff9800; width:100%; margin:8px 0;">🚑 AGGIUNGI NOTA NORMALE</button>
         <div id="normalNoteInfo" class="status-msg" style="color:#2e7d32; font-weight:500; background:#e8f5e9; padding:6px 12px; border-radius:20px; margin-bottom:8px; display:none;">
             📌 Nota normale selezionata: verrà letto l'intero messaggio di emergenza
         </div>
@@ -307,22 +350,12 @@
             <div style="font-size:0.7rem; color:#777;">Nessuna nota normale. Aggiungine una.</div>
         </div>
 
-        <!-- NOTE SPECIALI -->
-        <div style="margin-top: 24px;">
-            <label>📌 NOTE SPECIALI</label>
-            <button id="addSpecialNoteBtn" class="small-btn" style="background:#4caf50; width:100%; margin:8px 0;">➕ AGGIUNGI NOTA SPECIALE</button>
-            <div id="specialNoteInfo" class="status-msg" style="color:#1b5e20; font-weight:500; background:#e8f5e9; padding:6px 12px; border-radius:20px; margin-bottom:8px; display:none;">
-                ✨ Nota speciale selezionata: verrà letto solo il testo (ignora coordinate)
-            </div>
-            <div id="specialNotesListArea">
-                <div style="font-size:0.7rem; color:#777;">Nessuna nota speciale. Aggiungine una.</div>
-            </div>
+        <button id="addSpecialNoteBtn" class="small-btn" style="background:#4caf50; width:100%; margin:8px 0;">🏠 AGGIUNGI NOTA SPECIALE</button>
+        <div id="specialNoteInfo" class="status-msg" style="color:#1b5e20; font-weight:500; background:#e8f5e9; padding:6px 12px; border-radius:20px; margin-bottom:8px; display:none;">
+            ✨ Nota speciale selezionata: verrà letto solo il testo (ignora coordinate)
         </div>
-
-        <div class="import-export">
-            <button id="exportNotesBtn" class="small-btn" style="background:#4caf50;">💾 ESPORTA TXT</button>
-            <button id="importNotesBtn" class="small-btn" style="background:#2196f3;">📂 IMPORTA TXT</button>
-            <input type="file" id="importFileInput" accept=".txt" style="display:none;">
+        <div id="specialNotesListArea">
+            <div style="font-size:0.7rem; color:#777;">Nessuna nota speciale. Aggiungine una.</div>
         </div>
 
         <div class="response-area">
@@ -342,10 +375,10 @@
         </div>
 
         <button id="backHomeBtn" class="small-btn back-home" style="width:100%;">◀ TORNA INDIETRO</button>
-        <div class="version-footer">versione 0172 – emoji note normali 🚑</div>
+        <div class="version-footer">versione 0180 – logo singolo del servizio corrente, etichetta "Numero servizio" in stile note normali</div>
     </div>
 
-    <!-- MODALE per aggiunta nota normale -->
+    <!-- MODALI per aggiunta note -->
     <div id="noteModal" class="modal" style="display:none;">
         <div class="modal-content">
             <h3>➕ Nuova Nota Normale</h3>
@@ -359,8 +392,6 @@
             </div>
         </div>
     </div>
-
-    <!-- MODALE per aggiunta nota speciale -->
     <div id="specialNoteModal" class="modal" style="display:none;">
         <div class="modal-content">
             <h3>➕ Nuova Nota Speciale</h3>
@@ -377,29 +408,38 @@
 </div>
 
 <script>
-    // ==================== VERSIONE 0172 ====================
-    // - Solo cambio emoji note normali da 📋 a 🚑
-    // - Nessun'altra modifica
+    // ==================== VERSIONE 0180 ====================
+    // - Nella emergency page: un solo logo decorativo corrispondente al servizio corrente
+    // - Etichetta "Numero servizio" con stile note normali (bordo arancione sinistro, sfondo chiaro)
+    // - Pulsante "SALVA" al posto di "REGISTRA NUMERO"
+    // - Testo "Attenzione Emergenza..." mantenuto (non rimosso)
+    // - Mutua esclusione note già funzionante
     // =================================================================
 
-    const CURRENT_VERSION = "0172";
+    const CURRENT_VERSION = "0180";
     let currentService = "ambulanza";
     let currentLat = null, currentLng = null;
     let currentAddress = "";
     let currentRefA = "", currentRefB = "", currentRefC = "";
-    let normalNotes = [];
-    let specialNotes = [];
+    let normalNotes = {};
+    let specialNotes = {};
     let selectedNormalNoteId = null;
     let selectedSpecialNoteId = null;
     let selectedSpecialMode = false;
     let wakeLock = null;
 
+    const services = ["ambulanza", "polizia", "veterinario", "clinica"];
+    for (let s of services) {
+        normalNotes[s] = [];
+        specialNotes[s] = [];
+    }
+
     // DOM elements
     const homePage = document.getElementById('homePage');
     const emergencyPage = document.getElementById('emergencyPage');
-    const serviceTitleSpan = document.getElementById('serviceTitle');
+    const currentServiceDeco = document.getElementById('currentServiceDeco');
     const phoneInput = document.getElementById('phoneNumber');
-    const registerNumberBtn = document.getElementById('registerNumberBtn');
+    const saveNumberBtn = document.getElementById('saveNumberBtn');
     const googleMapsBtn = document.getElementById('googleMapsBtn');
     const geolocationBtn = document.getElementById('geolocationBtn');
     const latLonDisplay = document.getElementById('latLonDisplay');
@@ -417,9 +457,6 @@
     const audioFrBtn = document.getElementById('audioFrBtn');
     const backHomeBtn = document.getElementById('backHomeBtn');
     const phoneSaveMsg = document.getElementById('phoneSaveMsg');
-    const exportNotesBtn = document.getElementById('exportNotesBtn');
-    const importNotesBtn = document.getElementById('importNotesBtn');
-    const importFileInput = document.getElementById('importFileInput');
     const operatorResponse = document.getElementById('operatorResponse');
     const listenResponseBtn = document.getElementById('listenResponseBtn');
     const clearResponseBtn = document.getElementById('clearResponseBtn');
@@ -436,6 +473,9 @@
     const specialModalDesc = document.getElementById('specialModalDesc');
     const specialModalCreateBtn = document.getElementById('specialModalCreateBtn');
     const specialModalCancelBtn = document.getElementById('specialModalCancelBtn');
+    const exportAllBtn = document.getElementById('exportAllBtn');
+    const importAllBtn = document.getElementById('importAllBtn');
+    const globalImportFileInput = document.getElementById('globalImportFileInput');
 
     let recognition = null;
     let recognitionTimeout = null;
@@ -454,8 +494,7 @@
 
     // ---------- ARCHIVIO NUMERI ----------
     function migratePhoneNumbers() {
-        const services = ["ambulanza", "polizia", "veterinario", "clinica"];
-        const oldVersions = ["0171", "0170", "0169", "0168"];
+        const oldVersions = ["0179", "0178", "0177"];
         for (let s of services) {
             if (localStorage.getItem(`phone_${s}_${CURRENT_VERSION}`)) continue;
             for (let ver of oldVersions) {
@@ -490,7 +529,7 @@
         return frenchText + " (traduzione fallita)";
     }
 
-    // ---------- RICONOSCIMENTO VOCALE 15s ----------
+    // ---------- RICONOSCIMENTO VOCALE ----------
     function initRecognition() {
         if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
             transcribeStatus.innerText = "❌ Riconoscimento non supportato";
@@ -528,67 +567,53 @@
         recognitionTimeout = setTimeout(() => { if (recognition && recognition.stop) recognition.stop(); }, 15000);
     }
 
-    // ---------- GESTIONE NOTE NORMALI ----------
-    function migrateOldNotes() {
-        const services = ["ambulanza", "polizia", "veterinario", "clinica"];
-        const oldVersions = ["0171", "0170"];
+    // ---------- PERSISTENZA NOTE ----------
+    function getNormalNotesKey(s) { return `normalNotes_${s}_${CURRENT_VERSION}`; }
+    function getSpecialNotesKey(s) { return `specialNotes_${s}_${CURRENT_VERSION}`; }
+    function getSelectedNormalIdKey(s) { return `selectedNormalNote_${s}_${CURRENT_VERSION}`; }
+    function getSelectedSpecialIdKey(s) { return `selectedSpecialNote_${s}_${CURRENT_VERSION}`; }
+    function saveNormalNotesForService(s) { localStorage.setItem(getNormalNotesKey(s), JSON.stringify(normalNotes[s])); }
+    function saveSpecialNotesForService(s) { localStorage.setItem(getSpecialNotesKey(s), JSON.stringify(specialNotes[s])); }
+    function saveSelectedIds() {
+        if (selectedNormalNoteId) localStorage.setItem(getSelectedNormalIdKey(currentService), selectedNormalNoteId);
+        else localStorage.removeItem(getSelectedNormalIdKey(currentService));
+        if (selectedSpecialNoteId) localStorage.setItem(getSelectedSpecialIdKey(currentService), selectedSpecialNoteId);
+        else localStorage.removeItem(getSelectedSpecialIdKey(currentService));
+    }
+    function loadAllNotes() {
         for (let s of services) {
-            if (localStorage.getItem(`normalNotes_${s}_${CURRENT_VERSION}`)) continue;
-            for (let ver of oldVersions) {
-                let old = localStorage.getItem(`normalNotes_${s}_${ver}`);
-                if (old) {
-                    try {
-                        let arr = JSON.parse(old);
-                        if (arr.length && arr[0].title !== undefined) {
-                            localStorage.setItem(`normalNotes_${s}_${CURRENT_VERSION}`, JSON.stringify(arr));
-                        } else {
-                            let newArr = arr.map((n, idx) => ({
-                                id: Date.now() + idx,
-                                title: `Nota ${idx+1}`,
-                                description: n.description || n.text || ""
-                            }));
-                            localStorage.setItem(`normalNotes_${s}_${CURRENT_VERSION}`, JSON.stringify(newArr));
-                        }
-                        break;
-                    } catch(e) {}
-                }
-            }
+            let storedNormal = localStorage.getItem(getNormalNotesKey(s));
+            normalNotes[s] = storedNormal ? JSON.parse(storedNormal) : [];
+            let storedSpecial = localStorage.getItem(getSpecialNotesKey(s));
+            specialNotes[s] = storedSpecial ? JSON.parse(storedSpecial) : [];
+        }
+        if (currentService) loadCurrentServiceNotes();
+    }
+    function loadCurrentServiceNotes() {
+        if (!currentService) return;
+        let savedNormalId = localStorage.getItem(getSelectedNormalIdKey(currentService));
+        let savedSpecialId = localStorage.getItem(getSelectedSpecialIdKey(currentService));
+        selectedNormalNoteId = (savedNormalId && normalNotes[currentService].some(n => String(n.id) === savedNormalId)) ? savedNormalId : null;
+        selectedSpecialNoteId = (savedSpecialId && specialNotes[currentService].some(n => String(n.id) === savedSpecialId)) ? savedSpecialId : null;
+        renderCurrentNotes();
+        enforceMutualExclusion();
+    }
+    function saveCurrentServiceNotes() {
+        if (currentService) {
+            saveNormalNotesForService(currentService);
+            saveSpecialNotesForService(currentService);
         }
     }
-    function getNormalNotesKey(s) { return `normalNotes_${s}_${CURRENT_VERSION}`; }
-    function getSelectedNormalKey(s) { return `selectedNormalNote_${s}_${CURRENT_VERSION}`; }
-    function saveNormalNotes() {
-        if (!currentService) return;
-        localStorage.setItem(getNormalNotesKey(currentService), JSON.stringify(normalNotes));
-        if (selectedNormalNoteId) localStorage.setItem(getSelectedNormalKey(currentService), selectedNormalNoteId);
-        else localStorage.removeItem(getSelectedNormalKey(currentService));
-    }
-    function loadNormalNotes(s) {
-        let stored = localStorage.getItem(getNormalNotesKey(s));
-        if (stored) {
-            try {
-                normalNotes = JSON.parse(stored);
-                normalNotes = normalNotes.map(n => ({
-                    id: n.id,
-                    title: n.title || "Nota senza titolo",
-                    description: n.description || n.text || ""
-                }));
-                let savedId = localStorage.getItem(getSelectedNormalKey(s));
-                if (savedId && normalNotes.some(n => String(n.id) === savedId)) selectedNormalNoteId = savedId;
-                else if (normalNotes.length) selectedNormalNoteId = String(normalNotes[0].id);
-                else selectedNormalNoteId = null;
-            } catch(e) { normalNotes = []; selectedNormalNoteId = null; }
-        } else { normalNotes = []; selectedNormalNoteId = null; }
-        renderNormalNotes();
-    }
+
+    // ---------- GESTIONE INTERFACCIA E MUTUA ESCLUSIONE ----------
     function renderNormalNotes() {
-        if (!normalNotes.length) {
+        const notes = normalNotes[currentService] || [];
+        if (!notes.length) {
             notesListArea.innerHTML = `<div style="font-size:0.7rem;">Nessuna nota normale. Aggiungine una.</div>`;
-            selectedNormalNoteId = null;
             return;
         }
-        let html = '<div><strong>📋 Seleziona nota normale:</strong></div>';
-        normalNotes.forEach((note, idx) => {
+        let html = '<div><strong>Seleziona nota normale:</strong></div>';
+        notes.forEach((note, idx) => {
             const isChecked = (String(selectedNormalNoteId) === String(note.id)) ? 'checked' : '';
             html += `
                 <div class="note-item" data-id="${note.id}">
@@ -601,42 +626,14 @@
         });
         notesListArea.innerHTML = html;
     }
-
-    // ---------- GESTIONE NOTE SPECIALI ----------
-    function getSpecialNotesKey(s) { return `specialNotes_${s}_${CURRENT_VERSION}`; }
-    function getSelectedSpecialKey(s) { return `selectedSpecialNote_${s}_${CURRENT_VERSION}`; }
-    function saveSpecialNotes() {
-        if (!currentService) return;
-        localStorage.setItem(getSpecialNotesKey(currentService), JSON.stringify(specialNotes));
-        if (selectedSpecialNoteId) localStorage.setItem(getSelectedSpecialKey(currentService), selectedSpecialNoteId);
-        else localStorage.removeItem(getSelectedSpecialKey(currentService));
-    }
-    function loadSpecialNotes(s) {
-        let stored = localStorage.getItem(getSpecialNotesKey(s));
-        if (stored) {
-            try {
-                specialNotes = JSON.parse(stored);
-                specialNotes = specialNotes.map(n => ({
-                    id: n.id,
-                    title: n.title || "Nota speciale senza titolo",
-                    description: n.description || ""
-                }));
-                let savedId = localStorage.getItem(getSelectedSpecialKey(s));
-                if (savedId && specialNotes.some(n => String(n.id) === savedId)) selectedSpecialNoteId = savedId;
-                else if (specialNotes.length) selectedSpecialNoteId = String(specialNotes[0].id);
-                else selectedSpecialNoteId = null;
-            } catch(e) { specialNotes = []; selectedSpecialNoteId = null; }
-        } else { specialNotes = []; selectedSpecialNoteId = null; }
-        renderSpecialNotes();
-    }
     function renderSpecialNotes() {
-        if (!specialNotes.length) {
+        const notes = specialNotes[currentService] || [];
+        if (!notes.length) {
             specialNotesListArea.innerHTML = `<div style="font-size:0.7rem;">Nessuna nota speciale. Aggiungine una.</div>`;
-            selectedSpecialNoteId = null;
             return;
         }
-        let html = '<div><strong>✨ Seleziona nota speciale:</strong></div>';
-        specialNotes.forEach((note, idx) => {
+        let html = '<div><strong>Seleziona nota speciale:</strong></div>';
+        notes.forEach((note, idx) => {
             const isChecked = (String(selectedSpecialNoteId) === String(note.id)) ? 'checked' : '';
             html += `
                 <div class="special-note-item" data-id="${note.id}">
@@ -649,20 +646,44 @@
         });
         specialNotesListArea.innerHTML = html;
     }
+    function renderCurrentNotes() {
+        renderNormalNotes();
+        renderSpecialNotes();
+    }
 
-    // ---------- EVENTI DELEGATI PER NOTE NORMALI ----------
+    function enforceMutualExclusion() {
+        if (!currentService) return;
+        if (selectedNormalNoteId !== null && selectedSpecialNoteId !== null) {
+            selectedSpecialNoteId = null;
+            saveSelectedIds();
+        }
+        const normalRadios = document.querySelectorAll('#notesListArea input[type="radio"]');
+        const specialRadios = document.querySelectorAll('#specialNotesListArea input[type="radio"]');
+        normalRadios.forEach(radio => {
+            if (selectedNormalNoteId && radio.value === selectedNormalNoteId) radio.checked = true;
+            else radio.checked = false;
+        });
+        specialRadios.forEach(radio => {
+            if (selectedSpecialNoteId && radio.value === selectedSpecialNoteId) radio.checked = true;
+            else radio.checked = false;
+        });
+        selectedSpecialMode = (selectedSpecialNoteId !== null);
+    }
+
+    // ---------- EVENTI NOTE ----------
     function attachNormalNoteEvents() {
         notesListArea.addEventListener('change', (e) => {
             if (e.target && e.target.type === 'radio' && e.target.name === 'noteSelect') {
                 selectedNormalNoteId = e.target.value;
+                selectedSpecialNoteId = null;
                 selectedSpecialMode = false;
-                saveNormalNotes();
+                saveSelectedIds();
+                enforceMutualExclusion();
                 normalNoteInfo.style.display = 'block';
                 setTimeout(() => { normalNoteInfo.style.display = 'none'; }, 10000);
                 specialNoteInfo.style.display = 'none';
             }
         });
-
         notesListArea.addEventListener('click', (e) => {
             const btn = e.target;
             if (btn.classList && btn.classList.contains('edit-note-btn')) {
@@ -670,7 +691,7 @@
                 const parentDiv = btn.closest('.note-item');
                 if (!parentDiv) return;
                 const noteId = parentDiv.getAttribute('data-id');
-                const note = normalNotes.find(n => String(n.id) === noteId);
+                const note = normalNotes[currentService].find(n => String(n.id) === noteId);
                 if (note) {
                     let newTitle = prompt("Modifica titolo:", note.title);
                     if (newTitle !== null) {
@@ -678,8 +699,9 @@
                         if (newDesc !== null) {
                             note.title = newTitle.trim() || "Senza titolo";
                             note.description = newDesc.trim() || "";
-                            saveNormalNotes();
+                            saveNormalNotesForService(currentService);
                             renderNormalNotes();
+                            enforceMutualExclusion();
                             gpsStatus.innerHTML = "✅ Nota normale modificata";
                             setTimeout(()=> gpsStatus.innerHTML = "✅ Pronto.", 2000);
                         }
@@ -690,30 +712,31 @@
                 const parentDiv = btn.closest('.note-item');
                 if (!parentDiv) return;
                 const noteId = parentDiv.getAttribute('data-id');
-                normalNotes = normalNotes.filter(n => String(n.id) !== noteId);
-                if (String(selectedNormalNoteId) === noteId) selectedNormalNoteId = normalNotes.length ? normalNotes[0].id : null;
-                saveNormalNotes();
+                normalNotes[currentService] = normalNotes[currentService].filter(n => String(n.id) !== noteId);
+                if (String(selectedNormalNoteId) === noteId) selectedNormalNoteId = null;
+                saveNormalNotesForService(currentService);
+                saveSelectedIds();
                 renderNormalNotes();
-                if (!normalNotes.length) normalNoteInfo.style.display = 'none';
+                enforceMutualExclusion();
+                if (!normalNotes[currentService].length) normalNoteInfo.style.display = 'none';
                 gpsStatus.innerHTML = "✅ Nota normale eliminata";
                 setTimeout(()=> gpsStatus.innerHTML = "✅ Pronto.", 2000);
             }
         });
     }
-
-    // ---------- EVENTI DELEGATI PER NOTE SPECIALI ----------
     function attachSpecialNoteEvents() {
         specialNotesListArea.addEventListener('change', (e) => {
             if (e.target && e.target.type === 'radio' && e.target.name === 'specialNoteSelect') {
                 selectedSpecialNoteId = e.target.value;
+                selectedNormalNoteId = null;
                 selectedSpecialMode = true;
-                saveSpecialNotes();
+                saveSelectedIds();
+                enforceMutualExclusion();
                 specialNoteInfo.style.display = 'block';
                 setTimeout(() => { specialNoteInfo.style.display = 'none'; }, 10000);
                 normalNoteInfo.style.display = 'none';
             }
         });
-
         specialNotesListArea.addEventListener('click', (e) => {
             const btn = e.target;
             if (btn.classList && btn.classList.contains('edit-special-note-btn')) {
@@ -721,7 +744,7 @@
                 const parentDiv = btn.closest('.special-note-item');
                 if (!parentDiv) return;
                 const noteId = parentDiv.getAttribute('data-id');
-                const note = specialNotes.find(n => String(n.id) === noteId);
+                const note = specialNotes[currentService].find(n => String(n.id) === noteId);
                 if (note) {
                     let newTitle = prompt("Modifica titolo nota speciale:", note.title);
                     if (newTitle !== null) {
@@ -729,8 +752,9 @@
                         if (newDesc !== null) {
                             note.title = newTitle.trim() || "Senza titolo";
                             note.description = newDesc.trim() || "";
-                            saveSpecialNotes();
+                            saveSpecialNotesForService(currentService);
                             renderSpecialNotes();
+                            enforceMutualExclusion();
                             gpsStatus.innerHTML = "✅ Nota speciale modificata";
                             setTimeout(()=> gpsStatus.innerHTML = "✅ Pronto.", 2000);
                         }
@@ -741,27 +765,31 @@
                 const parentDiv = btn.closest('.special-note-item');
                 if (!parentDiv) return;
                 const noteId = parentDiv.getAttribute('data-id');
-                specialNotes = specialNotes.filter(n => String(n.id) !== noteId);
-                if (String(selectedSpecialNoteId) === noteId) selectedSpecialNoteId = specialNotes.length ? specialNotes[0].id : null;
-                saveSpecialNotes();
+                specialNotes[currentService] = specialNotes[currentService].filter(n => String(n.id) !== noteId);
+                if (String(selectedSpecialNoteId) === noteId) selectedSpecialNoteId = null;
+                saveSpecialNotesForService(currentService);
+                saveSelectedIds();
                 renderSpecialNotes();
-                if (!specialNotes.length) specialNoteInfo.style.display = 'none';
+                enforceMutualExclusion();
+                if (!specialNotes[currentService].length) specialNoteInfo.style.display = 'none';
                 gpsStatus.innerHTML = "✅ Nota speciale eliminata";
                 setTimeout(()=> gpsStatus.innerHTML = "✅ Pronto.", 2000);
             }
         });
     }
 
-    // ---------- MODALI PER AGGIUNTA ----------
+    // ---------- MODALI AGGIUNTA ----------
     function addNewNormalNote() {
         let title = modalTitle.value.trim();
         if (title === "") title = "Senza titolo";
         let description = modalDesc.value.trim() || "";
         let newId = Date.now() + Math.floor(Math.random() * 10000);
-        normalNotes.push({ id: newId, title: title, description: description });
-        if (normalNotes.length === 1) selectedNormalNoteId = String(newId);
-        saveNormalNotes();
+        normalNotes[currentService].push({ id: newId, title: title, description: description });
+        if (normalNotes[currentService].length === 1) selectedNormalNoteId = String(newId);
+        saveNormalNotesForService(currentService);
+        saveSelectedIds();
         renderNormalNotes();
+        enforceMutualExclusion();
         gpsStatus.innerHTML = "✅ Nota normale aggiunta";
         setTimeout(()=> gpsStatus.innerHTML = "✅ Pronto.", 2000);
         selectedSpecialMode = false;
@@ -772,10 +800,12 @@
         if (title === "") title = "Senza titolo";
         let description = specialModalDesc.value.trim() || "";
         let newId = Date.now() + Math.floor(Math.random() * 10000);
-        specialNotes.push({ id: newId, title: title, description: description });
-        if (specialNotes.length === 1) selectedSpecialNoteId = String(newId);
-        saveSpecialNotes();
+        specialNotes[currentService].push({ id: newId, title: title, description: description });
+        if (specialNotes[currentService].length === 1) selectedSpecialNoteId = String(newId);
+        saveSpecialNotesForService(currentService);
+        saveSelectedIds();
         renderSpecialNotes();
+        enforceMutualExclusion();
         gpsStatus.innerHTML = "✅ Nota speciale aggiunta";
         setTimeout(()=> gpsStatus.innerHTML = "✅ Pronto.", 2000);
         selectedSpecialMode = true;
@@ -796,16 +826,16 @@
 
     function getSelectedNoteDescription() {
         if (selectedSpecialMode) {
-            const note = specialNotes.find(n => String(n.id) === String(selectedSpecialNoteId));
+            const note = specialNotes[currentService].find(n => String(n.id) === String(selectedSpecialNoteId));
             return note ? note.description : null;
         } else {
-            const note = normalNotes.find(n => String(n.id) === String(selectedNormalNoteId));
+            const note = normalNotes[currentService].find(n => String(n.id) === String(selectedNormalNoteId));
             return note ? note.description : null;
         }
     }
     function escapeHtml(str) { return str.replace(/[&<>]/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;' }[m])); }
 
-    // ---------- COPIA BILINGUE ----------
+    // ---------- COPIA BILINGUE (con testo introduttivo mantenuto) ----------
     async function getBilingualCopy() {
         let noteIT = getSelectedNoteDescription() || "nessuna nota";
         let coord = (currentLat && currentLng) ? `${currentLat.toFixed(6)}, ${currentLng.toFixed(6)}` : "non disponibili";
@@ -844,7 +874,7 @@
         }
     }
 
-    // ---------- GEOLOCALIZZAZIONE + RICERCA ESTESA ----------
+    // ---------- GEOLOCALIZZAZIONE (invariata) ----------
     function haversine(lat1,lng1,lat2,lng2) {
         const R = 6371e3;
         const φ1 = lat1 * Math.PI/180, φ2 = lat2 * Math.PI/180;
@@ -970,7 +1000,7 @@
         gpsStatus.innerHTML = "";
     }
 
-    // ---------- LETTURA VOCALE ----------
+    // ---------- LETTURA VOCALE (testo introduttivo mantenuto) ----------
     function playBeep() {
         try {
             let ctx = new (window.AudioContext || window.webkitAudioContext)();
@@ -1010,20 +1040,14 @@
     async function speakFull(lang) {
         if (!window.speechSynthesis) { alert(lang==='it'?"Sintesi non supportata":"Synthèse non supportée"); return; }
         speechSynthesis.cancel();
-
         let note = getSelectedNoteDescription();
         let isSpecial = selectedSpecialMode;
-        
-        if (!note) {
-            note = (lang==='it' ? "nessuna nota selezionata" : "aucune note sélectionnée");
-        }
-
+        if (!note) note = (lang==='it' ? "nessuna nota selezionata" : "aucune note sélectionnée");
         let addr = currentAddress || (lang==='it'?"non disponibile":"non disponible");
         let refA = currentRefA || (lang==='it'?"non disponibile":"non disponible");
         let refB = currentRefB || (lang==='it'?"non disponibile":"non disponible");
         let refC = currentRefC || (lang==='it'?"non disponibile":"non disponible");
         let coord = (currentLat && currentLng) ? `${currentLat.toFixed(6)}, ${currentLng.toFixed(6)}` : (lang==='it'?"non disponibili":"non disponibles");
-        
         if (lang === 'fr') {
             gpsStatus.innerHTML = "⏳ Traduzione FR...";
             note = await translateToFrench(note);
@@ -1033,11 +1057,9 @@
             if (currentRefC && currentRefC !== "non disponibile") refC = await translateToFrench(currentRefC);
             gpsStatus.innerHTML = "🔊 Lettura FR...";
         } else gpsStatus.innerHTML = "🔊 Lettura IT...";
-        
         let intro = (lang==='it') ? "Attenzione Emergenza sono italiano uso il traduttore mi trovo in Emergenza" : await translateToFrench("Attenzione Emergenza sono italiano uso il traduttore mi trovo in Emergenza");
         await speakWords(intro, lang==='it'?'it-IT':'fr-FR', 1.0, 200);
         await speakWords(note, lang==='it'?'it-IT':'fr-FR', 1.0, 200);
-        
         if (!isSpecial) {
             await speakWords("Coordinate", lang==='it'?'it-IT':'fr-FR', 1.0, 200);
             await speakCoords(coord, lang==='it'?'it-IT':'fr-FR');
@@ -1050,7 +1072,6 @@
             await speakWords("Sono vicino a 3", lang==='it'?'it-IT':'fr-FR', 1.0, 200);
             await speakWords(refC, lang==='it'?'it-IT':'fr-FR', 1.0, 200);
         }
-        
         let domanda = (lang==='it') ? "il tuo messaggio di risposta verrà tradotto parla piano" : await translateToFrench("il tuo messaggio di risposta verrà tradotto parla piano");
         await speakWords(domanda, lang==='it'?'it-IT':'fr-FR', 1.0, 200);
         playBeep();
@@ -1061,77 +1082,127 @@
     function speakItalian() { speakFull('it'); }
     function speakFrench() { speakFull('fr'); }
 
-    // ---------- EXPORT/IMPORT TXT ----------
-    function exportTxt() {
-        if (!normalNotes.length && !specialNotes.length) { gpsStatus.innerHTML = "Nessuna nota."; return; }
-        let content = "=== NOTE NORMALI ===\n";
-        normalNotes.forEach((n, idx) => {
-            content += `${idx+1}. ${n.title}\n${n.description}\n\n`;
-        });
-        content += "=== NOTE SPECIALI ===\n";
-        specialNotes.forEach((n, idx) => {
-            content += `${idx+1}. ${n.title}\n${n.description}\n\n`;
-        });
-        let blob = new Blob([content], {type:'text/plain'});
-        let a = document.createElement('a');
+    // ---------- ESPORTA / IMPORTA (tutti i servizi) ----------
+    function exportAllNotes() {
+        let content = "";
+        for (let s of services) {
+            content += `[SERVIZIO: ${s.toUpperCase()}]\n`;
+            content += `--- NOTE NORMALI ---\n`;
+            const norm = normalNotes[s] || [];
+            if (norm.length === 0) content += `(nessuna nota normale)\n`;
+            else norm.forEach((note, idx) => {
+                content += `${idx+1}. Titolo: ${note.title}\n`;
+                content += `   Descrizione: ${note.description}\n`;
+            });
+            content += `--- NOTE SPECIALI ---\n`;
+            const spec = specialNotes[s] || [];
+            if (spec.length === 0) content += `(nessuna nota speciale)\n`;
+            else spec.forEach((note, idx) => {
+                content += `${idx+1}. Titolo: ${note.title}\n`;
+                content += `   Descrizione: ${note.description}\n`;
+            });
+            content += `\n`;
+        }
+        const blob = new Blob([content], {type: 'text/plain'});
+        const a = document.createElement('a');
         a.href = URL.createObjectURL(blob);
-        a.download = `sos_notes_${currentService}.txt`;
+        a.download = `sos_notes_backup_${CURRENT_VERSION}.txt`;
         a.click();
         URL.revokeObjectURL(a.href);
-        gpsStatus.innerHTML = `📁 Esportate ${normalNotes.length + specialNotes.length} note.`;
+        gpsStatus.innerHTML = "📁 Backup completo salvato (tutti i servizi).";
+        setTimeout(() => gpsStatus.innerHTML = "✅ Pronto.", 2000);
     }
-    function importTxt(file) {
-        let reader = new FileReader();
+    function importAllNotes(file) {
+        const reader = new FileReader();
         reader.onload = (e) => {
-            let content = e.target.result;
-            let lines = content.split(/\r?\n/);
-            let newNormal = [];
-            let newSpecial = [];
+            const content = e.target.result;
+            const lines = content.split(/\r?\n/);
+            let currentServiceImport = null;
             let currentSection = null;
-            let currentTitle = "";
-            let currentDesc = "";
+            let newNormal = {}, newSpecial = {};
+            for (let s of services) {
+                newNormal[s] = [];
+                newSpecial[s] = [];
+            }
+            let currentTitle = "", currentDesc = "";
             for (let line of lines) {
                 line = line.trim();
-                if (line === "=== NOTE NORMALI ===") { currentSection = "normal"; continue; }
-                if (line === "=== NOTE SPECIALI ===") { currentSection = "special"; continue; }
-                if (line.match(/^\d+\.\s+/) && currentSection) {
-                    if (currentTitle) {
-                        if (currentSection === "normal") newNormal.push({ id: Date.now()+Math.random(), title: currentTitle, description: currentDesc });
-                        else newSpecial.push({ id: Date.now()+Math.random(), title: currentTitle, description: currentDesc });
+                if (line.startsWith("[SERVIZIO:")) {
+                    const match = line.match(/\[SERVIZIO:\s*(\w+)\]/i);
+                    if (match) {
+                        currentServiceImport = match[1].toLowerCase();
+                        if (!services.includes(currentServiceImport)) currentServiceImport = null;
                     }
-                    currentTitle = line.replace(/^\d+\.\s+/, '');
+                    currentSection = null;
+                    continue;
+                }
+                if (line === "--- NOTE NORMALI ---") { currentSection = "normal"; continue; }
+                if (line === "--- NOTE SPECIALI ---") { currentSection = "special"; continue; }
+                if (line.startsWith("(nessuna nota") || line === "") continue;
+                const titleMatch = line.match(/^\d+\.\s*Titolo:\s*(.*)/i);
+                if (titleMatch && currentServiceImport && currentSection) {
+                    if (currentTitle !== "") {
+                        if (currentSection === "normal") {
+                            newNormal[currentServiceImport].push({
+                                id: Date.now() + Math.random() * 10000 + newNormal[currentServiceImport].length,
+                                title: currentTitle,
+                                description: currentDesc
+                            });
+                        } else {
+                            newSpecial[currentServiceImport].push({
+                                id: Date.now() + Math.random() * 10000 + newSpecial[currentServiceImport].length,
+                                title: currentTitle,
+                                description: currentDesc
+                            });
+                        }
+                    }
+                    currentTitle = titleMatch[1].trim();
                     currentDesc = "";
-                } else if (line !== "" && currentTitle) {
-                    currentDesc += (currentDesc ? "\n" : "") + line;
+                } else if (line.startsWith("   Descrizione:") && currentTitle !== "") {
+                    currentDesc = line.replace(/^\s*Descrizione:\s*/, "").trim();
                 }
             }
-            if (currentTitle) {
-                if (currentSection === "normal") newNormal.push({ id: Date.now()+Math.random(), title: currentTitle, description: currentDesc });
-                else if (currentSection === "special") newSpecial.push({ id: Date.now()+Math.random(), title: currentTitle, description: currentDesc });
+            if (currentTitle !== "" && currentServiceImport && currentSection) {
+                if (currentSection === "normal") {
+                    newNormal[currentServiceImport].push({ id: Date.now() + Math.random() * 10000 + newNormal[currentServiceImport].length, title: currentTitle, description: currentDesc });
+                } else {
+                    newSpecial[currentServiceImport].push({ id: Date.now() + Math.random() * 10000 + newSpecial[currentServiceImport].length, title: currentTitle, description: currentDesc });
+                }
             }
-            if (newNormal.length) { normalNotes = newNormal; saveNormalNotes(); renderNormalNotes(); }
-            if (newSpecial.length) { specialNotes = newSpecial; saveSpecialNotes(); renderSpecialNotes(); }
-            gpsStatus.innerHTML = `✅ Importate ${newNormal.length} normali, ${newSpecial.length} speciali.`;
+            for (let s of services) {
+                normalNotes[s] = newNormal[s];
+                specialNotes[s] = newSpecial[s];
+                saveNormalNotesForService(s);
+                saveSpecialNotesForService(s);
+            }
+            if (currentService) {
+                loadCurrentServiceNotes();
+                enforceMutualExclusion();
+            }
+            gpsStatus.innerHTML = "✅ Note ripristinate da file (tutti i servizi).";
+            setTimeout(() => gpsStatus.innerHTML = "✅ Pronto.", 2000);
         };
-        reader.readAsText(file,"UTF-8");
+        reader.readAsText(file, "UTF-8");
     }
 
-    // ---------- SHOW EMERGENCY ----------
+    // ---------- FLUSSO PRINCIPALE ----------
     function showEmergency(s) {
         currentService = s;
         let label = {ambulanza:"🚑 AMBULANZA", polizia:"👮 POLIZIA", veterinario:"🐾 VETERINARIO", clinica:"🏥 CLINICA"}[s];
-        serviceTitleSpan.innerText = label;
+        // Aggiorna il logo decorativo singolo
+        currentServiceDeco.innerText = label;
         phoneInput.value = getPhone(s) || defaultPhone[s];
-        loadNormalNotes(s);
-        loadSpecialNotes(s);
+        loadCurrentServiceNotes();
+        enforceMutualExclusion();
         resetCoords();
         homePage.classList.add("hidden");
         emergencyPage.classList.remove("hidden");
         phoneSaveMsg.innerText = "";
         requestWakeLock();
         selectedSpecialMode = false;
+        setTimeout(() => getLocationAndAddress(), 500);
     }
-    function onRegisterNumber() {
+    function onSaveNumber() {
         let n = phoneInput.value.trim();
         if (n) { savePhone(currentService, n); phoneSaveMsg.innerText = "✅ Numero salvato nell'archivio"; setTimeout(()=>phoneSaveMsg.innerText="",2000); }
         else phoneSaveMsg.innerText = "⚠️ Inserisci un numero valido";
@@ -1140,19 +1211,14 @@
         emergencyPage.classList.add("hidden");
         homePage.classList.remove("hidden");
         currentService = null;
-        normalNotes = [];
-        specialNotes = [];
-        selectedNormalNoteId = null;
-        selectedSpecialNoteId = null;
-        selectedSpecialMode = false;
         releaseWakeLock();
     }
 
     function init() {
-        migrateOldNotes();
+        loadAllNotes();
         migratePhoneNumbers();
         document.querySelectorAll('.big-btn').forEach(btn => btn.addEventListener('click', () => showEmergency(btn.getAttribute('data-service'))));
-        registerNumberBtn.addEventListener('click', onRegisterNumber);
+        saveNumberBtn.addEventListener('click', onSaveNumber);
         googleMapsBtn.addEventListener('click', () => window.open("https://maps.google.com", "_blank"));
         geolocationBtn.addEventListener('click', getLocationAndAddress);
         addNoteBtn.addEventListener('click', showAddNoteModal);
@@ -1161,9 +1227,6 @@
         audioItBtn.addEventListener('click', speakItalian);
         audioFrBtn.addEventListener('click', speakFrench);
         backHomeBtn.addEventListener('click', backHome);
-        exportNotesBtn.addEventListener('click', exportTxt);
-        importNotesBtn.addEventListener('click', () => importFileInput.click());
-        importFileInput.addEventListener('change', (e) => { if (e.target.files.length) importTxt(e.target.files[0]); importFileInput.value = ''; });
         listenResponseBtn.addEventListener('click', startListening15s);
         clearResponseBtn.addEventListener('click', () => { operatorResponse.value = ""; transcribeStatus.innerText = ""; });
         modalCreateBtn.addEventListener('click', addNewNormalNote);
@@ -1172,6 +1235,12 @@
         specialModalCreateBtn.addEventListener('click', addNewSpecialNote);
         specialModalCancelBtn.addEventListener('click', closeSpecialModal);
         specialModal.addEventListener('click', (e) => { if (e.target === specialModal) closeSpecialModal(); });
+        exportAllBtn.addEventListener('click', exportAllNotes);
+        importAllBtn.addEventListener('click', () => globalImportFileInput.click());
+        globalImportFileInput.addEventListener('change', (e) => {
+            if (e.target.files.length) importAllNotes(e.target.files[0]);
+            globalImportFileInput.value = '';
+        });
         initRecognition();
         attachNormalNoteEvents();
         attachSpecialNoteEvents();
