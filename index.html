@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
-    <title>SOS Drive - Emergenza v0170</title>
+    <title>SOS Drive - Emergenza v0171</title>
     <style>
         * {
             margin: 0;
@@ -262,7 +262,7 @@
 <div class="container">
     <!-- HOME PAGE -->
     <div id="homePage" class="page">
-        <div class="version-header">📟 SOS Drive v0170 - Note speciali uguali alle normali</div>
+        <div class="version-header">📟 SOS Drive v0171 - Rimossa dicitura superflua</div>
         <h1>🆘 SOS EMERGENZA</h1>
         <div class="grid-2">
             <button class="big-btn" data-service="ambulanza">🚑 AMBULANZA</button>
@@ -271,12 +271,12 @@
             <button class="big-btn" data-service="clinica">🏥 CLINICA</button>
         </div>
         <p style="text-align:center; font-size:0.75rem; color:#555;">Ogni servizio ha il proprio archivio note.<br>📍 Ricerca entro 300m di TUTTI i luoghi con nome (negozi, aziende, uffici, piazze)<br>🔊 Ascolto automatico 15 secondi dopo il messaggio</p>
-        <div class="version-footer">versione 0170 – Note speciali ora hanno titolo+descrizione (come normali)</div>
+        <div class="version-footer">versione 0171 – solo rimozione testo descrittivo note speciali</div>
     </div>
 
     <!-- EMERGENCY PAGE -->
     <div id="emergencyPage" class="page hidden">
-        <div class="version-header">📟 SOS Drive v0170 – Note speciali uguali alle normali</div>
+        <div class="version-header">📟 SOS Drive v0171 – Note speciali</div>
         <h2 id="serviceTitle">AMBULANZA</h2>
 
         <label>📞 Numero servizio</label>
@@ -307,9 +307,9 @@
             <div style="font-size:0.7rem; color:#777;">Nessuna nota normale. Aggiungine una.</div>
         </div>
 
-        <!-- NOTE SPECIALI (ora con stessa struttura delle normali) -->
+        <!-- NOTE SPECIALI (testo descrittivo rimosso) -->
         <div style="margin-top: 24px;">
-            <label>📌 NOTE SPECIALI (solo testo - ignorano coordinate)</label>
+            <label>📌 NOTE SPECIALI</label>
             <button id="addSpecialNoteBtn" class="small-btn" style="background:#4caf50; width:100%; margin:8px 0;">➕ AGGIUNGI NOTA SPECIALE</button>
             <div id="specialNoteInfo" class="status-msg" style="color:#1b5e20; font-weight:500; background:#e8f5e9; padding:6px 12px; border-radius:20px; margin-bottom:8px; display:none;">
                 ✨ Nota speciale selezionata: verrà letto solo il testo (ignora coordinate)
@@ -342,7 +342,7 @@
         </div>
 
         <button id="backHomeBtn" class="small-btn back-home" style="width:100%;">◀ TORNA INDIETRO</button>
-        <div class="version-footer">versione 0170 – Note speciali ora con titolo+descrizione, modificabili e cancellabili</div>
+        <div class="version-footer">versione 0171 – rimossa dicitura superflua nelle note speciali</div>
     </div>
 
     <!-- MODALE per aggiunta nota normale -->
@@ -377,14 +377,12 @@
 </div>
 
 <script>
-    // ==================== VERSIONE 0170 ====================
-    // - Note speciali trasformate identiche alle note normali (titolo + descrizione)
-    // - Eliminato il vecchio sistema con due campi statici
-    // - Aggiunto pulsante per aggiungere note speciali e modale dedicato
-    // - Persistenza separata per note normali e note speciali
+    // ==================== VERSIONE 0171 ====================
+    // - Solo rimozione della frase "(solo testo - ignorano coordinate)" accanto a "NOTE SPECIALI"
+    // - Nessuna altra modifica
     // =================================================================
 
-    const CURRENT_VERSION = "0170";
+    const CURRENT_VERSION = "0171";
     let currentService = "ambulanza";
     let currentLat = null, currentLng = null;
     let currentAddress = "";
@@ -457,7 +455,7 @@
     // ---------- ARCHIVIO NUMERI ----------
     function migratePhoneNumbers() {
         const services = ["ambulanza", "polizia", "veterinario", "clinica"];
-        const oldVersions = ["0169", "0168", "0167", "0166"];
+        const oldVersions = ["0170", "0169", "0168", "0167"];
         for (let s of services) {
             if (localStorage.getItem(`phone_${s}_${CURRENT_VERSION}`)) continue;
             for (let ver of oldVersions) {
@@ -533,11 +531,11 @@
     // ---------- GESTIONE NOTE NORMALI ----------
     function migrateOldNotes() {
         const services = ["ambulanza", "polizia", "veterinario", "clinica"];
-        const oldVersions = ["0169", "0168"];
+        const oldVersions = ["0170", "0169"];
         for (let s of services) {
             if (localStorage.getItem(`normalNotes_${s}_${CURRENT_VERSION}`)) continue;
             for (let ver of oldVersions) {
-                let old = localStorage.getItem(`sos_notes_${s}_${ver}`);
+                let old = localStorage.getItem(`normalNotes_${s}_${ver}`);
                 if (old) {
                     try {
                         let arr = JSON.parse(old);
@@ -604,7 +602,7 @@
         notesListArea.innerHTML = html;
     }
 
-    // ---------- GESTIONE NOTE SPECIALI (identica alle normali) ----------
+    // ---------- GESTIONE NOTE SPECIALI ----------
     function getSpecialNotesKey(s) { return `specialNotes_${s}_${CURRENT_VERSION}`; }
     function getSelectedSpecialKey(s) { return `selectedSpecialNote_${s}_${CURRENT_VERSION}`; }
     function saveSpecialNotes() {
@@ -637,7 +635,7 @@
             selectedSpecialNoteId = null;
             return;
         }
-        let html = '<div><strong>✨ Seleziona nota speciale (ignora coordinate):</strong></div>';
+        let html = '<div><strong>✨ Seleziona nota speciale:</strong></div>';
         specialNotes.forEach((note, idx) => {
             const isChecked = (String(selectedSpecialNoteId) === String(note.id)) ? 'checked' : '';
             html += `
@@ -846,7 +844,7 @@
         }
     }
 
-    // ---------- GEOLOCALIZZAZIONE + RICERCA ESTESA (invariata) ----------
+    // ---------- GEOLOCALIZZAZIONE + RICERCA ESTESA ----------
     function haversine(lat1,lng1,lat2,lng2) {
         const R = 6371e3;
         const φ1 = lat1 * Math.PI/180, φ2 = lat2 * Math.PI/180;
@@ -1040,7 +1038,6 @@
         await speakWords(intro, lang==='it'?'it-IT':'fr-FR', 1.0, 200);
         await speakWords(note, lang==='it'?'it-IT':'fr-FR', 1.0, 200);
         
-        // Per le note speciali, NON leggiamo coordinate, indirizzo e riferimenti
         if (!isSpecial) {
             await speakWords("Coordinate", lang==='it'?'it-IT':'fr-FR', 1.0, 200);
             await speakCoords(coord, lang==='it'?'it-IT':'fr-FR');
@@ -1185,4 +1182,3 @@
 </script>
 </body>
 </html>
-```
