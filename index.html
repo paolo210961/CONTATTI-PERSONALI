@@ -134,7 +134,7 @@
         .small-btn:active {
             transform: scale(0.97);
         }
-        /* NUOVI STILI PER I BLOCCHI CON SFONDO GRIGIO SCURO E BAFFO SINISTRO */
+        /* BLOCCHI GRIGI CON BAFFO SINISTRO */
         .dark-card {
             background: #d2d6dc;
             border-left: 6px solid #2c3e50;
@@ -184,20 +184,16 @@
         .info-card div {
             margin: 6px 0;
         }
-        /* STILE PER LE NOTE NORMALI E SPECIALI (layout con testo e tre pulsanti) */
+        /* STILE PER LE NOTE (senza sfondo arancione, direttamente su dark-card) */
         .note-item, .special-note-item {
-            background: #fff3e0;
-            padding: 10px 14px;
+            background: transparent;  /* rimuove sfondo arancione */
+            padding: 10px 0;
             margin: 12px 0;
-            border-radius: 48px;
             display: flex;
             align-items: center;
             gap: 10px;
             flex-wrap: wrap;
-            border-left: 6px solid #ff9800;
-        }
-        .special-note-item {
-            border-left-color: #4caf50;
+            border-bottom: 1px solid rgba(0,0,0,0.1);
         }
         .note-title, .special-note-title {
             font-weight: bold;
@@ -207,6 +203,7 @@
             padding: 0;
             margin-right: auto;  /* spinge i pulsanti a destra */
             flex: 1;
+            color: #1e1e2f;
         }
         .special-note-title {
             color: #1b5e20;
@@ -240,10 +237,6 @@
         }
         .confirm-note-btn.selected .dot {
             background-color: white; /* pallino bianco quando selezionato */
-        }
-        /* per garantire che il testo del bottone sia visibile */
-        .confirm-note-btn {
-            gap: 6px;
         }
         .add-note-btn {
             background: #283593 !important;
@@ -399,9 +392,7 @@
         <!-- BLOCCO NOTE NORMALI -->
         <div class="dark-card">
             <button id="addNoteBtn" class="small-btn add-note-btn">🚑 AGGIUNGI NOTA NORMALE</button>
-            <div id="normalNoteInfo" class="status-msg" style="color:#2e7d32; font-weight:500; background:#e8f5e9; padding:6px 12px; border-radius:20px; margin-bottom:8px; display:none;">
-                📌 Nota normale selezionata: verrà letto l'intero messaggio di emergenza
-            </div>
+            <!-- RIMOSSO div normalNoteInfo -->
             <div><strong>Seleziona nota normale:</strong></div>
             <div id="notesListArea">
                 <div style="font-size:0.7rem; color:#777;">Nessuna nota normale. Aggiungine una.</div>
@@ -411,9 +402,7 @@
         <!-- BLOCCO NOTE SPECIALI -->
         <div class="dark-card">
             <button id="addSpecialNoteBtn" class="small-btn add-note-btn">🏠 AGGIUNGI NOTA SPECIALE</button>
-            <div id="specialNoteInfo" class="status-msg" style="color:#1b5e20; font-weight:500; background:#e8f5e9; padding:6px 12px; border-radius:20px; margin-bottom:8px; display:none;">
-                ✨ Nota speciale selezionata: verrà letto solo il testo (ignora coordinate)
-            </div>
+            <!-- RIMOSSO div specialNoteInfo -->
             <div><strong>Seleziona nota speciale:</strong></div>
             <div id="specialNotesListArea">
                 <div style="font-size:0.7rem; color:#777;">Nessuna nota speciale. Aggiungine una.</div>
@@ -471,11 +460,12 @@
 
 <script>
     // ==================== VERSIONE 0182 MODIFICATA ====================
+    // - Rimossi sfondi arancioni delle note (ora trasparenti su dark-card)
+    // - Rimossi messaggi informativi normalNoteInfo e specialNoteInfo
     // - Geolocalizzazione solo manuale
     // - Tasto Google Maps: sfondo nero, testo bianco
     // - Blocchi dark-card per note normali e speciali
     // - Ogni nota: testo + pulsanti Modifica (verde oliva), Cancella (viola), Conferma (blu indaco con pallino centrale)
-    // - Il pulsante Conferma ha pallino che diventa bianco quando la nota è selezionata
     // - Esportazione/importazione include numeri di telefono
     // =================================================================
 
@@ -524,8 +514,6 @@
     const listenResponseBtn = document.getElementById('listenResponseBtn');
     const clearResponseBtn = document.getElementById('clearResponseBtn');
     const transcribeStatus = document.getElementById('transcribeStatus');
-    const normalNoteInfo = document.getElementById('normalNoteInfo');
-    const specialNoteInfo = document.getElementById('specialNoteInfo');
     const modal = document.getElementById('noteModal');
     const modalTitle = document.getElementById('modalTitle');
     const modalDesc = document.getElementById('modalDesc');
@@ -659,7 +647,6 @@
         selectedNormalNoteId = (savedNormalId && normalNotes[currentService].some(n => String(n.id) === savedNormalId)) ? savedNormalId : null;
         selectedSpecialNoteId = (savedSpecialId && specialNotes[currentService].some(n => String(n.id) === savedSpecialId)) ? savedSpecialId : null;
         renderCurrentNotes();
-        enforceMutualExclusion();
     }
     function saveCurrentServiceNotes() {
         if (currentService) {
@@ -668,7 +655,7 @@
         }
     }
 
-    // ---------- GESTIONE INTERFACCIA E MUTUA ESCLUSIONE ----------
+    // ---------- GESTIONE INTERFACCIA ----------
     function renderNormalNotes() {
         const notes = normalNotes[currentService] || [];
         if (!notes.length) {
@@ -690,7 +677,7 @@
             `;
         });
         notesListArea.innerHTML = html;
-        // Aggiungi event listener per i pulsanti conferma (dinamici)
+        // Aggiungi event listener per i pulsanti conferma
         document.querySelectorAll('.confirm-note-btn[data-type="normal"]').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 e.stopPropagation();
@@ -698,8 +685,6 @@
                 selectNormalNote(noteId);
             });
         });
-        // Event listener per modifica e cancella (delegazione)
-        attachNormalNoteEvents();
     }
 
     function renderSpecialNotes() {
@@ -730,7 +715,6 @@
                 selectSpecialNote(noteId);
             });
         });
-        attachSpecialNoteEvents();
     }
 
     function selectNormalNote(noteId) {
@@ -739,10 +723,6 @@
         selectedSpecialMode = false;
         saveSelectedIds();
         renderCurrentNotes();
-        enforceMutualExclusion();
-        normalNoteInfo.style.display = 'block';
-        specialNoteInfo.style.display = 'none';
-        setTimeout(() => { if (selectedNormalNoteId) normalNoteInfo.style.display = 'block'; }, 100);
     }
 
     function selectSpecialNote(noteId) {
@@ -751,29 +731,6 @@
         selectedSpecialMode = true;
         saveSelectedIds();
         renderCurrentNotes();
-        enforceMutualExclusion();
-        specialNoteInfo.style.display = 'block';
-        normalNoteInfo.style.display = 'none';
-        setTimeout(() => { if (selectedSpecialNoteId) specialNoteInfo.style.display = 'block'; }, 100);
-    }
-
-    function enforceMutualExclusion() {
-        // già gestita dalle select
-        if (selectedNormalNoteId && selectedSpecialNoteId) {
-            selectedSpecialNoteId = null;
-            saveSelectedIds();
-        }
-        // Aggiorna visibilità messaggi
-        if (selectedNormalNoteId) {
-            normalNoteInfo.style.display = 'block';
-            specialNoteInfo.style.display = 'none';
-        } else if (selectedSpecialNoteId) {
-            specialNoteInfo.style.display = 'block';
-            normalNoteInfo.style.display = 'none';
-        } else {
-            normalNoteInfo.style.display = 'none';
-            specialNoteInfo.style.display = 'none';
-        }
     }
 
     function renderCurrentNotes() {
@@ -783,7 +740,6 @@
 
     // ---------- EVENTI NOTE (modifica e cancella) ----------
     function attachNormalNoteEvents() {
-        // Usa delega sugli elementi statici notesListArea
         notesListArea.addEventListener('click', (e) => {
             const btn = e.target;
             if (btn.classList && btn.classList.contains('edit-note-btn')) {
@@ -801,7 +757,6 @@
                             note.description = newDesc.trim() || "";
                             saveNormalNotesForService(currentService);
                             renderNormalNotes();
-                            enforceMutualExclusion();
                             gpsStatus.innerHTML = "✅ Nota normale modificata";
                             setTimeout(()=> gpsStatus.innerHTML = "✅ Pronto.", 2000);
                         }
@@ -817,8 +772,6 @@
                 saveNormalNotesForService(currentService);
                 saveSelectedIds();
                 renderNormalNotes();
-                enforceMutualExclusion();
-                if (!normalNotes[currentService].length) normalNoteInfo.style.display = 'none';
                 gpsStatus.innerHTML = "✅ Nota normale eliminata";
                 setTimeout(()=> gpsStatus.innerHTML = "✅ Pronto.", 2000);
             }
@@ -843,7 +796,6 @@
                             note.description = newDesc.trim() || "";
                             saveSpecialNotesForService(currentService);
                             renderSpecialNotes();
-                            enforceMutualExclusion();
                             gpsStatus.innerHTML = "✅ Nota speciale modificata";
                             setTimeout(()=> gpsStatus.innerHTML = "✅ Pronto.", 2000);
                         }
@@ -859,8 +811,6 @@
                 saveSpecialNotesForService(currentService);
                 saveSelectedIds();
                 renderSpecialNotes();
-                enforceMutualExclusion();
-                if (!specialNotes[currentService].length) specialNoteInfo.style.display = 'none';
                 gpsStatus.innerHTML = "✅ Nota speciale eliminata";
                 setTimeout(()=> gpsStatus.innerHTML = "✅ Pronto.", 2000);
             }
@@ -878,7 +828,6 @@
         saveNormalNotesForService(currentService);
         saveSelectedIds();
         renderNormalNotes();
-        enforceMutualExclusion();
         gpsStatus.innerHTML = "✅ Nota normale aggiunta";
         setTimeout(()=> gpsStatus.innerHTML = "✅ Pronto.", 2000);
         selectedSpecialMode = false;
@@ -894,7 +843,6 @@
         saveSpecialNotesForService(currentService);
         saveSelectedIds();
         renderSpecialNotes();
-        enforceMutualExclusion();
         gpsStatus.innerHTML = "✅ Nota speciale aggiunta";
         setTimeout(()=> gpsStatus.innerHTML = "✅ Pronto.", 2000);
         selectedSpecialMode = true;
@@ -1288,7 +1236,6 @@
             }
             if (currentService) {
                 loadCurrentServiceNotes();
-                enforceMutualExclusion();
                 phoneInput.value = getPhone(currentService) || defaultPhone[currentService];
             }
             gpsStatus.innerHTML = "✅ Note e numeri ripristinati da file.";
@@ -1304,7 +1251,6 @@
         currentServiceDeco.innerText = label;
         phoneInput.value = getPhone(s) || defaultPhone[s];
         loadCurrentServiceNotes();
-        enforceMutualExclusion();
         resetCoords();
         homePage.classList.add("hidden");
         emergencyPage.classList.remove("hidden");
@@ -1352,9 +1298,8 @@
             globalImportFileInput.value = '';
         });
         initRecognition();
-        // Le funzioni attach saranno chiamate dai render, ma assicuriamo che i listener principali siano attivi
-        normalNoteInfo.style.display = 'none';
-        specialNoteInfo.style.display = 'none';
+        attachNormalNoteEvents();
+        attachSpecialNoteEvents();
     }
     init();
 </script>
