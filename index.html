@@ -126,12 +126,10 @@
         .small-btn:active {
             transform: scale(0.97);
         }
-        /* Altezza raddoppiata per alcuni pulsanti */
         .double-height {
             padding: 16px 12px;
             font-size: 1rem;
         }
-        /* BLOCCHI GRIGI CON BAFFO SINISTRO */
         .dark-card {
             background: #d2d6dc;
             border-left: 6px solid #2c3e50;
@@ -165,7 +163,6 @@
             background: #fff;
             font-family: monospace;
         }
-        /* STILE PER LE NOTE */
         .note-item, .special-note-item {
             background: transparent;
             padding: 10px 0;
@@ -272,9 +269,20 @@
             font-weight: bold;
             text-align: center;
             padding: 10px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
         .operator-header-btn:active {
             transform: none;
+        }
+        /* Riga con intestazione e tasto cancella: fissa su mobile */
+        .header-row {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: nowrap;
+            margin-bottom: 12px;
         }
         .status-msg {
             font-size: 0.7rem;
@@ -330,6 +338,20 @@
             .confirm-note-btn { width: 36px; }
             .confirm-note-btn .dot { width: 12px; height: 12px; }
             .note-title-btn { font-size: 0.75rem; padding: 6px 8px; min-width: 80px; }
+            /* Compatta la riga header su mobile */
+            .header-row {
+                gap: 6px;
+            }
+            .operator-header-btn {
+                font-size: 0.7rem;
+                padding: 8px 6px;
+                white-space: normal;
+                word-break: break-word;
+            }
+            .clear-btn {
+                padding: 8px 10px;
+                font-size: 0.7rem;
+            }
         }
         .version-footer {
             text-align: center;
@@ -369,18 +391,10 @@
             margin-top: 8px;
             color: #1a237e;
         }
-        /* Riga con intestazione e tasto cancella */
-        .header-row {
-            display: flex;
-            gap: 10px;
-            align-items: center;
-            margin-bottom: 12px;
-        }
     </style>
 </head>
 <body>
 <div class="container">
-    <!-- HOME PAGE -->
     <div id="homePage" class="page">
         <div class="version-header">📟 SOS-EMERGENZE v0182 - Layout home aggiornato</div>
         <h1>🆘 SOS EMERGENZA</h1>
@@ -400,11 +414,9 @@
         <div class="version-footer">versione 0182 – ascolto 30s, layout operatore ridisegnato</div>
     </div>
 
-    <!-- EMERGENCY PAGE -->
     <div id="emergencyPage" class="page hidden">
         <div id="currentServiceDeco" class="current-service-deco">🚑 AMBULANZA</div>
 
-        <!-- BLOCCO 1: NUMERO SERVIZIO + TELEFONO + SALVA -->
         <div class="dark-card">
             <div class="section-title">Numero servizio</div>
             <div class="flex-row">
@@ -416,7 +428,6 @@
 
         <button id="googleMapsBtn" class="small-btn" style="width:100%; margin:4px 0;">🗺️ APRI GOOGLE MAPS</button>
 
-        <!-- BLOCCO 2: CARICA POSIZIONE + INDIRIZZO + INFORMAZIONI COORDINATE -->
         <div class="dark-card">
             <button id="geolocationBtn" class="small-btn" style="width:100%; margin-bottom:12px;">📍 CARICA POSIZIONE + INDIRIZZO</button>
             <div id="coordsContainer" style="margin-top:8px;">
@@ -429,7 +440,6 @@
             </div>
         </div>
 
-        <!-- BLOCCO NOTE NORMALI -->
         <div class="dark-card">
             <button id="addNoteBtn" class="small-btn add-note-btn">
                 <span>🚑 AGGIUNGI NOTA NORMALE</span>
@@ -441,7 +451,6 @@
             </div>
         </div>
 
-        <!-- BLOCCO NOTE SPECIALI -->
         <div class="dark-card">
             <button id="addSpecialNoteBtn" class="small-btn add-note-btn">
                 <span>🏠 AGGIUNGI NOTA SPECIALE</span>
@@ -453,23 +462,18 @@
             </div>
         </div>
 
-        <!-- BLOCCO UNICO: RISPOSTA OPERATORE (nuovo layout) -->
         <div class="dark-card">
-            <!-- Riga con intestazione e tasto CANCELLA -->
             <div class="header-row">
                 <button class="small-btn operator-header-btn" disabled>🎧 RISPOSTA OPERATORE tradotto in ITALIANO</button>
                 <button id="clearResponseBtn" class="small-btn clear-btn">🗑️ CANCELLA</button>
             </div>
-            <!-- Pulsante ASCOLTA OPERATORE (larghezza piena, altezza doppia) -->
             <button id="listenResponseBtn" class="small-btn listen-btn double-height">🎤 ASCOLTA OPERATORE</button>
             <div id="listenInfoMsg" class="temp-message" style="display:none;"></div>
-            <!-- Textarea traduzione -->
             <textarea id="operatorResponse" rows="3" readonly placeholder="Traduzione italiana"></textarea>
-            <!-- Riga con COPIA, LEGGI IT, LEGGI FR (ciascuno altezza doppia) -->
             <div class="flex-row">
-                <button id="copyBtn" class="small-btn copy-btn double-height">📋 COPIA</button>
-                <button id="audioItBtn" class="small-btn audio-lang-btn double-height">🔊 LEGGI IT</button>
-                <button id="audioFrBtn" class="small-btn audio-lang-btn double-height">🔊 LEGGI FR</button>
+                <button id="copyBtn" class="small-btn copy-btn double-height">COPIA</button>
+                <button id="audioItBtn" class="small-btn audio-lang-btn double-height">LEGGI in IT</button>
+                <button id="audioFrBtn" class="small-btn audio-lang-btn double-height">LEGGI in FR</button>
             </div>
             <div id="copyInfoMsg" class="temp-message" style="display:none;"></div>
             <div id="transcribeStatus" class="status-msg"></div>
@@ -479,7 +483,6 @@
         <div class="version-footer">versione 0182 – ascolto 30s, traduzione persistente, layout migliorato</div>
     </div>
 
-    <!-- MODALI per aggiunta note -->
     <div id="noteModal" class="modal" style="display:none;">
         <div class="modal-content">
             <h3>➕ Nuova Nota Normale</h3>
@@ -509,12 +512,10 @@
 </div>
 
 <script>
-    // ==================== VERSIONE 0182 MODIFICATA ====================
-    // - Tasto ASCOLTA: durata 30 secondi, nessuna scritta "15s", messaggio info temporaneo, altezza doppia
-    // - Tasto COPIA: messaggio differenziato (normale/speciale) per 15 secondi
-    // - Tasto CANCELLA spostato accanto all'intestazione del blocco operatore
-    // - Altezza raddoppiata per ASCOLTA OPERATORE, COPIA, LEGGI IT, LEGGI FR
-    // - Persistenza traduzione operatore in localStorage
+    // ==================== VERSIONE 0182 FINALE ====================
+    // - Testi pulsanti senza emoji: "COPIA", "LEGGI in IT", "LEGGI in FR"
+    // - Layout header con tasto CANCELLA ora corretto su mobile (flex-wrap: nowrap)
+    // - Tutte le funzionalità precedenti invariate
     // =================================================================
 
     const CURRENT_VERSION = "0182";
@@ -535,7 +536,6 @@
         specialNotes[s] = [];
     }
 
-    // DOM elements
     const homePage = document.getElementById('homePage');
     const emergencyPage = document.getElementById('emergencyPage');
     const currentServiceDeco = document.getElementById('currentServiceDeco');
@@ -593,7 +593,6 @@
         }, duration);
     }
 
-    // Persistenza traduzione operatore
     function saveOperatorTranslation(text) {
         if (currentService) {
             localStorage.setItem(`operatorResponse_${currentService}_${CURRENT_VERSION}`, text);
@@ -602,11 +601,8 @@
     function loadOperatorTranslation() {
         if (currentService) {
             const saved = localStorage.getItem(`operatorResponse_${currentService}_${CURRENT_VERSION}`);
-            if (saved !== null) {
-                operatorResponse.value = saved;
-            } else {
-                operatorResponse.value = "";
-            }
+            if (saved !== null) operatorResponse.value = saved;
+            else operatorResponse.value = "";
         }
     }
     function clearOperatorTranslation() {
@@ -616,19 +612,16 @@
         }
     }
 
-    // ---------- WakeLock ----------
     async function requestWakeLock() {
         if ('wakeLock' in navigator) {
             try {
                 wakeLock = await navigator.wakeLock.request('screen');
-                console.log('WakeLock attivo');
                 wakeLock.addEventListener('release', () => console.log('WakeLock rilasciato'));
             } catch(err) { console.warn('WakeLock non supportato:', err); }
         }
     }
     function releaseWakeLock() { if (wakeLock) { wakeLock.release(); wakeLock = null; } }
 
-    // ---------- ARCHIVIO NUMERI ----------
     function migratePhoneNumbers() {
         const oldVersions = ["0181", "0180", "0179"];
         for (let s of services) {
@@ -643,7 +636,6 @@
     function getPhone(s) { return localStorage.getItem(`phone_${s}_${CURRENT_VERSION}`); }
     const defaultPhone = { ambulanza:"118", polizia:"113", veterinario:"800123456", clinica:"800987654" };
 
-    // ---------- TRADUZIONI ----------
     async function translateToFrench(italianText) {
         if (!italianText || italianText.trim() === "") return "";
         try {
@@ -665,7 +657,6 @@
         return frenchText + " (traduzione fallita)";
     }
 
-    // ---------- RICONOSCIMENTO VOCALE (30 secondi) ----------
     function initRecognition() {
         if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
             transcribeStatus.innerText = "❌ Riconoscimento non supportato";
@@ -681,9 +672,7 @@
     async function startListening30s() {
         if (!recognition && !initRecognition()) return;
         if (recognitionTimeout) clearTimeout(recognitionTimeout);
-        
         showTemporaryMessage(listenInfoMsg, "🎤 Ascolto in corso per 30 secondi. La risposta dell'operatore verrà tradotta in italiano.", 15000);
-        
         transcribeStatus.innerText = "🎤 Ascolto francese per 30 secondi...";
         recognition.start();
         let finalTranscript = "";
@@ -707,7 +696,6 @@
         recognitionTimeout = setTimeout(() => { if (recognition && recognition.stop) recognition.stop(); }, 30000);
     }
 
-    // ---------- PERSISTENZA NOTE ----------
     function getNormalNotesKey(s) { return `normalNotes_${s}_${CURRENT_VERSION}`; }
     function getSpecialNotesKey(s) { return `specialNotes_${s}_${CURRENT_VERSION}`; }
     function getSelectedNormalIdKey(s) { return `selectedNormalNote_${s}_${CURRENT_VERSION}`; }
@@ -737,14 +725,7 @@
         selectedSpecialNoteId = (savedSpecialId && specialNotes[currentService].some(n => String(n.id) === savedSpecialId)) ? savedSpecialId : null;
         renderCurrentNotes();
     }
-    function saveCurrentServiceNotes() {
-        if (currentService) {
-            saveNormalNotesForService(currentService);
-            saveSpecialNotesForService(currentService);
-        }
-    }
 
-    // ---------- GESTIONE INTERFACCIA ----------
     function renderNormalNotes() {
         const notes = normalNotes[currentService] || [];
         if (!notes.length) {
@@ -776,14 +757,11 @@
             btn.addEventListener('click', handleNormalConfirm);
         });
     }
-
     function handleNormalConfirm(e) {
         e.stopPropagation();
-        const btn = e.currentTarget;
-        const noteId = btn.getAttribute('data-id');
+        const noteId = e.currentTarget.getAttribute('data-id');
         selectNormalNote(noteId);
     }
-
     function renderSpecialNotes() {
         const notes = specialNotes[currentService] || [];
         if (!notes.length) {
@@ -815,14 +793,11 @@
             btn.addEventListener('click', handleSpecialConfirm);
         });
     }
-
     function handleSpecialConfirm(e) {
         e.stopPropagation();
-        const btn = e.currentTarget;
-        const noteId = btn.getAttribute('data-id');
+        const noteId = e.currentTarget.getAttribute('data-id');
         selectSpecialNote(noteId);
     }
-
     function selectNormalNote(noteId) {
         selectedNormalNoteId = noteId;
         selectedSpecialNoteId = null;
@@ -832,7 +807,6 @@
         if (normalNoteInfo) showTemporaryMessage(normalNoteInfo, "📌 Nota normale selezionata: verrà letto l'intero messaggio di emergenza", 15000);
         if (specialNoteInfo) specialNoteInfo.style.display = 'none';
     }
-
     function selectSpecialNote(noteId) {
         selectedSpecialNoteId = noteId;
         selectedNormalNoteId = null;
@@ -842,13 +816,8 @@
         if (specialNoteInfo) showTemporaryMessage(specialNoteInfo, "✨ Nota speciale selezionata: verrà letto solo il testo (ignora coordinate)", 15000);
         if (normalNoteInfo) normalNoteInfo.style.display = 'none';
     }
+    function renderCurrentNotes() { renderNormalNotes(); renderSpecialNotes(); }
 
-    function renderCurrentNotes() {
-        renderNormalNotes();
-        renderSpecialNotes();
-    }
-
-    // ---------- EVENTI NOTE (modifica e cancella) ----------
     function attachNormalNoteEvents() {
         notesListArea.addEventListener('click', (e) => {
             const btn = e.target;
@@ -887,7 +856,6 @@
             }
         });
     }
-
     function attachSpecialNoteEvents() {
         specialNotesListArea.addEventListener('click', (e) => {
             const btn = e.target;
@@ -927,7 +895,6 @@
         });
     }
 
-    // ---------- MODALI AGGIUNTA ----------
     function addNewNormalNote() {
         let title = modalTitle.value.trim();
         if (title === "") title = "Senza titolo";
@@ -982,7 +949,6 @@
     }
     function escapeHtml(str) { return str.replace(/[&<>]/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;' }[m])); }
 
-    // ---------- COPIA BILINGUE con messaggio differenziato ----------
     async function getBilingualCopy() {
         let noteIT = getSelectedNoteDescription() || "nessuna nota";
         let coord = (currentLat && currentLng) ? `${currentLat.toFixed(6)}, ${currentLng.toFixed(6)}` : "non disponibili";
@@ -1003,19 +969,13 @@
         let french = `${introFR}\n\n${noteFR}\n\nCoordonnées: ${coord}\nAdresse: ${addrFR}\nJe suis près de (1): ${refAFR}\nJe suis près de (2): ${refBFR}\nJe suis près de (3): ${refCFR}\n\n${domandaFR}`;
         return french + "\n\n-----\n\n" + italian;
     }
-
     async function copyBilingual() {
         gpsStatus.innerHTML = "⏳ Preparazione copia...";
         let txt = await getBilingualCopy();
         try {
             await navigator.clipboard.writeText(txt);
             gpsStatus.innerHTML = "📋 Copiato!";
-            let infoMessage = "";
-            if (selectedSpecialMode) {
-                infoMessage = "⚠️ ATTENZIONE: è selezionata una NOTA SPECIALE. Verrà copiato solo il testo della nota, SENZA coordinate, indirizzo e riferimenti stradali.";
-            } else {
-                infoMessage = "📋 Copiati: coordinate, indirizzo, riferimenti vicini e la nota selezionata (normale).";
-            }
+            let infoMessage = selectedSpecialMode ? "⚠️ ATTENZIONE: è selezionata una NOTA SPECIALE. Verrà copiato solo il testo della nota, SENZA coordinate, indirizzo e riferimenti stradali." : "📋 Copiati: coordinate, indirizzo, riferimenti vicini e la nota selezionata (normale).";
             showTemporaryMessage(copyInfoMsg, infoMessage, 15000);
             setTimeout(()=> gpsStatus.innerHTML = "✅ Pronto.", 2000);
         } catch(e) {
@@ -1031,7 +991,6 @@
         }
     }
 
-    // ---------- GEOLOCALIZZAZIONE (solo manuale) ----------
     function haversine(lat1,lng1,lat2,lng2) {
         const R = 6371e3;
         const φ1 = lat1 * Math.PI/180, φ2 = lat2 * Math.PI/180;
@@ -1157,7 +1116,6 @@
         gpsStatus.innerHTML = "";
     }
 
-    // ---------- LETTURA VOCALE ----------
     function playBeep() {
         try {
             let ctx = new (window.AudioContext || window.webkitAudioContext)();
@@ -1239,7 +1197,6 @@
     function speakItalian() { speakFull('it'); }
     function speakFrench() { speakFull('fr'); }
 
-    // ---------- ESPORTA / IMPORTA (tutti i servizi + numeri) ----------
     function exportAllNotes() {
         let content = "";
         content += "[NUMERI TELEFONO]\n";
@@ -1275,7 +1232,6 @@
         gpsStatus.innerHTML = "📁 Backup completo salvato (note + numeri).";
         setTimeout(() => gpsStatus.innerHTML = "✅ Pronto.", 2000);
     }
-
     function importAllNotes(file) {
         const reader = new FileReader();
         reader.onload = (e) => {
@@ -1290,19 +1246,13 @@
             }
             let currentTitle = "", currentDesc = "";
             let inPhoneSection = false;
-
             for (let line of lines) {
                 line = line.trim();
-                if (line === "[NUMERI TELEFONO]") {
-                    inPhoneSection = true;
-                    continue;
-                }
+                if (line === "[NUMERI TELEFONO]") { inPhoneSection = true; continue; }
                 if (inPhoneSection && line.match(/^[A-Z]+=/)) {
                     let [key, value] = line.split('=');
                     let serv = key.toLowerCase();
-                    if (services.includes(serv) && value) {
-                        savePhone(serv, value);
-                    }
+                    if (services.includes(serv) && value) savePhone(serv, value);
                     continue;
                 }
                 if (line.startsWith("[SERVIZIO:")) {
@@ -1322,17 +1272,9 @@
                 if (titleMatch && currentServiceImport && currentSection) {
                     if (currentTitle !== "") {
                         if (currentSection === "normal") {
-                            newNormal[currentServiceImport].push({
-                                id: Date.now() + Math.random() * 10000 + newNormal[currentServiceImport].length,
-                                title: currentTitle,
-                                description: currentDesc
-                            });
+                            newNormal[currentServiceImport].push({ id: Date.now() + Math.random() * 10000 + newNormal[currentServiceImport].length, title: currentTitle, description: currentDesc });
                         } else {
-                            newSpecial[currentServiceImport].push({
-                                id: Date.now() + Math.random() * 10000 + newSpecial[currentServiceImport].length,
-                                title: currentTitle,
-                                description: currentDesc
-                            });
+                            newSpecial[currentServiceImport].push({ id: Date.now() + Math.random() * 10000 + newSpecial[currentServiceImport].length, title: currentTitle, description: currentDesc });
                         }
                     }
                     currentTitle = titleMatch[1].trim();
@@ -1364,7 +1306,6 @@
         reader.readAsText(file, "UTF-8");
     }
 
-    // ---------- FLUSSO PRINCIPALE ----------
     function showEmergency(s) {
         currentService = s;
         let label = {ambulanza:"🚑 AMBULANZA", polizia:"👮 POLIZIA", veterinario:"🐾 VETERINARIO", clinica:"🏥 CLINICA"}[s];
