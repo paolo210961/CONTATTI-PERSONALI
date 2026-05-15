@@ -163,68 +163,68 @@
             background: #fff;
             font-family: monospace;
         }
+        /* LAYOUT NOTE: riga pulsanti + pulsante titolo bianco sottostante */
         .note-item, .special-note-item {
             background: transparent;
-            padding: 10px 0;
-            margin: 12px 0;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            flex-wrap: wrap;
+            margin: 16px 0;
             border-bottom: 1px solid rgba(0,0,0,0.1);
         }
-        .note-actions-left {
+        .note-row-buttons {
             display: flex;
-            gap: 8px;
-            flex-shrink: 0;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-bottom: 8px;
         }
-        .note-actions-right {
-            display: flex;
-            gap: 8px;
-            flex-shrink: 1;
-            min-width: 0;
+        .note-btn-edit, .note-btn-delete {
             flex: 1;
-            justify-content: flex-end;
+            text-align: center;
+        }
+        .note-btn-confirm {
+            flex: 0 0 50px;
+            width: 50px;
+            background: #283593;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .note-btn-confirm .dot {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background-color: #283593;
+            display: inline-block;
+            transition: background-color 0.1s;
+        }
+        .note-btn-confirm.selected .dot {
+            background-color: white;
+        }
+        /* Pulsante titolo (bianco, disabilitato) */
+        .note-title-btn {
+            background: white;
+            color: black;
+            cursor: default;
+            opacity: 1;
+            width: 100%;
+            text-align: left;
+            padding: 10px 12px;
+            border: 1px solid #ced4da;
+            border-radius: 32px;
+            font-weight: normal;
+            font-size: 0.9rem;
+            margin-top: 4px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .note-title-btn:active {
+            transform: none;
         }
         .edit-note-btn, .edit-special-note-btn {
             background: #6b8e23;
         }
         .delete-note-btn, .delete-special-note-btn {
             background: #8e44ad;
-        }
-        .confirm-note-btn {
-            background: #283593;
-            width: 40px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
-        }
-        .confirm-note-btn .dot {
-            width: 16px;
-            height: 16px;
-            border-radius: 50%;
-            background-color: #283593;
-            display: inline-block;
-            transition: background-color 0.1s;
-        }
-        .confirm-note-btn.selected .dot {
-            background-color: white;
-        }
-        .note-title-btn {
-            background: white;
-            color: black;
-            cursor: default;
-            opacity: 1;
-            flex: 1;
-            min-width: 100px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-            text-align: left;
-            padding: 8px 12px;
-            border: 1px solid #ced4da;
-            font-weight: normal;
         }
         .add-note-btn {
             background: #283593 !important;
@@ -244,7 +244,6 @@
             margin-right: 6px;
             font-size: 1.2rem;
         }
-        /* Pulsante Torna Indietro (arancione intenso) */
         .back-home {
             background: #e67e22 !important;
             color: white;
@@ -287,6 +286,39 @@
             font-size: 0.7rem;
             color: #2c3e66;
             margin-top: 6px;
+        }
+        /* MODAL FULLSCREEN per textarea */
+        .fullscreen-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: white;
+            z-index: 2000;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .fullscreen-modal textarea {
+            flex: 1;
+            width: 100%;
+            font-size: 1.2rem;
+            padding: 16px;
+            border-radius: 24px;
+            margin-bottom: 20px;
+            resize: none;
+        }
+        .fullscreen-modal button {
+            background: #283593;
+            color: white;
+            padding: 14px;
+            border-radius: 40px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            border: none;
+            cursor: pointer;
         }
         .modal {
             position: fixed;
@@ -333,13 +365,10 @@
             .double-height { padding: 12px 10px; font-size: 0.9rem; }
             h1 { font-size: 1.6rem; }
             .dark-card { padding: 12px; }
-            .note-item, .special-note-item { gap: 8px; }
-            .confirm-note-btn { width: 36px; }
-            .confirm-note-btn .dot { width: 12px; height: 12px; }
-            .note-title-btn { font-size: 0.75rem; padding: 6px 8px; min-width: 80px; }
-            .listen-row { gap: 6px; }
-            .clear-btn { padding: 12px 10px; }
-            .back-home { margin: 12px 0; }
+            .note-row-buttons { gap: 6px; }
+            .note-btn-confirm { width: 40px; }
+            .note-btn-confirm .dot { width: 16px; height: 16px; }
+            .note-title-btn { font-size: 0.8rem; padding: 8px 10px; white-space: normal; }
         }
         .version-footer {
             text-align: center;
@@ -440,7 +469,7 @@
             </div>
         </div>
 
-        <!-- BLOCCO NOTE NORMALI -->
+        <!-- BLOCCO NOTE NORMALI con nuovo layout -->
         <div class="dark-card">
             <button id="addNoteBtn" class="small-btn add-note-btn">
                 <span>🚑 AGGIUNGI NOTA NORMALE</span>
@@ -452,10 +481,10 @@
             </div>
         </div>
 
-        <!-- PULSANTE TORNA INDIETRO (posizionato tra i due blocchi note) -->
+        <!-- PULSANTE TORNA INDIETRO -->
         <button id="backHomeBtn" class="small-btn back-home" style="width:100%;">◀ TORNA INDIETRO</button>
 
-        <!-- BLOCCO NOTE SPECIALI -->
+        <!-- BLOCCO NOTE SPECIALI con nuovo layout -->
         <div class="dark-card">
             <button id="addSpecialNoteBtn" class="small-btn add-note-btn">
                 <span>🏠 AGGIUNGI NOTA SPECIALE</span>
@@ -467,7 +496,7 @@
             </div>
         </div>
 
-        <!-- NUOVO LAYOUT PER OPERATORE -->
+        <!-- BLOCCO OPERATORE -->
         <div class="dark-card">
             <div class="listen-row">
                 <button id="listenResponseBtn" class="small-btn listen-btn double-height">🎤 ASCOLTA OPERATORE</button>
@@ -491,7 +520,13 @@
         <div class="version-footer">versione 0182 – ascolto 30s, traduzione persistente, layout operatore ridisegnato</div>
     </div>
 
-    <!-- MODALI per aggiunta note (invariati) -->
+    <!-- MODAL FULLSCREEN PER TEXTAREA -->
+    <div id="fullscreenModal" class="fullscreen-modal" style="display:none;">
+        <textarea id="fullscreenTextarea" readonly></textarea>
+        <button id="closeFullscreenBtn">CHIUDI</button>
+    </div>
+
+    <!-- MODALI per aggiunta note -->
     <div id="noteModal" class="modal" style="display:none;">
         <div class="modal-content">
             <h3>➕ Nuova Nota Normale</h3>
@@ -521,11 +556,10 @@
 </div>
 
 <script>
-    // ==================== VERSIONE 0182 FINALE ====================
-    // - Pulsante TORNA INDIETRO posizionato tra blocchi NOTE NORMALI e NOTE SPECIALI
-    // - Colore arancione intenso
-    // - Layout operatore con ASCOLTA e CANCELLA in alto, poi intestazione, textarea e tre pulsanti
-    // - Tutte le funzionalità invariate
+    // ==================== VERSIONE 0182 FINALE (corretta) ====================
+    // - Layout note: riga con Modifica, Cancella, Conferma (fisso) + pulsante titolo bianco sottostante
+    // - Textarea traduzione cliccabile apre fullscreen
+    // - Tutte le funzionalità precedenti invariate
     // =================================================================
 
     const CURRENT_VERSION = "0182";
@@ -546,6 +580,7 @@
         specialNotes[s] = [];
     }
 
+    // DOM elements
     const homePage = document.getElementById('homePage');
     const emergencyPage = document.getElementById('emergencyPage');
     const currentServiceDeco = document.getElementById('currentServiceDeco');
@@ -589,9 +624,22 @@
     const exportAllBtn = document.getElementById('exportAllBtn');
     const importAllBtn = document.getElementById('importAllBtn');
     const globalImportFileInput = document.getElementById('globalImportFileInput');
+    const fullscreenModal = document.getElementById('fullscreenModal');
+    const fullscreenTextarea = document.getElementById('fullscreenTextarea');
+    const closeFullscreenBtn = document.getElementById('closeFullscreenBtn');
 
     let recognition = null;
     let recognitionTimeout = null;
+
+    function openFullscreen() {
+        fullscreenTextarea.value = operatorResponse.value;
+        fullscreenModal.style.display = 'flex';
+    }
+    function closeFullscreen() {
+        fullscreenModal.style.display = 'none';
+    }
+    operatorResponse.addEventListener('click', openFullscreen);
+    closeFullscreenBtn.addEventListener('click', closeFullscreen);
 
     function showTemporaryMessage(element, message, duration = 15000) {
         if (!element) return;
@@ -736,6 +784,7 @@
         renderCurrentNotes();
     }
 
+    // Render note con pulsante titolo bianco disabilitato
     function renderNormalNotes() {
         const notes = normalNotes[currentService] || [];
         if (!notes.length) {
@@ -747,17 +796,15 @@
             const isSelected = (String(selectedNormalNoteId) === String(note.id));
             const titleText = note.title && note.title.trim() !== "" ? note.title : "titolo nota";
             html += `
-                <div class="note-item" data-id="${note.id}">
-                    <div class="note-actions-left">
-                        <button class="edit-note-btn small-btn">✏️ Modifica</button>
-                        <button class="delete-note-btn small-btn">🗑️ Cancella</button>
-                    </div>
-                    <div class="note-actions-right">
-                        <button class="note-title-btn small-btn" disabled title="${escapeHtml(titleText)}">${escapeHtml(titleText)}</button>
-                        <button class="confirm-note-btn small-btn ${isSelected ? 'selected' : ''}" data-id="${note.id}" data-type="normal">
+                <div class="note-item" data-id="${note.id}" data-type="normal">
+                    <div class="note-row-buttons">
+                        <button class="edit-note-btn small-btn note-btn-edit">✏️ Modifica</button>
+                        <button class="delete-note-btn small-btn note-btn-delete">🗑️ Cancella</button>
+                        <button class="confirm-note-btn small-btn note-btn-confirm ${isSelected ? 'selected' : ''}" data-id="${note.id}" data-type="normal">
                             <span class="dot"></span>
                         </button>
                     </div>
+                    <button class="note-title-btn" disabled title="${escapeHtml(titleText)}">${escapeHtml(titleText)}</button>
                 </div>
             `;
         });
@@ -767,11 +814,14 @@
             btn.addEventListener('click', handleNormalConfirm);
         });
     }
+
     function handleNormalConfirm(e) {
         e.stopPropagation();
-        const noteId = e.currentTarget.getAttribute('data-id');
+        const btn = e.currentTarget;
+        const noteId = btn.getAttribute('data-id');
         selectNormalNote(noteId);
     }
+
     function renderSpecialNotes() {
         const notes = specialNotes[currentService] || [];
         if (!notes.length) {
@@ -783,17 +833,15 @@
             const isSelected = (String(selectedSpecialNoteId) === String(note.id));
             const titleText = note.title && note.title.trim() !== "" ? note.title : "titolo nota";
             html += `
-                <div class="special-note-item" data-id="${note.id}">
-                    <div class="note-actions-left">
-                        <button class="edit-special-note-btn small-btn">✏️ Modifica</button>
-                        <button class="delete-special-note-btn small-btn">🗑️ Cancella</button>
-                    </div>
-                    <div class="note-actions-right">
-                        <button class="note-title-btn small-btn" disabled title="${escapeHtml(titleText)}">${escapeHtml(titleText)}</button>
-                        <button class="confirm-note-btn small-btn ${isSelected ? 'selected' : ''}" data-id="${note.id}" data-type="special">
+                <div class="special-note-item" data-id="${note.id}" data-type="special">
+                    <div class="note-row-buttons">
+                        <button class="edit-special-note-btn small-btn note-btn-edit">✏️ Modifica</button>
+                        <button class="delete-special-note-btn small-btn note-btn-delete">🗑️ Cancella</button>
+                        <button class="confirm-note-btn small-btn note-btn-confirm ${isSelected ? 'selected' : ''}" data-id="${note.id}" data-type="special">
                             <span class="dot"></span>
                         </button>
                     </div>
+                    <button class="note-title-btn" disabled title="${escapeHtml(titleText)}">${escapeHtml(titleText)}</button>
                 </div>
             `;
         });
@@ -803,11 +851,14 @@
             btn.addEventListener('click', handleSpecialConfirm);
         });
     }
+
     function handleSpecialConfirm(e) {
         e.stopPropagation();
-        const noteId = e.currentTarget.getAttribute('data-id');
+        const btn = e.currentTarget;
+        const noteId = btn.getAttribute('data-id');
         selectSpecialNote(noteId);
     }
+
     function selectNormalNote(noteId) {
         selectedNormalNoteId = noteId;
         selectedSpecialNoteId = null;
@@ -817,6 +868,7 @@
         if (normalNoteInfo) showTemporaryMessage(normalNoteInfo, "📌 Nota normale selezionata: verrà letto l'intero messaggio di emergenza", 15000);
         if (specialNoteInfo) specialNoteInfo.style.display = 'none';
     }
+
     function selectSpecialNote(noteId) {
         selectedSpecialNoteId = noteId;
         selectedNormalNoteId = null;
@@ -826,6 +878,7 @@
         if (specialNoteInfo) showTemporaryMessage(specialNoteInfo, "✨ Nota speciale selezionata: verrà letto solo il testo (ignora coordinate)", 15000);
         if (normalNoteInfo) normalNoteInfo.style.display = 'none';
     }
+
     function renderCurrentNotes() { renderNormalNotes(); renderSpecialNotes(); }
 
     function attachNormalNoteEvents() {
@@ -866,6 +919,7 @@
             }
         });
     }
+
     function attachSpecialNoteEvents() {
         specialNotesListArea.addEventListener('click', (e) => {
             const btn = e.target;
@@ -1001,6 +1055,7 @@
         }
     }
 
+    // Funzioni geolocalizzazione (invariate)
     function haversine(lat1,lng1,lat2,lng2) {
         const R = 6371e3;
         const φ1 = lat1 * Math.PI/180, φ2 = lat2 * Math.PI/180;
