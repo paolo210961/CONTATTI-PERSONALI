@@ -42,7 +42,6 @@
             padding-bottom: 10px;
             margin-bottom: 20px;
         }
-        /* Pulsante titolo (con long press per admin) */
         .title-btn {
             background: #FFC107;
             border: none;
@@ -441,8 +440,9 @@
             .title-field { font-size: 0.8rem; padding: 6px 10px; white-space: normal; }
             .top-actions, .mid-actions { gap: 6px; }
             .license-header {
-                flex-direction: column;
-                align-items: stretch;
+                flex-direction: row;
+                justify-content: space-between;
+                flex-wrap: wrap;
             }
             .license-fields {
                 flex-direction: column;
@@ -552,16 +552,25 @@
         }
         .license-header h4 {
             margin: 0;
+            white-space: nowrap;
+        }
+        .license-header .license-buttons {
+            display: flex;
+            gap: 8px;
+            flex-wrap: nowrap;
         }
         .license-fields {
             display: flex;
             gap: 10px;
             flex-wrap: nowrap;
         }
-        .license-fields input {
+        .license-fields #clientCodeInput {
             flex: 1;
-            font-size: 0.8rem;
-            padding: 8px 10px;
+            min-width: 110px;
+        }
+        .license-fields #unlockCodeInput {
+            flex: 2;
+            min-width: 160px;
         }
         .admin-section {
             margin: 16px 0;
@@ -573,6 +582,13 @@
         }
         .admin-section .flex-row {
             margin-bottom: 8px;
+        }
+        .days-line {
+            text-align: center;
+            font-size: 0.75rem;
+            color: #555;
+            margin-top: 8px;
+            font-weight: bold;
         }
     </style>
 </head>
@@ -589,8 +605,8 @@
         <!-- Sezione licenza -->
         <div class="license-section">
             <div class="license-header">
-                <h4 style="margin:0;">🔐 Licenza</h4>
-                <div style="display: flex; gap: 8px;">
+                <h4>🔐 Licenza</h4>
+                <div class="license-buttons">
                     <button id="copyRequestBtn" class="small-btn" style="background:#e67e22;">📋 Richiedi attivazione</button>
                     <button id="activateLicenseBtn" class="small-btn" style="background:#283593;">ATTIVA</button>
                 </div>
@@ -624,10 +640,11 @@
             <div class="grid-2" id="contactsGrid"></div>
         </div>
 
-        <!-- Informazioni nella home -->
+        <!-- Informazioni nella home (modificate) -->
         <div class="rubrica-info">Rubrica Personale di Supporto e Consultazione</div>
         <div class="info-text">Ogni contatto ha il proprio archivio note.<br>📍 Ricerca entro 300m di TUTTI i luoghi con nome<br>🔊 Ascolto automatico 30 secondi dopo il messaggio</div>
-        <div class="info-text" id="daysInfoLine">Non Utilizzare APP per Situazioni di Emergenza di Salute - Giorni rimanenti: --</div>
+        <div class="info-text">Non Utilizzare APP per Situazioni di Emergenza di Salute</div>
+        <div class="days-line" id="daysLeftDisplayHome">Giorni rimanenti: --</div>
         <div class="info-text">💾 Il file SALVA NOTE si chiama: contatti_personali_notes_backup_0205.txt</div>
 
         <div class="export-import-row">
@@ -635,9 +652,10 @@
             <button id="importAllBtn">📂 RIPRISTINA NOTE</button>
         </div>
         <input type="file" id="globalImportFileInput" accept=".txt" style="display:none;">
-        <div class="version-footer">versione 0205 – licenza, admin, giorni rimanenti in info</div>
+        <div class="version-footer">versione 0205 – licenza, admin, layout righe</div>
     </div>
 
+    <!-- EMERGENCY PAGE (invariata) -->
     <div id="emergencyPage" class="page hidden">
         <div id="currentServiceDeco" class="current-service-deco">Contatto:</div>
         <div class="dark-card"><div class="section-title">Numero servizio</div><div class="flex-row"><input type="tel" id="phoneNumber" placeholder="Numero" style="flex:2;"><button id="saveNumberBtn" class="small-btn" style="flex:0.4;">SALVA</button></div><div id="phoneSaveMsg" class="status-msg"></div></div>
@@ -659,13 +677,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
 <script>
     // ==================== VERSIONE 0205 COMPLETA ====================
-    // Basata sulla stabile v0202, con:
-    // - Layout licenza: campi affiancati, tasti in alto
-    // - "Richiedi attivazione" copia dati + email + pagamento
-    // - Area admin con cambio codice amministratore (long press 10s sul titolo, admin2025 modificabile)
-    // - Giorni rimanenti spostati nella riga informativa (info-text)
-    // - Rimossa informativa "Codice cliente generato automaticamente..."
-    // - Tutte le funzionalità originali (geolocalizzazione, note, traduzione, esportazione, ecc.) invariate e funzionanti
+    // Basata sulla stabile v0202, con layout migliorato e gestione giorni in riga separata.
     // =================================================================
 
     const CURRENT_VERSION = "0205";
@@ -769,7 +781,7 @@
     const adminLongPressBtn = document.getElementById('adminLongPressBtn');
     const newAdminCode = document.getElementById('newAdminCode');
     const changeAdminCodeBtn = document.getElementById('changeAdminCodeBtn');
-    const daysInfoLine = document.getElementById('daysInfoLine');
+    const daysHomeDisplay = document.getElementById('daysLeftDisplayHome');
 
     let currentEditMode = null;
     let currentEditId = null;
@@ -837,9 +849,7 @@
         updateLicenseUI();
         toggleAppAccess(!licenseCheckPassed);
         if (clientCodeInput) clientCodeInput.value = clientCode;
-        if (daysInfoLine) {
-            daysInfoLine.innerText = `Non Utilizzare APP per Situazioni di Emergenza di Salute - Giorni rimanenti: ${daysRemaining}`;
-        }
+        if (daysHomeDisplay) daysHomeDisplay.innerText = `Giorni rimanenti: ${daysRemaining}`;
     }
     function updateLicenseUI() {
         const activated = localStorage.getItem('activated') === 'true';
@@ -1063,7 +1073,7 @@
         });
     }
 
-    // ==================== FUNZIONI DI SUPPORTO ====================
+    // ==================== FUNZIONI DI SUPPORTO (invariate) ====================
     function openAdaptiveModal() { modalTextarea.value = operatorResponse.value; adaptiveModal.style.display = 'flex'; }
     function closeAdaptiveModal() { adaptiveModal.style.display = 'none'; }
     operatorResponse.addEventListener('click', openAdaptiveModal);
