@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
-    <title>Contatti Personali - v0201</title>
+    <title>Contatti Personali - v0202</title>
     <style>
         * {
             margin: 0;
@@ -560,23 +560,29 @@
         .admin-section .flex-row {
             margin-bottom: 8px;
         }
+        .client-info {
+            font-size: 0.7rem;
+            color: #2c3e66;
+            margin-top: 4px;
+            text-align: center;
+        }
     </style>
 </head>
 <body>
 <div class="container">
     <div id="homePage" class="page">
-        <div class="version-header">📇 CONTATTI PERSONALI v0201</div>
+        <div class="version-header">📇 CONTATTI PERSONALI v0202</div>
         <div class="title-btn" id="adminLongPressBtn">
             <span>📇</span>
             <span>CONTATTI PERSONALI</span>
             <span>📇</span>
         </div>
 
-        <!-- Sezione licenza (sempre visibile) -->
+        <!-- Sezione licenza -->
         <div class="license-section">
             <div style="font-weight: bold; margin-bottom: 8px;">🔐 Licenza</div>
             <div class="flex-row" style="gap: 8px;">
-                <input type="text" id="clientCodeInput" placeholder="Codice Cliente (6-10 cifre)" inputmode="numeric" style="flex:1;">
+                <input type="text" id="clientCodeInput" placeholder="Codice Cliente" inputmode="numeric" style="flex:1;" readonly>
                 <input type="text" id="unlockCodeInput" placeholder="Codice Sblocco (20 cifre)" maxlength="20" inputmode="numeric" style="flex:1;">
                 <button id="activateLicenseBtn" class="small-btn" style="background:#283593; white-space:normal;">ATTIVA</button>
             </div>
@@ -584,9 +590,10 @@
                 <span id="daysLeftDisplay" style="font-size:0.75rem;">Giorni rimanenti: --</span>
                 <button id="copyRequestBtn" class="small-btn" style="background:#e67e22; padding:6px 12px;">📋 COPIA RICHIESTA</button>
             </div>
+            <div class="client-info">✔️ Codice cliente generato automaticamente (non modificabile). Usalo per richiedere lo sblocco.</div>
         </div>
 
-        <!-- Sezione admin (nascosta, visibile solo dopo autenticazione) -->
+        <!-- Sezione admin (nascosta) -->
         <div id="adminSection" class="admin-section">
             <div style="font-weight: bold; margin-bottom: 8px;">🛠️ Area Amministratore - Genera Codici Sblocco</div>
             <div class="flex-row">
@@ -610,14 +617,14 @@
             Non Utilizzare per Situazioni di Emergenza di Salute
         </div>
         <div class="info-text">Ogni contatto ha il proprio archivio note.<br>📍 Ricerca entro 300m di TUTTI i luoghi con nome<br>🔊 Ascolto automatico 30 secondi dopo il messaggio</div>
-        <div class="info-text">💾 Il file SALVA NOTE si chiama: contatti_personali_notes_backup_0201.txt</div>
+        <div class="info-text">💾 Il file SALVA NOTE si chiama: contatti_personali_notes_backup_0202.txt</div>
 
         <div class="export-import-row">
             <button id="exportAllBtn">💾 SALVA NOTE</button>
             <button id="importAllBtn">📂 RIPRISTINA NOTE</button>
         </div>
         <input type="file" id="globalImportFileInput" accept=".txt" style="display:none;">
-        <div class="version-footer">versione 0201 – con area admin nascosta</div>
+        <div class="version-footer">versione 0202 – codice cliente autogenerato, non modificabile</div>
     </div>
 
     <div id="emergencyPage" class="page hidden">
@@ -693,7 +700,7 @@
             <div id="speakStatus" class="status-msg"></div>
         </div>
 
-        <div class="version-footer">versione 0201 – con area admin nascosta</div>
+        <div class="version-footer">versione 0202 – codice cliente autogenerato</div>
     </div>
 
     <!-- MODALI -->
@@ -732,14 +739,15 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
 <script>
-    // ==================== VERSIONE 0201 ====================
-    // - Aggiunta sezione amministratore nascosta accessibile con long press (10 secondi) sul titolo "CONTATTI PERSONALI"
-    // - Codice admin: "admin2025" (una volta autenticato, la sezione rimane visibile finché non viene nascosta o la pagina non viene ricaricata)
-    // - Generatore di codici sblocco (HMAC-SHA256) per amministratore
-    // - Tutte le funzionalità di licenza, contatti, note, geolocalizzazione, traduzione rimangono invariate
+    // ==================== VERSIONE 0202 ====================
+    // - Generazione automatica di un codice cliente univoco (10 cifre casuali) al primo avvio, salvato in localStorage
+    // - Il campo "Codice Cliente" è readonly (non modificabile)
+    // - L'utente lo copia con "COPIA RICHIESTA" insieme al firstRun
+    // - L'amministratore usa codice cliente + firstRun per generare il codice sblocco
+    // - Tutte le altre funzionalità invariate
     // =================================================================
 
-    const CURRENT_VERSION = "0201";
+    const CURRENT_VERSION = "0202";
     let currentService = "ambulanza";
     let currentLat = null, currentLng = null;
     let currentAddress = "";
@@ -768,11 +776,12 @@
     let licenseActive = false;
     let daysRemaining = 0;
     let licenseCheckPassed = false;
-    const SECRET_KEY = "ChiaveSegreta123";  // Modifica con la tua chiave segreta
+    let clientCode = "";
+    const SECRET_KEY = "ChiaveSegreta123";
 
     // Variabili admin
     let adminAuthenticated = false;
-    const ADMIN_CODE = "admin2025";  // Codice per accedere all'area admin
+    const ADMIN_CODE = "admin2025";
 
     // DOM elements
     const homePage = document.getElementById('homePage');
@@ -851,6 +860,12 @@
     let lastFrenchTranslation = "";
 
     // ==================== FUNZIONI LICENZA ====================
+    function generateRandomClientCode() {
+        // 10 cifre casuali (non inizia con zero)
+        let code = Math.floor(1000000000 + Math.random() * 9000000000).toString();
+        return code;
+    }
+
     function hashTo20Digits(hash) {
         let hex = hash.toString(CryptoJS.enc.Hex);
         let decimal = BigInt('0x' + hex).toString();
@@ -882,11 +897,15 @@
         if (!firstRun) {
             firstRun = now.getTime();
             localStorage.setItem('firstRun', firstRun);
+            // Genera codice cliente univoco
+            let newClientCode = generateRandomClientCode();
+            localStorage.setItem('clientCode', newClientCode);
             localStorage.setItem('activated', 'false');
             localStorage.setItem('expiryDate', firstRun + 90 * 86400000);
-        } else {
-            firstRun = parseInt(firstRun);
         }
+        firstRun = parseInt(firstRun);
+        clientCode = localStorage.getItem('clientCode') || generateRandomClientCode();
+        if (!localStorage.getItem('clientCode')) localStorage.setItem('clientCode', clientCode);
         const activated = localStorage.getItem('activated') === 'true';
         let expiry = parseInt(localStorage.getItem('expiryDate'));
         if (activated && expiry < firstRun + 365 * 86400000) {
@@ -904,16 +923,19 @@
         daysRemaining = Math.ceil((expiry - nowTime) / 86400000);
         updateLicenseUI();
         toggleAppAccess(!licenseCheckPassed);
+        // Aggiorna campo cliente
+        if (clientCodeInput) clientCodeInput.value = clientCode;
     }
 
     function updateLicenseUI() {
         if (daysLeftDisplay) daysLeftDisplay.innerText = `Giorni rimanenti: ${daysRemaining}`;
-        if (licenseCheckPassed) {
+        const activated = localStorage.getItem('activated') === 'true';
+        if (activated) {
             if (clientCodeInput) clientCodeInput.disabled = true;
             if (unlockCodeInput) unlockCodeInput.disabled = true;
             if (activateLicenseBtn) activateLicenseBtn.disabled = true;
         } else {
-            if (clientCodeInput) clientCodeInput.disabled = false;
+            if (clientCodeInput) clientCodeInput.disabled = true; // readonly, non editabile
             if (unlockCodeInput) unlockCodeInput.disabled = false;
             if (activateLicenseBtn) activateLicenseBtn.disabled = false;
         }
@@ -933,19 +955,14 @@
     }
 
     async function onActivateLicense() {
-        const clientCode = clientCodeInput.value.trim();
         const unlockCode = unlockCodeInput.value.trim();
-        if (!/^\d{6,10}$/.test(clientCode)) {
-            alert('Codice cliente deve essere numerico da 6 a 10 cifre.');
-            return;
-        }
         if (!/^\d{20}$/.test(unlockCode)) {
             alert('Codice sblocco deve essere esattamente 20 cifre.');
             return;
         }
         const firstRun = localStorage.getItem('firstRun');
         if (!firstRun) {
-            alert('Errore: primo avvio non rilevato. Reinstalla l\'app.');
+            alert('Errore: primo avvio non rilevato.');
             return;
         }
         if (verifyUnlockCode(clientCode, parseInt(firstRun), unlockCode)) {
@@ -961,11 +978,6 @@
     }
 
     function copyRequest() {
-        let clientCode = clientCodeInput.value.trim();
-        if (!/^\d{6,10}$/.test(clientCode)) {
-            alert('Inserisci prima un codice cliente valido (6-10 cifre).');
-            return;
-        }
         const firstRun = localStorage.getItem('firstRun');
         if (!firstRun) {
             alert('Errore: impossibile recuperare il timestamp.');
@@ -980,24 +992,24 @@
     }
 
     // ==================== FUNZIONI ADMIN ====================
-    function generateUnlockCode(clientCode, firstRun) {
+    function generateUnlockCodeAdmin(clientCode, firstRun) {
         const message = `${clientCode}|${firstRun}`;
         const hash = CryptoJS.HmacSHA256(message, SECRET_KEY);
         return hashTo20Digits(hash);
     }
 
     function onGenerateUnlock() {
-        let clientCode = adminClientCode.value.trim();
-        let firstRun = adminFirstRun.value.trim();
-        if (!/^\d{6,10}$/.test(clientCode)) {
+        let clientCodeVal = adminClientCode.value.trim();
+        let firstRunVal = adminFirstRun.value.trim();
+        if (!/^\d{6,10}$/.test(clientCodeVal)) {
             alert('Codice cliente deve essere numerico da 6 a 10 cifre.');
             return;
         }
-        if (!/^\d+$/.test(firstRun) || firstRun.length < 10) {
+        if (!/^\d+$/.test(firstRunVal) || firstRunVal.length < 10) {
             alert('Inserisci un FIRST_RUN valido (timestamp numerico, es. 1734567890000).');
             return;
         }
-        const code = generateUnlockCode(clientCode, firstRun);
+        const code = generateUnlockCodeAdmin(clientCodeVal, firstRunVal);
         generatedCode.value = code;
     }
 
@@ -1016,12 +1028,11 @@
     function showAdminSection() {
         adminSection.style.display = 'block';
     }
-
     function hideAdminSection() {
         adminSection.style.display = 'none';
     }
 
-    // Long press sul titolo per attivare area admin
+    // Long press per admin
     let pressTimer = null;
     function startAdminTimer() {
         pressTimer = setTimeout(() => {
@@ -1035,14 +1046,13 @@
                     alert("Codice errato.");
                 }
             } else {
-                // Se già autenticato, mostra o nascondi area admin (toggle)
                 if (adminSection.style.display === 'none' || getComputedStyle(adminSection).display === 'none') {
                     showAdminSection();
                 } else {
                     hideAdminSection();
                 }
             }
-        }, 10000); // 10 secondi
+        }, 10000);
     }
     function cancelAdminTimer() {
         if (pressTimer) {
@@ -1073,7 +1083,7 @@
             if (saved !== null) {
                 contactExtraText[s] = saved;
             } else {
-                for (let oldVer of ["0200", "0199", "0198"]) {
+                for (let oldVer of ["0201", "0200", "0199"]) {
                     const old = localStorage.getItem(`contactExtra_${s}_${oldVer}`);
                     if (old !== null) {
                         contactExtraText[s] = old;
@@ -1150,7 +1160,7 @@
         });
     }
 
-    // ==================== FUNZIONI ESISTENTI (INVARIATE) ====================
+    // ==================== FUNZIONI ESISTENTI (BREVI) ====================
     function openAdaptiveModal() {
         modalTextarea.value = operatorResponse.value;
         adaptiveModal.style.display = 'flex';
@@ -1161,9 +1171,9 @@
     adaptiveModal.addEventListener('click', (e) => { if (e.target === adaptiveModal) closeAdaptiveModal(); });
 
     function openSpeakDetailModal() {
-        if (!lastItalianText && !lastFrenchTranslation) { alert("Nessuna conversazione recente. Usa 'PARLA CON OPERATORE' prima."); return; }
-        speakOriginalText.innerText = lastItalianText || "(nessun testo italiano)";
-        speakTranslatedText.innerText = lastFrenchTranslation || "(nessuna traduzione)";
+        if (!lastItalianText && !lastFrenchTranslation) { alert("Nessuna conversazione recente."); return; }
+        speakOriginalText.innerText = lastItalianText || "";
+        speakTranslatedText.innerText = lastFrenchTranslation || "";
         speakDetailModal.style.display = 'flex';
     }
     function closeSpeakDetailModal() { speakDetailModal.style.display = 'none'; }
@@ -1371,7 +1381,7 @@
                 lastFrenchTranslation = french;
                 speakResultField.innerHTML = `<strong>Italiano:</strong> ${lastItalianText}<br><strong>Francese:</strong> ${lastFrenchTranslation}`;
                 speakStatus.innerText = "✅ Testo tradotto. Tocca il campo per visualizzare dettaglio.";
-                showTemporaryMessage(speakStatus, "✅ Traduzione completata. Tocca il campo bianco per vedere la trascrizione completa.", 15000);
+                showTemporaryMessage(speakStatus, "✅ Traduzione completata.", 15000);
                 saveSpeakTranslation();
                 if (lastFrenchTranslation) await speakFrenchWithMicroPause(lastFrenchTranslation, 'fr-FR');
             } else {
@@ -1411,7 +1421,7 @@
     function releaseWakeLock() { if (wakeLock) { wakeLock.release(); wakeLock = null; } }
 
     function migratePhoneNumbers() {
-        const oldVersions = ["0200", "0199", "0198"];
+        const oldVersions = ["0201", "0200", "0199"];
         for (let s of services) {
             if (localStorage.getItem(`phone_${s}_${CURRENT_VERSION}`)) continue;
             for (let ver of oldVersions) {
@@ -1584,7 +1594,7 @@
         selectedSpecialMode = false;
         saveSelectedIds();
         renderCurrentNotes();
-        if (normalNoteInfo) showTemporaryMessage(normalNoteInfo, "📌 Nota normale selezionata: verrà letto l'intero messaggio di emergenza", 15000);
+        if (normalNoteInfo) showTemporaryMessage(normalNoteInfo, "📌 Nota normale selezionata", 15000);
         if (specialNoteInfo) specialNoteInfo.style.display = 'none';
     }
     function selectSpecialNote(noteId) {
@@ -1593,7 +1603,7 @@
         selectedSpecialMode = true;
         saveSelectedIds();
         renderCurrentNotes();
-        if (specialNoteInfo) showTemporaryMessage(specialNoteInfo, "✨ Nota speciale selezionata: verrà letto solo il testo (ignora coordinate)", 15000);
+        if (specialNoteInfo) showTemporaryMessage(specialNoteInfo, "✨ Nota speciale selezionata", 15000);
         if (normalNoteInfo) normalNoteInfo.style.display = 'none';
     }
     function renderCurrentNotes() { renderNormalNotes(); renderSpecialNotes(); }
@@ -1726,7 +1736,7 @@
         gpsStatus.innerHTML = "";
     }
 
-    // ==================== LETTURA VOCALE E COPIA NOTE ====================
+    // ==================== LETTURA VOCALE E COPIA NOTE (già funzionanti) ====================
     function playBeep() {
         try {
             let ctx = new (window.AudioContext || window.webkitAudioContext)();
@@ -1839,7 +1849,7 @@
         try {
             await navigator.clipboard.writeText(txt);
             gpsStatus.innerHTML = "📋 Copiato!";
-            let infoMessage = selectedSpecialMode ? "⚠️ ATTENZIONE: è selezionata una NOTA SPECIALE. Verrà copiato solo il testo della nota, SENZA coordinate, indirizzo e riferimenti stradali." : "📋 Copiati: coordinate, indirizzo, riferimenti vicini e la nota selezionata (normale).";
+            let infoMessage = selectedSpecialMode ? "⚠️ NOTA SPECIALE: copiato solo il testo della nota." : "📋 Copiati: coordinate, indirizzo, riferimenti vicini e la nota selezionata (normale).";
             showTemporaryMessage(copyInfoMsg, infoMessage, 15000);
             setTimeout(()=> gpsStatus.innerHTML = "✅ Pronto.", 2000);
         } catch(e) {
@@ -2051,7 +2061,6 @@
         initLicense();
         activateLicenseBtn.addEventListener('click', onActivateLicense);
         copyRequestBtn.addEventListener('click', copyRequest);
-        // Admin: sezione già gestita con long press
     }
     init();
 </script>
