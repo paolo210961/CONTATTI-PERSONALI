@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
-    <title>Contatti Personali - v0196</title>
+    <title>Contatti Personali - v0197</title>
     <style>
         * {
             margin: 0;
@@ -42,24 +42,27 @@
             padding-bottom: 10px;
             margin-bottom: 20px;
         }
-        h1 {
-            font-size: 1.7rem;
+        /* Pulsante titolo non editabile (arancione forte) */
+        .title-btn {
+            background: #e67e22;
+            border: none;
+            border-radius: 60px;
+            padding: 14px 12px;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: white;
+            width: 100%;
             text-align: center;
-            color: #FFC107;
-            margin: 0 0 8px 0;
-            font-weight: 700;
+            margin-bottom: 20px;
+            cursor: default;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 10px;
-            flex-wrap: nowrap;
-            white-space: nowrap;
-        }
-        h1 span {
-            flex-shrink: 0;
+            gap: 12px;
+            box-shadow: 0 6px 12px rgba(0,0,0,0.3);
         }
         .current-service-deco {
-            background: #6c757d;  /* grigio scuro */
+            background: #6c757d;
             border: none;
             border-radius: 60px;
             padding: 14px 12px;
@@ -78,7 +81,7 @@
             margin: 24px 0;
         }
         .big-btn {
-            background: #6c757d;  /* grigio scuro */
+            background: #6c757d;
             border: none;
             border-radius: 60px;
             padding: 16px 12px;
@@ -147,7 +150,7 @@
             border-radius: 24px;
             padding: 16px;
             margin: 16px 0;
-            box-shadow: none; /* rimossa ombra di evidenziazione */
+            box-shadow: none;
         }
         .section-title {
             font-weight: bold;
@@ -423,7 +426,7 @@
             .big-btn { font-size: 1.2rem; padding: 14px 12px; }
             .small-btn { padding: 6px 10px; font-size: 0.75rem; }
             .double-height { padding: 12px 10px; font-size: 0.9rem; }
-            h1 { font-size: 1.4rem; gap: 5px; white-space: normal; flex-wrap: wrap; }
+            .title-btn { font-size: 1.2rem; padding: 12px; gap: 6px; }
             .dark-card { padding: 12px; }
             .speak-box { padding: 12px; }
             .note-row-buttons { gap: 6px; }
@@ -477,23 +480,12 @@
             color: #555;
             margin-top: 8px;
         }
-        .disclaimer-text {
-            font-size: 0.7rem;
-            color: #c62828;
-            text-align: center;
-            margin-top: 4px;
-            font-weight: bold;
-        }
         .rubrica-info {
-            margin-top: 16px;
-            margin-bottom: 8px;
-            font-size: 0.85rem;
-            color: #1e2a3a;
             text-align: center;
-            font-style: normal;
-            font-weight: 500;
-            background: transparent;
-            padding: 0;
+            font-size: 0.75rem;
+            color: #555;
+            margin-top: 8px;
+            line-height: 1.4;
         }
         .custom-prompt {
             position: fixed;
@@ -537,32 +529,33 @@
 <body>
 <div class="container">
     <div id="homePage" class="page">
-        <div class="version-header">📇 CONTATTI PERSONALI v0196</div>
-        <h1>
+        <div class="version-header">📇 CONTATTI PERSONALI v0197</div>
+        <!-- Pulsante titolo non editabile (arancione forte, ombra aumentata) -->
+        <div class="title-btn">
             <span>📇</span>
             <span>CONTATTI PERSONALI</span>
             <span>📇</span>
-        </h1>
+        </div>
         <div class="grid-2" id="contactsGrid">
             <!-- I pulsanti verranno generati dinamicamente -->
         </div>
-        
-        <!-- NUOVO ORDINE: prima le due righe informativa e disclaimer -->
+
+        <!-- Nuove righe informative con stesso stile -->
         <div class="rubrica-info">
             Rubrica Personale di Supporto e Consultazione<br>
-            <span class="disclaimer-text">Non Utilizzare per Situazioni di Emergenza di Salute</span>
+            Non Utilizzare per Situazioni di Emergenza di Salute
         </div>
-        
-        <!-- Poi le righe esistenti (senza ombra di evidenziazione) -->
-        <p class="info-text">Ogni contatto ha il proprio archivio note.<br>📍 Ricerca entro 300m di TUTTI i luoghi con nome<br>🔊 Ascolto automatico 30 secondi dopo il messaggio</p>
-        <p class="info-text">💾 Il file SALVA NOTE si chiama: contatti_personali_notes_backup_0196.txt</p>
-        
+
+        <!-- Righe esistenti con stesso stile -->
+        <div class="info-text">Ogni contatto ha il proprio archivio note.<br>📍 Ricerca entro 300m di TUTTI i luoghi con nome<br>🔊 Ascolto automatico 30 secondi dopo il messaggio</div>
+        <div class="info-text">💾 Il file SALVA NOTE si chiama: contatti_personali_notes_backup_0197.txt</div>
+
         <div class="export-import-row">
             <button id="exportAllBtn">💾 SALVA NOTE</button>
             <button id="importAllBtn">📂 RIPRISTINA NOTE</button>
         </div>
         <input type="file" id="globalImportFileInput" accept=".txt" style="display:none;">
-        <div class="version-footer">versione 0196 – contatti personalizzabili, long press 5s</div>
+        <div class="version-footer">versione 0197 – contatti personalizzabili, long press 5s</div>
     </div>
 
     <div id="emergencyPage" class="page hidden">
@@ -642,7 +635,7 @@
             <div id="speakStatus" class="status-msg"></div>
         </div>
 
-        <div class="version-footer">versione 0196 – rubrica contatti personali</div>
+        <div class="version-footer">versione 0197 – rubrica contatti personali</div>
     </div>
 
     <!-- MODALI -->
@@ -680,14 +673,13 @@
 </div>
 
 <script>
-    // ==================== VERSIONE 0196 ====================
-    // - Tasti contatti: colore grigio scuro (#6c757d) con ombra
-    // - Rimossa ombra di evidenziazione dai box (dark-card, speak-box)
-    // - Riordinato testo informativo nella home: prima "Rubrica Personale..." e disclaimer, poi le altre righe
-    // - Stesso carattere per tutte le righe
+    // ==================== VERSIONE 0197 ====================
+    // - Titolo "CONTATTI PERSONALI" in pulsante non editabile con sfondo arancione forte (#e67e22) e ombra aumentata
+    // - Righe informative con stesso stile (colore, dimensione) delle righe esistenti
+    // - Tutte le altre funzionalità invariate
     // =================================================================
 
-    const CURRENT_VERSION = "0196";
+    const CURRENT_VERSION = "0197";
     let currentService = "ambulanza";
     let currentLat = null, currentLng = null;
     let currentAddress = "";
@@ -699,7 +691,6 @@
     let selectedSpecialMode = false;
     let wakeLock = null;
 
-    // Dati per i contatti personalizzabili
     let contactExtraText = {
         ambulanza: "",
         polizia: "",
@@ -774,7 +765,7 @@
     let lastItalianText = "";
     let lastFrenchTranslation = "";
 
-    // ==================== FUNZIONI PER I CONTATTI PERSONALIZZABILI ====================
+    // ==================== FUNZIONI PER I CONTATTI ====================
     function saveContactExtraText() {
         for (let s of services) {
             localStorage.setItem(`contactExtra_${s}_${CURRENT_VERSION}`, contactExtraText[s]);
@@ -783,28 +774,20 @@
     function loadContactExtraText() {
         for (let s of services) {
             const saved = localStorage.getItem(`contactExtra_${s}_${CURRENT_VERSION}`);
-            if (saved !== null) {
-                contactExtraText[s] = saved;
-            } else {
-                contactExtraText[s] = "";
-            }
+            if (saved !== null) contactExtraText[s] = saved;
+            else contactExtraText[s] = "";
         }
     }
     function getContactButtonText(service) {
         let base = "Contatto:";
         let extra = contactExtraText[service];
-        if (extra && extra.trim() !== "") {
-            return `${base} ${extra}`;
-        }
+        if (extra && extra.trim() !== "") return `${base} ${extra}`;
         return base;
     }
     function updateContactButtons() {
-        const buttons = document.querySelectorAll('.big-btn');
-        buttons.forEach(btn => {
+        document.querySelectorAll('.big-btn').forEach(btn => {
             const s = btn.getAttribute('data-service');
-            if (s) {
-                btn.innerText = getContactButtonText(s);
-            }
+            if (s) btn.innerText = getContactButtonText(s);
         });
     }
     function showCustomPrompt(service, currentExtra) {
@@ -838,7 +821,6 @@
         input.focus();
     }
 
-    // ==================== GENERAZIONE PULSANTI HOME ====================
     function initHomeButtons() {
         contactsGrid.innerHTML = '';
         services.forEach(service => {
@@ -846,21 +828,10 @@
             btn.className = 'big-btn';
             btn.setAttribute('data-service', service);
             btn.innerText = getContactButtonText(service);
-            // Click normale -> pagina emergenza
             btn.addEventListener('click', () => showEmergency(service));
-            // Long press (5 secondi) per modificare il testo aggiuntivo
             let pressTimer = null;
-            const startTimer = () => {
-                pressTimer = setTimeout(() => {
-                    showCustomPrompt(service, contactExtraText[service]);
-                }, 5000);
-            };
-            const cancelTimer = () => {
-                if (pressTimer) {
-                    clearTimeout(pressTimer);
-                    pressTimer = null;
-                }
-            };
+            const startTimer = () => { pressTimer = setTimeout(() => showCustomPrompt(service, contactExtraText[service]), 5000); };
+            const cancelTimer = () => { if (pressTimer) { clearTimeout(pressTimer); pressTimer = null; } };
             btn.addEventListener('mousedown', startTimer);
             btn.addEventListener('mouseup', cancelTimer);
             btn.addEventListener('mouseleave', cancelTimer);
@@ -871,7 +842,7 @@
         });
     }
 
-    // ==================== FUNZIONI ESISTENTI (invariate) ====================
+    // ==================== FUNZIONI ESISTENTI (INVARIATE) ====================
     function openAdaptiveModal() {
         modalTextarea.value = operatorResponse.value;
         adaptiveModal.style.display = 'flex';
@@ -882,10 +853,7 @@
     adaptiveModal.addEventListener('click', (e) => { if (e.target === adaptiveModal) closeAdaptiveModal(); });
 
     function openSpeakDetailModal() {
-        if (!lastItalianText && !lastFrenchTranslation) {
-            alert("Nessuna conversazione recente. Usa 'PARLA CON OPERATORE' prima.");
-            return;
-        }
+        if (!lastItalianText && !lastFrenchTranslation) { alert("Nessuna conversazione recente. Usa 'PARLA CON OPERATORE' prima."); return; }
         speakOriginalText.innerText = lastItalianText || "(nessun testo italiano)";
         speakTranslatedText.innerText = lastFrenchTranslation || "(nessuna traduzione)";
         speakDetailModal.style.display = 'flex';
@@ -909,24 +877,17 @@
                     const data = JSON.parse(saved);
                     lastItalianText = data.italian || "";
                     lastFrenchTranslation = data.french || "";
-                    if (lastItalianText && lastFrenchTranslation) {
-                        speakResultField.innerHTML = `<strong>Italiano:</strong> ${lastItalianText}<br><strong>Francese:</strong> ${lastFrenchTranslation}`;
-                    } else {
-                        speakResultField.innerHTML = "Traduzione Italiana e Francese";
-                    }
+                    if (lastItalianText && lastFrenchTranslation) speakResultField.innerHTML = `<strong>Italiano:</strong> ${lastItalianText}<br><strong>Francese:</strong> ${lastFrenchTranslation}`;
+                    else speakResultField.innerHTML = "Traduzione Italiana e Francese";
                 } catch(e) { console.warn(e); }
-            } else {
-                speakResultField.innerHTML = "Traduzione Italiana e Francese";
-            }
+            } else speakResultField.innerHTML = "Traduzione Italiana e Francese";
         }
     }
     function clearSpeakTranslation() {
         lastItalianText = "";
         lastFrenchTranslation = "";
         speakResultField.innerHTML = "Traduzione Italiana e Francese";
-        if (currentService) {
-            localStorage.removeItem(`speakTranslation_${currentService}_${CURRENT_VERSION}`);
-        }
+        if (currentService) localStorage.removeItem(`speakTranslation_${currentService}_${CURRENT_VERSION}`);
         speakStatus.innerText = "🧹 Traduzione cancellata";
         setTimeout(() => { if (speakStatus.innerText === "🧹 Traduzione cancellata") speakStatus.innerText = ""; }, 2000);
     }
@@ -1079,10 +1040,7 @@
             utterance.lang = langCode;
             utterance.rate = 1.0;
             speechSynthesis.speak(utterance);
-            await new Promise((resolve) => {
-                utterance.onend = resolve;
-                setTimeout(resolve, 1000);
-            });
+            await new Promise((resolve) => { utterance.onend = resolve; setTimeout(resolve, 1000); });
             await new Promise(r => setTimeout(r, 0.1));
         }
     }
@@ -1107,9 +1065,7 @@
                 speakStatus.innerText = "✅ Testo tradotto. Tocca il campo per visualizzare dettaglio.";
                 showTemporaryMessage(speakStatus, "✅ Traduzione completata. Tocca il campo bianco per vedere la trascrizione completa.", 15000);
                 saveSpeakTranslation();
-                if (lastFrenchTranslation) {
-                    await speakFrenchWithMicroPause(lastFrenchTranslation, 'fr-FR');
-                }
+                if (lastFrenchTranslation) await speakFrenchWithMicroPause(lastFrenchTranslation, 'fr-FR');
             } else {
                 speakStatus.innerText = "⏹️ Nessun parlato rilevato.";
                 speakResultField.innerHTML = "Traduzione Italiana e Francese";
@@ -1147,7 +1103,7 @@
     function releaseWakeLock() { if (wakeLock) { wakeLock.release(); wakeLock = null; } }
 
     function migratePhoneNumbers() {
-        const oldVersions = ["0195", "0194", "0193"];
+        const oldVersions = ["0196", "0195", "0194"];
         for (let s of services) {
             if (localStorage.getItem(`phone_${s}_${CURRENT_VERSION}`)) continue;
             for (let ver of oldVersions) {
@@ -1336,7 +1292,7 @@
     addNoteBtn.addEventListener('click', () => openAddNoteModal('normal'));
     addSpecialNoteBtn.addEventListener('click', () => openAddNoteModal('special'));
 
-    // GEOLOCALIZZAZIONE (invariata)
+    // ==================== GEOLOCALIZZAZIONE (INVARIATA) ====================
     function haversine(lat1,lng1,lat2,lng2) {
         const R = 6371e3;
         const φ1 = lat1 * Math.PI/180, φ2 = lat2 * Math.PI/180;
@@ -1462,6 +1418,7 @@
         gpsStatus.innerHTML = "";
     }
 
+    // ==================== LETTURA VOCALE E COPIA NOTE ====================
     function playBeep() {
         try {
             let ctx = new (window.AudioContext || window.webkitAudioContext)();
@@ -1719,13 +1676,8 @@
 
     function showEmergency(s) {
         currentService = s;
-        let label = "Contatto:";
         let extra = contactExtraText[s];
-        if (extra && extra.trim() !== "") {
-            label = `Contatto: ${extra}`;
-        } else {
-            label = "Contatto:";
-        }
+        let label = extra && extra.trim() !== "" ? `Contatto: ${extra}` : "Contatto:";
         currentServiceDeco.innerText = label;
         phoneInput.value = getPhone(s) || defaultPhone[s];
         loadCurrentServiceNotes();
