@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
-    <title>SOS Drive - Emergenza v0189</title>
+    <title>SOS Drive - Emergenza v0191</title>
     <style>
         * {
             margin: 0;
@@ -258,7 +258,7 @@
             color: white;
             margin: 16px 0;
         }
-        /* Sezione operatore */
+        /* Sezione operatore originale */
         .top-actions {
             display: flex;
             gap: 10px;
@@ -288,7 +288,7 @@
             flex: 1;
             text-align: center;
         }
-        /* Box parla con operatore */
+        /* Box separato per PARLA CON OPERATORE */
         .speak-box {
             margin-top: 16px;
             padding-top: 12px;
@@ -462,7 +462,7 @@
 <body>
 <div class="container">
     <div id="homePage" class="page">
-        <div class="version-header">📟 SOS-EMERGENZE v0189 - Layout home aggiornato</div>
+        <div class="version-header">📟 SOS-EMERGENZE v0191 - Layout home aggiornato</div>
         <h1>🆘 SOS EMERGENZA</h1>
         <div class="grid-2">
             <button class="big-btn" data-service="ambulanza">🚑 AMBULANZA</button>
@@ -471,13 +471,13 @@
             <button class="big-btn" data-service="clinica">🏥 CLINICA</button>
         </div>
         <p style="text-align:center; font-size:0.75rem; color:#555;">Ogni servizio ha il proprio archivio note.<br>📍 Ricerca entro 300m di TUTTI i luoghi con nome<br>🔊 Ascolto automatico 30 secondi dopo il messaggio</p>
-        <p style="text-align:center; font-size:0.7rem; color:#2c3e66; margin-top:8px;">💾 Il file SALVA NOTE si chiama: sos_notes_backup_0189.txt</p>
+        <p style="text-align:center; font-size:0.7rem; color:#2c3e66; margin-top:8px;">💾 Il file SALVA NOTE si chiama: sos_notes_backup_0191.txt</p>
         <div class="export-import-row">
             <button id="exportAllBtn">💾 SALVA NOTE</button>
             <button id="importAllBtn">📂 RIPRISTINA NOTE</button>
         </div>
         <input type="file" id="globalImportFileInput" accept=".txt" style="display:none;">
-        <div class="version-footer">versione 0189 – parla con operatore con tasto cancella</div>
+        <div class="version-footer">versione 0191 – box separato per parlare con operatore</div>
     </div>
 
     <div id="emergencyPage" class="page hidden">
@@ -532,7 +532,7 @@
             </div>
         </div>
 
-        <!-- BLOCCO OPERATORE RIDISEGNATO -->
+        <!-- BLOCCO OPERATORE (originale) -->
         <div class="dark-card">
             <div class="top-actions">
                 <button id="audioItBtn" class="small-btn audio-lang-btn">LEGGI in IT</button>
@@ -547,16 +547,18 @@
             <button id="listenResponseBtn" class="small-btn listen-btn double-height">🎤 ASCOLTA OPERATORE</button>
             <div id="copyInfoMsg" class="temp-message" style="display:none;"></div>
             <div id="transcribeStatus" class="status-msg"></div>
-
-            <div class="speak-box">
-                <button id="clearSpeakBtn" class="small-btn clear-speak-btn">🗑️ CANCELLA TRADUZIONE</button>
-                <div id="speakResultField" class="speak-field">Traduzione Italiana e Francese</div>
-                <button id="speakToOperatorBtn" class="small-btn double-height speak-btn">🗣️ PARLA CON OPERATORE</button>
-                <div id="speakStatus" class="status-msg"></div>
-            </div>
         </div>
 
-        <div class="version-footer">versione 0189 – tasto cancella per la traduzione vocale</div>
+        <!-- NUOVO BOX SEPARATO PER PARLA CON OPERATORE -->
+        <div class="dark-card">
+            <div class="section-title">🗣️ PARLA CON OPERATORE (Italiano → Francese)</div>
+            <button id="clearSpeakBtn" class="small-btn clear-speak-btn">🗑️ CANCELLA TRADUZIONE</button>
+            <div id="speakResultField" class="speak-field">Traduzione Italiana e Francese</div>
+            <button id="speakToOperatorBtn" class="small-btn double-height speak-btn">🗣️ PARLA CON OPERATORE</button>
+            <div id="speakStatus" class="status-msg"></div>
+        </div>
+
+        <div class="version-footer">versione 0191 – box separato per parlare con operatore</div>
     </div>
 
     <!-- MODALI -->
@@ -594,12 +596,12 @@
 </div>
 
 <script>
-    // ==================== VERSIONE 0189 ====================
-    // Basata sulla stabile 0187, aggiunto pulsante "CANCELLA TRADUZIONE" nella sezione "PARLA CON OPERATORE"
-    // Tutti i tasti della home funzionano correttamente.
+    // ==================== VERSIONE 0191 ====================
+    // - Box separato per "PARLA CON OPERATORE" (dark-card indipendente)
+    // - Messaggio "Ascolto in corso..." durante la fase di riconoscimento
     // =================================================================
 
-    const CURRENT_VERSION = "0189";
+    const CURRENT_VERSION = "0191";
     let currentService = "ambulanza";
     let currentLat = null, currentLng = null;
     let currentAddress = "";
@@ -800,7 +802,7 @@
         return frenchText + " (traduzione fallita)";
     }
 
-    // ==================== RICONOSCIMENTO OPERATORE ====================
+    // ==================== RICONOSCIMENTO OPERATORE (francese → italiano) ====================
     function initRecognitionOperator() {
         if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
             transcribeStatus.innerText = "❌ Riconoscimento non supportato";
@@ -840,7 +842,7 @@
         recognitionTimeout = setTimeout(() => { if (recognitionOperator && recognitionOperator.stop) recognitionOperator.stop(); }, 30000);
     }
 
-    // ==================== RICONOSCIMENTO PARLA CON OPERATORE ====================
+    // ==================== RICONOSCIMENTO PARLA CON OPERATORE (italiano → francese) ====================
     function initRecognitionSpeak() {
         if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
             speakStatus.innerText = "❌ Riconoscimento non supportato";
@@ -855,7 +857,8 @@
     }
     async function startSpeakingItalian() {
         if (!recognitionSpeak && !initRecognitionSpeak()) return;
-        speakStatus.innerText = "🎤 Ascolto italiano... parla ora. (max 30 secondi)";
+        // Mostra messaggio "Ascolto in corso..."
+        showTemporaryMessage(speakStatus, "🎤 Ascolto in corso... parla ora.", 30000);
         recognitionSpeak.start();
         let finalTranscript = "";
         recognitionSpeak.onresult = (event) => {
@@ -879,7 +882,7 @@
                 lastItalianText = "";
                 lastFrenchTranslation = "";
             }
-            setTimeout(() => { if (speakStatus.innerText.includes("Nessun parlato") || speakStatus.innerText.includes("completata")) speakStatus.innerText = ""; }, 4000);
+            // Il messaggio "Ascolto in corso..." verrà sovrascritto o scomparirà dopo il timeout
         };
         setTimeout(() => { if (recognitionSpeak && recognitionSpeak.stop) recognitionSpeak.stop(); }, 30000);
     }
@@ -913,7 +916,7 @@
 
     // ==================== NUMERI TELEFONO ====================
     function migratePhoneNumbers() {
-        const oldVersions = ["0188", "0187", "0186"];
+        const oldVersions = ["0190", "0189", "0188"];
         for (let s of services) {
             if (localStorage.getItem(`phone_${s}_${CURRENT_VERSION}`)) continue;
             for (let ver of oldVersions) {
@@ -1230,7 +1233,7 @@
         gpsStatus.innerHTML = "";
     }
 
-    // ==================== LETTURA VOCALE ====================
+    // ==================== LETTURA VOCALE (LEGGI in IT/FR) ====================
     function playBeep() {
         try {
             let ctx = new (window.AudioContext || window.webkitAudioContext)();
