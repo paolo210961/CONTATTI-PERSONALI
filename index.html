@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
-    <title>Contatti Personali - v0199</title>
+    <title>Contatti Personali - v0201</title>
     <style>
         * {
             margin: 0;
@@ -42,7 +42,7 @@
             padding-bottom: 10px;
             margin-bottom: 20px;
         }
-        /* Pulsante titolo non editabile (sfondo giallo) */
+        /* Pulsante titolo (con long press per admin) */
         .title-btn {
             background: #FFC107;
             border: none;
@@ -54,12 +54,16 @@
             width: 100%;
             text-align: center;
             margin-bottom: 20px;
-            cursor: default;
+            cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 12px;
             box-shadow: 0 6px 12px rgba(0,0,0,0.2);
+            transition: 0.05s linear;
+        }
+        .title-btn:active {
+            transform: scale(0.97);
         }
         .current-service-deco {
             background: #6c757d;
@@ -438,6 +442,13 @@
             .title-badge { font-size: 0.7rem; padding: 6px 10px; }
             .title-field { font-size: 0.8rem; padding: 6px 10px; white-space: normal; }
             .top-actions, .mid-actions { gap: 6px; }
+            .license-section .flex-row {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .admin-section {
+                flex-direction: column;
+            }
         }
         .version-footer {
             text-align: center;
@@ -527,16 +538,67 @@
             margin: 0 5px;
             cursor: pointer;
         }
+        /* Stili per la sezione licenza e admin */
+        .license-section {
+            margin: 16px 0;
+            padding: 12px;
+            background: #f0f0f0;
+            border-radius: 24px;
+        }
+        .license-section input {
+            font-size: 0.8rem;
+            padding: 8px 10px;
+        }
+        .admin-section {
+            margin: 16px 0;
+            padding: 12px;
+            background: #ffe0b5;
+            border-radius: 24px;
+            border-left: 6px solid #e67e22;
+            display: none;
+        }
+        .admin-section .flex-row {
+            margin-bottom: 8px;
+        }
     </style>
 </head>
 <body>
 <div class="container">
     <div id="homePage" class="page">
-        <div class="version-header">📇 CONTATTI PERSONALI v0199</div>
-        <div class="title-btn">
+        <div class="version-header">📇 CONTATTI PERSONALI v0201</div>
+        <div class="title-btn" id="adminLongPressBtn">
             <span>📇</span>
             <span>CONTATTI PERSONALI</span>
             <span>📇</span>
+        </div>
+
+        <!-- Sezione licenza (sempre visibile) -->
+        <div class="license-section">
+            <div style="font-weight: bold; margin-bottom: 8px;">🔐 Licenza</div>
+            <div class="flex-row" style="gap: 8px;">
+                <input type="text" id="clientCodeInput" placeholder="Codice Cliente (6-10 cifre)" inputmode="numeric" style="flex:1;">
+                <input type="text" id="unlockCodeInput" placeholder="Codice Sblocco (20 cifre)" maxlength="20" inputmode="numeric" style="flex:1;">
+                <button id="activateLicenseBtn" class="small-btn" style="background:#283593; white-space:normal;">ATTIVA</button>
+            </div>
+            <div class="flex-row" style="justify-content: space-between; margin-top: 8px;">
+                <span id="daysLeftDisplay" style="font-size:0.75rem;">Giorni rimanenti: --</span>
+                <button id="copyRequestBtn" class="small-btn" style="background:#e67e22; padding:6px 12px;">📋 COPIA RICHIESTA</button>
+            </div>
+        </div>
+
+        <!-- Sezione admin (nascosta, visibile solo dopo autenticazione) -->
+        <div id="adminSection" class="admin-section">
+            <div style="font-weight: bold; margin-bottom: 8px;">🛠️ Area Amministratore - Genera Codici Sblocco</div>
+            <div class="flex-row">
+                <input type="text" id="adminClientCode" placeholder="Codice Cliente (6-10 cifre)" inputmode="numeric" style="flex:1;">
+                <input type="text" id="adminFirstRun" placeholder="First Run (timestamp)" inputmode="numeric" style="flex:1;">
+            </div>
+            <button id="generateUnlockBtn" class="small-btn" style="background:#e67e22; width:100%; margin-bottom:8px;">🔑 GENERA CODICE SBLOCC</button>
+            <div class="flex-row">
+                <input type="text" id="generatedCode" readonly placeholder="Codice generato" style="flex:1; background:#f8f9fa;">
+                <button id="copyGeneratedBtn" class="small-btn" style="background:#283593;">📋 COPIA</button>
+            </div>
+            <button id="hideAdminBtn" class="small-btn" style="background:#8e44ad; width:100%; margin-top:8px;">NASCONDI AREA ADMIN</button>
         </div>
 
         <div class="dark-card">
@@ -548,14 +610,14 @@
             Non Utilizzare per Situazioni di Emergenza di Salute
         </div>
         <div class="info-text">Ogni contatto ha il proprio archivio note.<br>📍 Ricerca entro 300m di TUTTI i luoghi con nome<br>🔊 Ascolto automatico 30 secondi dopo il messaggio</div>
-        <div class="info-text">💾 Il file SALVA NOTE si chiama: contatti_personali_notes_backup_0199.txt</div>
+        <div class="info-text">💾 Il file SALVA NOTE si chiama: contatti_personali_notes_backup_0201.txt</div>
 
         <div class="export-import-row">
             <button id="exportAllBtn">💾 SALVA NOTE</button>
             <button id="importAllBtn">📂 RIPRISTINA NOTE</button>
         </div>
         <input type="file" id="globalImportFileInput" accept=".txt" style="display:none;">
-        <div class="version-footer">versione 0199 – contatti personalizzabili, long press 5s</div>
+        <div class="version-footer">versione 0201 – con area admin nascosta</div>
     </div>
 
     <div id="emergencyPage" class="page hidden">
@@ -631,7 +693,7 @@
             <div id="speakStatus" class="status-msg"></div>
         </div>
 
-        <div class="version-footer">versione 0199 – rubrica contatti personali</div>
+        <div class="version-footer">versione 0201 – con area admin nascosta</div>
     </div>
 
     <!-- MODALI -->
@@ -668,14 +730,16 @@
     </div>
 </div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
 <script>
-    // ==================== VERSIONE 0199 ====================
-    // - Titolo CONTATTI PERSONALI su sfondo giallo
-    // - Pulsanti contatto: bordo nero grassetto, sfondo bianco, testo "Contatto: premi 5 sc. per modifica" su una riga (mobile adattato)
-    // - Persistenza dei testi personalizzati: alla migrazione della versione, i vecchi dati vengono mantenuti
+    // ==================== VERSIONE 0201 ====================
+    // - Aggiunta sezione amministratore nascosta accessibile con long press (10 secondi) sul titolo "CONTATTI PERSONALI"
+    // - Codice admin: "admin2025" (una volta autenticato, la sezione rimane visibile finché non viene nascosta o la pagina non viene ricaricata)
+    // - Generatore di codici sblocco (HMAC-SHA256) per amministratore
+    // - Tutte le funzionalità di licenza, contatti, note, geolocalizzazione, traduzione rimangono invariate
     // =================================================================
 
-    const CURRENT_VERSION = "0199";
+    const CURRENT_VERSION = "0201";
     let currentService = "ambulanza";
     let currentLat = null, currentLng = null;
     let currentAddress = "";
@@ -699,6 +763,16 @@
         normalNotes[s] = [];
         specialNotes[s] = [];
     }
+
+    // Variabili licenza
+    let licenseActive = false;
+    let daysRemaining = 0;
+    let licenseCheckPassed = false;
+    const SECRET_KEY = "ChiaveSegreta123";  // Modifica con la tua chiave segreta
+
+    // Variabili admin
+    let adminAuthenticated = false;
+    const ADMIN_CODE = "admin2025";  // Codice per accedere all'area admin
 
     // DOM elements
     const homePage = document.getElementById('homePage');
@@ -752,6 +826,21 @@
     const importAllBtn = document.getElementById('importAllBtn');
     const globalImportFileInput = document.getElementById('globalImportFileInput');
     const contactsGrid = document.getElementById('contactsGrid');
+    // Licenza elementi
+    const clientCodeInput = document.getElementById('clientCodeInput');
+    const unlockCodeInput = document.getElementById('unlockCodeInput');
+    const activateLicenseBtn = document.getElementById('activateLicenseBtn');
+    const copyRequestBtn = document.getElementById('copyRequestBtn');
+    const daysLeftDisplay = document.getElementById('daysLeftDisplay');
+    // Admin elementi
+    const adminSection = document.getElementById('adminSection');
+    const adminClientCode = document.getElementById('adminClientCode');
+    const adminFirstRun = document.getElementById('adminFirstRun');
+    const generateUnlockBtn = document.getElementById('generateUnlockBtn');
+    const generatedCode = document.getElementById('generatedCode');
+    const copyGeneratedBtn = document.getElementById('copyGeneratedBtn');
+    const hideAdminBtn = document.getElementById('hideAdminBtn');
+    const adminLongPressBtn = document.getElementById('adminLongPressBtn');
 
     let currentEditMode = null;
     let currentEditId = null;
@@ -760,6 +849,217 @@
     let recognitionTimeout = null;
     let lastItalianText = "";
     let lastFrenchTranslation = "";
+
+    // ==================== FUNZIONI LICENZA ====================
+    function hashTo20Digits(hash) {
+        let hex = hash.toString(CryptoJS.enc.Hex);
+        let decimal = BigInt('0x' + hex).toString();
+        return decimal.slice(0,20).padStart(20,'0');
+    }
+
+    function verifyUnlockCode(clientCode, firstRun, unlockCode) {
+        const message = `${clientCode}|${firstRun}`;
+        const hash = CryptoJS.HmacSHA256(message, SECRET_KEY);
+        const expected = hashTo20Digits(hash);
+        return expected === unlockCode;
+    }
+
+    async function getCurrentUTCTime() {
+        try {
+            const res = await fetch('https://worldtimeapi.org/api/timezone/Etc/UTC');
+            if (!res.ok) throw new Error();
+            const data = await res.json();
+            return new Date(data.utc_datetime);
+        } catch(e) {
+            console.warn("API oraria fallita, uso orario locale:", e);
+            return new Date();
+        }
+    }
+
+    async function initLicense() {
+        const now = await getCurrentUTCTime();
+        let firstRun = localStorage.getItem('firstRun');
+        if (!firstRun) {
+            firstRun = now.getTime();
+            localStorage.setItem('firstRun', firstRun);
+            localStorage.setItem('activated', 'false');
+            localStorage.setItem('expiryDate', firstRun + 90 * 86400000);
+        } else {
+            firstRun = parseInt(firstRun);
+        }
+        const activated = localStorage.getItem('activated') === 'true';
+        let expiry = parseInt(localStorage.getItem('expiryDate'));
+        if (activated && expiry < firstRun + 365 * 86400000) {
+            expiry = firstRun + 365 * 86400000;
+            localStorage.setItem('expiryDate', expiry);
+        }
+        const nowTime = now.getTime();
+        if (nowTime > expiry) {
+            licenseActive = false;
+            licenseCheckPassed = false;
+        } else {
+            licenseActive = activated;
+            licenseCheckPassed = true;
+        }
+        daysRemaining = Math.ceil((expiry - nowTime) / 86400000);
+        updateLicenseUI();
+        toggleAppAccess(!licenseCheckPassed);
+    }
+
+    function updateLicenseUI() {
+        if (daysLeftDisplay) daysLeftDisplay.innerText = `Giorni rimanenti: ${daysRemaining}`;
+        if (licenseCheckPassed) {
+            if (clientCodeInput) clientCodeInput.disabled = true;
+            if (unlockCodeInput) unlockCodeInput.disabled = true;
+            if (activateLicenseBtn) activateLicenseBtn.disabled = true;
+        } else {
+            if (clientCodeInput) clientCodeInput.disabled = false;
+            if (unlockCodeInput) unlockCodeInput.disabled = false;
+            if (activateLicenseBtn) activateLicenseBtn.disabled = false;
+        }
+    }
+
+    function toggleAppAccess(block) {
+        const btns = document.querySelectorAll('.big-btn');
+        btns.forEach(btn => {
+            if (block) {
+                btn.style.pointerEvents = 'none';
+                btn.style.opacity = '0.5';
+            } else {
+                btn.style.pointerEvents = 'auto';
+                btn.style.opacity = '1';
+            }
+        });
+    }
+
+    async function onActivateLicense() {
+        const clientCode = clientCodeInput.value.trim();
+        const unlockCode = unlockCodeInput.value.trim();
+        if (!/^\d{6,10}$/.test(clientCode)) {
+            alert('Codice cliente deve essere numerico da 6 a 10 cifre.');
+            return;
+        }
+        if (!/^\d{20}$/.test(unlockCode)) {
+            alert('Codice sblocco deve essere esattamente 20 cifre.');
+            return;
+        }
+        const firstRun = localStorage.getItem('firstRun');
+        if (!firstRun) {
+            alert('Errore: primo avvio non rilevato. Reinstalla l\'app.');
+            return;
+        }
+        if (verifyUnlockCode(clientCode, parseInt(firstRun), unlockCode)) {
+            const firstRunNum = parseInt(firstRun);
+            const newExpiry = firstRunNum + 365 * 86400000;
+            localStorage.setItem('activated', 'true');
+            localStorage.setItem('expiryDate', newExpiry);
+            await initLicense();
+            alert('Licenza attivata con successo! 365 giorni di utilizzo.');
+        } else {
+            alert('Codice di sblocco non valido.');
+        }
+    }
+
+    function copyRequest() {
+        let clientCode = clientCodeInput.value.trim();
+        if (!/^\d{6,10}$/.test(clientCode)) {
+            alert('Inserisci prima un codice cliente valido (6-10 cifre).');
+            return;
+        }
+        const firstRun = localStorage.getItem('firstRun');
+        if (!firstRun) {
+            alert('Errore: impossibile recuperare il timestamp.');
+            return;
+        }
+        const textToCopy = `CODICE_CLIENTE=${clientCode}&FIRST_RUN=${firstRun}`;
+        navigator.clipboard.writeText(textToCopy).then(() => {
+            alert('Dati copiati negli appunti! Puoi inviarli a gliamicidipaolino@gmail.com');
+        }).catch(() => {
+            alert('Copia manuale: ' + textToCopy);
+        });
+    }
+
+    // ==================== FUNZIONI ADMIN ====================
+    function generateUnlockCode(clientCode, firstRun) {
+        const message = `${clientCode}|${firstRun}`;
+        const hash = CryptoJS.HmacSHA256(message, SECRET_KEY);
+        return hashTo20Digits(hash);
+    }
+
+    function onGenerateUnlock() {
+        let clientCode = adminClientCode.value.trim();
+        let firstRun = adminFirstRun.value.trim();
+        if (!/^\d{6,10}$/.test(clientCode)) {
+            alert('Codice cliente deve essere numerico da 6 a 10 cifre.');
+            return;
+        }
+        if (!/^\d+$/.test(firstRun) || firstRun.length < 10) {
+            alert('Inserisci un FIRST_RUN valido (timestamp numerico, es. 1734567890000).');
+            return;
+        }
+        const code = generateUnlockCode(clientCode, firstRun);
+        generatedCode.value = code;
+    }
+
+    function copyGenerated() {
+        if (!generatedCode.value) {
+            alert('Nessun codice generato.');
+            return;
+        }
+        navigator.clipboard.writeText(generatedCode.value).then(() => {
+            alert('Codice copiato negli appunti.');
+        }).catch(() => {
+            alert('Copia manuale: ' + generatedCode.value);
+        });
+    }
+
+    function showAdminSection() {
+        adminSection.style.display = 'block';
+    }
+
+    function hideAdminSection() {
+        adminSection.style.display = 'none';
+    }
+
+    // Long press sul titolo per attivare area admin
+    let pressTimer = null;
+    function startAdminTimer() {
+        pressTimer = setTimeout(() => {
+            if (!adminAuthenticated) {
+                const code = prompt("Inserisci il codice amministratore:");
+                if (code === ADMIN_CODE) {
+                    adminAuthenticated = true;
+                    showAdminSection();
+                    alert("Accesso amministratore autorizzato.");
+                } else if (code !== null) {
+                    alert("Codice errato.");
+                }
+            } else {
+                // Se già autenticato, mostra o nascondi area admin (toggle)
+                if (adminSection.style.display === 'none' || getComputedStyle(adminSection).display === 'none') {
+                    showAdminSection();
+                } else {
+                    hideAdminSection();
+                }
+            }
+        }, 10000); // 10 secondi
+    }
+    function cancelAdminTimer() {
+        if (pressTimer) {
+            clearTimeout(pressTimer);
+            pressTimer = null;
+        }
+    }
+    adminLongPressBtn.addEventListener('mousedown', startAdminTimer);
+    adminLongPressBtn.addEventListener('mouseup', cancelAdminTimer);
+    adminLongPressBtn.addEventListener('mouseleave', cancelAdminTimer);
+    adminLongPressBtn.addEventListener('touchstart', startAdminTimer, { passive: true });
+    adminLongPressBtn.addEventListener('touchend', cancelAdminTimer);
+    adminLongPressBtn.addEventListener('touchcancel', cancelAdminTimer);
+
+    generateUnlockBtn.addEventListener('click', onGenerateUnlock);
+    copyGeneratedBtn.addEventListener('click', copyGenerated);
+    hideAdminBtn.addEventListener('click', hideAdminSection);
 
     // ==================== FUNZIONI PER I CONTATTI ====================
     function saveContactExtraText() {
@@ -773,8 +1073,7 @@
             if (saved !== null) {
                 contactExtraText[s] = saved;
             } else {
-                // Migrazione dalle versioni precedenti (0198, 0197, ...)
-                for (let oldVer of ["0198", "0197", "0196", "0195"]) {
+                for (let oldVer of ["0200", "0199", "0198"]) {
                     const old = localStorage.getItem(`contactExtra_${s}_${oldVer}`);
                     if (old !== null) {
                         contactExtraText[s] = old;
@@ -838,9 +1137,9 @@
             btn.setAttribute('data-service', service);
             btn.innerText = getContactButtonText(service);
             btn.addEventListener('click', () => showEmergency(service));
-            let pressTimer = null;
-            const startTimer = () => { pressTimer = setTimeout(() => showCustomPrompt(service, contactExtraText[service]), 5000); };
-            const cancelTimer = () => { if (pressTimer) { clearTimeout(pressTimer); pressTimer = null; } };
+            let pressTimerBtn = null;
+            const startTimer = () => { pressTimerBtn = setTimeout(() => showCustomPrompt(service, contactExtraText[service]), 5000); };
+            const cancelTimer = () => { if (pressTimerBtn) { clearTimeout(pressTimerBtn); pressTimerBtn = null; } };
             btn.addEventListener('mousedown', startTimer);
             btn.addEventListener('mouseup', cancelTimer);
             btn.addEventListener('mouseleave', cancelTimer);
@@ -851,7 +1150,7 @@
         });
     }
 
-    // ==================== FUNZIONI ESISTENTI (INVARIATE, tranne migrazione) ====================
+    // ==================== FUNZIONI ESISTENTI (INVARIATE) ====================
     function openAdaptiveModal() {
         modalTextarea.value = operatorResponse.value;
         adaptiveModal.style.display = 'flex';
@@ -1112,7 +1411,7 @@
     function releaseWakeLock() { if (wakeLock) { wakeLock.release(); wakeLock = null; } }
 
     function migratePhoneNumbers() {
-        const oldVersions = ["0198", "0197", "0196", "0195"];
+        const oldVersions = ["0200", "0199", "0198"];
         for (let s of services) {
             if (localStorage.getItem(`phone_${s}_${CURRENT_VERSION}`)) continue;
             for (let ver of oldVersions) {
@@ -1684,6 +1983,10 @@
     }
 
     function showEmergency(s) {
+        if (!licenseCheckPassed) {
+            alert('Licenza non attiva o scaduta. Attivala dalla home.');
+            return;
+        }
         currentService = s;
         let extra = contactExtraText[s];
         let label = extra && extra.trim() !== "" ? `Contatto: ${extra}` : "Contatto:";
@@ -1745,6 +2048,10 @@
         });
         initRecognitionOperator();
         initRecognitionSpeak();
+        initLicense();
+        activateLicenseBtn.addEventListener('click', onActivateLicense);
+        copyRequestBtn.addEventListener('click', copyRequest);
+        // Admin: sezione già gestita con long press
     }
     init();
 </script>
