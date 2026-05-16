@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
-    <title>SOS Drive - Emergenza v0193</title>
+    <title>Contatti Personali - v0194</title>
     <style>
         * {
             margin: 0;
@@ -163,7 +163,6 @@
             background: #fff;
             font-family: monospace;
         }
-        /* LAYOUT NOTE */
         .note-item, .special-note-item {
             background: transparent;
             margin: 16px 0;
@@ -258,7 +257,6 @@
             color: white;
             margin: 16px 0;
         }
-        /* Sezione operatore (primo box) */
         .top-actions {
             display: flex;
             gap: 10px;
@@ -278,7 +276,6 @@
             flex-shrink: 0;
             width: auto;
         }
-        /* Tasto ASCOLTA OPERATORE ora giallo come PARLA CON OPERATORE */
         .listen-btn {
             background: #FFC107 !important;
             color: #1e2a3a !important;
@@ -290,7 +287,6 @@
             flex: 1;
             text-align: center;
         }
-        /* Box separato per Parla con Operatore */
         .speak-box {
             background: #d2d6dc;
             border-left: 6px solid #2c3e50;
@@ -329,7 +325,6 @@
             color: #2c3e66;
             margin-top: 6px;
         }
-        /* MODALI */
         .adaptive-modal {
             position: fixed;
             top: 0;
@@ -462,33 +457,75 @@
             margin-top: 8px;
             color: #1a237e;
         }
+        .rubrica-info {
+            margin-top: 16px;
+            font-size: 0.8rem;
+            color: #1e2a3a;
+            text-align: center;
+            font-style: italic;
+        }
+        /* Stile per il prompt personalizzato */
+        .custom-prompt {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 3000;
+        }
+        .custom-prompt-content {
+            background: white;
+            border-radius: 32px;
+            padding: 20px;
+            max-width: 90%;
+            width: 300px;
+            text-align: center;
+        }
+        .custom-prompt-content input {
+            width: 100%;
+            padding: 10px;
+            margin: 15px 0;
+            border-radius: 40px;
+            border: 1px solid #ced4da;
+            font-size: 1rem;
+        }
+        .custom-prompt-content button {
+            background: #283593;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 40px;
+            margin: 0 5px;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
 <div class="container">
     <div id="homePage" class="page">
-        <div class="version-header">📟 SOS-EMERGENZE v0193 - Layout home aggiornato</div>
-        <h1>🆘 SOS EMERGENZA</h1>
-        <div class="grid-2">
-            <button class="big-btn" data-service="ambulanza">🚑 AMBULANZA</button>
-            <button class="big-btn" data-service="polizia">👮 POLIZIA</button>
-            <button class="big-btn" data-service="veterinario">🐾 VETERINARIO</button>
-            <button class="big-btn" data-service="clinica">🏥 CLINICA</button>
+        <div class="version-header">📇 CONTATTI PERSONALI v0194</div>
+        <h1>📇 SUPPORTO CONTATTI PERSONALI</h1>
+        <div class="grid-2" id="contactsGrid">
+            <!-- I pulsanti verranno generati dinamicamente -->
         </div>
-        <p style="text-align:center; font-size:0.75rem; color:#555;">Ogni servizio ha il proprio archivio note.<br>📍 Ricerca entro 300m di TUTTI i luoghi con nome<br>🔊 Ascolto automatico 30 secondi dopo il messaggio</p>
-        <p style="text-align:center; font-size:0.7rem; color:#2c3e66; margin-top:8px;">💾 Il file SALVA NOTE si chiama: sos_notes_backup_0193.txt</p>
+        <div class="rubrica-info">Rubrica Personale di Supporto e Consultazione</div>
+        <p style="text-align:center; font-size:0.75rem; color:#555;">Ogni contatto ha il proprio archivio note.<br>📍 Ricerca entro 300m di TUTTI i luoghi con nome<br>🔊 Ascolto automatico 30 secondi dopo il messaggio</p>
+        <p style="text-align:center; font-size:0.7rem; color:#2c3e66; margin-top:8px;">💾 Il file SALVA NOTE si chiama: contatti_personali_notes_backup_0194.txt</p>
         <div class="export-import-row">
             <button id="exportAllBtn">💾 SALVA NOTE</button>
             <button id="importAllBtn">📂 RIPRISTINA NOTE</button>
         </div>
         <input type="file" id="globalImportFileInput" accept=".txt" style="display:none;">
-        <div class="version-footer">versione 0193 – ascolto operatore giallo, lettura vocale automatica FR</div>
+        <div class="version-footer">versione 0194 – rubrica contatti personali</div>
     </div>
 
     <div id="emergencyPage" class="page hidden">
         <div id="currentServiceDeco" class="current-service-deco">🚑 AMBULANZA</div>
 
-        <!-- BLOCCO NUMERO SERVIZIO -->
         <div class="dark-card">
             <div class="section-title">Numero servizio</div>
             <div class="flex-row">
@@ -500,7 +537,6 @@
 
         <button id="googleMapsBtn" class="small-btn" style="width:100%; margin:4px 0;">🗺️ APRI GOOGLE MAPS</button>
 
-        <!-- BLOCCO POSIZIONE -->
         <div class="dark-card">
             <button id="geolocationBtn" class="small-btn" style="width:100%; margin-bottom:12px;">📍 CARICA POSIZIONE + INDIRIZZO</button>
             <div id="coordsContainer" style="margin-top:8px;">
@@ -564,7 +600,7 @@
             <div id="speakStatus" class="status-msg"></div>
         </div>
 
-        <div class="version-footer">versione 0193 – ascolto operatore giallo, lettura vocale automatica FR</div>
+        <div class="version-footer">versione 0194 – rubrica contatti personali</div>
     </div>
 
     <!-- MODALI -->
@@ -602,14 +638,14 @@
 </div>
 
 <script>
-    // ==================== VERSIONE 0193 ====================
-    // - Messaggio "Traduzione completata" visibile 15 secondi
-    // - Dopo traduzione, lettura automatica in francese con pausa di 0.1 ms tra parole (fluida)
-    // - Tasto ASCOLTA OPERATORE colore giallo (#FFC107) come PARLA CON OPERATORE
-    // - Emoji 🎙️ aggiunta a sinistra del testo "PARLA CON OPERATORE"
+    // ==================== VERSIONE 0194 ====================
+    // - Home page: titolo "SUPPORTO CONTATTI PERSONALI", pulsanti "CONTATTO" modificabili con long press (5 sec)
+    // - Testo aggiuntivo massimo 14 caratteri, salvato in localStorage
+    // - Prefisso "CONTATTO" fisso, emoji rimosse
+    // - File di backup rinominato in "contatti_personali_notes_backup_0194.txt"
     // =================================================================
 
-    const CURRENT_VERSION = "0193";
+    const CURRENT_VERSION = "0194";
     let currentService = "ambulanza";
     let currentLat = null, currentLng = null;
     let currentAddress = "";
@@ -621,14 +657,19 @@
     let selectedSpecialMode = false;
     let wakeLock = null;
 
+    // Dati per i contatti personalizzabili
+    let contactExtraText = {
+        ambulanza: "",
+        polizia: "",
+        veterinario: "",
+        clinica: ""
+    };
+
     const services = ["ambulanza", "polizia", "veterinario", "clinica"];
     for (let s of services) {
         normalNotes[s] = [];
         specialNotes[s] = [];
     }
-
-    let lastItalianText = "";
-    let lastFrenchTranslation = "";
 
     // DOM elements
     const homePage = document.getElementById('homePage');
@@ -681,14 +722,119 @@
     const exportAllBtn = document.getElementById('exportAllBtn');
     const importAllBtn = document.getElementById('importAllBtn');
     const globalImportFileInput = document.getElementById('globalImportFileInput');
+    const contactsGrid = document.getElementById('contactsGrid');
 
     let currentEditMode = null;
     let currentEditId = null;
     let recognitionOperator = null;
     let recognitionSpeak = null;
     let recognitionTimeout = null;
+    let lastItalianText = "";
+    let lastFrenchTranslation = "";
 
-    // ==================== MODALI ====================
+    // ==================== FUNZIONI PER I CONTATTI PERSONALIZZABILI ====================
+    function saveContactExtraText() {
+        for (let s of services) {
+            localStorage.setItem(`contactExtra_${s}_${CURRENT_VERSION}`, contactExtraText[s]);
+        }
+    }
+    function loadContactExtraText() {
+        for (let s of services) {
+            const saved = localStorage.getItem(`contactExtra_${s}_${CURRENT_VERSION}`);
+            if (saved !== null) {
+                contactExtraText[s] = saved;
+            } else {
+                contactExtraText[s] = "";
+            }
+        }
+    }
+    function getContactButtonText(service) {
+        let base = "CONTATTO";
+        let extra = contactExtraText[service];
+        if (extra && extra.trim() !== "") {
+            return `${base} ${extra}`;
+        }
+        return base;
+    }
+    function updateContactButtons() {
+        const buttons = document.querySelectorAll('.big-btn');
+        buttons.forEach(btn => {
+            const s = btn.getAttribute('data-service');
+            if (s) {
+                btn.innerText = getContactButtonText(s);
+            }
+        });
+    }
+    function showCustomPrompt(service, currentExtra) {
+        // Crea un overlay per il prompt personalizzato
+        const overlay = document.createElement('div');
+        overlay.className = 'custom-prompt';
+        overlay.innerHTML = `
+            <div class="custom-prompt-content">
+                <h3>Modifica testo aggiuntivo</h3>
+                <p>Testo attuale: "${currentExtra}"</p>
+                <input type="text" id="customPromptInput" maxlength="14" placeholder="Max 14 caratteri" value="${currentExtra}">
+                <div>
+                    <button id="customPromptOk">OK</button>
+                    <button id="customPromptCancel">ANNULLA</button>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(overlay);
+        const input = overlay.querySelector('#customPromptInput');
+        const okBtn = overlay.querySelector('#customPromptOk');
+        const cancelBtn = overlay.querySelector('#customPromptCancel');
+        const close = () => overlay.remove();
+        okBtn.onclick = () => {
+            let newText = input.value.trim();
+            if (newText.length > 14) newText = newText.substring(0, 14);
+            contactExtraText[service] = newText;
+            saveContactExtraText();
+            updateContactButtons();
+            close();
+        };
+        cancelBtn.onclick = close;
+        input.focus();
+    }
+
+    // ==================== GENERAZIONE PULSANTI HOME ====================
+    function initHomeButtons() {
+        contactsGrid.innerHTML = '';
+        services.forEach(service => {
+            const btn = document.createElement('button');
+            btn.className = 'big-btn';
+            btn.setAttribute('data-service', service);
+            btn.innerText = getContactButtonText(service);
+            // Evento click normale
+            btn.addEventListener('click', () => showEmergency(service));
+            // Long press (5 secondi) per modificare il testo aggiuntivo
+            let pressTimer = null;
+            btn.addEventListener('mousedown', () => {
+                pressTimer = setTimeout(() => {
+                    showCustomPrompt(service, contactExtraText[service]);
+                }, 5000);
+            });
+            btn.addEventListener('mouseup', () => {
+                if (pressTimer) clearTimeout(pressTimer);
+            });
+            btn.addEventListener('mouseleave', () => {
+                if (pressTimer) clearTimeout(pressTimer);
+            });
+            // Per touch devices
+            btn.addEventListener('touchstart', (e) => {
+                pressTimer = setTimeout(() => {
+                    showCustomPrompt(service, contactExtraText[service]);
+                }, 5000);
+            });
+            btn.addEventListener('touchend', () => {
+                if (pressTimer) clearTimeout(pressTimer);
+            });
+            contactsGrid.appendChild(btn);
+        });
+    }
+
+    // ==================== FUNZIONI ESISTENTI (invariate) ====================
+    // MODALI
     function openAdaptiveModal() {
         modalTextarea.value = operatorResponse.value;
         adaptiveModal.style.display = 'flex';
@@ -712,7 +858,6 @@
     closeSpeakModalBtn.addEventListener('click', closeSpeakDetailModal);
     speakDetailModal.addEventListener('click', (e) => { if (e.target === speakDetailModal) closeSpeakDetailModal(); });
 
-    // Persistenza per la conversazione "Parla con operatore"
     function saveSpeakTranslation() {
         if (currentService) {
             const data = { italian: lastItalianText, french: lastFrenchTranslation };
@@ -749,7 +894,7 @@
         setTimeout(() => { if (speakStatus.innerText === "🧹 Traduzione cancellata") speakStatus.innerText = ""; }, 2000);
     }
 
-    // ==================== MODALE NOTE ====================
+    // MODALE NOTE
     function closeEditModal() {
         noteEditModal.style.display = 'none';
         currentEditMode = null;
@@ -808,7 +953,7 @@
     saveNoteBtn.addEventListener('click', saveNoteFromModal);
     noteEditModal.addEventListener('click', (e) => { if (e.target === noteEditModal) closeEditModal(); });
 
-    // ==================== UTILITY ====================
+    // UTILITY
     function showTemporaryMessage(element, message, duration = 15000) {
         if (!element) return;
         element.innerText = message;
@@ -817,7 +962,7 @@
         element._hideTimeout = setTimeout(() => { element.style.display = 'none'; }, duration);
     }
 
-    // ==================== TRADUZIONI ====================
+    // TRADUZIONI
     async function translateToFrench(italianText) {
         if (!italianText || italianText.trim() === "") return "";
         try {
@@ -839,7 +984,7 @@
         return frenchText + " (traduzione fallita)";
     }
 
-    // ==================== RICONOSCIMENTO OPERATORE ====================
+    // RICONOSCIMENTO OPERATORE
     function initRecognitionOperator() {
         if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
             transcribeStatus.innerText = "❌ Riconoscimento non supportato";
@@ -879,7 +1024,7 @@
         recognitionTimeout = setTimeout(() => { if (recognitionOperator && recognitionOperator.stop) recognitionOperator.stop(); }, 30000);
     }
 
-    // ==================== RICONOSCIMENTO PARLA CON OPERATORE ====================
+    // RICONOSCIMENTO PARLA CON OPERATORE
     function initRecognitionSpeak() {
         if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
             speakStatus.innerText = "❌ Riconoscimento non supportato";
@@ -892,8 +1037,6 @@
         recognitionSpeak.lang = 'it-IT';
         return true;
     }
-
-    // Funzione per leggere il testo francese con pausa di 0.1 ms tra le parole
     async function speakFrenchWithMicroPause(text, langCode = 'fr-FR') {
         if (!window.speechSynthesis) return;
         speechSynthesis.cancel();
@@ -904,17 +1047,13 @@
             utterance.lang = langCode;
             utterance.rate = 1.0;
             speechSynthesis.speak(utterance);
-            // Attendere la fine della pronuncia della parola prima di procedere
             await new Promise((resolve) => {
                 utterance.onend = resolve;
-                // Timeout di sicurezza (1 secondo per parola)
                 setTimeout(resolve, 1000);
             });
-            // Pausa di 0.1 millisecondi tra le parole (praticamente nulla)
             await new Promise(r => setTimeout(r, 0.1));
         }
     }
-
     async function startSpeakingItalian() {
         if (!recognitionSpeak && !initRecognitionSpeak()) return;
         speakStatus.innerText = "🎤 Ascolto in corso...";
@@ -934,11 +1073,8 @@
                 lastFrenchTranslation = french;
                 speakResultField.innerHTML = `<strong>Italiano:</strong> ${lastItalianText}<br><strong>Francese:</strong> ${lastFrenchTranslation}`;
                 speakStatus.innerText = "✅ Testo tradotto. Tocca il campo per visualizzare dettaglio.";
-                // Mostra il messaggio per 15 secondi
                 showTemporaryMessage(speakStatus, "✅ Traduzione completata. Tocca il campo bianco per vedere la trascrizione completa.", 15000);
-                // Salva in localStorage
                 saveSpeakTranslation();
-                // Leggi automaticamente il testo francese con pausa di 0.1 ms tra parole
                 if (lastFrenchTranslation) {
                     await speakFrenchWithMicroPause(lastFrenchTranslation, 'fr-FR');
                 }
@@ -953,7 +1089,7 @@
         setTimeout(() => { if (recognitionSpeak && recognitionSpeak.stop) recognitionSpeak.stop(); }, 30000);
     }
 
-    // ==================== PERSISTENZA TRADUZIONE OPERATORE ====================
+    // PERSISTENZA TRADUZIONE OPERATORE
     function saveOperatorTranslation(text) {
         if (currentService) localStorage.setItem(`operatorResponse_${currentService}_${CURRENT_VERSION}`, text);
     }
@@ -969,7 +1105,7 @@
         operatorResponse.value = "";
     }
 
-    // ==================== WAKE LOCK ====================
+    // WAKE LOCK
     async function requestWakeLock() {
         if ('wakeLock' in navigator) {
             try {
@@ -980,9 +1116,9 @@
     }
     function releaseWakeLock() { if (wakeLock) { wakeLock.release(); wakeLock = null; } }
 
-    // ==================== NUMERI TELEFONO ====================
+    // NUMERI TELEFONO
     function migratePhoneNumbers() {
-        const oldVersions = ["0192", "0191", "0190"];
+        const oldVersions = ["0193", "0192", "0191"];
         for (let s of services) {
             if (localStorage.getItem(`phone_${s}_${CURRENT_VERSION}`)) continue;
             for (let ver of oldVersions) {
@@ -995,7 +1131,7 @@
     function getPhone(s) { return localStorage.getItem(`phone_${s}_${CURRENT_VERSION}`); }
     const defaultPhone = { ambulanza:"118", polizia:"113", veterinario:"800123456", clinica:"800987654" };
 
-    // ==================== PERSISTENZA NOTE ====================
+    // PERSISTENZA NOTE
     function getNormalNotesKey(s) { return `normalNotes_${s}_${CURRENT_VERSION}`; }
     function getSpecialNotesKey(s) { return `specialNotes_${s}_${CURRENT_VERSION}`; }
     function getSelectedNormalIdKey(s) { return `selectedNormalNote_${s}_${CURRENT_VERSION}`; }
@@ -1026,7 +1162,7 @@
         renderCurrentNotes();
     }
 
-    // ==================== RENDER NOTE ====================
+    // RENDER NOTE
     function renderNormalNotes() {
         const notes = normalNotes[currentService] || [];
         if (!notes.length) {
@@ -1173,7 +1309,7 @@
     addNoteBtn.addEventListener('click', () => openAddNoteModal('normal'));
     addSpecialNoteBtn.addEventListener('click', () => openAddNoteModal('special'));
 
-    // ==================== GEOLOCALIZZAZIONE ====================
+    // GEOLOCALIZZAZIONE (invariata)
     function haversine(lat1,lng1,lat2,lng2) {
         const R = 6371e3;
         const φ1 = lat1 * Math.PI/180, φ2 = lat2 * Math.PI/180;
@@ -1299,7 +1435,7 @@
         gpsStatus.innerHTML = "";
     }
 
-    // ==================== LETTURA VOCALE (LEGGI in IT/FR) ====================
+    // LETTURA VOCALE
     function playBeep() {
         try {
             let ctx = new (window.AudioContext || window.webkitAudioContext)();
@@ -1381,7 +1517,7 @@
     function speakItalian() { speakFull('it'); }
     function speakFrench() { speakFull('fr'); }
 
-    // ==================== COPIA NOTE ====================
+    // COPIA NOTE
     function getSelectedNoteDescription() {
         if (selectedSpecialMode) return specialNotes[currentService].find(n => String(n.id) === String(selectedSpecialNoteId))?.description || null;
         else return normalNotes[currentService].find(n => String(n.id) === String(selectedNormalNoteId))?.description || null;
@@ -1429,13 +1565,19 @@
         }
     }
 
-    // ==================== ESPORTA / IMPORTA ====================
+    // ESPORTA / IMPORTA
     function exportAllNotes() {
         let content = "";
         content += "[NUMERI TELEFONO]\n";
         for (let s of services) {
             let phone = getPhone(s) || defaultPhone[s];
             content += `${s.toUpperCase()}=${phone}\n`;
+        }
+        content += "\n";
+        // Esporta anche i testi aggiuntivi dei contatti
+        content += "[TESTI CONTATTI]\n";
+        for (let s of services) {
+            content += `${s.toUpperCase()}=${contactExtraText[s]}\n`;
         }
         content += "\n";
         for (let s of services) {
@@ -1459,10 +1601,10 @@
         const blob = new Blob([content], {type: 'text/plain'});
         const a = document.createElement('a');
         a.href = URL.createObjectURL(blob);
-        a.download = `sos_notes_backup_${CURRENT_VERSION}.txt`;
+        a.download = `contatti_personali_notes_backup_${CURRENT_VERSION}.txt`;
         a.click();
         URL.revokeObjectURL(a.href);
-        gpsStatus.innerHTML = "📁 Backup completo salvato (note + numeri).";
+        gpsStatus.innerHTML = "📁 Backup completo salvato (note + contatti).";
         setTimeout(() => gpsStatus.innerHTML = "✅ Pronto.", 2000);
     }
     function importAllNotes(file) {
@@ -1479,17 +1621,29 @@
             }
             let currentTitle = "", currentDesc = "";
             let inPhoneSection = false;
+            let inContactTextSection = false;
             for (let line of lines) {
                 line = line.trim();
-                if (line === "[NUMERI TELEFONO]") { inPhoneSection = true; continue; }
+                if (line === "[NUMERI TELEFONO]") { inPhoneSection = true; inContactTextSection = false; continue; }
+                if (line === "[TESTI CONTATTI]") { inContactTextSection = true; inPhoneSection = false; continue; }
                 if (inPhoneSection && line.match(/^[A-Z]+=/)) {
                     let [key, value] = line.split('=');
                     let serv = key.toLowerCase();
                     if (services.includes(serv) && value) savePhone(serv, value);
                     continue;
                 }
+                if (inContactTextSection && line.match(/^[A-Z]+=/)) {
+                    let [key, value] = line.split('=');
+                    let serv = key.toLowerCase();
+                    if (services.includes(serv)) {
+                        contactExtraText[serv] = value;
+                        saveContactExtraText();
+                    }
+                    continue;
+                }
                 if (line.startsWith("[SERVIZIO:")) {
                     inPhoneSection = false;
+                    inContactTextSection = false;
                     const match = line.match(/\[SERVIZIO:\s*(\w+)\]/i);
                     if (match) {
                         currentServiceImport = match[1].toLowerCase();
@@ -1533,16 +1687,23 @@
                 loadCurrentServiceNotes();
                 phoneInput.value = getPhone(currentService) || defaultPhone[currentService];
             }
-            gpsStatus.innerHTML = "✅ Note e numeri ripristinati da file.";
+            updateContactButtons();
+            gpsStatus.innerHTML = "✅ Note, numeri e testi contatti ripristinati da file.";
             setTimeout(() => gpsStatus.innerHTML = "✅ Pronto.", 2000);
         };
         reader.readAsText(file, "UTF-8");
     }
 
-    // ==================== FLUSSO PRINCIPALE ====================
+    // FLUSSO PRINCIPALE
     function showEmergency(s) {
         currentService = s;
-        let label = {ambulanza:"🚑 AMBULANZA", polizia:"👮 POLIZIA", veterinario:"🐾 VETERINARIO", clinica:"🏥 CLINICA"}[s];
+        let label = "CONTATTO";
+        let extra = contactExtraText[s];
+        if (extra && extra.trim() !== "") {
+            label = `CONTATTO ${extra}`;
+        } else {
+            label = "CONTATTO";
+        }
         currentServiceDeco.innerText = label;
         phoneInput.value = getPhone(s) || defaultPhone[s];
         loadCurrentServiceNotes();
@@ -1579,8 +1740,9 @@
 
     function init() {
         loadAllNotes();
+        loadContactExtraText();
         migratePhoneNumbers();
-        document.querySelectorAll('.big-btn').forEach(btn => btn.addEventListener('click', () => showEmergency(btn.getAttribute('data-service'))));
+        initHomeButtons();
         saveNumberBtn.addEventListener('click', onSaveNumber);
         googleMapsBtn.addEventListener('click', () => window.open("https://maps.google.com", "_blank"));
         geolocationBtn.addEventListener('click', getLocationAndAddress);
