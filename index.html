@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
-    <title>Contatti Personali - v0197</title>
+    <title>Contatti Personali - v0198</title>
     <style>
         * {
             margin: 0;
@@ -74,25 +74,34 @@
             margin-bottom: 20px;
             box-shadow: 0 4px 8px rgba(0,0,0,0.2);
         }
+        /* Box che contiene i pulsanti contatto */
+        .dark-card {
+            background: #d2d6dc;
+            border-left: 6px solid #2c3e50;
+            border-radius: 24px;
+            padding: 16px;
+            margin: 16px 0;
+            box-shadow: none;
+        }
         .grid-2 {
             display: flex;
             flex-direction: column;
             gap: 14px;
-            margin: 24px 0;
         }
+        /* Pulsanti contatto: sfondo giallo, senza ombra */
         .big-btn {
-            background: #6c757d;
+            background: #FFC107 !important;
+            color: #1e2a3a !important;
             border: none;
             border-radius: 60px;
             padding: 16px 12px;
             font-size: 1.3rem;
             font-weight: bold;
-            color: white;
             width: 100%;
             text-align: center;
             cursor: pointer;
             transition: 0.05s linear;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            box-shadow: none !important;
         }
         .big-btn:active {
             transform: scale(0.97);
@@ -143,14 +152,6 @@
         .double-height {
             padding: 16px 12px;
             font-size: 1rem;
-        }
-        .dark-card {
-            background: #d2d6dc;
-            border-left: 6px solid #2c3e50;
-            border-radius: 24px;
-            padding: 16px;
-            margin: 16px 0;
-            box-shadow: none;
         }
         .section-title {
             font-weight: bold;
@@ -529,33 +530,31 @@
 <body>
 <div class="container">
     <div id="homePage" class="page">
-        <div class="version-header">📇 CONTATTI PERSONALI v0197</div>
-        <!-- Pulsante titolo non editabile (arancione forte, ombra aumentata) -->
+        <div class="version-header">📇 CONTATTI PERSONALI v0198</div>
         <div class="title-btn">
             <span>📇</span>
             <span>CONTATTI PERSONALI</span>
             <span>📇</span>
         </div>
-        <div class="grid-2" id="contactsGrid">
-            <!-- I pulsanti verranno generati dinamicamente -->
+
+        <!-- Box che contiene i pulsanti contatto (dark-card, sfondo grigio) -->
+        <div class="dark-card">
+            <div class="grid-2" id="contactsGrid"></div>
         </div>
 
-        <!-- Nuove righe informative con stesso stile -->
         <div class="rubrica-info">
             Rubrica Personale di Supporto e Consultazione<br>
             Non Utilizzare per Situazioni di Emergenza di Salute
         </div>
-
-        <!-- Righe esistenti con stesso stile -->
         <div class="info-text">Ogni contatto ha il proprio archivio note.<br>📍 Ricerca entro 300m di TUTTI i luoghi con nome<br>🔊 Ascolto automatico 30 secondi dopo il messaggio</div>
-        <div class="info-text">💾 Il file SALVA NOTE si chiama: contatti_personali_notes_backup_0197.txt</div>
+        <div class="info-text">💾 Il file SALVA NOTE si chiama: contatti_personali_notes_backup_0198.txt</div>
 
         <div class="export-import-row">
             <button id="exportAllBtn">💾 SALVA NOTE</button>
             <button id="importAllBtn">📂 RIPRISTINA NOTE</button>
         </div>
         <input type="file" id="globalImportFileInput" accept=".txt" style="display:none;">
-        <div class="version-footer">versione 0197 – contatti personalizzabili, long press 5s</div>
+        <div class="version-footer">versione 0198 – contatti personalizzabili, long press 5s</div>
     </div>
 
     <div id="emergencyPage" class="page hidden">
@@ -635,7 +634,7 @@
             <div id="speakStatus" class="status-msg"></div>
         </div>
 
-        <div class="version-footer">versione 0197 – rubrica contatti personali</div>
+        <div class="version-footer">versione 0198 – rubrica contatti personali</div>
     </div>
 
     <!-- MODALI -->
@@ -673,13 +672,13 @@
 </div>
 
 <script>
-    // ==================== VERSIONE 0197 ====================
-    // - Titolo "CONTATTI PERSONALI" in pulsante non editabile con sfondo arancione forte (#e67e22) e ombra aumentata
-    // - Righe informative con stesso stile (colore, dimensione) delle righe esistenti
-    // - Tutte le altre funzionalità invariate
+    // ==================== VERSIONE 0198 ====================
+    // - Pulsanti contatto: sfondo giallo, nessuna ombra, racchiusi in dark-card
+    // - Testo: "Contatto: premi 5 sc. per modifica" quando non personalizzato
+    // - Dopo personalizzazione: solo "Contatto: (testo aggiuntivo)" (senza messaggio di invito)
     // =================================================================
 
-    const CURRENT_VERSION = "0197";
+    const CURRENT_VERSION = "0198";
     let currentService = "ambulanza";
     let currentLat = null, currentLng = null;
     let currentAddress = "";
@@ -779,10 +778,12 @@
         }
     }
     function getContactButtonText(service) {
-        let base = "Contatto:";
         let extra = contactExtraText[service];
-        if (extra && extra.trim() !== "") return `${base} ${extra}`;
-        return base;
+        if (extra && extra.trim() !== "") {
+            return `Contatto: ${extra}`;
+        } else {
+            return `Contatto: premi 5 sc. per modifica`;
+        }
     }
     function updateContactButtons() {
         document.querySelectorAll('.big-btn').forEach(btn => {
@@ -842,7 +843,7 @@
         });
     }
 
-    // ==================== FUNZIONI ESISTENTI (INVARIATE) ====================
+    // ==================== FUNZIONI ESISTENTI (INVARIATE, tranne per il salvataggio) ====================
     function openAdaptiveModal() {
         modalTextarea.value = operatorResponse.value;
         adaptiveModal.style.display = 'flex';
@@ -1103,7 +1104,7 @@
     function releaseWakeLock() { if (wakeLock) { wakeLock.release(); wakeLock = null; } }
 
     function migratePhoneNumbers() {
-        const oldVersions = ["0196", "0195", "0194"];
+        const oldVersions = ["0197", "0196", "0195"];
         for (let s of services) {
             if (localStorage.getItem(`phone_${s}_${CURRENT_VERSION}`)) continue;
             for (let ver of oldVersions) {
