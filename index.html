@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
-    <title>Contatti Personali - v0195</title>
+    <title>Contatti Personali - v0196</title>
     <style>
         * {
             margin: 0;
@@ -45,7 +45,7 @@
         h1 {
             font-size: 1.7rem;
             text-align: center;
-            color: #FFC107; /* giallo */
+            color: #FFC107;
             margin: 0 0 8px 0;
             font-weight: 700;
             display: flex;
@@ -59,7 +59,7 @@
             flex-shrink: 0;
         }
         .current-service-deco {
-            background: #d32f2f;
+            background: #6c757d;  /* grigio scuro */
             border: none;
             border-radius: 60px;
             padding: 14px 12px;
@@ -69,7 +69,7 @@
             width: 100%;
             text-align: center;
             margin-bottom: 20px;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
         }
         .grid-2 {
             display: flex;
@@ -78,7 +78,7 @@
             margin: 24px 0;
         }
         .big-btn {
-            background: #d32f2f;
+            background: #6c757d;  /* grigio scuro */
             border: none;
             border-radius: 60px;
             padding: 16px 12px;
@@ -89,7 +89,7 @@
             text-align: center;
             cursor: pointer;
             transition: 0.05s linear;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
         }
         .big-btn:active {
             transform: scale(0.97);
@@ -110,6 +110,7 @@
             transition: 0.05s linear;
             text-align: center;
             color: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
         .export-import-row button:active {
             transform: scale(0.97);
@@ -131,6 +132,7 @@
             text-align: center;
             transition: 0.05s linear;
             white-space: nowrap;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
         .small-btn:active {
             transform: scale(0.97);
@@ -145,6 +147,7 @@
             border-radius: 24px;
             padding: 16px;
             margin: 16px 0;
+            box-shadow: none; /* rimossa ombra di evidenziazione */
         }
         .section-title {
             font-weight: bold;
@@ -303,6 +306,7 @@
             border-radius: 24px;
             padding: 16px;
             margin: 16px 0;
+            box-shadow: none;
         }
         .speak-field {
             background: white;
@@ -467,6 +471,19 @@
             margin-top: 8px;
             color: #1a237e;
         }
+        .info-text {
+            text-align: center;
+            font-size: 0.75rem;
+            color: #555;
+            margin-top: 8px;
+        }
+        .disclaimer-text {
+            font-size: 0.7rem;
+            color: #c62828;
+            text-align: center;
+            margin-top: 4px;
+            font-weight: bold;
+        }
         .rubrica-info {
             margin-top: 16px;
             margin-bottom: 8px;
@@ -475,16 +492,8 @@
             text-align: center;
             font-style: normal;
             font-weight: 500;
-            background: #fff3e0;
-            padding: 8px;
-            border-radius: 24px;
-        }
-        .disclaimer {
-            font-size: 0.7rem;
-            color: #c62828;
-            text-align: center;
-            margin-top: 4px;
-            font-weight: bold;
+            background: transparent;
+            padding: 0;
         }
         .custom-prompt {
             position: fixed;
@@ -528,7 +537,7 @@
 <body>
 <div class="container">
     <div id="homePage" class="page">
-        <div class="version-header">📇 CONTATTI PERSONALI v0195</div>
+        <div class="version-header">📇 CONTATTI PERSONALI v0196</div>
         <h1>
             <span>📇</span>
             <span>CONTATTI PERSONALI</span>
@@ -537,22 +546,27 @@
         <div class="grid-2" id="contactsGrid">
             <!-- I pulsanti verranno generati dinamicamente -->
         </div>
+        
+        <!-- NUOVO ORDINE: prima le due righe informativa e disclaimer -->
         <div class="rubrica-info">
             Rubrica Personale di Supporto e Consultazione<br>
-            <span class="disclaimer">Non Utilizzare per Situazioni di Emergenza di Salute</span>
+            <span class="disclaimer-text">Non Utilizzare per Situazioni di Emergenza di Salute</span>
         </div>
-        <p style="text-align:center; font-size:0.75rem; color:#555;">Ogni contatto ha il proprio archivio note.<br>📍 Ricerca entro 300m di TUTTI i luoghi con nome<br>🔊 Ascolto automatico 30 secondi dopo il messaggio</p>
-        <p style="text-align:center; font-size:0.7rem; color:#2c3e66; margin-top:8px;">💾 Il file SALVA NOTE si chiama: contatti_personali_notes_backup_0195.txt</p>
+        
+        <!-- Poi le righe esistenti (senza ombra di evidenziazione) -->
+        <p class="info-text">Ogni contatto ha il proprio archivio note.<br>📍 Ricerca entro 300m di TUTTI i luoghi con nome<br>🔊 Ascolto automatico 30 secondi dopo il messaggio</p>
+        <p class="info-text">💾 Il file SALVA NOTE si chiama: contatti_personali_notes_backup_0196.txt</p>
+        
         <div class="export-import-row">
             <button id="exportAllBtn">💾 SALVA NOTE</button>
             <button id="importAllBtn">📂 RIPRISTINA NOTE</button>
         </div>
         <input type="file" id="globalImportFileInput" accept=".txt" style="display:none;">
-        <div class="version-footer">versione 0195 – contatti personalizzabili, long press 5s</div>
+        <div class="version-footer">versione 0196 – contatti personalizzabili, long press 5s</div>
     </div>
 
     <div id="emergencyPage" class="page hidden">
-        <div id="currentServiceDeco" class="current-service-deco">🚑 AMBULANZA</div>
+        <div id="currentServiceDeco" class="current-service-deco">Contatto:</div>
 
         <div class="dark-card">
             <div class="section-title">Numero servizio</div>
@@ -628,7 +642,7 @@
             <div id="speakStatus" class="status-msg"></div>
         </div>
 
-        <div class="version-footer">versione 0195 – rubrica contatti personali</div>
+        <div class="version-footer">versione 0196 – rubrica contatti personali</div>
     </div>
 
     <!-- MODALI -->
@@ -666,15 +680,14 @@
 </div>
 
 <script>
-    // ==================== VERSIONE 0195 ====================
-    // - Titolo "CONTATTI PERSONALI" con emoji laterali, colore giallo, adattabile
-    // - Pulsanti: testo "Contatto:" (con due punti) + eventuale testo aggiuntivo
-    // - Long press (5 secondi) per modificare il testo aggiuntivo (nessun tocco breve attiva la modifica)
-    // - Nuovo testo informativo: "Rubrica Personale di Supporto e Consultazione" + disclaimer
-    // - Mantenute tutte le funzionalità di note, geolocalizzazione, traduzione, ecc.
+    // ==================== VERSIONE 0196 ====================
+    // - Tasti contatti: colore grigio scuro (#6c757d) con ombra
+    // - Rimossa ombra di evidenziazione dai box (dark-card, speak-box)
+    // - Riordinato testo informativo nella home: prima "Rubrica Personale..." e disclaimer, poi le altre righe
+    // - Stesso carattere per tutte le righe
     // =================================================================
 
-    const CURRENT_VERSION = "0195";
+    const CURRENT_VERSION = "0196";
     let currentService = "ambulanza";
     let currentLat = null, currentLng = null;
     let currentAddress = "";
@@ -1134,7 +1147,7 @@
     function releaseWakeLock() { if (wakeLock) { wakeLock.release(); wakeLock = null; } }
 
     function migratePhoneNumbers() {
-        const oldVersions = ["0194", "0193", "0192"];
+        const oldVersions = ["0195", "0194", "0193"];
         for (let s of services) {
             if (localStorage.getItem(`phone_${s}_${CURRENT_VERSION}`)) continue;
             for (let ver of oldVersions) {
