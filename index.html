@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
-    <title>Contatti Personali - v0198</title>
+    <title>Contatti Personali - v0199</title>
     <style>
         * {
             margin: 0;
@@ -42,15 +42,15 @@
             padding-bottom: 10px;
             margin-bottom: 20px;
         }
-        /* Pulsante titolo non editabile (arancione forte) */
+        /* Pulsante titolo non editabile (sfondo giallo) */
         .title-btn {
-            background: #e67e22;
+            background: #FFC107;
             border: none;
             border-radius: 60px;
             padding: 14px 12px;
             font-size: 1.5rem;
             font-weight: bold;
-            color: white;
+            color: #1e2a3a;
             width: 100%;
             text-align: center;
             margin-bottom: 20px;
@@ -59,7 +59,7 @@
             align-items: center;
             justify-content: center;
             gap: 12px;
-            box-shadow: 0 6px 12px rgba(0,0,0,0.3);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.2);
         }
         .current-service-deco {
             background: #6c757d;
@@ -74,7 +74,6 @@
             margin-bottom: 20px;
             box-shadow: 0 4px 8px rgba(0,0,0,0.2);
         }
-        /* Box che contiene i pulsanti contatto */
         .dark-card {
             background: #d2d6dc;
             border-left: 6px solid #2c3e50;
@@ -88,11 +87,11 @@
             flex-direction: column;
             gap: 14px;
         }
-        /* Pulsanti contatto: sfondo giallo, senza ombra */
+        /* Pulsanti contatto: bordo nero grassetto, sfondo bianco */
         .big-btn {
-            background: #FFC107 !important;
+            background: white !important;
             color: #1e2a3a !important;
-            border: none;
+            border: 2px solid black !important;
             border-radius: 60px;
             padding: 16px 12px;
             font-size: 1.3rem;
@@ -102,6 +101,9 @@
             cursor: pointer;
             transition: 0.05s linear;
             box-shadow: none !important;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
         .big-btn:active {
             transform: scale(0.97);
@@ -424,7 +426,7 @@
         @media (max-width: 480px) {
             body { padding: 8px; }
             .page { padding: 16px 12px 24px; }
-            .big-btn { font-size: 1.2rem; padding: 14px 12px; }
+            .big-btn { font-size: 1rem; padding: 12px 10px; white-space: normal; word-break: break-word; }
             .small-btn { padding: 6px 10px; font-size: 0.75rem; }
             .double-height { padding: 12px 10px; font-size: 0.9rem; }
             .title-btn { font-size: 1.2rem; padding: 12px; gap: 6px; }
@@ -530,14 +532,13 @@
 <body>
 <div class="container">
     <div id="homePage" class="page">
-        <div class="version-header">📇 CONTATTI PERSONALI v0198</div>
+        <div class="version-header">📇 CONTATTI PERSONALI v0199</div>
         <div class="title-btn">
             <span>📇</span>
             <span>CONTATTI PERSONALI</span>
             <span>📇</span>
         </div>
 
-        <!-- Box che contiene i pulsanti contatto (dark-card, sfondo grigio) -->
         <div class="dark-card">
             <div class="grid-2" id="contactsGrid"></div>
         </div>
@@ -547,14 +548,14 @@
             Non Utilizzare per Situazioni di Emergenza di Salute
         </div>
         <div class="info-text">Ogni contatto ha il proprio archivio note.<br>📍 Ricerca entro 300m di TUTTI i luoghi con nome<br>🔊 Ascolto automatico 30 secondi dopo il messaggio</div>
-        <div class="info-text">💾 Il file SALVA NOTE si chiama: contatti_personali_notes_backup_0198.txt</div>
+        <div class="info-text">💾 Il file SALVA NOTE si chiama: contatti_personali_notes_backup_0199.txt</div>
 
         <div class="export-import-row">
             <button id="exportAllBtn">💾 SALVA NOTE</button>
             <button id="importAllBtn">📂 RIPRISTINA NOTE</button>
         </div>
         <input type="file" id="globalImportFileInput" accept=".txt" style="display:none;">
-        <div class="version-footer">versione 0198 – contatti personalizzabili, long press 5s</div>
+        <div class="version-footer">versione 0199 – contatti personalizzabili, long press 5s</div>
     </div>
 
     <div id="emergencyPage" class="page hidden">
@@ -583,7 +584,6 @@
             </div>
         </div>
 
-        <!-- BLOCCO NOTE NORMALI -->
         <div class="dark-card">
             <button id="addNoteBtn" class="small-btn add-note-btn">
                 <span>🚑 AGGIUNGI NOTA NORMALE</span>
@@ -597,7 +597,6 @@
 
         <button id="backHomeBtn" class="small-btn back-home" style="width:100%;">◀ TORNA INDIETRO</button>
 
-        <!-- BLOCCO NOTE SPECIALI -->
         <div class="dark-card">
             <button id="addSpecialNoteBtn" class="small-btn add-note-btn">
                 <span>🏠 AGGIUNGI NOTA SPECIALE</span>
@@ -609,7 +608,6 @@
             </div>
         </div>
 
-        <!-- BLOCCO OPERATORE -->
         <div class="dark-card">
             <div class="top-actions">
                 <button id="audioItBtn" class="small-btn audio-lang-btn">LEGGI in IT</button>
@@ -626,7 +624,6 @@
             <div id="transcribeStatus" class="status-msg"></div>
         </div>
 
-        <!-- BOX SEPARATO PER PARLA CON OPERATORE -->
         <div class="speak-box">
             <button id="clearSpeakBtn" class="small-btn clear-speak-btn">CANCELLA TRADUZIONE</button>
             <div id="speakResultField" class="speak-field">Traduzione Italiana e Francese</div>
@@ -634,7 +631,7 @@
             <div id="speakStatus" class="status-msg"></div>
         </div>
 
-        <div class="version-footer">versione 0198 – rubrica contatti personali</div>
+        <div class="version-footer">versione 0199 – rubrica contatti personali</div>
     </div>
 
     <!-- MODALI -->
@@ -672,13 +669,13 @@
 </div>
 
 <script>
-    // ==================== VERSIONE 0198 ====================
-    // - Pulsanti contatto: sfondo giallo, nessuna ombra, racchiusi in dark-card
-    // - Testo: "Contatto: premi 5 sc. per modifica" quando non personalizzato
-    // - Dopo personalizzazione: solo "Contatto: (testo aggiuntivo)" (senza messaggio di invito)
+    // ==================== VERSIONE 0199 ====================
+    // - Titolo CONTATTI PERSONALI su sfondo giallo
+    // - Pulsanti contatto: bordo nero grassetto, sfondo bianco, testo "Contatto: premi 5 sc. per modifica" su una riga (mobile adattato)
+    // - Persistenza dei testi personalizzati: alla migrazione della versione, i vecchi dati vengono mantenuti
     // =================================================================
 
-    const CURRENT_VERSION = "0198";
+    const CURRENT_VERSION = "0199";
     let currentService = "ambulanza";
     let currentLat = null, currentLng = null;
     let currentAddress = "";
@@ -773,8 +770,19 @@
     function loadContactExtraText() {
         for (let s of services) {
             const saved = localStorage.getItem(`contactExtra_${s}_${CURRENT_VERSION}`);
-            if (saved !== null) contactExtraText[s] = saved;
-            else contactExtraText[s] = "";
+            if (saved !== null) {
+                contactExtraText[s] = saved;
+            } else {
+                // Migrazione dalle versioni precedenti (0198, 0197, ...)
+                for (let oldVer of ["0198", "0197", "0196", "0195"]) {
+                    const old = localStorage.getItem(`contactExtra_${s}_${oldVer}`);
+                    if (old !== null) {
+                        contactExtraText[s] = old;
+                        saveContactExtraText();
+                        break;
+                    }
+                }
+            }
         }
     }
     function getContactButtonText(service) {
@@ -843,7 +851,7 @@
         });
     }
 
-    // ==================== FUNZIONI ESISTENTI (INVARIATE, tranne per il salvataggio) ====================
+    // ==================== FUNZIONI ESISTENTI (INVARIATE, tranne migrazione) ====================
     function openAdaptiveModal() {
         modalTextarea.value = operatorResponse.value;
         adaptiveModal.style.display = 'flex';
@@ -1104,7 +1112,7 @@
     function releaseWakeLock() { if (wakeLock) { wakeLock.release(); wakeLock = null; } }
 
     function migratePhoneNumbers() {
-        const oldVersions = ["0197", "0196", "0195"];
+        const oldVersions = ["0198", "0197", "0196", "0195"];
         for (let s of services) {
             if (localStorage.getItem(`phone_${s}_${CURRENT_VERSION}`)) continue;
             for (let ver of oldVersions) {
