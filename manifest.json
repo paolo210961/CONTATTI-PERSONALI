@@ -2,7 +2,7 @@
   "name": "Rubrica Contatti Personali",
   "short_name": "Contatti",
   "description": "Rubrica per gestire contatti personali",
-  "start_url": "contatti_personali_v0208.html",
+  "start_url": "./index.html",
   "display": "standalone",
   "theme_color": "#283593",
   "background_color": "#e9ecef",
