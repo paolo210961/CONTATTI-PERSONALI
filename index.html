@@ -12,6 +12,7 @@
     <meta name="apple-mobile-web-app-title" content="Contatti">
     <link rel="apple-touch-icon" href="icons/192.png">
     <style>
+        /* ========== STILI (identici alla versione 0208) ========== */
         * {
             margin: 0;
             padding: 0;
@@ -645,7 +646,6 @@
             <div class="grid-2" id="contactsGrid"></div>
         </div>
 
-        <!-- Informazioni nella home -->
         <div class="rubrica-info">Rubrica Personale di Supporto e Consultazione</div>
         <div class="info-text">Ogni contatto ha il proprio archivio note.<br>📍 Ricerca entro 300m di TUTTI i luoghi con nome<br>🔊 Ascolto automatico 30 secondi dopo il messaggio</div>
         <div class="info-text">Non Utilizzare APP per Situazioni di Emergenza di Salute</div>
@@ -660,7 +660,6 @@
         <div class="version-footer">versione 0208 – modale richiesta con copia integrale del messaggio</div>
     </div>
 
-    <!-- EMERGENCY PAGE (invariata) -->
     <div id="emergencyPage" class="page hidden">
         <div id="currentServiceDeco" class="current-service-deco">Contatto:</div>
         <div class="dark-card"><div class="section-title">Numero servizio</div><div class="flex-row"><input type="tel" id="phoneNumber" placeholder="Numero" style="flex:2;"><button id="saveNumberBtn" class="small-btn" style="flex:0.4;">SALVA</button></div><div id="phoneSaveMsg" class="status-msg"></div></div>
@@ -674,12 +673,10 @@
         <div class="version-footer">versione 0208 – emergency invariata</div>
     </div>
 
-    <!-- MODALI ESISTENTI -->
     <div id="adaptiveModal" class="adaptive-modal" style="display:none;"><div class="adaptive-modal-content"><textarea id="modalTextarea" readonly></textarea><button id="closeAdaptiveBtn">CHIUDI</button></div></div>
     <div id="speakDetailModal" class="adaptive-modal" style="display:none;"><div class="adaptive-modal-content"><h3>📄 Dettaglio conversazione</h3><div class="detail-label">Italiano (originale)</div><div class="detail-text" id="speakOriginalText"></div><div class="detail-label">Francese (traduzione)</div><div class="detail-text" id="speakTranslatedText"></div><div class="modal-buttons"><button id="closeSpeakModalBtn" class="save-btn">CHIUDI</button></div></div></div>
     <div id="noteEditModal" class="adaptive-modal note-edit-modal" style="display:none;"><div class="adaptive-modal-content"><h3 id="noteModalTitle">➕ Aggiungi Nota</h3><label class="detail-label">Titolo</label><input type="text" id="editNoteTitle" placeholder="Inserisci il titolo"><label class="detail-label">Descrizione</label><textarea id="editNoteDesc" rows="4" placeholder="Inserisci la descrizione"></textarea><div class="modal-buttons"><button id="saveNoteBtn" class="save-btn">SALVA</button><button id="cancelNoteBtn" class="cancel-btn">ANNULLA</button></div></div></div>
 
-    <!-- MODALE INFORMATIVA PER RICHIESTA ATTIVAZIONE -->
     <div id="infoModal" class="adaptive-modal" style="display:none;">
         <div class="adaptive-modal-content">
             <h3>📋 Richiesta attivazione</h3>
@@ -690,14 +687,10 @@
         </div>
     </div>
 </div>
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
 <script>
-    // ==================== VERSIONE 0208 COMPLETA ====================
-    // - Pulsante "Richiedi attivazione": copia l'intero messaggio della modale
-    // - Modale con IBAN, intestatario, importo, causale e email
-    // - Tutte le funzionalità di contatti, note, geolocalizzazione, admin, licenza
-    // =================================================================
-
+    // ==================== VERSIONE 0208 (JavaScript completo) ====================
     const CURRENT_VERSION = "0208";
     let currentService = "ambulanza";
     let currentLat = null, currentLng = null;
@@ -722,15 +715,12 @@
         specialNotes[s] = [];
     }
 
-    // Variabili licenza
     let licenseActive = false;
     let daysRemaining = 0;
     let licenseCheckPassed = false;
     let clientCode = "";
     const SECRET_KEY = "ChiaveSegreta123";
     let adminCode = "admin2025";
-
-    // Variabili admin
     let adminAuthenticated = false;
 
     // DOM elements
@@ -946,31 +936,18 @@ Un caro Saluto.`;
         infoModalText.innerText = fullMessage;
         infoModal.style.display = 'flex';
     }
-    closeInfoModalBtn.addEventListener('click', () => {
-        infoModal.style.display = 'none';
-    });
-    infoModal.addEventListener('click', (e) => {
-        if (e.target === infoModal) infoModal.style.display = 'none';
-    });
+    closeInfoModalBtn.addEventListener('click', () => { infoModal.style.display = 'none'; });
+    infoModal.addEventListener('click', (e) => { if (e.target === infoModal) infoModal.style.display = 'none'; });
 
     // ==================== FUNZIONI ADMIN ====================
     function loadAdminCode() {
         const saved = localStorage.getItem('adminCode');
-        if (saved && saved.trim() !== "") {
-            adminCode = saved;
-        } else {
-            adminCode = "admin2025";
-            localStorage.setItem('adminCode', adminCode);
-        }
+        if (saved && saved.trim() !== "") adminCode = saved;
+        else { adminCode = "admin2025"; localStorage.setItem('adminCode', adminCode); }
     }
     function saveAdminCode(newCode) {
-        if (newCode && newCode.trim() !== "") {
-            adminCode = newCode;
-            localStorage.setItem('adminCode', adminCode);
-            alert("Codice amministratore cambiato con successo! Usalo per i prossimi accessi.");
-        } else {
-            alert("Codice non valido.");
-        }
+        if (newCode && newCode.trim() !== "") { adminCode = newCode; localStorage.setItem('adminCode', adminCode); alert("Codice amministratore cambiato!"); }
+        else alert("Codice non valido.");
     }
     function generateUnlockCodeAdmin(clientCode, firstRun) {
         const message = `${clientCode}|${firstRun}`;
@@ -980,53 +957,26 @@ Un caro Saluto.`;
     function onGenerateUnlock() {
         let clientCodeVal = adminClientCode.value.trim();
         let firstRunVal = adminFirstRun.value.trim();
-        if (!/^\d{6,10}$/.test(clientCodeVal)) {
-            alert('Codice cliente deve essere numerico da 6 a 10 cifre.');
-            return;
-        }
-        if (!/^\d+$/.test(firstRunVal) || firstRunVal.length < 10) {
-            alert('Inserisci un FIRST_RUN valido (timestamp numerico).');
-            return;
-        }
-        const code = generateUnlockCodeAdmin(clientCodeVal, firstRunVal);
-        generatedCode.value = code;
+        if (!/^\d{6,10}$/.test(clientCodeVal)) { alert('Codice cliente 6-10 cifre.'); return; }
+        if (!/^\d+$/.test(firstRunVal) || firstRunVal.length < 10) { alert('FIRST_RUN valido?'); return; }
+        generatedCode.value = generateUnlockCodeAdmin(clientCodeVal, firstRunVal);
     }
     function copyGenerated() {
-        if (!generatedCode.value) {
-            alert('Nessun codice generato.');
-            return;
-        }
-        navigator.clipboard.writeText(generatedCode.value).then(() => {
-            alert('Codice copiato negli appunti.');
-        }).catch(() => {
-            alert('Copia manuale: ' + generatedCode.value);
-        });
+        if (!generatedCode.value) { alert('Nessun codice generato.'); return; }
+        navigator.clipboard.writeText(generatedCode.value);
+        alert('Codice copiato.');
     }
-    function showAdminSection() {
-        adminSection.style.display = 'block';
-    }
-    function hideAdminSection() {
-        adminSection.style.display = 'none';
-    }
+    function showAdminSection() { adminSection.style.display = 'block'; }
+    function hideAdminSection() { adminSection.style.display = 'none'; }
     let pressTimer = null;
     function startAdminTimer() {
         pressTimer = setTimeout(() => {
             const code = prompt("Inserisci il codice amministratore:");
-            if (code === adminCode) {
-                adminAuthenticated = true;
-                showAdminSection();
-                alert("Accesso amministratore autorizzato.");
-            } else if (code !== null) {
-                alert("Codice errato.");
-            }
+            if (code === adminCode) { adminAuthenticated = true; showAdminSection(); alert("Accesso amministratore autorizzato."); }
+            else if (code !== null) alert("Codice errato.");
         }, 10000);
     }
-    function cancelAdminTimer() {
-        if (pressTimer) {
-            clearTimeout(pressTimer);
-            pressTimer = null;
-        }
-    }
+    function cancelAdminTimer() { if (pressTimer) { clearTimeout(pressTimer); pressTimer = null; } }
     adminLongPressBtn.addEventListener('mousedown', startAdminTimer);
     adminLongPressBtn.addEventListener('mouseup', cancelAdminTimer);
     adminLongPressBtn.addEventListener('mouseleave', cancelAdminTimer);
@@ -1039,12 +989,8 @@ Un caro Saluto.`;
     hideAdminBtn.addEventListener('click', hideAdminSection);
     changeAdminCodeBtn.addEventListener('click', () => {
         const newCode = newAdminCode.value.trim();
-        if (newCode) {
-            saveAdminCode(newCode);
-            newAdminCode.value = "";
-        } else {
-            alert("Inserisci un nuovo codice.");
-        }
+        if (newCode) saveAdminCode(newCode);
+        else alert("Inserisci un nuovo codice.");
     });
 
     // ==================== FUNZIONI PER I CONTATTI ====================
@@ -1115,12 +1061,13 @@ Un caro Saluto.`;
         });
     }
 
-    // ==================== FUNZIONI DI SUPPORTO (INVARIATE) ====================
+    // ==================== FUNZIONI DI SUPPORTO E GEOLOCALIZZAZIONE ====================
     function openAdaptiveModal() { modalTextarea.value = operatorResponse.value; adaptiveModal.style.display = 'flex'; }
     function closeAdaptiveModal() { adaptiveModal.style.display = 'none'; }
     operatorResponse.addEventListener('click', openAdaptiveModal);
     closeAdaptiveBtn.addEventListener('click', closeAdaptiveModal);
     adaptiveModal.addEventListener('click', (e) => { if (e.target === adaptiveModal) closeAdaptiveModal(); });
+
     function openSpeakDetailModal() {
         if (!lastItalianText && !lastFrenchTranslation) { alert("Nessuna conversazione recente."); return; }
         speakOriginalText.innerText = lastItalianText || ""; speakTranslatedText.innerText = lastFrenchTranslation || "";
@@ -1130,6 +1077,7 @@ Un caro Saluto.`;
     speakResultField.addEventListener('click', openSpeakDetailModal);
     closeSpeakModalBtn.addEventListener('click', closeSpeakDetailModal);
     speakDetailModal.addEventListener('click', (e) => { if (e.target === speakDetailModal) closeSpeakDetailModal(); });
+
     function saveSpeakTranslation() {
         if (currentService) localStorage.setItem(`speakTranslation_${currentService}_${CURRENT_VERSION}`, JSON.stringify({ italian: lastItalianText, french: lastFrenchTranslation }));
     }
@@ -1153,6 +1101,7 @@ Un caro Saluto.`;
         speakStatus.innerText = "🧹 Traduzione cancellata";
         setTimeout(() => { if (speakStatus.innerText === "🧹 Traduzione cancellata") speakStatus.innerText = ""; }, 2000);
     }
+
     function closeEditModal() {
         noteEditModal.style.display = 'none';
         currentEditMode = null; currentEditId = null;
@@ -1204,6 +1153,7 @@ Un caro Saluto.`;
     cancelNoteBtn.addEventListener('click', closeEditModal);
     saveNoteBtn.addEventListener('click', saveNoteFromModal);
     noteEditModal.addEventListener('click', (e) => { if (e.target === noteEditModal) closeEditModal(); });
+
     function showTemporaryMessage(element, message, duration = 15000) {
         if (!element) return;
         element.innerText = message;
@@ -1211,6 +1161,7 @@ Un caro Saluto.`;
         if (element._hideTimeout) clearTimeout(element._hideTimeout);
         element._hideTimeout = setTimeout(() => { element.style.display = 'none'; }, duration);
     }
+
     async function translateToFrench(italianText) {
         if (!italianText || italianText.trim() === "") return "";
         try {
@@ -1231,6 +1182,7 @@ Un caro Saluto.`;
         } catch(e) { console.warn(e); }
         return frenchText + " (traduzione fallita)";
     }
+
     function initRecognitionOperator() {
         if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
             transcribeStatus.innerText = "❌ Riconoscimento non supportato";
@@ -1269,6 +1221,7 @@ Un caro Saluto.`;
         };
         recognitionTimeout = setTimeout(() => { if (recognitionOperator && recognitionOperator.stop) recognitionOperator.stop(); }, 30000);
     }
+
     function initRecognitionSpeak() {
         if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
             speakStatus.innerText = "❌ Riconoscimento non supportato";
@@ -1327,6 +1280,7 @@ Un caro Saluto.`;
         };
         setTimeout(() => { if (recognitionSpeak && recognitionSpeak.stop) recognitionSpeak.stop(); }, 30000);
     }
+
     function saveOperatorTranslation(text) {
         if (currentService) localStorage.setItem(`operatorResponse_${currentService}_${CURRENT_VERSION}`, text);
     }
@@ -1432,7 +1386,7 @@ Un caro Saluto.`;
     addNoteBtn.addEventListener('click', () => openAddNoteModal('normal'));
     addSpecialNoteBtn.addEventListener('click', () => openAddNoteModal('special'));
 
-    // ==================== GEOLOCALIZZAZIONE (INVARIATA) ====================
+    // ==================== GEOLOCALIZZAZIONE ====================
     function haversine(lat1,lng1,lat2,lng2) { const R = 6371e3; const φ1 = lat1 * Math.PI/180, φ2 = lat2 * Math.PI/180; const Δφ = (lat2-lat1) * Math.PI/180, Δλ = (lng2-lng1) * Math.PI/180; const a = Math.sin(Δφ/2)**2 + Math.cos(φ1)*Math.cos(φ2)*Math.sin(Δλ/2)**2; return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); }
     async function snapToRoad(lat,lng) { let url = `https://overpass-api.de/api/interpreter?data=[out:json];way(around:50,${lat},${lng})["highway"];out center;`; try { let resp = await fetch(url); let data = await resp.json(); if (!data.elements?.length) return {lat,lng}; let way = data.elements[0]; let clat = way.center?.lat || way.lat; let clng = way.center?.lon || way.lon; if (clat && clng && haversine(lat,lng,clat,clng) < 50) return {lat:clat, lng:clng}; return {lat,lng}; } catch(e) { return {lat,lng}; } }
     async function fetchAllNamedPlaces(lat, lng) { const excludeTags = ["information","bench","waste_basket","toilets","telephone","recycling","fountain","drinking_water"]; let query = `[out:json];(node(around:300,${lat},${lng})[name];way(around:300,${lat},${lng})[name];);out center;`; let url = `https://overpass-api.de/api/interpreter?data=${encodeURIComponent(query)}`; try { let resp = await fetch(url); let data = await resp.json(); if (!data.elements?.length) return []; let items = []; for (let el of data.elements) { let latEl = el.lat || el.center?.lat; let lonEl = el.lon || el.center?.lon; if (!latEl) continue; let tags = el.tags || {}; let name = tags.name; if (!name || name.trim() === "") continue; let cat = tags.amenity || tags.shop || tags.tourism || tags.office || tags.leisure || tags.historic || tags.place || tags.aeroway || tags.railway; if (cat && excludeTags.includes(cat)) continue; let dist = haversine(lat, lng, latEl, lonEl); let display = name; if (cat) { let catMap = { "pharmacy":"Farmacia","hospital":"Ospedale","police":"Commissariato","post_office":"Posta","bank":"Banca","library":"Biblioteca","fire_station":"Caserma","townhall":"Municipio","supermarket":"Supermercato","convenience":"Alimentari","cafe":"Bar","restaurant":"Ristorante","pub":"Pub","fast_food":"Fast food","museum":"Museo","monument":"Monumento","attraction":"Attrazione","square":"Piazza","garden":"Giardino","park":"Parco","bus_station":"Stazione bus","train_station":"Stazione","church":"Chiesa","services":"Area di servizio","motorway_junction":"Uscita autostradale","aeroway":"Aeroporto","railway":"Stazione","shop":"Negozio","office":"Ufficio","leisure":"Tempo libero","historic":"Sito storico","place":"Luogo","industrial":"Azienda" }; let readable = catMap[cat] || (cat.charAt(0).toUpperCase() + cat.slice(1)); display = `${name} (${readable})`; } items.push({ display, dist }); } const unique = new Map(); for (let item of items) { if (!unique.has(item.display.split(' (')[0])) unique.set(item.display.split(' (')[0], item); } let uniqueItems = Array.from(unique.values()); uniqueItems.sort((a,b) => a.dist - b.dist); let refs = uniqueItems.slice(0,3).map(i => `${i.display} a ${Math.round(i.dist)} metri`); while(refs.length < 3) refs.push("Nessun riferimento"); return refs; } catch(e) { console.warn("Errore ricerca nomi", e); return ["Nessun riferimento","Nessun riferimento","Nessun riferimento"]; } }
@@ -1441,7 +1395,7 @@ Un caro Saluto.`;
     async function getLocationAndAddress() { if (!navigator.geolocation) { gpsStatus.innerHTML = "❌ GPS non supportato"; return; } gpsStatus.innerHTML = "⏳ Acquisizione 5 letture GPS..."; try { let avg = await getAveragePosition(); gpsStatus.innerHTML = "📍 Elaborazione map matching..."; let snapped = await snapToRoad(avg.lat, avg.lng); let finalLat = snapped.lat, finalLng = snapped.lng; let address = await reverseGeocode(finalLat, finalLng); gpsStatus.innerHTML = "🔍 Ricerca luoghi con nome entro 300m..."; let [ref1, ref2, ref3] = await fetchAllNamedPlaces(finalLat, finalLng); currentLat = finalLat; currentLng = finalLng; currentAddress = address; currentRefA = ref1; currentRefB = ref2; currentRefC = ref3; latLonDisplay.innerText = `${finalLat.toFixed(6)}, ${finalLng.toFixed(6)}`; addressDisplay.innerText = address; refADisplay.innerText = ref1; refBDisplay.innerText = ref2; refCDisplay.innerText = ref3; gpsStatus.innerHTML = "✅ Posizione e riferimenti aggiornati!"; setTimeout(()=> gpsStatus.innerHTML = "✅ Pronto.", 3000); } catch(e) { gpsStatus.innerHTML = `❌ Errore GPS: ${e.message}`; } }
     function resetCoords() { currentLat=currentLng=null; currentAddress=""; currentRefA=""; currentRefB=""; currentRefC=""; latLonDisplay.innerText = addressDisplay.innerText = refADisplay.innerText = refBDisplay.innerText = refCDisplay.innerText = "---"; gpsStatus.innerHTML = ""; }
 
-    // ==================== LETTURA VOCALE E COPIA NOTE (INVARIATE) ====================
+    // ==================== LETTURA VOCALE E COPIA NOTE ====================
     function playBeep() { try { let ctx = new (window.AudioContext || window.webkitAudioContext)(); let osc = ctx.createOscillator(); let gain = ctx.createGain(); osc.connect(gain); gain.connect(ctx.destination); osc.frequency.value = 880; gain.gain.value = 0.3; osc.type = "sine"; osc.start(); gain.gain.exponentialRampToValueAtTime(0.00001, ctx.currentTime + 0.8); osc.stop(ctx.currentTime + 0.8); ctx.resume(); } catch(e) { console.warn("beep fallito", e); } }
     async function speakWords(msg, langCode, rate=1.0, wordPauseMs=200) { let words = msg.split(/\s+/); for (let w of words) { let u = new SpeechSynthesisUtterance(w); u.lang = langCode; u.rate = rate; speechSynthesis.speak(u); await new Promise(r=>setTimeout(r, wordPauseMs)); } }
     async function speakCoords(text, langCode) { let chars = text.split(''); for (let ch of chars) { if (ch === ' ') continue; let word = (ch === '.') ? "punto" : (ch === ',') ? "virgola" : ch; let u = new SpeechSynthesisUtterance(word); u.lang = langCode; u.rate = 1.0; speechSynthesis.speak(u); await new Promise(r=>setTimeout(r, 2000)); } }
