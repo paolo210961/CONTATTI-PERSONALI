@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
-    <title>Contatti Personali - v0211</title>
+    <title>Contatti Personali - v0212</title>
     <link rel="manifest" href="manifest.json">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -39,11 +39,11 @@
         .hidden {
             display: none !important;
         }
-        /* Disabilita selezione e menu contestuale su tutti i tasti e testi */
+        /* Disabilita selezione su tutti i tasti e testi interattivi */
         button, .big-btn, .small-btn, .title-btn, .speak-field, .note-title-row, .confirm-note-btn,
         .edit-note-btn, .delete-note-btn, .add-note-btn, .back-home, .export-import-row button,
         #loadImageBtn, .uploaded-image, .image-container img, .image-top-title, .rete-button,
-        .back-button, .rete-container button {
+        .back-button, .rete-container button, .image-placeholder {
             user-select: none;
             -webkit-touch-callout: none;
             -webkit-user-select: none;
@@ -477,7 +477,7 @@
             white-space: pre-wrap;
             word-break: break-word;
         }
-        /* Stili per la pagina immagini - nuovo layout con RETE */
+        /* Stili per la pagina immagini - RETE dinamica */
         .image-top-box {
             background: #d2d6dc;
             border-radius: 24px;
@@ -610,17 +610,17 @@
         <div class="info-text">Ogni contatto ha il proprio archivio note.<br>📍 Ricerca entro 300m di TUTTI i luoghi con nome<br>🔊 Ascolto automatico 30 secondi dopo il messaggio</div>
         <div class="info-text">Non Utilizzare APP per Situazioni di Emergenza di Salute</div>
         <div class="days-line" id="daysLeftDisplayHome">Giorni rimanenti: --</div>
-        <div class="info-text">💾 Il file SALVA NOTE si chiama: contatti_personali_notes_backup_0211.txt</div>
+        <div class="info-text">💾 Il file SALVA NOTE si chiama: contatti_personali_notes_backup_0212.txt</div>
 
         <div class="export-import-row">
             <button id="exportAllBtn">💾 SALVA NOTE</button>
             <button id="importAllBtn">📂 RIPRISTINA NOTE</button>
         </div>
         <input type="file" id="globalImportFileInput" accept=".txt" style="display:none;">
-        <div class="version-footer">versione 0211 – RETE dinamica con livelli</div>
+        <div class="version-footer">versione 0212 – RETE gerarchica</div>
     </div>
 
-    <!-- PAGINA EMERGENZA (invariata) -->
+    <!-- PAGINA EMERGENZA (CONTATTI) -->
     <div id="emergencyPage" class="page hidden">
         <div id="currentServiceDeco" class="current-service-deco">Contatto:</div>
         <div class="dark-card"><div class="section-title">Numero servizio</div><div class="flex-row"><input type="tel" id="phoneNumber" placeholder="Numero" style="flex:2;"><button id="saveNumberBtn" class="small-btn" style="flex:0.4;">SALVA</button></div><div id="phoneSaveMsg" class="status-msg"></div></div>
@@ -631,36 +631,33 @@
         <div class="dark-card"><button id="addSpecialNoteBtn" class="small-btn add-note-btn"><span>🏠 AGGIUNGI NOTA SPECIALE</span><span>SELEZIONA</span></button><div id="specialNoteInfo" class="info-message"></div><div id="specialNotesListArea"><div style="font-size:0.7rem; color:#777;">Nessuna nota speciale. Aggiungine una.</div></div></div>
         <div class="dark-card"><div class="top-actions"><button id="audioItBtn" class="small-btn audio-lang-btn">LEGGI in IT</button><button id="audioFrBtn" class="small-btn audio-lang-btn">LEGGI in FR</button></div><div class="mid-actions"><button id="copyNoteBtn" class="small-btn copy-note-btn">COPIA NOTE</button><button id="clearResponseBtn" class="small-btn clear-btn">CANCELLA</button></div><textarea id="operatorResponse" rows="3" readonly placeholder="Traduzione italiana"></textarea><div id="listenInfoMsg" class="temp-message"></div><button id="listenResponseBtn" class="small-btn listen-btn double-height">🎤 ASCOLTA OPERATORE</button><div id="copyInfoMsg" class="temp-message"></div><div id="transcribeStatus" class="status-msg"></div></div>
         <div class="speak-box"><button id="clearSpeakBtn" class="small-btn clear-speak-btn">CANCELLA TRADUZIONE</button><div id="speakResultField" class="speak-field">Traduzione Italiana e Francese</div><button id="speakToOperatorBtn" class="small-btn double-height speak-btn">🎙️ PARLA CON OPERATORE</button><div id="speakStatus" class="status-msg"></div></div>
-        <div class="version-footer">versione 0211 – emergency invariata</div>
+        <div class="version-footer">versione 0212 – emergenza invariata</div>
     </div>
 
-    <!-- NUOVA PAGINA MONASTIR con RETE dinamica -->
+    <!-- PAGINA FOTO (MONASTIR) -->
     <div id="imagePage" class="page hidden">
         <div class="image-top-box">
             <div class="image-top-title">MONASTIR: Facciamo Rete</div>
-            <!-- Area immagine: contiene il tasto di caricamento integrato -->
             <div id="imagePreviewArea" class="image-container">
                 <div class="image-placeholder" id="imagePlaceholder">📸 Premi a lungo (10 sec) per caricare un'immagine</div>
             </div>
         </div>
-        <!-- Tasto TORNA INDIETRO (sotto la foto, sopra RETE) -->
         <button id="backFromImageBtn" class="small-btn back-button">◀ TORNA INDIETRO</button>
-        <!-- Contenitore per i tasti RETE (dinamici) -->
         <div id="reteRootContainer" class="rete-container">
             <div id="reteLevelContainer"></div>
         </div>
-        <div class="version-footer">versione 0211 – rete gerarchica</div>
+        <div class="version-footer">versione 0212 – rete gerarchica</div>
     </div>
 
-    <!-- PAGINA PER I SOTTOLIVELLI DELLA RETE (dinamica) -->
+    <!-- PAGINA ATTIVITA' (sottolivelli RETE) -->
     <div id="reteSubPage" class="page hidden">
         <div id="reteSubHeader" class="rete-level-title"></div>
         <div id="reteSubContainer" class="rete-container"></div>
         <button id="backFromReteSubBtn" class="small-btn back-button">◀ TORNA INDIETRO</button>
-        <div class="version-footer">versione 0211 – sottorete</div>
+        <div class="version-footer">versione 0212 – sottorete</div>
     </div>
 
-    <!-- MODALI ESISTENTI -->
+    <!-- MODALI -->
     <div id="adaptiveModal" class="adaptive-modal" style="display:none;"><div class="adaptive-modal-content"><textarea id="modalTextarea" readonly></textarea><button id="closeAdaptiveBtn">CHIUDI</button></div></div>
     <div id="speakDetailModal" class="adaptive-modal" style="display:none;"><div class="adaptive-modal-content"><h3>📄 Dettaglio conversazione</h3><div class="detail-label">Italiano (originale)</div><div class="detail-text" id="speakOriginalText"></div><div class="detail-label">Francese (traduzione)</div><div class="detail-text" id="speakTranslatedText"></div><div class="modal-buttons"><button id="closeSpeakModalBtn" class="save-btn">CHIUDI</button></div></div></div>
     <div id="noteEditModal" class="adaptive-modal note-edit-modal" style="display:none;"><div class="adaptive-modal-content"><h3 id="noteModalTitle">➕ Aggiungi Nota</h3><label class="detail-label">Titolo</label><input type="text" id="editNoteTitle" placeholder="Inserisci il titolo"><label class="detail-label">Descrizione</label><textarea id="editNoteDesc" rows="4" placeholder="Inserisci la descrizione"></textarea><div class="modal-buttons"><button id="saveNoteBtn" class="save-btn">SALVA</button><button id="cancelNoteBtn" class="cancel-btn">ANNULLA</button></div></div></div>
@@ -668,14 +665,13 @@
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
 <script>
-    // ==================== VERSIONE 0211 - MONASTIR RETE DINAMICA ====================
-    // Implementazione di una struttura ad albero per i tasti "RETE"
-    // Ogni nodo ha un titolo e un array di figli (sottotasti)
-    // La navigazione avviene tramite stack di livelli
-    // I dati vengono salvati in localStorage
-    // =================================================================
+    // ==================== VERSIONE 0212 - MODIFICHE PAGINA FOTO ====================
+    // a) Testo all'interno della foto: disabilitata selezione (CSS su .image-placeholder)
+    // b) Pressione 10 sec su area foto (placeholder) apre galleria per caricare foto
+    // c) Quando foto presente, pressione 10 sec sulla foto la sostituisce
+    // ============================================================================
 
-    const CURRENT_VERSION = "0211";
+    const CURRENT_VERSION = "0212";
     let currentService = "ambulanza";
     let currentLat = null, currentLng = null;
     let currentAddress = "";
@@ -708,7 +704,7 @@
     let adminCode = "admin2025";
     let adminAuthenticated = false;
 
-    // DOM elements (principali)
+    // DOM elements
     const homePage = document.getElementById('homePage');
     const emergencyPage = document.getElementById('emergencyPage');
     const imagePage = document.getElementById('imagePage');
@@ -784,8 +780,6 @@
     const infoModal = document.getElementById('infoModal');
     const infoModalText = document.getElementById('infoModalText');
     const closeInfoModalBtn = document.getElementById('closeInfoModalBtn');
-    // Elementi MONASTIR
-    const loadImageBtnOld = document.getElementById('loadImageBtn'); // non esiste più, lo rimuoviamo
     const backFromImageBtn = document.getElementById('backFromImageBtn');
     const imagePreviewArea = document.getElementById('imagePreviewArea');
 
@@ -798,13 +792,12 @@
     let lastFrenchTranslation = "";
 
     // ==================== GESTIONE RETE DINAMICA (albero) ====================
-    let reteData = { title: "RETE", children: [] };  // radice
-    let currentStack = []; // stack dei nodi per la navigazione: array di {node, parentNode}
+    let reteData = { title: "RETE", children: [] };
+    let currentStack = [];
 
     function saveReteData() {
         localStorage.setItem('monastir_rete_data', JSON.stringify(reteData));
     }
-
     function loadReteData() {
         const saved = localStorage.getItem('monastir_rete_data');
         if (saved) {
@@ -815,22 +808,16 @@
         if (!reteData.title) reteData = { title: "RETE", children: [] };
         if (!reteData.children) reteData.children = [];
     }
-
-    // Crea un nuovo tasto vuoto (figlio) per un dato nodo padre
     function addEmptyChildToNode(parentNode) {
         if (!parentNode.children) parentNode.children = [];
         parentNode.children.push({ title: "", children: [] });
         saveReteData();
         return parentNode.children[parentNode.children.length - 1];
     }
-
-    // Modifica il titolo di un nodo
     function editNodeTitle(node, newTitle) {
         node.title = newTitle;
         saveReteData();
     }
-
-    // Renderizza i tasti per un dato nodo (contenitore HTML)
     function renderReteLevel(container, parentNode, levelStack) {
         container.innerHTML = '';
         if (!parentNode.children || parentNode.children.length === 0) {
@@ -845,13 +832,10 @@
                 const btn = document.createElement('div');
                 btn.className = 'rete-button';
                 btn.innerText = child.title && child.title.trim() !== "" ? child.title : "[Tasto vuoto]";
-                // Pressione corta: naviga al livello inferiore
                 btn.addEventListener('click', (e) => {
                     e.stopPropagation();
-                    // Apri la pagina dei sottotasti
                     openReteSubPage(child, parentNode, levelStack);
                 });
-                // Pressione lunga (10 secondi) per modificare il titolo
                 let pressTimer = null;
                 const startLongPress = () => {
                     pressTimer = setTimeout(() => {
@@ -864,9 +848,7 @@
                         }
                     }, 10000);
                 };
-                const cancelLongPress = () => {
-                    if (pressTimer) clearTimeout(pressTimer);
-                };
+                const cancelLongPress = () => { if (pressTimer) clearTimeout(pressTimer); };
                 btn.addEventListener('mousedown', startLongPress);
                 btn.addEventListener('mouseup', cancelLongPress);
                 btn.addEventListener('mouseleave', cancelLongPress);
@@ -876,7 +858,6 @@
                 container.appendChild(btn);
             });
         }
-        // Pulsante per aggiungere un nuovo tasto vuoto (solo al livello radice e sottolivelli)
         const addBtn = document.createElement('div');
         addBtn.className = 'rete-button';
         addBtn.style.background = '#558b2f';
@@ -884,53 +865,39 @@
         let addPressTimer = null;
         const startAddLongPress = () => {
             addPressTimer = setTimeout(() => {
-                const newEmpty = addEmptyChildToNode(parentNode);
+                addEmptyChildToNode(parentNode);
                 renderReteLevel(container, parentNode, levelStack);
             }, 10000);
         };
-        const cancelAddLongPress = () => {
-            if (addPressTimer) clearTimeout(addPressTimer);
-        };
+        const cancelAddLongPress = () => { if (addPressTimer) clearTimeout(addPressTimer); };
         addBtn.addEventListener('mousedown', startAddLongPress);
         addBtn.addEventListener('mouseup', cancelAddLongPress);
         addBtn.addEventListener('mouseleave', cancelAddLongPress);
         addBtn.addEventListener('touchstart', startAddLongPress, { passive: true });
         addBtn.addEventListener('touchend', cancelAddLongPress);
         addBtn.addEventListener('touchcancel', cancelAddLongPress);
-        // Pressione corta: non fa nulla (solo long press)
         container.appendChild(addBtn);
     }
-
     function openReteSubPage(node, parentNode, levelStack) {
-        // Salva lo stack corrente (per tornare indietro)
         currentStack.push({ node: parentNode, parent: levelStack.length > 0 ? levelStack[levelStack.length-1] : null });
-        // Imposta l'intestazione della sottopagina
         reteSubHeader.innerText = node.title && node.title.trim() !== "" ? node.title : "SottoRete";
-        // Renderizza i figli del nodo
         renderReteLevel(reteSubContainer, node, [...levelStack, node]);
-        // Mostra la pagina dei sottolivelli
         imagePage.classList.add('hidden');
         reteSubPage.classList.remove('hidden');
     }
-
     function backFromReteSub() {
-        if (currentStack.length > 0) {
-            currentStack.pop();
-        }
-        // Torna alla pagina principale MONASTIR e ricarica il livello radice
+        if (currentStack.length > 0) currentStack.pop();
         reteSubPage.classList.add('hidden');
         imagePage.classList.remove('hidden');
         renderReteLevel(reteLevelContainer, reteData, [reteData]);
     }
-
     backFromReteSubBtn.addEventListener('click', backFromReteSub);
 
-    // ==================== FUNZIONI PER LA PAGINA IMMAGINI (modificate) ====================
+    // ==================== FUNZIONI PER LA PAGINA FOTO (IMMAGINI) ====================
     let imagePressTimer = null;
     let currentImageData = null;
 
     function setupImageArea() {
-        // Svuota e ricostruisci l'area immagine con la logica di long press
         imagePreviewArea.innerHTML = '';
         if (currentImageData) {
             const img = document.createElement('img');
@@ -970,7 +937,7 @@
         let pressTimer = null;
         const start = () => {
             pressTimer = setTimeout(() => {
-                openImageGallery(true); // true = sostituisci immagine
+                openImageGallery(true);
             }, 10000);
         };
         const cancel = () => { if (pressTimer) clearTimeout(pressTimer); };
@@ -1001,7 +968,6 @@
         input.click();
     }
 
-    // Carica immagine salvata
     function loadSavedImage() {
         const saved = localStorage.getItem('monastir_image');
         if (saved) {
@@ -1193,7 +1159,7 @@ Un caro Saluto.`;
         else alert("Inserisci un nuovo codice.");
     });
 
-    // ==================== FUNZIONI PER I CONTATTI ====================
+    // ==================== FUNZIONI PER I CONTATTI (HOME) ====================
     function saveContactExtraText() {
         for (let s of services) {
             if (s === 'clinica') continue;
@@ -1206,7 +1172,7 @@ Un caro Saluto.`;
             const saved = localStorage.getItem(`contactExtra_${s}_${CURRENT_VERSION}`);
             if (saved !== null) contactExtraText[s] = saved;
             else {
-                for (let oldVer of ["0210", "0209"]) {
+                for (let oldVer of ["0211", "0210"]) {
                     const old = localStorage.getItem(`contactExtra_${s}_${oldVer}`);
                     if (old !== null) { contactExtraText[s] = old; saveContactExtraText(); break; }
                 }
@@ -1258,7 +1224,6 @@ Un caro Saluto.`;
                     homePage.classList.add('hidden');
                     imagePage.classList.remove('hidden');
                     requestImagePageWakeLock();
-                    // Ricarica la visuale della rete principale
                     renderReteLevel(reteLevelContainer, reteData, [reteData]);
                     loadSavedImage();
                 } else {
@@ -1280,7 +1245,7 @@ Un caro Saluto.`;
         });
     }
 
-    // ==================== FUNZIONI GEOLOCALIZZAZIONE (identiche a versione 0210) ====================
+    // ==================== FUNZIONI GEOLOCALIZZAZIONE (invariate) ====================
     function haversine(lat1,lng1,lat2,lng2) {
         const R = 6371e3;
         const φ1 = lat1 * Math.PI/180, φ2 = lat2 * Math.PI/180;
@@ -1446,7 +1411,6 @@ Un caro Saluto.`;
         speakStatus.innerText = "🧹 Traduzione cancellata";
         setTimeout(() => { if (speakStatus.innerText === "🧹 Traduzione cancellata") speakStatus.innerText = ""; }, 2000);
     }
-
     function closeEditModal() {
         noteEditModal.style.display = 'none';
         currentEditMode = null; currentEditId = null;
@@ -1498,7 +1462,6 @@ Un caro Saluto.`;
     cancelNoteBtn.addEventListener('click', closeEditModal);
     saveNoteBtn.addEventListener('click', saveNoteFromModal);
     noteEditModal.addEventListener('click', (e) => { if (e.target === noteEditModal) closeEditModal(); });
-
     function showTemporaryMessage(element, message, duration = 15000) {
         if (!element) return;
         element.innerText = message;
@@ -1628,7 +1591,6 @@ Un caro Saluto.`;
         };
         setTimeout(() => { if (recognitionSpeak && recognitionSpeak.stop) recognitionSpeak.stop(); }, 30000);
     }
-
     function saveOperatorTranslation(text) {
         if (currentService) localStorage.setItem(`operatorResponse_${currentService}_${CURRENT_VERSION}`, text);
     }
@@ -1643,7 +1605,6 @@ Un caro Saluto.`;
         if (currentService) localStorage.removeItem(`operatorResponse_${currentService}_${CURRENT_VERSION}`);
         operatorResponse.value = "";
     }
-
     async function requestWakeLock() {
         if ('wakeLock' in navigator) {
             try {
@@ -1653,9 +1614,8 @@ Un caro Saluto.`;
         }
     }
     function releaseWakeLock() { if (wakeLock) { wakeLock.release(); wakeLock = null; } }
-
     function migratePhoneNumbers() {
-        const oldVersions = ["0210", "0209"];
+        const oldVersions = ["0211", "0210"];
         for (let s of services) {
             if (localStorage.getItem(`phone_${s}_${CURRENT_VERSION}`)) continue;
             for (let ver of oldVersions) {
@@ -1763,7 +1723,7 @@ Un caro Saluto.`;
         loadContactExtraText();
         migratePhoneNumbers();
         initHomeButtons();
-        loadReteData();  // carica la struttura RETE
+        loadReteData();
         saveNumberBtn.addEventListener('click', onSaveNumber);
         googleMapsBtn.addEventListener('click', () => window.open("https://maps.google.com", "_blank"));
         geolocationBtn.addEventListener('click', getLocationAndAddress);
@@ -1783,7 +1743,6 @@ Un caro Saluto.`;
         initLicense();
         activateLicenseBtn.addEventListener('click', onActivateLicense);
         copyRequestBtn.addEventListener('click', copyRequest);
-        // Inizializza la rete principale con un tasto "RETE" se non esiste
         if (!reteData.children || reteData.children.length === 0) {
             reteData.children = [];
             saveReteData();
