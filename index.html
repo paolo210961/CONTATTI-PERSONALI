@@ -4,7 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
     <title>Contatti Personali - v0210</title>
+    <!-- PWA manifest -->
     <link rel="manifest" href="manifest.json">
+    <!-- iOS support -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Contatti">
@@ -39,13 +41,17 @@
         .hidden {
             display: none !important;
         }
-        /* Disabilita selezione e menu contestuale su tutti i tasti */
+        /* Disabilita selezione e menu contestuale su tutti i pulsanti e aree tappabili */
         button, .big-btn, .small-btn, .title-btn, .speak-field, .note-title-row, .confirm-note-btn,
         .edit-note-btn, .delete-note-btn, .add-note-btn, .back-home, .export-import-row button,
         #loadImageBtn, .uploaded-image, .image-container img {
             user-select: none;
             -webkit-touch-callout: none;
             -webkit-user-select: none;
+        }
+        /* Nascondi il vecchio header della home */
+        .version-header {
+            display: none;
         }
         .title-btn {
             background: #FFC107;
@@ -136,8 +142,12 @@
         .export-import-row button:active {
             transform: scale(0.97);
         }
-        #exportAllBtn { background: #283593; }
-        #importAllBtn { background: #558b2f; }
+        #exportAllBtn {
+            background: #283593;
+        }
+        #importAllBtn {
+            background: #558b2f;
+        }
         .small-btn {
             padding: 8px 12px;
             font-size: 0.85rem;
@@ -151,11 +161,30 @@
             white-space: nowrap;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
-        .small-btn:active { transform: scale(0.97); }
-        .double-height { padding: 16px 12px; font-size: 1rem; }
-        .section-title { font-weight: bold; font-size: 0.9rem; color: #1e2a3a; margin-bottom: 8px; display: block; }
-        .flex-row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin: 12px 0; }
-        .full-width { width: 100%; }
+        .small-btn:active {
+            transform: scale(0.97);
+        }
+        .double-height {
+            padding: 16px 12px;
+            font-size: 1rem;
+        }
+        .section-title {
+            font-weight: bold;
+            font-size: 0.9rem;
+            color: #1e2a3a;
+            margin-bottom: 8px;
+            display: block;
+        }
+        .flex-row {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+            margin: 12px 0;
+        }
+        .full-width {
+            width: 100%;
+        }
         input, textarea {
             width: 100%;
             padding: 12px 16px;
@@ -177,7 +206,10 @@
             flex-wrap: wrap;
             margin-bottom: 8px;
         }
-        .note-btn-edit, .note-btn-delete { flex: 1; text-align: center; }
+        .note-btn-edit, .note-btn-delete {
+            flex: 1;
+            text-align: center;
+        }
         .note-btn-confirm {
             flex: 0 0 50px;
             width: 50px;
@@ -193,7 +225,9 @@
             background-color: #283593;
             transition: background-color 0.1s;
         }
-        .note-btn-confirm.selected .dot { background-color: white; }
+        .note-btn-confirm.selected .dot {
+            background-color: white;
+        }
         .note-title-row {
             display: flex;
             gap: 10px;
@@ -224,8 +258,12 @@
             white-space: nowrap;
             cursor: default;
         }
-        .edit-note-btn, .edit-special-note-btn { background: #6b8e23; }
-        .delete-note-btn, .delete-special-note-btn { background: #8e44ad; }
+        .edit-note-btn, .edit-special-note-btn {
+            background: #6b8e23;
+        }
+        .delete-note-btn, .delete-special-note-btn {
+            background: #8e44ad;
+        }
         .add-note-btn {
             background: #283593 !important;
             color: white;
@@ -236,15 +274,49 @@
             align-items: center;
             padding: 8px 16px;
         }
-        .add-note-btn span:first-child { text-align: left; }
-        .add-note-btn span:last-child::before { content: "●"; margin-right: 6px; font-size: 1.2rem; }
-        .back-home { background: #e67e22 !important; color: white; margin: 16px 0; }
-        .top-actions { display: flex; gap: 10px; margin-bottom: 12px; }
-        .mid-actions { display: flex; gap: 10px; margin-bottom: 12px; }
-        .copy-note-btn { background: #283593 !important; flex: 1; }
-        .clear-btn { background: #8e44ad !important; flex-shrink: 0; width: auto; }
-        .listen-btn { background: #FFC107 !important; color: #1e2a3a !important; width: 100%; margin-top: 12px; }
-        .audio-lang-btn { background: #6b8e23 !important; flex: 1; text-align: center; }
+        .add-note-btn span:first-child {
+            text-align: left;
+        }
+        .add-note-btn span:last-child::before {
+            content: "●";
+            margin-right: 6px;
+            font-size: 1.2rem;
+        }
+        .back-home {
+            background: #e67e22 !important;
+            color: white;
+            margin: 16px 0;
+        }
+        .top-actions {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+        .mid-actions {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+        .copy-note-btn {
+            background: #283593 !important;
+            flex: 1;
+        }
+        .clear-btn {
+            background: #8e44ad !important;
+            flex-shrink: 0;
+            width: auto;
+        }
+        .listen-btn {
+            background: #FFC107 !important;
+            color: #1e2a3a !important;
+            width: 100%;
+            margin-top: 12px;
+        }
+        .audio-lang-btn {
+            background: #6b8e23 !important;
+            flex: 1;
+            text-align: center;
+        }
         .speak-box {
             background: #d2d6dc;
             border-left: 6px solid #2c3e50;
@@ -266,10 +338,24 @@
             min-height: 80px;
             word-break: break-word;
         }
-        .speak-field:active { background: #f0f0f0; }
-        .speak-btn { background: #FFC107 !important; color: #1e2a3a !important; width: 100%; }
-        .clear-speak-btn { background: #8e44ad !important; width: 100%; margin-bottom: 8px; }
-        .status-msg { font-size: 0.7rem; color: #2c3e66; margin-top: 6px; }
+        .speak-field:active {
+            background: #f0f0f0;
+        }
+        .speak-btn {
+            background: #FFC107 !important;
+            color: #1e2a3a !important;
+            width: 100%;
+        }
+        .clear-speak-btn {
+            background: #8e44ad !important;
+            width: 100%;
+            margin-bottom: 8px;
+        }
+        .status-msg {
+            font-size: 0.7rem;
+            color: #2c3e66;
+            margin-top: 6px;
+        }
         .adaptive-modal {
             position: fixed;
             top: 0;
@@ -315,9 +401,17 @@
             border: none;
             cursor: pointer;
         }
-        .note-edit-modal .adaptive-modal-content { max-width: 500px; }
-        .note-edit-modal .detail-label { font-weight: bold; margin-top: 12px; color: #1e2a3a; }
-        .note-edit-modal input, .note-edit-modal textarea { margin-top: 4px; }
+        .note-edit-modal .adaptive-modal-content {
+            max-width: 500px;
+        }
+        .note-edit-modal .detail-label {
+            font-weight: bold;
+            margin-top: 12px;
+            color: #1e2a3a;
+        }
+        .note-edit-modal input, .note-edit-modal textarea {
+            margin-top: 4px;
+        }
         .modal-buttons {
             display: flex;
             gap: 10px;
@@ -332,8 +426,14 @@
             border: none;
             cursor: pointer;
         }
-        .modal-buttons .save-btn { background: #283593; color: white; }
-        .modal-buttons .cancel-btn { background: #8e44ad; color: white; }
+        .modal-buttons .save-btn {
+            background: #283593;
+            color: white;
+        }
+        .modal-buttons .cancel-btn {
+            background: #8e44ad;
+            color: white;
+        }
         @media (max-width: 480px) {
             body { padding: 8px; }
             .page { padding: 16px 12px 24px; }
@@ -349,7 +449,9 @@
             .title-badge { font-size: 0.7rem; padding: 6px 10px; }
             .title-field { font-size: 0.8rem; padding: 6px 10px; white-space: normal; }
             .top-actions, .mid-actions { gap: 6px; }
-            .license-row { flex-wrap: wrap; }
+            .license-row {
+                flex-wrap: wrap;
+            }
         }
         .version-footer {
             text-align: center;
@@ -359,7 +461,9 @@
             padding-top: 12px;
             border-top: 1px solid #e9ecef;
         }
-        #saveNumberBtn, #geolocationBtn { background: #283593 !important; }
+        #saveNumberBtn, #geolocationBtn {
+            background: #283593 !important;
+        }
         #googleMapsBtn {
             background: black !important;
             color: white !important;
@@ -387,7 +491,13 @@
             margin-top: 8px;
             color: #1a237e;
         }
-        .info-text, .rubrica-info {
+        .info-text {
+            text-align: center;
+            font-size: 0.75rem;
+            color: #555;
+            margin-top: 8px;
+        }
+        .rubrica-info {
             text-align: center;
             font-size: 0.75rem;
             color: #555;
@@ -444,12 +554,27 @@
             flex-wrap: nowrap;
             margin-bottom: 12px;
         }
-        .license-row:last-child { margin-bottom: 0; }
-        .license-label { font-weight: bold; white-space: nowrap; }
-        #clientCodeInput { flex: 1; min-width: 100px; }
-        #copyRequestBtn { flex-shrink: 0; }
-        #unlockCodeInput { flex: 2; min-width: 160px; }
-        #activateLicenseBtn { flex-shrink: 0; }
+        .license-row:last-child {
+            margin-bottom: 0;
+        }
+        .license-label {
+            font-weight: bold;
+            white-space: nowrap;
+        }
+        #clientCodeInput {
+            flex: 1;
+            min-width: 100px;
+        }
+        #copyRequestBtn {
+            flex-shrink: 0;
+        }
+        #unlockCodeInput {
+            flex: 2;
+            min-width: 160px;
+        }
+        #activateLicenseBtn {
+            flex-shrink: 0;
+        }
         .admin-section {
             margin: 16px 0;
             padding: 12px;
@@ -458,7 +583,9 @@
             border-left: 6px solid #e67e22;
             display: none;
         }
-        .admin-section .flex-row { margin-bottom: 8px; }
+        .admin-section .flex-row {
+            margin-bottom: 8px;
+        }
         .days-line {
             text-align: center;
             font-size: 0.75rem;
@@ -473,7 +600,7 @@
             white-space: pre-wrap;
             word-break: break-word;
         }
-        /* Stili pagina immagini - nuovo layout */
+        /* Stili per la pagina immagini - nuovo layout */
         .image-top-box {
             background: #d2d6dc;
             border-radius: 24px;
@@ -514,20 +641,31 @@
             align-items: center;
             margin-bottom: 12px;
         }
-        .image-page-header button { background: #e67e22; padding: 8px 16px; }
-        #loadImageBtn { background: #283593; width: 100%; margin-bottom: 16px; }
-        .hidden-btn { display: none !important; }
+        .image-page-header button {
+            background: #e67e22;
+            padding: 8px 16px;
+        }
+        #loadImageBtn {
+            background: #283593;
+            width: 100%;
+            margin-bottom: 16px;
+        }
+        .hidden-btn {
+            display: none !important;
+        }
     </style>
 </head>
 <body>
 <div class="container">
     <div id="homePage" class="page">
+        <!-- version-header rimosso come da richiesta -->
         <div class="title-btn" id="adminLongPressBtn">
             <span>📇</span>
             <span>CONTATTI PERSONALI</span>
             <span>📇</span>
         </div>
 
+        <!-- Sezione licenza -->
         <div class="license-section">
             <div class="license-row">
                 <span class="license-label">LICENZA</span>
@@ -540,6 +678,7 @@
             </div>
         </div>
 
+        <!-- Sezione admin (nascosta) -->
         <div id="adminSection" class="admin-section">
             <div style="font-weight: bold; margin-bottom: 8px;">🛠️ Area Amministratore</div>
             <div class="flex-row">
@@ -576,6 +715,7 @@
         <div class="version-footer">versione 0210 – quarto contatto speciale con galleria immagini</div>
     </div>
 
+    <!-- PAGINA EMERGENZA (invariata, per i primi tre contatti) -->
     <div id="emergencyPage" class="page hidden">
         <div id="currentServiceDeco" class="current-service-deco">Contatto:</div>
         <div class="dark-card"><div class="section-title">Numero servizio</div><div class="flex-row"><input type="tel" id="phoneNumber" placeholder="Numero" style="flex:2;"><button id="saveNumberBtn" class="small-btn" style="flex:0.4;">SALVA</button></div><div id="phoneSaveMsg" class="status-msg"></div></div>
@@ -589,165 +729,163 @@
         <div class="version-footer">versione 0210 – emergency invariata</div>
     </div>
 
+    <!-- NUOVA PAGINA PER IL QUARTO CONTATTO (immagini) con layout modificato -->
     <div id="imagePage" class="page hidden">
         <div class="image-page-header">
             <button id="backFromImageBtn" class="small-btn" style="background:#e67e22;">◀ TORNA INDIETRO</button>
         </div>
+        <!-- Box alto che contiene titolo + immagine -->
         <div class="image-top-box">
             <div class="image-top-title">MONASTIR: Facciamo Rete</div>
-            <div id="imagePreviewArea" class="image-container"></div>
+            <div id="imagePreviewArea" class="image-container">
+                <!-- L'immagine verrà mostrata qui -->
+            </div>
         </div>
         <button id="loadImageBtn" class="small-btn" style="background:#283593; width:100%;">CARICA IMMAGINE</button>
         <div class="version-footer">versione 0210 – galleria immagini</div>
     </div>
 
+    <!-- MODALI ESISTENTI -->
     <div id="adaptiveModal" class="adaptive-modal" style="display:none;"><div class="adaptive-modal-content"><textarea id="modalTextarea" readonly></textarea><button id="closeAdaptiveBtn">CHIUDI</button></div></div>
     <div id="speakDetailModal" class="adaptive-modal" style="display:none;"><div class="adaptive-modal-content"><h3>📄 Dettaglio conversazione</h3><div class="detail-label">Italiano (originale)</div><div class="detail-text" id="speakOriginalText"></div><div class="detail-label">Francese (traduzione)</div><div class="detail-text" id="speakTranslatedText"></div><div class="modal-buttons"><button id="closeSpeakModalBtn" class="save-btn">CHIUDI</button></div></div></div>
     <div id="noteEditModal" class="adaptive-modal note-edit-modal" style="display:none;"><div class="adaptive-modal-content"><h3 id="noteModalTitle">➕ Aggiungi Nota</h3><label class="detail-label">Titolo</label><input type="text" id="editNoteTitle" placeholder="Inserisci il titolo"><label class="detail-label">Descrizione</label><textarea id="editNoteDesc" rows="4" placeholder="Inserisci la descrizione"></textarea><div class="modal-buttons"><button id="saveNoteBtn" class="save-btn">SALVA</button><button id="cancelNoteBtn" class="cancel-btn">ANNULLA</button></div></div></div>
     <div id="infoModal" class="adaptive-modal" style="display:none;"><div class="adaptive-modal-content"><h3>📋 Richiesta attivazione</h3><div id="infoModalText" class="modal-info-text"></div><div class="modal-buttons"><button id="closeInfoModalBtn" class="cancel-btn">CHIUDI</button></div></div></div>
+
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
 <script>
-// ==================== VERSIONE 0210 - CODICE COMPLETO (PARTE 1) ====================
-const CURRENT_VERSION = "0210";
-let currentService = "ambulanza";
-let currentLat = null, currentLng = null;
-let currentAddress = "";
-let currentRefA = "", currentRefB = "", currentRefC = "";
-let normalNotes = {};
-let specialNotes = {};
-let selectedNormalNoteId = null;
-let selectedSpecialNoteId = null;
-let selectedSpecialMode = false;
-let wakeLock = null;
-let imagePageWakeLock = null;
+    // ==================== VERSIONE 0210 COMPLETA ====================
+    // Modifiche:
+    // - Disabilitata selezione testo su tutti i pulsanti
+    // - Home: rimosso version-header (nascosto), riga giorni "Versione: 0210 - Giorni rimanenti: XX"
+    // - Pagina MONASTIR: nuovo box titolo+immagine, eliminato vecchio current-service-deco
+    // - Tasto CARICA IMMAGINE: long press 10s -> scompare dopo primo caricamento, cambio immagine con long press sull'immagine
+    // - Wake lock attivo nella pagina MONASTIR
+    // =================================================================
 
-let contactExtraText = { ambulanza: "", polizia: "", veterinario: "", clinica: "" };
-const services = ["ambulanza", "polizia", "veterinario", "clinica"];
-for (let s of services) { normalNotes[s] = []; specialNotes[s] = []; }
+    const CURRENT_VERSION = "0210";
+    let currentService = "ambulanza";
+    let currentLat = null, currentLng = null;
+    let currentAddress = "";
+    let currentRefA = "", currentRefB = "", currentRefC = "";
+    let normalNotes = {};
+    let specialNotes = {};
+    let selectedNormalNoteId = null;
+    let selectedSpecialNoteId = null;
+    let selectedSpecialMode = false;
+    let wakeLock = null;
+    let imagePageWakeLock = null;
 
-let licenseActive = false, daysRemaining = 0, licenseCheckPassed = false, clientCode = "";
-const SECRET_KEY = "ChiaveSegreta123";
-let adminCode = "admin2025", adminAuthenticated = false;
+    let contactExtraText = {
+        ambulanza: "",
+        polizia: "",
+        veterinario: "",
+        clinica: ""
+    };
+    const services = ["ambulanza", "polizia", "veterinario", "clinica"];
+    for (let s of services) {
+        normalNotes[s] = [];
+        specialNotes[s] = [];
+    }
 
-// DOM elements
-const homePage = document.getElementById('homePage');
-const emergencyPage = document.getElementById('emergencyPage');
-const imagePage = document.getElementById('imagePage');
-const currentServiceDeco = document.getElementById('currentServiceDeco');
-const phoneInput = document.getElementById('phoneNumber');
-const saveNumberBtn = document.getElementById('saveNumberBtn');
-const googleMapsBtn = document.getElementById('googleMapsBtn');
-const geolocationBtn = document.getElementById('geolocationBtn');
-const latLonDisplay = document.getElementById('latLonDisplay');
-const addressDisplay = document.getElementById('addressDisplay');
-const refADisplay = document.getElementById('refADisplay');
-const refBDisplay = document.getElementById('refBDisplay');
-const refCDisplay = document.getElementById('refCDisplay');
-const gpsStatus = document.getElementById('gpsStatus');
-const addNoteBtn = document.getElementById('addNoteBtn');
-const addSpecialNoteBtn = document.getElementById('addSpecialNoteBtn');
-const notesListArea = document.getElementById('notesListArea');
-const specialNotesListArea = document.getElementById('specialNotesListArea');
-const copyNoteBtn = document.getElementById('copyNoteBtn');
-const audioItBtn = document.getElementById('audioItBtn');
-const audioFrBtn = document.getElementById('audioFrBtn');
-const backHomeBtn = document.getElementById('backHomeBtn');
-const phoneSaveMsg = document.getElementById('phoneSaveMsg');
-const operatorResponse = document.getElementById('operatorResponse');
-const listenResponseBtn = document.getElementById('listenResponseBtn');
-const clearResponseBtn = document.getElementById('clearResponseBtn');
-const transcribeStatus = document.getElementById('transcribeStatus');
-const listenInfoMsg = document.getElementById('listenInfoMsg');
-const copyInfoMsg = document.getElementById('copyInfoMsg');
-const normalNoteInfo = document.getElementById('normalNoteInfo');
-const specialNoteInfo = document.getElementById('specialNoteInfo');
-const speakToOperatorBtn = document.getElementById('speakToOperatorBtn');
-const speakResultField = document.getElementById('speakResultField');
-const speakStatus = document.getElementById('speakStatus');
-const clearSpeakBtn = document.getElementById('clearSpeakBtn');
-const speakDetailModal = document.getElementById('speakDetailModal');
-const speakOriginalText = document.getElementById('speakOriginalText');
-const speakTranslatedText = document.getElementById('speakTranslatedText');
-const closeSpeakModalBtn = document.getElementById('closeSpeakModalBtn');
-const adaptiveModal = document.getElementById('adaptiveModal');
-const modalTextarea = document.getElementById('modalTextarea');
-const closeAdaptiveBtn = document.getElementById('closeAdaptiveBtn');
-const noteEditModal = document.getElementById('noteEditModal');
-const editNoteTitle = document.getElementById('editNoteTitle');
-const editNoteDesc = document.getElementById('editNoteDesc');
-const saveNoteBtn = document.getElementById('saveNoteBtn');
-const cancelNoteBtn = document.getElementById('cancelNoteBtn');
-const noteModalTitle = document.getElementById('noteModalTitle');
-const exportAllBtn = document.getElementById('exportAllBtn');
-const importAllBtn = document.getElementById('importAllBtn');
-const globalImportFileInput = document.getElementById('globalImportFileInput');
-const contactsGrid = document.getElementById('contactsGrid');
-const clientCodeInput = document.getElementById('clientCodeInput');
-const unlockCodeInput = document.getElementById('unlockCodeInput');
-const activateLicenseBtn = document.getElementById('activateLicenseBtn');
-const copyRequestBtn = document.getElementById('copyRequestBtn');
-const adminSection = document.getElementById('adminSection');
-const adminClientCode = document.getElementById('adminClientCode');
-const adminFirstRun = document.getElementById('adminFirstRun');
-const generateUnlockBtn = document.getElementById('generateUnlockBtn');
-const generatedCode = document.getElementById('generatedCode');
-const copyGeneratedBtn = document.getElementById('copyGeneratedBtn');
-const hideAdminBtn = document.getElementById('hideAdminBtn');
-const adminLongPressBtn = document.getElementById('adminLongPressBtn');
-const newAdminCode = document.getElementById('newAdminCode');
-const changeAdminCodeBtn = document.getElementById('changeAdminCodeBtn');
-const daysHomeDisplay = document.getElementById('daysLeftDisplayHome');
-const infoModal = document.getElementById('infoModal');
-const infoModalText = document.getElementById('infoModalText');
-const closeInfoModalBtn = document.getElementById('closeInfoModalBtn');
-const loadImageBtn = document.getElementById('loadImageBtn');
-const backFromImageBtn = document.getElementById('backFromImageBtn');
-const imagePreviewArea = document.getElementById('imagePreviewArea');
+    let licenseActive = false;
+    let daysRemaining = 0;
+    let licenseCheckPassed = false;
+    let clientCode = "";
+    const SECRET_KEY = "ChiaveSegreta123";
+    let adminCode = "admin2025";
+    let adminAuthenticated = false;
 
-let currentEditMode = null, currentEditId = null;
-let recognitionOperator = null, recognitionSpeak = null, recognitionTimeout = null;
-let lastItalianText = "", lastFrenchTranslation = "";
+    // DOM elements
+    const homePage = document.getElementById('homePage');
+    const emergencyPage = document.getElementById('emergencyPage');
+    const imagePage = document.getElementById('imagePage');
+    const currentServiceDeco = document.getElementById('currentServiceDeco');
+    const phoneInput = document.getElementById('phoneNumber');
+    const saveNumberBtn = document.getElementById('saveNumberBtn');
+    const googleMapsBtn = document.getElementById('googleMapsBtn');
+    const geolocationBtn = document.getElementById('geolocationBtn');
+    const latLonDisplay = document.getElementById('latLonDisplay');
+    const addressDisplay = document.getElementById('addressDisplay');
+    const refADisplay = document.getElementById('refADisplay');
+    const refBDisplay = document.getElementById('refBDisplay');
+    const refCDisplay = document.getElementById('refCDisplay');
+    const gpsStatus = document.getElementById('gpsStatus');
+    const addNoteBtn = document.getElementById('addNoteBtn');
+    const addSpecialNoteBtn = document.getElementById('addSpecialNoteBtn');
+    const notesListArea = document.getElementById('notesListArea');
+    const specialNotesListArea = document.getElementById('specialNotesListArea');
+    const copyNoteBtn = document.getElementById('copyNoteBtn');
+    const audioItBtn = document.getElementById('audioItBtn');
+    const audioFrBtn = document.getElementById('audioFrBtn');
+    const backHomeBtn = document.getElementById('backHomeBtn');
+    const phoneSaveMsg = document.getElementById('phoneSaveMsg');
+    const operatorResponse = document.getElementById('operatorResponse');
+    const listenResponseBtn = document.getElementById('listenResponseBtn');
+    const clearResponseBtn = document.getElementById('clearResponseBtn');
+    const transcribeStatus = document.getElementById('transcribeStatus');
+    const listenInfoMsg = document.getElementById('listenInfoMsg');
+    const copyInfoMsg = document.getElementById('copyInfoMsg');
+    const normalNoteInfo = document.getElementById('normalNoteInfo');
+    const specialNoteInfo = document.getElementById('specialNoteInfo');
+    const speakToOperatorBtn = document.getElementById('speakToOperatorBtn');
+    const speakResultField = document.getElementById('speakResultField');
+    const speakStatus = document.getElementById('speakStatus');
+    const clearSpeakBtn = document.getElementById('clearSpeakBtn');
+    const speakDetailModal = document.getElementById('speakDetailModal');
+    const speakOriginalText = document.getElementById('speakOriginalText');
+    const speakTranslatedText = document.getElementById('speakTranslatedText');
+    const closeSpeakModalBtn = document.getElementById('closeSpeakModalBtn');
+    const adaptiveModal = document.getElementById('adaptiveModal');
+    const modalTextarea = document.getElementById('modalTextarea');
+    const closeAdaptiveBtn = document.getElementById('closeAdaptiveBtn');
+    const noteEditModal = document.getElementById('noteEditModal');
+    const editNoteTitle = document.getElementById('editNoteTitle');
+    const editNoteDesc = document.getElementById('editNoteDesc');
+    const saveNoteBtn = document.getElementById('saveNoteBtn');
+    const cancelNoteBtn = document.getElementById('cancelNoteBtn');
+    const noteModalTitle = document.getElementById('noteModalTitle');
+    const exportAllBtn = document.getElementById('exportAllBtn');
+    const importAllBtn = document.getElementById('importAllBtn');
+    const globalImportFileInput = document.getElementById('globalImportFileInput');
+    const contactsGrid = document.getElementById('contactsGrid');
+    const clientCodeInput = document.getElementById('clientCodeInput');
+    const unlockCodeInput = document.getElementById('unlockCodeInput');
+    const activateLicenseBtn = document.getElementById('activateLicenseBtn');
+    const copyRequestBtn = document.getElementById('copyRequestBtn');
+    const adminSection = document.getElementById('adminSection');
+    const adminClientCode = document.getElementById('adminClientCode');
+    const adminFirstRun = document.getElementById('adminFirstRun');
+    const generateUnlockBtn = document.getElementById('generateUnlockBtn');
+    const generatedCode = document.getElementById('generatedCode');
+    const copyGeneratedBtn = document.getElementById('copyGeneratedBtn');
+    const hideAdminBtn = document.getElementById('hideAdminBtn');
+    const adminLongPressBtn = document.getElementById('adminLongPressBtn');
+    const newAdminCode = document.getElementById('newAdminCode');
+    const changeAdminCodeBtn = document.getElementById('changeAdminCodeBtn');
+    const daysHomeDisplay = document.getElementById('daysLeftDisplayHome');
+    const infoModal = document.getElementById('infoModal');
+    const infoModalText = document.getElementById('infoModalText');
+    const closeInfoModalBtn = document.getElementById('closeInfoModalBtn');
+    // Elementi nuova pagina immagini
+    const loadImageBtn = document.getElementById('loadImageBtn');
+    const backFromImageBtn = document.getElementById('backFromImageBtn');
+    const imagePreviewArea = document.getElementById('imagePreviewArea');
 
-// ==================== FUNZIONI PAGINA IMMAGINI (modificate) ====================
-let imagePressTimer = null;
-let currentImageData = null;
+    let currentEditMode = null;
+    let currentEditId = null;
+    let recognitionOperator = null;
+    let recognitionSpeak = null;
+    let recognitionTimeout = null;
+    let lastItalianText = "";
+    let lastFrenchTranslation = "";
 
-function startImageTimer() {
-    imagePressTimer = setTimeout(() => {
-        const input = document.createElement('input');
-        input.type = 'file';
-        input.accept = 'image/*';
-        input.onchange = (e) => {
-            const file = e.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = (event) => {
-                    const img = document.createElement('img');
-                    img.src = event.target.result;
-                    img.className = 'uploaded-image';
-                    img.style.maxWidth = '100%';
-                    img.style.maxHeight = '180px';
-                    img.style.borderRadius = '16px';
-                    imagePreviewArea.innerHTML = '';
-                    imagePreviewArea.appendChild(img);
-                    currentImageData = event.target.result;
-                    if (loadImageBtn) loadImageBtn.classList.add('hidden-btn');
-                    attachImageLongPress(img);
-                };
-                reader.readAsDataURL(file);
-            }
-        };
-        input.click();
-    }, 10000);
-}
-function cancelImageTimer() {
-    if (imagePressTimer) { clearTimeout(imagePressTimer); imagePressTimer = null; }
-}
-function attachImageLongPress(imgElement) {
-    let pressTimer = null;
-    const start = () => {
-        pressTimer = setTimeout(() => {
+    // ==================== FUNZIONI PER LA PAGINA IMMAGINI (modificate) ====================
+    let imagePressTimer = null;
+    let currentImageData = null;
+
+    function startImageTimer() {
+        imagePressTimer = setTimeout(() => {
             const input = document.createElement('input');
             input.type = 'file';
             input.accept = 'image/*';
@@ -755,131 +893,207 @@ function attachImageLongPress(imgElement) {
                 const file = e.target.files[0];
                 if (file) {
                     const reader = new FileReader();
-                    reader.onload = (ev) => {
-                        imgElement.src = ev.target.result;
-                        currentImageData = ev.target.result;
+                    reader.onload = (event) => {
+                        const img = document.createElement('img');
+                        img.src = event.target.result;
+                        img.className = 'uploaded-image';
+                        img.style.maxWidth = '100%';
+                        img.style.maxHeight = '180px';
+                        img.style.borderRadius = '16px';
+                        // Sostituisci il contenuto
+                        imagePreviewArea.innerHTML = '';
+                        imagePreviewArea.appendChild(img);
+                        currentImageData = event.target.result;
+                        // Il tasto "CARICA IMMAGINE" scompare dopo il primo caricamento
+                        if (loadImageBtn) loadImageBtn.classList.add('hidden-btn');
+                        // Aggiungi long press sull'immagine per cambiarla
+                        attachImageLongPress(img);
                     };
                     reader.readAsDataURL(file);
                 }
             };
             input.click();
         }, 10000);
-    };
-    const cancel = () => { if (pressTimer) clearTimeout(pressTimer); };
-    imgElement.addEventListener('mousedown', start);
-    imgElement.addEventListener('mouseup', cancel);
-    imgElement.addEventListener('mouseleave', cancel);
-    imgElement.addEventListener('touchstart', start, { passive: true });
-    imgElement.addEventListener('touchend', cancel);
-    imgElement.addEventListener('touchcancel', cancel);
-}
-loadImageBtn.addEventListener('mousedown', startImageTimer);
-loadImageBtn.addEventListener('mouseup', cancelImageTimer);
-loadImageBtn.addEventListener('mouseleave', cancelImageTimer);
-loadImageBtn.addEventListener('touchstart', startImageTimer, { passive: true });
-loadImageBtn.addEventListener('touchend', cancelImageTimer);
-loadImageBtn.addEventListener('touchcancel', cancelImageTimer);
-backFromImageBtn.addEventListener('click', () => {
-    imagePage.classList.add('hidden');
-    homePage.classList.remove('hidden');
-    releaseImagePageWakeLock();
-});
-async function requestImagePageWakeLock() {
-    if ('wakeLock' in navigator) {
-        try {
-            imagePageWakeLock = await navigator.wakeLock.request('screen');
-        } catch(err) { console.warn('WakeLock fallito:', err); }
     }
-}
-function releaseImagePageWakeLock() {
-    if (imagePageWakeLock) { imagePageWakeLock.release(); imagePageWakeLock = null; }
-}
-
-// ==================== FUNZIONI LICENZA ====================
-function generateRandomClientCode() { return Math.floor(1000000000 + Math.random() * 9000000000).toString(); }
-function hashTo20Digits(hash) {
-    let hex = hash.toString(CryptoJS.enc.Hex);
-    let decimal = BigInt('0x' + hex).toString();
-    return decimal.slice(0,20).padStart(20,'0');
-}
-function verifyUnlockCode(clientCode, firstRun, unlockCode) {
-    const message = `${clientCode}|${firstRun}`;
-    const hash = CryptoJS.HmacSHA256(message, SECRET_KEY);
-    const expected = hashTo20Digits(hash);
-    return expected === unlockCode;
-}
-async function getCurrentUTCTime() {
-    try {
-        const res = await fetch('https://worldtimeapi.org/api/timezone/Etc/UTC');
-        if (!res.ok) throw new Error();
-        const data = await res.json();
-        return new Date(data.utc_datetime);
-    } catch(e) { return new Date(); }
-}
-async function initLicense() {
-    const now = await getCurrentUTCTime();
-    let firstRun = localStorage.getItem('firstRun');
-    if (!firstRun) {
-        firstRun = now.getTime();
-        localStorage.setItem('firstRun', firstRun);
-        let newClientCode = generateRandomClientCode();
-        localStorage.setItem('clientCode', newClientCode);
-        localStorage.setItem('activated', 'false');
-        localStorage.setItem('expiryDate', firstRun + 90 * 86400000);
+    function cancelImageTimer() {
+        if (imagePressTimer) {
+            clearTimeout(imagePressTimer);
+            imagePressTimer = null;
+        }
     }
-    firstRun = parseInt(firstRun);
-    clientCode = localStorage.getItem('clientCode') || generateRandomClientCode();
-    if (!localStorage.getItem('clientCode')) localStorage.setItem('clientCode', clientCode);
-    const activated = localStorage.getItem('activated') === 'true';
-    let expiry = parseInt(localStorage.getItem('expiryDate'));
-    if (activated && expiry < firstRun + 365 * 86400000) {
-        expiry = firstRun + 365 * 86400000;
-        localStorage.setItem('expiryDate', expiry);
+    function attachImageLongPress(imgElement) {
+        let pressTimer = null;
+        const start = () => {
+            pressTimer = setTimeout(() => {
+                // Riapri galleria per cambiare immagine
+                const input = document.createElement('input');
+                input.type = 'file';
+                input.accept = 'image/*';
+                input.onchange = (e) => {
+                    const file = e.target.files[0];
+                    if (file) {
+                        const reader = new FileReader();
+                        reader.onload = (ev) => {
+                            imgElement.src = ev.target.result;
+                            currentImageData = ev.target.result;
+                        };
+                        reader.readAsDataURL(file);
+                    }
+                };
+                input.click();
+            }, 10000);
+        };
+        const cancel = () => { if (pressTimer) clearTimeout(pressTimer); };
+        imgElement.addEventListener('mousedown', start);
+        imgElement.addEventListener('mouseup', cancel);
+        imgElement.addEventListener('mouseleave', cancel);
+        imgElement.addEventListener('touchstart', start, { passive: true });
+        imgElement.addEventListener('touchend', cancel);
+        imgElement.addEventListener('touchcancel', cancel);
     }
-    const nowTime = now.getTime();
-    if (nowTime > expiry) { licenseActive = false; licenseCheckPassed = false; }
-    else { licenseActive = activated; licenseCheckPassed = true; }
-    daysRemaining = Math.ceil((expiry - nowTime) / 86400000);
-    updateLicenseUI();
-    toggleAppAccess(!licenseCheckPassed);
-    if (clientCodeInput) clientCodeInput.value = clientCode;
-    if (daysHomeDisplay) daysHomeDisplay.innerText = `Versione: ${CURRENT_VERSION} - Giorni rimanenti: ${daysRemaining}`;
-}
-function updateLicenseUI() {
-    const activated = localStorage.getItem('activated') === 'true';
-    if (activated) {
-        if (unlockCodeInput) unlockCodeInput.disabled = true;
-        if (activateLicenseBtn) activateLicenseBtn.disabled = true;
-    } else {
-        if (unlockCodeInput) unlockCodeInput.disabled = false;
-        if (activateLicenseBtn) activateLicenseBtn.disabled = false;
-    }
-}
-function toggleAppAccess(block) {
-    document.querySelectorAll('.big-btn').forEach(btn => {
-        if (block) { btn.style.pointerEvents = 'none'; btn.style.opacity = '0.5'; }
-        else { btn.style.pointerEvents = 'auto'; btn.style.opacity = '1'; }
+    loadImageBtn.addEventListener('mousedown', startImageTimer);
+    loadImageBtn.addEventListener('mouseup', cancelImageTimer);
+    loadImageBtn.addEventListener('mouseleave', cancelImageTimer);
+    loadImageBtn.addEventListener('touchstart', startImageTimer, { passive: true });
+    loadImageBtn.addEventListener('touchend', cancelImageTimer);
+    loadImageBtn.addEventListener('touchcancel', cancelImageTimer);
+    
+    backFromImageBtn.addEventListener('click', () => {
+        imagePage.classList.add('hidden');
+        homePage.classList.remove('hidden');
+        releaseImagePageWakeLock();
     });
-}
-async function onActivateLicense() {
-    const unlockCode = unlockCodeInput.value.trim();
-    if (!/^\d{20}$/.test(unlockCode)) { alert('Codice sblocco deve essere esattamente 20 cifre.'); return; }
-    const firstRun = localStorage.getItem('firstRun');
-    if (!firstRun) { alert('Errore: primo avvio non rilevato.'); return; }
-    if (verifyUnlockCode(clientCode, parseInt(firstRun), unlockCode)) {
-        const firstRunNum = parseInt(firstRun);
-        const newExpiry = firstRunNum + 365 * 86400000;
-        localStorage.setItem('activated', 'true');
-        localStorage.setItem('expiryDate', newExpiry);
-        await initLicense();
-        alert('Licenza attivata con successo! 365 giorni di utilizzo.');
-    } else { alert('Codice di sblocco non valido.'); }
-}
-function copyRequest() {
-    const firstRun = localStorage.getItem('firstRun');
-    if (!firstRun) { alert('Errore: impossibile recuperare i dati.'); return; }
-    const clientCodeVal = clientCode;
-    const fullMessage = `Dati copiati negli appunti!
+
+    // Wake Lock per pagina MONASTIR
+    async function requestImagePageWakeLock() {
+        if ('wakeLock' in navigator) {
+            try {
+                imagePageWakeLock = await navigator.wakeLock.request('screen');
+                console.log('WakeLock attivo per MONASTIR');
+            } catch (err) { console.warn('WakeLock fallito:', err); }
+        }
+    }
+    function releaseImagePageWakeLock() {
+        if (imagePageWakeLock) {
+            imagePageWakeLock.release();
+            imagePageWakeLock = null;
+            console.log('WakeLock rilasciato');
+        }
+    }
+
+    // ==================== FUNZIONI LICENZA ====================
+    function generateRandomClientCode() {
+        return Math.floor(1000000000 + Math.random() * 9000000000).toString();
+    }
+    function hashTo20Digits(hash) {
+        let hex = hash.toString(CryptoJS.enc.Hex);
+        let decimal = BigInt('0x' + hex).toString();
+        return decimal.slice(0,20).padStart(20,'0');
+    }
+    function verifyUnlockCode(clientCode, firstRun, unlockCode) {
+        const message = `${clientCode}|${firstRun}`;
+        const hash = CryptoJS.HmacSHA256(message, SECRET_KEY);
+        const expected = hashTo20Digits(hash);
+        return expected === unlockCode;
+    }
+    async function getCurrentUTCTime() {
+        try {
+            const res = await fetch('https://worldtimeapi.org/api/timezone/Etc/UTC');
+            if (!res.ok) throw new Error();
+            const data = await res.json();
+            return new Date(data.utc_datetime);
+        } catch(e) {
+            console.warn("API oraria fallita, uso orario locale:", e);
+            return new Date();
+        }
+    }
+    async function initLicense() {
+        const now = await getCurrentUTCTime();
+        let firstRun = localStorage.getItem('firstRun');
+        if (!firstRun) {
+            firstRun = now.getTime();
+            localStorage.setItem('firstRun', firstRun);
+            let newClientCode = generateRandomClientCode();
+            localStorage.setItem('clientCode', newClientCode);
+            localStorage.setItem('activated', 'false');
+            localStorage.setItem('expiryDate', firstRun + 90 * 86400000);
+        }
+        firstRun = parseInt(firstRun);
+        clientCode = localStorage.getItem('clientCode') || generateRandomClientCode();
+        if (!localStorage.getItem('clientCode')) localStorage.setItem('clientCode', clientCode);
+        const activated = localStorage.getItem('activated') === 'true';
+        let expiry = parseInt(localStorage.getItem('expiryDate'));
+        if (activated && expiry < firstRun + 365 * 86400000) {
+            expiry = firstRun + 365 * 86400000;
+            localStorage.setItem('expiryDate', expiry);
+        }
+        const nowTime = now.getTime();
+        if (nowTime > expiry) {
+            licenseActive = false;
+            licenseCheckPassed = false;
+        } else {
+            licenseActive = activated;
+            licenseCheckPassed = true;
+        }
+        daysRemaining = Math.ceil((expiry - nowTime) / 86400000);
+        updateLicenseUI();
+        toggleAppAccess(!licenseCheckPassed);
+        if (clientCodeInput) clientCodeInput.value = clientCode;
+        // MODIFICA HOME: visualizza "Versione: 0210 - Giorni rimanenti: X"
+        if (daysHomeDisplay) daysHomeDisplay.innerText = `Versione: ${CURRENT_VERSION} - Giorni rimanenti: ${daysRemaining}`;
+    }
+    function updateLicenseUI() {
+        const activated = localStorage.getItem('activated') === 'true';
+        if (activated) {
+            if (unlockCodeInput) unlockCodeInput.disabled = true;
+            if (activateLicenseBtn) activateLicenseBtn.disabled = true;
+        } else {
+            if (unlockCodeInput) unlockCodeInput.disabled = false;
+            if (activateLicenseBtn) activateLicenseBtn.disabled = false;
+        }
+    }
+    function toggleAppAccess(block) {
+        const btns = document.querySelectorAll('.big-btn');
+        btns.forEach(btn => {
+            if (block) {
+                btn.style.pointerEvents = 'none';
+                btn.style.opacity = '0.5';
+            } else {
+                btn.style.pointerEvents = 'auto';
+                btn.style.opacity = '1';
+            }
+        });
+    }
+    async function onActivateLicense() {
+        const unlockCode = unlockCodeInput.value.trim();
+        if (!/^\d{20}$/.test(unlockCode)) {
+            alert('Codice sblocco deve essere esattamente 20 cifre.');
+            return;
+        }
+        const firstRun = localStorage.getItem('firstRun');
+        if (!firstRun) {
+            alert('Errore: primo avvio non rilevato.');
+            return;
+        }
+        if (verifyUnlockCode(clientCode, parseInt(firstRun), unlockCode)) {
+            const firstRunNum = parseInt(firstRun);
+            const newExpiry = firstRunNum + 365 * 86400000;
+            localStorage.setItem('activated', 'true');
+            localStorage.setItem('expiryDate', newExpiry);
+            await initLicense();
+            alert('Licenza attivata con successo! 365 giorni di utilizzo.');
+        } else {
+            alert('Codice di sblocco non valido.');
+        }
+    }
+    function copyRequest() {
+        const firstRun = localStorage.getItem('firstRun');
+        if (!firstRun) {
+            alert('Errore: impossibile recuperare i dati.');
+            return;
+        }
+        const clientCodeVal = clientCode;
+        const fullMessage = `Dati copiati negli appunti!
 
 CODICE CLIENTE: ${clientCodeVal}
 
@@ -898,633 +1112,632 @@ gliamicidipaolino@gmail.com
 Risponderemo fornendoti il CODICE di SBLOCCO.
 
 Un caro Saluto.`;
-    navigator.clipboard.writeText(fullMessage);
-    infoModalText.innerText = fullMessage;
-    infoModal.style.display = 'flex';
-}
-closeInfoModalBtn.addEventListener('click', () => { infoModal.style.display = 'none'; });
-infoModal.addEventListener('click', (e) => { if (e.target === infoModal) infoModal.style.display = 'none'; });
-
-// ==================== FUNZIONI ADMIN ====================
-function loadAdminCode() {
-    const saved = localStorage.getItem('adminCode');
-    if (saved && saved.trim() !== "") adminCode = saved;
-    else { adminCode = "admin2025"; localStorage.setItem('adminCode', adminCode); }
-}
-function saveAdminCode(newCode) {
-    if (newCode && newCode.trim() !== "") { adminCode = newCode; localStorage.setItem('adminCode', adminCode); alert("Codice amministratore cambiato!"); }
-    else alert("Codice non valido.");
-}
-function generateUnlockCodeAdmin(clientCode, firstRun) {
-    const message = `${clientCode}|${firstRun}`;
-    const hash = CryptoJS.HmacSHA256(message, SECRET_KEY);
-    return hashTo20Digits(hash);
-}
-function onGenerateUnlock() {
-    let clientCodeVal = adminClientCode.value.trim();
-    let firstRunVal = adminFirstRun.value.trim();
-    if (!/^\d{6,10}$/.test(clientCodeVal)) { alert('Codice cliente 6-10 cifre.'); return; }
-    if (!/^\d+$/.test(firstRunVal) || firstRunVal.length < 10) { alert('FIRST_RUN valido?'); return; }
-    generatedCode.value = generateUnlockCodeAdmin(clientCodeVal, firstRunVal);
-}
-function copyGenerated() {
-    if (!generatedCode.value) { alert('Nessun codice generato.'); return; }
-    navigator.clipboard.writeText(generatedCode.value);
-    alert('Codice copiato.');
-}
-function showAdminSection() { adminSection.style.display = 'block'; }
-function hideAdminSection() { adminSection.style.display = 'none'; }
-let pressTimer = null;
-function startAdminTimer() {
-    pressTimer = setTimeout(() => {
-        const code = prompt("Inserisci il codice amministratore:");
-        if (code === adminCode) { adminAuthenticated = true; showAdminSection(); alert("Accesso amministratore autorizzato."); }
-        else if (code !== null) alert("Codice errato.");
-    }, 10000);
-}
-function cancelAdminTimer() { if (pressTimer) { clearTimeout(pressTimer); pressTimer = null; } }
-adminLongPressBtn.addEventListener('mousedown', startAdminTimer);
-adminLongPressBtn.addEventListener('mouseup', cancelAdminTimer);
-adminLongPressBtn.addEventListener('mouseleave', cancelAdminTimer);
-adminLongPressBtn.addEventListener('touchstart', startAdminTimer, { passive: true });
-adminLongPressBtn.addEventListener('touchend', cancelAdminTimer);
-adminLongPressBtn.addEventListener('touchcancel', cancelAdminTimer);
-generateUnlockBtn.addEventListener('click', onGenerateUnlock);
-copyGeneratedBtn.addEventListener('click', copyGenerated);
-hideAdminBtn.addEventListener('click', hideAdminSection);
-changeAdminCodeBtn.addEventListener('click', () => {
-    const newCode = newAdminCode.value.trim();
-    if (newCode) saveAdminCode(newCode);
-    else alert("Inserisci un nuovo codice.");
-});
-
-// ==================== FUNZIONI CONTATTI ====================
-function saveContactExtraText() {
-    for (let s of services) {
-        if (s === 'clinica') continue;
-        localStorage.setItem(`contactExtra_${s}_${CURRENT_VERSION}`, contactExtraText[s]);
+        navigator.clipboard.writeText(fullMessage).then(() => {}).catch(() => {});
+        infoModalText.innerText = fullMessage;
+        infoModal.style.display = 'flex';
     }
-}
-function loadContactExtraText() {
-    for (let s of services) {
-        if (s === 'clinica') continue;
-        const saved = localStorage.getItem(`contactExtra_${s}_${CURRENT_VERSION}`);
-        if (saved !== null) contactExtraText[s] = saved;
-        else {
-            for (let oldVer of ["0209", "0208"]) {
-                const old = localStorage.getItem(`contactExtra_${s}_${oldVer}`);
-                if (old !== null) { contactExtraText[s] = old; saveContactExtraText(); break; }
+    closeInfoModalBtn.addEventListener('click', () => { infoModal.style.display = 'none'; });
+    infoModal.addEventListener('click', (e) => { if (e.target === infoModal) infoModal.style.display = 'none'; });
+
+    // ==================== FUNZIONI ADMIN ====================
+    function loadAdminCode() {
+        const saved = localStorage.getItem('adminCode');
+        if (saved && saved.trim() !== "") adminCode = saved;
+        else { adminCode = "admin2025"; localStorage.setItem('adminCode', adminCode); }
+    }
+    function saveAdminCode(newCode) {
+        if (newCode && newCode.trim() !== "") { adminCode = newCode; localStorage.setItem('adminCode', adminCode); alert("Codice amministratore cambiato!"); }
+        else alert("Codice non valido.");
+    }
+    function generateUnlockCodeAdmin(clientCode, firstRun) {
+        const message = `${clientCode}|${firstRun}`;
+        const hash = CryptoJS.HmacSHA256(message, SECRET_KEY);
+        return hashTo20Digits(hash);
+    }
+    function onGenerateUnlock() {
+        let clientCodeVal = adminClientCode.value.trim();
+        let firstRunVal = adminFirstRun.value.trim();
+        if (!/^\d{6,10}$/.test(clientCodeVal)) { alert('Codice cliente 6-10 cifre.'); return; }
+        if (!/^\d+$/.test(firstRunVal) || firstRunVal.length < 10) { alert('FIRST_RUN valido?'); return; }
+        generatedCode.value = generateUnlockCodeAdmin(clientCodeVal, firstRunVal);
+    }
+    function copyGenerated() {
+        if (!generatedCode.value) { alert('Nessun codice generato.'); return; }
+        navigator.clipboard.writeText(generatedCode.value);
+        alert('Codice copiato.');
+    }
+    function showAdminSection() { adminSection.style.display = 'block'; }
+    function hideAdminSection() { adminSection.style.display = 'none'; }
+    let pressTimer = null;
+    function startAdminTimer() {
+        pressTimer = setTimeout(() => {
+            const code = prompt("Inserisci il codice amministratore:");
+            if (code === adminCode) { adminAuthenticated = true; showAdminSection(); alert("Accesso amministratore autorizzato."); }
+            else if (code !== null) alert("Codice errato.");
+        }, 10000);
+    }
+    function cancelAdminTimer() { if (pressTimer) { clearTimeout(pressTimer); pressTimer = null; } }
+    adminLongPressBtn.addEventListener('mousedown', startAdminTimer);
+    adminLongPressBtn.addEventListener('mouseup', cancelAdminTimer);
+    adminLongPressBtn.addEventListener('mouseleave', cancelAdminTimer);
+    adminLongPressBtn.addEventListener('touchstart', startAdminTimer, { passive: true });
+    adminLongPressBtn.addEventListener('touchend', cancelAdminTimer);
+    adminLongPressBtn.addEventListener('touchcancel', cancelAdminTimer);
+
+    generateUnlockBtn.addEventListener('click', onGenerateUnlock);
+    copyGeneratedBtn.addEventListener('click', copyGenerated);
+    hideAdminBtn.addEventListener('click', hideAdminSection);
+    changeAdminCodeBtn.addEventListener('click', () => {
+        const newCode = newAdminCode.value.trim();
+        if (newCode) saveAdminCode(newCode);
+        else alert("Inserisci un nuovo codice.");
+    });
+
+    // ==================== FUNZIONI PER I CONTATTI ====================
+    function saveContactExtraText() {
+        for (let s of services) {
+            if (s === 'clinica') continue;
+            localStorage.setItem(`contactExtra_${s}_${CURRENT_VERSION}`, contactExtraText[s]);
+        }
+    }
+    function loadContactExtraText() {
+        for (let s of services) {
+            if (s === 'clinica') continue;
+            const saved = localStorage.getItem(`contactExtra_${s}_${CURRENT_VERSION}`);
+            if (saved !== null) contactExtraText[s] = saved;
+            else {
+                for (let oldVer of ["0209", "0208", "0207"]) {
+                    const old = localStorage.getItem(`contactExtra_${s}_${oldVer}`);
+                    if (old !== null) { contactExtraText[s] = old; saveContactExtraText(); break; }
+                }
             }
         }
     }
-}
-function getContactButtonText(service) {
-    if (service === 'clinica') return "MONASTIR: Facciamo Rete";
-    let extra = contactExtraText[service];
-    if (extra && extra.trim() !== "") return `Contatto: ${extra}`;
-    else return `Contatto: premi 5 sc. per modifica`;
-}
-function updateContactButtons() {
-    document.querySelectorAll('.big-btn').forEach(btn => {
-        const s = btn.getAttribute('data-service');
-        if (s) btn.innerText = getContactButtonText(s);
-    });
-}
-function showCustomPrompt(service, currentExtra) {
-    if (service === 'clinica') return;
-    const overlay = document.createElement('div');
-    overlay.className = 'custom-prompt';
-    overlay.innerHTML = `<div class="custom-prompt-content"><h3>Modifica testo aggiuntivo</h3><p>Testo attuale: "${currentExtra}"</p><input type="text" id="customPromptInput" maxlength="14" placeholder="Max 14 caratteri" value="${currentExtra}"><div><button id="customPromptOk">OK</button><button id="customPromptCancel">ANNULLA</button></div></div>`;
-    document.body.appendChild(overlay);
-    const input = overlay.querySelector('#customPromptInput');
-    const okBtn = overlay.querySelector('#customPromptOk');
-    const cancelBtn = overlay.querySelector('#customPromptCancel');
-    const close = () => overlay.remove();
-    okBtn.onclick = () => {
-        let newText = input.value.trim();
-        if (newText.length > 14) newText = newText.substring(0, 14);
-        contactExtraText[service] = newText;
-        saveContactExtraText();
-        updateContactButtons();
-        close();
-    };
-    cancelBtn.onclick = close;
-    input.focus();
-}
-function initHomeButtons() {
-    contactsGrid.innerHTML = '';
-    services.forEach(service => {
-        const btn = document.createElement('button');
-        btn.className = 'big-btn';
-        btn.setAttribute('data-service', service);
-        btn.innerText = getContactButtonText(service);
-        btn.addEventListener('click', () => {
-            if (service === 'clinica') {
-                homePage.classList.add('hidden');
-                imagePage.classList.remove('hidden');
-                requestImagePageWakeLock();
-            } else {
-                showEmergency(service);
-            }
+    function getContactButtonText(service) {
+        if (service === 'clinica') {
+            return "MONASTIR: Facciamo Rete";
+        }
+        let extra = contactExtraText[service];
+        if (extra && extra.trim() !== "") return `Contatto: ${extra}`;
+        else return `Contatto: premi 5 sc. per modifica`;
+    }
+    function updateContactButtons() {
+        document.querySelectorAll('.big-btn').forEach(btn => {
+            const s = btn.getAttribute('data-service');
+            if (s) btn.innerText = getContactButtonText(s);
         });
-        if (service !== 'clinica') {
-            let pressTimerBtn = null;
-            const startTimer = () => { pressTimerBtn = setTimeout(() => showCustomPrompt(service, contactExtraText[service]), 5000); };
-            const cancelTimer = () => { if (pressTimerBtn) { clearTimeout(pressTimerBtn); pressTimerBtn = null; } };
-            btn.addEventListener('mousedown', startTimer);
-            btn.addEventListener('mouseup', cancelTimer);
-            btn.addEventListener('mouseleave', cancelTimer);
-            btn.addEventListener('touchstart', startTimer, { passive: true });
-            btn.addEventListener('touchend', cancelTimer);
-            btn.addEventListener('touchcancel', cancelTimer);
-        }
-        contactsGrid.appendChild(btn);
-    });
-}
-    // ==================== GEOLOCALIZZAZIONE E UTILITY ====================
-function haversine(lat1, lng1, lat2, lng2) {
-    const R = 6371e3;
-    const φ1 = lat1 * Math.PI / 180, φ2 = lat2 * Math.PI / 180;
-    const Δφ = (lat2 - lat1) * Math.PI / 180, Δλ = (lng2 - lng1) * Math.PI / 180;
-    const a = Math.sin(Δφ / 2) ** 2 + Math.cos(φ1) * Math.cos(φ2) * Math.sin(Δλ / 2) ** 2;
-    return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-}
-async function snapToRoad(lat, lng) {
-    let url = `https://overpass-api.de/api/interpreter?data=[out:json];way(around:50,${lat},${lng})["highway"];out center;`;
-    try {
-        let resp = await fetch(url);
-        let data = await resp.json();
-        if (!data.elements?.length) return { lat, lng };
-        let way = data.elements[0];
-        let clat = way.center?.lat || way.lat;
-        let clng = way.center?.lon || way.lon;
-        if (clat && clng && haversine(lat, lng, clat, clng) < 50) return { lat: clat, lng: clng };
-        return { lat, lng };
-    } catch (e) { return { lat, lng }; }
-}
-async function fetchAllNamedPlaces(lat, lng) {
-    const excludeTags = ["information", "bench", "waste_basket", "toilets", "telephone", "recycling", "fountain", "drinking_water"];
-    let query = `[out:json];(node(around:300,${lat},${lng})[name];way(around:300,${lat},${lng})[name];);out center;`;
-    let url = `https://overpass-api.de/api/interpreter?data=${encodeURIComponent(query)}`;
-    try {
-        let resp = await fetch(url);
-        let data = await resp.json();
-        if (!data.elements?.length) return [];
-        let items = [];
-        for (let el of data.elements) {
-            let latEl = el.lat || el.center?.lat;
-            let lonEl = el.lon || el.center?.lon;
-            if (!latEl) continue;
-            let tags = el.tags || {};
-            let name = tags.name;
-            if (!name || name.trim() === "") continue;
-            let cat = tags.amenity || tags.shop || tags.tourism || tags.office || tags.leisure || tags.historic || tags.place || tags.aeroway || tags.railway;
-            if (cat && excludeTags.includes(cat)) continue;
-            let dist = haversine(lat, lng, latEl, lonEl);
-            let display = name;
-            if (cat) {
-                let catMap = {
-                    "pharmacy": "Farmacia", "hospital": "Ospedale", "police": "Commissariato", "post_office": "Posta", "bank": "Banca",
-                    "library": "Biblioteca", "fire_station": "Caserma", "townhall": "Municipio", "supermarket": "Supermercato", "convenience": "Alimentari",
-                    "cafe": "Bar", "restaurant": "Ristorante", "pub": "Pub", "fast_food": "Fast food", "museum": "Museo", "monument": "Monumento",
-                    "attraction": "Attrazione", "square": "Piazza", "garden": "Giardino", "park": "Parco", "bus_station": "Stazione bus", "train_station": "Stazione",
-                    "church": "Chiesa", "services": "Area di servizio", "motorway_junction": "Uscita autostradale", "aeroway": "Aeroporto", "railway": "Stazione",
-                    "shop": "Negozio", "office": "Ufficio", "leisure": "Tempo libero", "historic": "Sito storico", "place": "Luogo", "industrial": "Azienda"
-                };
-                let readable = catMap[cat] || (cat.charAt(0).toUpperCase() + cat.slice(1));
-                display = `${name} (${readable})`;
+    }
+    function showCustomPrompt(service, currentExtra) {
+        if (service === 'clinica') return;
+        const overlay = document.createElement('div');
+        overlay.className = 'custom-prompt';
+        overlay.innerHTML = `<div class="custom-prompt-content"><h3>Modifica testo aggiuntivo</h3><p>Testo attuale: "${currentExtra}"</p><input type="text" id="customPromptInput" maxlength="14" placeholder="Max 14 caratteri" value="${currentExtra}"><div><button id="customPromptOk">OK</button><button id="customPromptCancel">ANNULLA</button></div></div>`;
+        document.body.appendChild(overlay);
+        const input = overlay.querySelector('#customPromptInput');
+        const okBtn = overlay.querySelector('#customPromptOk');
+        const cancelBtn = overlay.querySelector('#customPromptCancel');
+        const close = () => overlay.remove();
+        okBtn.onclick = () => {
+            let newText = input.value.trim();
+            if (newText.length > 14) newText = newText.substring(0, 14);
+            contactExtraText[service] = newText;
+            saveContactExtraText();
+            updateContactButtons();
+            close();
+        };
+        cancelBtn.onclick = close;
+        input.focus();
+    }
+    function initHomeButtons() {
+        contactsGrid.innerHTML = '';
+        services.forEach(service => {
+            const btn = document.createElement('button');
+            btn.className = 'big-btn';
+            btn.setAttribute('data-service', service);
+            btn.innerText = getContactButtonText(service);
+            btn.addEventListener('click', () => {
+                if (service === 'clinica') {
+                    homePage.classList.add('hidden');
+                    imagePage.classList.remove('hidden');
+                    requestImagePageWakeLock();
+                } else {
+                    showEmergency(service);
+                }
+            });
+            if (service !== 'clinica') {
+                let pressTimerBtn = null;
+                const startTimer = () => { pressTimerBtn = setTimeout(() => showCustomPrompt(service, contactExtraText[service]), 5000); };
+                const cancelTimer = () => { if (pressTimerBtn) { clearTimeout(pressTimerBtn); pressTimerBtn = null; } };
+                btn.addEventListener('mousedown', startTimer);
+                btn.addEventListener('mouseup', cancelTimer);
+                btn.addEventListener('mouseleave', cancelTimer);
+                btn.addEventListener('touchstart', startTimer, { passive: true });
+                btn.addEventListener('touchend', cancelTimer);
+                btn.addEventListener('touchcancel', cancelTimer);
             }
-            items.push({ display, dist });
-        }
-        const unique = new Map();
-        for (let item of items) {
-            if (!unique.has(item.display.split(' (')[0])) unique.set(item.display.split(' (')[0], item));
-        }
-        let uniqueItems = Array.from(unique.values());
-        uniqueItems.sort((a, b) => a.dist - b.dist);
-        let refs = uniqueItems.slice(0, 3).map(i => `${i.display} a ${Math.round(i.dist)} metri`);
-        while (refs.length < 3) refs.push("Nessun riferimento");
-        return refs;
-    } catch (e) {
-        console.warn("Errore ricerca nomi", e);
-        return ["Nessun riferimento", "Nessun riferimento", "Nessun riferimento"];
+            contactsGrid.appendChild(btn);
+        });
     }
-}
-async function reverseGeocode(lat, lng) {
-    try {
-        let url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1&accept-language=it`;
-        let resp = await fetch(url, { headers: { 'User-Agent': 'SOSDrive/1.0' } });
-        let data = await resp.json();
-        return data.display_name || "Indirizzo non trovato";
-    } catch (e) { return "Indirizzo non disponibile"; }
-}
-async function getAveragePosition() {
-    return new Promise((resolve, reject) => {
-        let attempts = 0, positions = [];
-        let success = (pos) => {
-            positions.push({ lat: pos.coords.latitude, lng: pos.coords.longitude });
-            attempts++;
-            if (attempts >= 5) {
-                let sumLat = 0, sumLng = 0;
-                positions.forEach(p => { sumLat += p.lat; sumLng += p.lng; });
-                resolve({ lat: sumLat / positions.length, lng: sumLng / positions.length });
-            } else navigator.geolocation.getCurrentPosition(success, error, { enableHighAccuracy: true, timeout: 5000 });
-        };
-        let error = (err) => {
-            if (positions.length) {
-                let sumLat = 0, sumLng = 0;
-                positions.forEach(p => { sumLat += p.lat; sumLng += p.lng; });
-                resolve({ lat: sumLat / positions.length, lng: sumLng / positions.length });
-            } else reject(err);
-        };
-        navigator.geolocation.getCurrentPosition(success, error, { enableHighAccuracy: true, timeout: 5000 });
-    });
-}
-async function getLocationAndAddress() {
-    if (!navigator.geolocation) { gpsStatus.innerHTML = "❌ GPS non supportato"; return; }
-    gpsStatus.innerHTML = "⏳ Acquisizione 5 letture GPS...";
-    try {
-        let avg = await getAveragePosition();
-        gpsStatus.innerHTML = "📍 Elaborazione map matching...";
-        let snapped = await snapToRoad(avg.lat, avg.lng);
-        let finalLat = snapped.lat, finalLng = snapped.lng;
-        let address = await reverseGeocode(finalLat, finalLng);
-        gpsStatus.innerHTML = "🔍 Ricerca luoghi con nome entro 300m...";
-        let [ref1, ref2, ref3] = await fetchAllNamedPlaces(finalLat, finalLng);
-        currentLat = finalLat; currentLng = finalLng; currentAddress = address; currentRefA = ref1; currentRefB = ref2; currentRefC = ref3;
-        latLonDisplay.innerText = `${finalLat.toFixed(6)}, ${finalLng.toFixed(6)}`;
-        addressDisplay.innerText = address;
-        refADisplay.innerText = ref1;
-        refBDisplay.innerText = ref2;
-        refCDisplay.innerText = ref3;
-        gpsStatus.innerHTML = "✅ Posizione e riferimenti aggiornati!";
-        setTimeout(() => gpsStatus.innerHTML = "✅ Pronto.", 3000);
-    } catch (e) { gpsStatus.innerHTML = `❌ Errore GPS: ${e.message}`; }
-}
-function resetCoords() {
-    currentLat = currentLng = null; currentAddress = ""; currentRefA = ""; currentRefB = ""; currentRefC = "";
-    latLonDisplay.innerText = addressDisplay.innerText = refADisplay.innerText = refBDisplay.innerText = refCDisplay.innerText = "---";
-    gpsStatus.innerHTML = "";
-}
 
-// ==================== FUNZIONI NOTE E MODALI ====================
-function openAdaptiveModal() { modalTextarea.value = operatorResponse.value; adaptiveModal.style.display = 'flex'; }
-function closeAdaptiveModal() { adaptiveModal.style.display = 'none'; }
-operatorResponse.addEventListener('click', openAdaptiveModal);
-closeAdaptiveBtn.addEventListener('click', closeAdaptiveModal);
-adaptiveModal.addEventListener('click', (e) => { if (e.target === adaptiveModal) closeAdaptiveModal(); });
-
-function openSpeakDetailModal() {
-    if (!lastItalianText && !lastFrenchTranslation) { alert("Nessuna conversazione recente."); return; }
-    speakOriginalText.innerText = lastItalianText || "";
-    speakTranslatedText.innerText = lastFrenchTranslation || "";
-    speakDetailModal.style.display = 'flex';
-}
-function closeSpeakDetailModal() { speakDetailModal.style.display = 'none'; }
-speakResultField.addEventListener('click', openSpeakDetailModal);
-closeSpeakModalBtn.addEventListener('click', closeSpeakDetailModal);
-speakDetailModal.addEventListener('click', (e) => { if (e.target === speakDetailModal) closeSpeakDetailModal(); });
-
-function saveSpeakTranslation() {
-    if (currentService) localStorage.setItem(`speakTranslation_${currentService}_${CURRENT_VERSION}`, JSON.stringify({ italian: lastItalianText, french: lastFrenchTranslation }));
-}
-function loadSpeakTranslation() {
-    if (currentService) {
-        const saved = localStorage.getItem(`speakTranslation_${currentService}_${CURRENT_VERSION}`);
-        if (saved) {
-            try {
-                const data = JSON.parse(saved);
-                lastItalianText = data.italian || "";
-                lastFrenchTranslation = data.french || "";
-                if (lastItalianText && lastFrenchTranslation) speakResultField.innerHTML = `<strong>Italiano:</strong> ${lastItalianText}<br><strong>Francese:</strong> ${lastFrenchTranslation}`;
-                else speakResultField.innerHTML = "Traduzione Italiana e Francese";
-            } catch (e) { console.warn(e); }
-        } else speakResultField.innerHTML = "Traduzione Italiana e Francese";
+    // ==================== FUNZIONI GEOLOCALIZZAZIONE ====================
+    function haversine(lat1,lng1,lat2,lng2) {
+        const R = 6371e3;
+        const φ1 = lat1 * Math.PI/180, φ2 = lat2 * Math.PI/180;
+        const Δφ = (lat2-lat1) * Math.PI/180, Δλ = (lng2-lng1) * Math.PI/180;
+        const a = Math.sin(Δφ/2)**2 + Math.cos(φ1)*Math.cos(φ2)*Math.sin(Δλ/2)**2;
+        return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
     }
-}
-function clearSpeakTranslation() {
-    lastItalianText = "";
-    lastFrenchTranslation = "";
-    speakResultField.innerHTML = "Traduzione Italiana e Francese";
-    if (currentService) localStorage.removeItem(`speakTranslation_${currentService}_${CURRENT_VERSION}`);
-    speakStatus.innerText = "🧹 Traduzione cancellata";
-    setTimeout(() => { if (speakStatus.innerText === "🧹 Traduzione cancellata") speakStatus.innerText = ""; }, 2000);
-}
-function closeEditModal() {
-    noteEditModal.style.display = 'none';
-    currentEditMode = null;
-    currentEditId = null;
-    editNoteTitle.value = "";
-    editNoteDesc.value = "";
-}
-function openAddNoteModal(type) {
-    currentEditMode = type;
-    currentEditId = null;
-    noteModalTitle.innerText = type === 'normal' ? "➕ Aggiungi Nota Normale" : "➕ Aggiungi Nota Speciale";
-    editNoteTitle.value = "";
-    editNoteDesc.value = "";
-    noteEditModal.style.display = 'flex';
-}
-function openEditNoteModal(type, noteId, currentTitle, currentDesc) {
-    currentEditMode = type;
-    currentEditId = noteId;
-    noteModalTitle.innerText = type === 'normal' ? "✏️ Modifica Nota Normale" : "✏️ Modifica Nota Speciale";
-    editNoteTitle.value = currentTitle || "";
-    editNoteDesc.value = currentDesc || "";
-    noteEditModal.style.display = 'flex';
-}
-function saveNoteFromModal() {
-    const title = editNoteTitle.value.trim();
-    const description = editNoteDesc.value.trim();
-    if (title === "") { alert("Il titolo non può essere vuoto."); return; }
-    if (currentEditId === null) {
-        const newId = Date.now() + Math.floor(Math.random() * 10000);
-        if (currentEditMode === 'normal') {
-            normalNotes[currentService].push({ id: newId, title: title, description: description });
-            if (normalNotes[currentService].length === 1) selectedNormalNoteId = String(newId);
-            saveNormalNotesForService(currentService);
-            renderNormalNotes();
-            gpsStatus.innerHTML = "✅ Nota normale aggiunta";
-        } else {
-            specialNotes[currentService].push({ id: newId, title: title, description: description });
-            if (specialNotes[currentService].length === 1) selectedSpecialNoteId = String(newId);
-            saveSpecialNotesForService(currentService);
-            renderSpecialNotes();
-            gpsStatus.innerHTML = "✅ Nota speciale aggiunta";
-        }
-    } else {
-        if (currentEditMode === 'normal') {
-            const note = normalNotes[currentService].find(n => String(n.id) === currentEditId);
-            if (note) { note.title = title; note.description = description; saveNormalNotesForService(currentService); renderNormalNotes(); gpsStatus.innerHTML = "✅ Nota normale modificata"; }
-        } else {
-            const note = specialNotes[currentService].find(n => String(n.id) === currentEditId);
-            if (note) { note.title = title; note.description = description; saveSpecialNotesForService(currentService); renderSpecialNotes(); gpsStatus.innerHTML = "✅ Nota speciale modificata"; }
-        }
-    }
-    setTimeout(() => gpsStatus.innerHTML = "✅ Pronto.", 2000);
-    closeEditModal();
-}
-cancelNoteBtn.addEventListener('click', closeEditModal);
-saveNoteBtn.addEventListener('click', saveNoteFromModal);
-noteEditModal.addEventListener('click', (e) => { if (e.target === noteEditModal) closeEditModal(); });
-
-function showTemporaryMessage(element, message, duration = 15000) {
-    if (!element) return;
-    element.innerText = message;
-    element.style.display = 'block';
-    if (element._hideTimeout) clearTimeout(element._hideTimeout);
-    element._hideTimeout = setTimeout(() => { element.style.display = 'none'; }, duration);
-}
-
-// ==================== TRADUZIONI ====================
-async function translateToFrench(italianText) {
-    if (!italianText || italianText.trim() === "") return "";
-    try {
-        const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(italianText)}&langpair=it|fr`;
-        const resp = await fetch(url);
-        const data = await resp.json();
-        if (data && data.responseData && data.responseData.translatedText) return data.responseData.translatedText;
-    } catch (e) { console.warn(e); }
-    return italianText;
-}
-async function translateFrenchToItalian(frenchText) {
-    if (!frenchText || frenchText.trim() === "") return "";
-    try {
-        const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(frenchText)}&langpair=fr|it`;
-        const resp = await fetch(url);
-        const data = await resp.json();
-        if (data && data.responseData && data.responseData.translatedText) return data.responseData.translatedText;
-    } catch (e) { console.warn(e); }
-    return frenchText + " (traduzione fallita)";
-}
-
-// ==================== RICONOSCIMENTO VOCALE OPERATORE ====================
-function initRecognitionOperator() {
-    if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
-        transcribeStatus.innerText = "❌ Riconoscimento non supportato";
-        return false;
-    }
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    recognitionOperator = new SpeechRecognition();
-    recognitionOperator.continuous = true;
-    recognitionOperator.interimResults = false;
-    recognitionOperator.lang = 'fr-FR';
-    return true;
-}
-async function startListening30s() {
-    if (!recognitionOperator && !initRecognitionOperator()) return;
-    if (recognitionTimeout) clearTimeout(recognitionTimeout);
-    showTemporaryMessage(listenInfoMsg, "🎤 Ascolto in corso per 30 secondi. La risposta dell'operatore verrà tradotta in italiano.", 15000);
-    transcribeStatus.innerText = "🎤 Ascolto francese per 30 secondi...";
-    recognitionOperator.start();
-    let finalTranscript = "";
-    recognitionOperator.onresult = (event) => {
-        for (let i = event.resultIndex; i < event.results.length; i++) {
-            if (event.results[i].isFinal) finalTranscript += event.results[i][0].transcript + " ";
-        }
-    };
-    recognitionOperator.onerror = (e) => { transcribeStatus.innerText = "❌ Errore microfono: " + e.error; };
-    recognitionOperator.onend = async () => {
-        if (finalTranscript.trim() !== "") {
-            transcribeStatus.innerText = "⏳ Traduzione...";
-            const italian = await translateFrenchToItalian(finalTranscript.trim());
-            if (operatorResponse.value.trim()) operatorResponse.value += "\n---\n" + italian;
-            else operatorResponse.value = italian;
-            saveOperatorTranslation(operatorResponse.value);
-            transcribeStatus.innerText = "✅ Testo tradotto (30s) e salvato permanentemente";
-        } else transcribeStatus.innerText = "⏹️ Nessun parlato";
-        setTimeout(() => { if (transcribeStatus.innerText.includes("Tradotto") || transcribeStatus.innerText.includes("Nessun parlato")) transcribeStatus.innerText = ""; }, 4000);
-    };
-    recognitionTimeout = setTimeout(() => { if (recognitionOperator && recognitionOperator.stop) recognitionOperator.stop(); }, 30000);
-}
-
-// ==================== RICONOSCIMENTO VOCALE (PARLA CON OPERATORE) ====================
-function initRecognitionSpeak() {
-    if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
-        speakStatus.innerText = "❌ Riconoscimento non supportato";
-        return false;
-    }
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    recognitionSpeak = new SpeechRecognition();
-    recognitionSpeak.continuous = true;
-    recognitionSpeak.interimResults = false;
-    recognitionSpeak.lang = 'it-IT';
-    return true;
-}
-async function speakFrenchWithMicroPause(text, langCode = 'fr-FR') {
-    if (!window.speechSynthesis) return;
-    speechSynthesis.cancel();
-    const words = text.split(/\s+/);
-    for (let i = 0; i < words.length; i++) {
-        const word = words[i];
-        const utterance = new SpeechSynthesisUtterance(word);
-        utterance.lang = langCode;
-        utterance.rate = 1.0;
-        speechSynthesis.speak(utterance);
-        await new Promise((resolve) => { utterance.onend = resolve; setTimeout(resolve, 1000); });
-        await new Promise(r => setTimeout(r, 0.1));
-    }
-}
-async function startSpeakingItalian() {
-    if (!recognitionSpeak && !initRecognitionSpeak()) return;
-    speakStatus.innerText = "🎤 Ascolto in corso...";
-    recognitionSpeak.start();
-    let finalTranscript = "";
-    recognitionSpeak.onresult = (event) => {
-        for (let i = event.resultIndex; i < event.results.length; i++) {
-            if (event.results[i].isFinal) finalTranscript += event.results[i][0].transcript + " ";
-        }
-    };
-    recognitionSpeak.onerror = (e) => { speakStatus.innerText = "❌ Errore microfono: " + e.error; };
-    recognitionSpeak.onend = async () => {
-        if (finalTranscript.trim() !== "") {
-            speakStatus.innerText = "⏳ Traduzione in corso...";
-            lastItalianText = finalTranscript.trim();
-            const french = await translateToFrench(lastItalianText);
-            lastFrenchTranslation = french;
-            speakResultField.innerHTML = `<strong>Italiano:</strong> ${lastItalianText}<br><strong>Francese:</strong> ${lastFrenchTranslation}`;
-            speakStatus.innerText = "✅ Testo tradotto. Tocca il campo per visualizzare dettaglio.";
-            showTemporaryMessage(speakStatus, "✅ Traduzione completata.", 15000);
-            saveSpeakTranslation();
-            if (lastFrenchTranslation) await speakFrenchWithMicroPause(lastFrenchTranslation, 'fr-FR');
-        } else {
-            speakStatus.innerText = "⏹️ Nessun parlato rilevato.";
-            speakResultField.innerHTML = "Traduzione Italiana e Francese";
-            lastItalianText = "";
-            lastFrenchTranslation = "";
-            saveSpeakTranslation();
-        }
-    };
-    setTimeout(() => { if (recognitionSpeak && recognitionSpeak.stop) recognitionSpeak.stop(); }, 30000);
-}
-function saveOperatorTranslation(text) {
-    if (currentService) localStorage.setItem(`operatorResponse_${currentService}_${CURRENT_VERSION}`, text);
-}
-function loadOperatorTranslation() {
-    if (currentService) {
-        const saved = localStorage.getItem(`operatorResponse_${currentService}_${CURRENT_VERSION}`);
-        if (saved !== null) operatorResponse.value = saved;
-        else operatorResponse.value = "";
-    }
-}
-function clearOperatorTranslation() {
-    if (currentService) localStorage.removeItem(`operatorResponse_${currentService}_${CURRENT_VERSION}`);
-    operatorResponse.value = "";
-}
-async function requestWakeLock() {
-    if ('wakeLock' in navigator) {
+    async function snapToRoad(lat,lng) {
+        let url = `https://overpass-api.de/api/interpreter?data=[out:json];way(around:50,${lat},${lng})["highway"];out center;`;
         try {
-            wakeLock = await navigator.wakeLock.request('screen');
-            wakeLock.addEventListener('release', () => console.log('WakeLock rilasciato'));
-        } catch (err) { console.warn('WakeLock non supportato:', err); }
+            let resp = await fetch(url);
+            let data = await resp.json();
+            if (!data.elements?.length) return {lat,lng};
+            let way = data.elements[0];
+            let clat = way.center?.lat || way.lat;
+            let clng = way.center?.lon || way.lon;
+            if (clat && clng && haversine(lat,lng,clat,clng) < 50) return {lat:clat, lng:clng};
+            return {lat,lng};
+        } catch(e) { return {lat,lng}; }
     }
-}
-function releaseWakeLock() { if (wakeLock) { wakeLock.release(); wakeLock = null; } }
-function migratePhoneNumbers() {
-    const oldVersions = ["0209", "0208"];
-    for (let s of services) {
-        if (localStorage.getItem(`phone_${s}_${CURRENT_VERSION}`)) continue;
-        for (let ver of oldVersions) {
-            let old = localStorage.getItem(`phone_${s}_${ver}`);
-            if (old) { localStorage.setItem(`phone_${s}_${CURRENT_VERSION}`, old); break; }
+    async function fetchAllNamedPlaces(lat, lng) {
+        const excludeTags = ["information","bench","waste_basket","toilets","telephone","recycling","fountain","drinking_water"];
+        let query = `[out:json];(node(around:300,${lat},${lng})[name];way(around:300,${lat},${lng})[name];);out center;`;
+        let url = `https://overpass-api.de/api/interpreter?data=${encodeURIComponent(query)}`;
+        try {
+            let resp = await fetch(url);
+            let data = await resp.json();
+            if (!data.elements?.length) return [];
+            let items = [];
+            for (let el of data.elements) {
+                let latEl = el.lat || el.center?.lat;
+                let lonEl = el.lon || el.center?.lon;
+                if (!latEl) continue;
+                let tags = el.tags || {};
+                let name = tags.name;
+                if (!name || name.trim() === "") continue;
+                let cat = tags.amenity || tags.shop || tags.tourism || tags.office || tags.leisure || tags.historic || tags.place || tags.aeroway || tags.railway;
+                if (cat && excludeTags.includes(cat)) continue;
+                let dist = haversine(lat, lng, latEl, lonEl);
+                let display = name;
+                if (cat) {
+                    let catMap = {
+                        "pharmacy":"Farmacia","hospital":"Ospedale","police":"Commissariato","post_office":"Posta","bank":"Banca",
+                        "library":"Biblioteca","fire_station":"Caserma","townhall":"Municipio","supermarket":"Supermercato","convenience":"Alimentari",
+                        "cafe":"Bar","restaurant":"Ristorante","pub":"Pub","fast_food":"Fast food","museum":"Museo","monument":"Monumento",
+                        "attraction":"Attrazione","square":"Piazza","garden":"Giardino","park":"Parco","bus_station":"Stazione bus","train_station":"Stazione",
+                        "church":"Chiesa","services":"Area di servizio","motorway_junction":"Uscita autostradale","aeroway":"Aeroporto","railway":"Stazione",
+                        "shop":"Negozio","office":"Ufficio","leisure":"Tempo libero","historic":"Sito storico","place":"Luogo","industrial":"Azienda"
+                    };
+                    let readable = catMap[cat] || (cat.charAt(0).toUpperCase() + cat.slice(1));
+                    display = `${name} (${readable})`;
+                }
+                items.push({ display, dist });
+            }
+            const unique = new Map();
+            for (let item of items) {
+                if (!unique.has(item.display.split(' (')[0])) unique.set(item.display.split(' (')[0], item);
+            }
+            let uniqueItems = Array.from(unique.values());
+            uniqueItems.sort((a,b) => a.dist - b.dist);
+            let refs = uniqueItems.slice(0,3).map(i => `${i.display} a ${Math.round(i.dist)} metri`);
+            while(refs.length < 3) refs.push("Nessun riferimento");
+            return refs;
+        } catch(e) {
+            console.warn("Errore ricerca nomi", e);
+            return ["Nessun riferimento","Nessun riferimento","Nessun riferimento"];
         }
     }
-}
-function savePhone(s, n) { localStorage.setItem(`phone_${s}_${CURRENT_VERSION}`, n); }
-function getPhone(s) { return localStorage.getItem(`phone_${s}_${CURRENT_VERSION}`); }
-const defaultPhone = { ambulanza: "118", polizia: "113", veterinario: "800123456", clinica: "800987654" };
-
-// ==================== PERSISTENZA NOTE ====================
-function getNormalNotesKey(s) { return `normalNotes_${s}_${CURRENT_VERSION}`; }
-function getSpecialNotesKey(s) { return `specialNotes_${s}_${CURRENT_VERSION}`; }
-function getSelectedNormalIdKey(s) { return `selectedNormalNote_${s}_${CURRENT_VERSION}`; }
-function getSelectedSpecialIdKey(s) { return `selectedSpecialNote_${s}_${CURRENT_VERSION}`; }
-function saveNormalNotesForService(s) { localStorage.setItem(getNormalNotesKey(s), JSON.stringify(normalNotes[s])); }
-function saveSpecialNotesForService(s) { localStorage.setItem(getSpecialNotesKey(s), JSON.stringify(specialNotes[s])); }
-function saveSelectedIds() {
-    if (selectedNormalNoteId) localStorage.setItem(getSelectedNormalIdKey(currentService), selectedNormalNoteId);
-    else localStorage.removeItem(getSelectedNormalIdKey(currentService));
-    if (selectedSpecialNoteId) localStorage.setItem(getSelectedSpecialIdKey(currentService), selectedSpecialNoteId);
-    else localStorage.removeItem(getSelectedSpecialIdKey(currentService));
-}
-function loadAllNotes() {
-    for (let s of services) {
-        let storedNormal = localStorage.getItem(getNormalNotesKey(s));
-        normalNotes[s] = storedNormal ? JSON.parse(storedNormal) : [];
-        let storedSpecial = localStorage.getItem(getSpecialNotesKey(s));
-        specialNotes[s] = storedSpecial ? JSON.parse(storedSpecial) : [];
+    async function reverseGeocode(lat,lng) {
+        try {
+            let url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1&accept-language=it`;
+            let resp = await fetch(url, {headers:{'User-Agent':'SOSDrive/1.0'}});
+            let data = await resp.json();
+            return data.display_name || "Indirizzo non trovato";
+        } catch(e) { return "Indirizzo non disponibile"; }
     }
-    if (currentService) loadCurrentServiceNotes();
-}
-function loadCurrentServiceNotes() {
-    if (!currentService) return;
-    let savedNormalId = localStorage.getItem(getSelectedNormalIdKey(currentService));
-    let savedSpecialId = localStorage.getItem(getSelectedSpecialIdKey(currentService));
-    selectedNormalNoteId = (savedNormalId && normalNotes[currentService].some(n => String(n.id) === savedNormalId)) ? savedNormalId : null;
-    selectedSpecialNoteId = (savedSpecialId && specialNotes[currentService].some(n => String(n.id) === savedSpecialId)) ? savedSpecialId : null;
-    renderCurrentNotes();
-}
+    async function getAveragePosition() {
+        return new Promise((resolve,reject) => {
+            let attempts=0, positions=[];
+            let success = (pos) => {
+                positions.push({lat:pos.coords.latitude, lng:pos.coords.longitude});
+                attempts++;
+                if (attempts>=5) {
+                    let sumLat=0, sumLng=0;
+                    positions.forEach(p=>{sumLat+=p.lat; sumLng+=p.lng;});
+                    resolve({lat:sumLat/positions.length, lng:sumLng/positions.length});
+                } else navigator.geolocation.getCurrentPosition(success, error, {enableHighAccuracy:true, timeout:5000});
+            };
+            let error = (err) => {
+                if (positions.length) {
+                    let sumLat=0, sumLng=0;
+                    positions.forEach(p=>{sumLat+=p.lat; sumLng+=p.lng;});
+                    resolve({lat:sumLat/positions.length, lng:sumLng/positions.length});
+                } else reject(err);
+            };
+            navigator.geolocation.getCurrentPosition(success, error, {enableHighAccuracy:true, timeout:5000});
+        });
+    }
+    async function getLocationAndAddress() {
+        if (!navigator.geolocation) { gpsStatus.innerHTML = "❌ GPS non supportato"; return; }
+        gpsStatus.innerHTML = "⏳ Acquisizione 5 letture GPS...";
+        try {
+            let avg = await getAveragePosition();
+            gpsStatus.innerHTML = "📍 Elaborazione map matching...";
+            let snapped = await snapToRoad(avg.lat, avg.lng);
+            let finalLat = snapped.lat, finalLng = snapped.lng;
+            let address = await reverseGeocode(finalLat, finalLng);
+            gpsStatus.innerHTML = "🔍 Ricerca luoghi con nome entro 300m...";
+            let [ref1, ref2, ref3] = await fetchAllNamedPlaces(finalLat, finalLng);
+            currentLat = finalLat; currentLng = finalLng; currentAddress = address; currentRefA = ref1; currentRefB = ref2; currentRefC = ref3;
+            latLonDisplay.innerText = `${finalLat.toFixed(6)}, ${finalLng.toFixed(6)}`;
+            addressDisplay.innerText = address;
+            refADisplay.innerText = ref1;
+            refBDisplay.innerText = ref2;
+            refCDisplay.innerText = ref3;
+            gpsStatus.innerHTML = "✅ Posizione e riferimenti aggiornati!";
+            setTimeout(()=> gpsStatus.innerHTML = "✅ Pronto.", 3000);
+        } catch(e) { gpsStatus.innerHTML = `❌ Errore GPS: ${e.message}`; }
+    }
+    function resetCoords() {
+        currentLat=currentLng=null; currentAddress=""; currentRefA=""; currentRefB=""; currentRefC="";
+        latLonDisplay.innerText = addressDisplay.innerText = refADisplay.innerText = refBDisplay.innerText = refCDisplay.innerText = "---";
+        gpsStatus.innerHTML = "";
+    }
 
-// ==================== RENDER NOTE ====================
-function renderNormalNotes() {
-    const notes = normalNotes[currentService] || [];
-    if (!notes.length) { notesListArea.innerHTML = `<div style="font-size:0.7rem; color:#777;">Nessuna nota normale. Aggiungine una.</div>`; return; }
-    let html = '';
-    notes.forEach((note) => {
-        const isSelected = (String(selectedNormalNoteId) === String(note.id));
-        const titleText = note.title && note.title.trim() !== "" ? note.title : "titolo nota";
-        html += `<div class="note-item" data-id="${note.id}" data-type="normal"><div class="note-row-buttons"><button class="edit-note-btn small-btn note-btn-edit" data-id="${note.id}" data-type="normal">✏️ Modifica</button><button class="delete-note-btn small-btn note-btn-delete" data-id="${note.id}" data-type="normal">🗑️ Cancella</button><button class="confirm-note-btn small-btn note-btn-confirm ${isSelected ? 'selected' : ''}" data-id="${note.id}" data-type="normal"><span class="dot"></span></button></div><div class="note-title-row"><div class="title-badge">Titolo</div><div class="title-field">${escapeHtml(titleText)}</div></div></div>`;
-    });
-    notesListArea.innerHTML = html;
-    document.querySelectorAll('.edit-note-btn[data-type="normal"]').forEach(btn => { btn.removeEventListener('click', handleEditNormal); btn.addEventListener('click', handleEditNormal); });
-    document.querySelectorAll('.delete-note-btn[data-type="normal"]').forEach(btn => { btn.removeEventListener('click', handleDeleteNormal); btn.addEventListener('click', handleDeleteNormal); });
-    document.querySelectorAll('.confirm-note-btn[data-type="normal"]').forEach(btn => { btn.removeEventListener('click', handleNormalConfirm); btn.addEventListener('click', handleNormalConfirm); });
-}
-function handleEditNormal(e) { e.stopPropagation(); const noteId = e.currentTarget.getAttribute('data-id'); const note = normalNotes[currentService].find(n => String(n.id) === noteId); if (note) openEditNoteModal('normal', noteId, note.title, note.description); }
-function handleDeleteNormal(e) { e.stopPropagation(); const noteId = e.currentTarget.getAttribute('data-id'); normalNotes[currentService] = normalNotes[currentService].filter(n => String(n.id) !== noteId); if (String(selectedNormalNoteId) === noteId) selectedNormalNoteId = null; saveNormalNotesForService(currentService); saveSelectedIds(); renderNormalNotes(); gpsStatus.innerHTML = "✅ Nota normale eliminata"; setTimeout(()=> gpsStatus.innerHTML = "✅ Pronto.", 2000); }
-function handleNormalConfirm(e) { e.stopPropagation(); const noteId = e.currentTarget.getAttribute('data-id'); selectNormalNote(noteId); }
-function renderSpecialNotes() {
-    const notes = specialNotes[currentService] || [];
-    if (!notes.length) { specialNotesListArea.innerHTML = `<div style="font-size:0.7rem; color:#777;">Nessuna nota speciale. Aggiungine una.</div>`; return; }
-    let html = '';
-    notes.forEach((note) => {
-        const isSelected = (String(selectedSpecialNoteId) === String(note.id));
-        const titleText = note.title && note.title.trim() !== "" ? note.title : "titolo nota";
-        html += `<div class="special-note-item" data-id="${note.id}" data-type="special"><div class="note-row-buttons"><button class="edit-special-note-btn small-btn note-btn-edit" data-id="${note.id}" data-type="special">✏️ Modifica</button><button class="delete-special-note-btn small-btn note-btn-delete" data-id="${note.id}" data-type="special">🗑️ Cancella</button><button class="confirm-note-btn small-btn note-btn-confirm ${isSelected ? 'selected' : ''}" data-id="${note.id}" data-type="special"><span class="dot"></span></button></div><div class="note-title-row"><div class="title-badge">Titolo</div><div class="title-field">${escapeHtml(titleText)}</div></div></div>`;
-    });
-    specialNotesListArea.innerHTML = html;
-    document.querySelectorAll('.edit-special-note-btn[data-type="special"]').forEach(btn => { btn.removeEventListener('click', handleEditSpecial); btn.addEventListener('click', handleEditSpecial); });
-    document.querySelectorAll('.delete-special-note-btn[data-type="special"]').forEach(btn => { btn.removeEventListener('click', handleDeleteSpecial); btn.addEventListener('click', handleDeleteSpecial); });
-    document.querySelectorAll('.confirm-note-btn[data-type="special"]').forEach(btn => { btn.removeEventListener('click', handleSpecialConfirm); btn.addEventListener('click', handleSpecialConfirm); });
-}
-function handleEditSpecial(e) { e.stopPropagation(); const noteId = e.currentTarget.getAttribute('data-id'); const note = specialNotes[currentService].find(n => String(n.id) === noteId); if (note) openEditNoteModal('special', noteId, note.title, note.description); }
-function handleDeleteSpecial(e) { e.stopPropagation(); const noteId = e.currentTarget.getAttribute('data-id'); specialNotes[currentService] = specialNotes[currentService].filter(n => String(n.id) !== noteId); if (String(selectedSpecialNoteId) === noteId) selectedSpecialNoteId = null; saveSpecialNotesForService(currentService); saveSelectedIds(); renderSpecialNotes(); gpsStatus.innerHTML = "✅ Nota speciale eliminata"; setTimeout(()=> gpsStatus.innerHTML = "✅ Pronto.", 2000); }
-function handleSpecialConfirm(e) { e.stopPropagation(); const noteId = e.currentTarget.getAttribute('data-id'); selectSpecialNote(noteId); }
-function selectNormalNote(noteId) { selectedNormalNoteId = noteId; selectedSpecialNoteId = null; selectedSpecialMode = false; saveSelectedIds(); renderCurrentNotes(); if (normalNoteInfo) showTemporaryMessage(normalNoteInfo, "📌 Nota normale selezionata", 15000); if (specialNoteInfo) specialNoteInfo.style.display = 'none'; }
-function selectSpecialNote(noteId) { selectedSpecialNoteId = noteId; selectedNormalNoteId = null; selectedSpecialMode = true; saveSelectedIds(); renderCurrentNotes(); if (specialNoteInfo) showTemporaryMessage(specialNoteInfo, "✨ Nota speciale selezionata", 15000); if (normalNoteInfo) normalNoteInfo.style.display = 'none'; }
-function renderCurrentNotes() { renderNormalNotes(); renderSpecialNotes(); }
-addNoteBtn.addEventListener('click', () => openAddNoteModal('normal'));
-addSpecialNoteBtn.addEventListener('click', () => openAddNoteModal('special'));
+    // ==================== FUNZIONI NOTE E MODALI ====================
+    function openAdaptiveModal() { modalTextarea.value = operatorResponse.value; adaptiveModal.style.display = 'flex'; }
+    function closeAdaptiveModal() { adaptiveModal.style.display = 'none'; }
+    operatorResponse.addEventListener('click', openAdaptiveModal);
+    closeAdaptiveBtn.addEventListener('click', closeAdaptiveModal);
+    adaptiveModal.addEventListener('click', (e) => { if (e.target === adaptiveModal) closeAdaptiveModal(); });
 
-// ==================== UTILITY FINALI ====================
-function playBeep() { try { let ctx = new (window.AudioContext || window.webkitAudioContext)(); let osc = ctx.createOscillator(); let gain = ctx.createGain(); osc.connect(gain); gain.connect(ctx.destination); osc.frequency.value = 880; gain.gain.value = 0.3; osc.type = "sine"; osc.start(); gain.gain.exponentialRampToValueAtTime(0.00001, ctx.currentTime + 0.8); osc.stop(ctx.currentTime + 0.8); ctx.resume(); } catch(e) { console.warn("beep fallito", e); } }
-async function speakWords(msg, langCode, rate = 1.0, wordPauseMs = 200) { let words = msg.split(/\s+/); for (let w of words) { let u = new SpeechSynthesisUtterance(w); u.lang = langCode; u.rate = rate; speechSynthesis.speak(u); await new Promise(r => setTimeout(r, wordPauseMs)); } }
-async function speakCoords(text, langCode) { let chars = text.split(''); for (let ch of chars) { if (ch === ' ') continue; let word = (ch === '.') ? "punto" : (ch === ',') ? "virgola" : ch; let u = new SpeechSynthesisUtterance(word); u.lang = langCode; u.rate = 1.0; speechSynthesis.speak(u); await new Promise(r => setTimeout(r, 2000)); } }
-async function speakFull(lang) { if (!window.speechSynthesis) { alert(lang === 'it' ? "Sintesi non supportata" : "Synthèse non supportée"); return; } speechSynthesis.cancel(); let note = getSelectedNoteDescription(); let isSpecial = selectedSpecialMode; if (!note) note = (lang === 'it' ? "nessuna nota selezionata" : "aucune note sélectionnée"); let addr = currentAddress || (lang === 'it' ? "non disponibile" : "non disponible"); let refA = currentRefA || (lang === 'it' ? "non disponibile" : "non disponible"); let refB = currentRefB || (lang === 'it' ? "non disponibile" : "non disponible"); let refC = currentRefC || (lang === 'it' ? "non disponibile" : "non disponible"); let coord = (currentLat && currentLng) ? `${currentLat.toFixed(6)}, ${currentLng.toFixed(6)}` : (lang === 'it' ? "non disponibili" : "non disponibles"); if (lang === 'fr') { gpsStatus.innerHTML = "⏳ Traduzione FR..."; note = await translateToFrench(note); if (currentAddress && currentAddress !== "non disponibile") addr = await translateToFrench(currentAddress); if (currentRefA && currentRefA !== "non disponibile") refA = await translateToFrench(currentRefA); if (currentRefB && currentRefB !== "non disponibile") refB = await translateToFrench(currentRefB); if (currentRefC && currentRefC !== "non disponibile") refC = await translateToFrench(currentRefC); gpsStatus.innerHTML = "🔊 Lettura FR..."; } else gpsStatus.innerHTML = "🔊 Lettura IT..."; let intro = (lang === 'it') ? "Attenzione Emergenza sono italiano uso il traduttore mi trovo in Emergenza" : await translateToFrench("Attenzione Emergenza sono italiano uso il traduttore mi trovo in Emergenza"); await speakWords(intro, lang === 'it' ? 'it-IT' : 'fr-FR', 1.0, 200); await speakWords(note, lang === 'it' ? 'it-IT' : 'fr-FR', 1.0, 200); if (!isSpecial) { await speakWords("Coordinate", lang === 'it' ? 'it-IT' : 'fr-FR', 1.0, 200); await speakCoords(coord, lang === 'it' ? 'it-IT' : 'fr-FR'); await speakWords("Indirizzo", lang === 'it' ? 'it-IT' : 'fr-FR', 1.0, 200); await speakWords(addr, lang === 'it' ? 'it-IT' : 'fr-FR', 1.0, 200); await speakWords("Sono vicino a 1", lang === 'it' ? 'it-IT' : 'fr-FR', 1.0, 200); await speakWords(refA, lang === 'it' ? 'it-IT' : 'fr-FR', 1.0, 200); await speakWords("Sono vicino a 2", lang === 'it' ? 'it-IT' : 'fr-FR', 1.0, 200); await speakWords(refB, lang === 'it' ? 'it-IT' : 'fr-FR', 1.0, 200); await speakWords("Sono vicino a 3", lang === 'it' ? 'it-IT' : 'fr-FR', 1.0, 200); await speakWords(refC, lang === 'it' ? 'it-IT' : 'fr-FR', 1.0, 200); } let domanda = (lang === 'it') ? "il tuo messaggio di risposta verrà tradotto parla piano" : await translateToFrench("il tuo messaggio di risposta verrà tradotto parla piano"); await speakWords(domanda, lang === 'it' ? 'it-IT' : 'fr-FR', 1.0, 200); playBeep(); await new Promise(r => setTimeout(r, 800)); gpsStatus.innerHTML = "✅ Messaggio completo. Avvio ascolto operatore (30 secondi)..."; setTimeout(() => startListening30s(), 500); }
-function speakItalian() { speakFull('it'); }
-function speakFrench() { speakFull('fr'); }
-function getSelectedNoteDescription() { if (selectedSpecialMode) return specialNotes[currentService].find(n => String(n.id) === String(selectedSpecialNoteId))?.description || null; else return normalNotes[currentService].find(n => String(n.id) === String(selectedNormalNoteId))?.description || null; }
-function escapeHtml(str) { return str.replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m])); }
-async function getBilingualCopy() { let noteIT = getSelectedNoteDescription() || "nessuna nota"; let coord = (currentLat && currentLng) ? `${currentLat.toFixed(6)}, ${currentLng.toFixed(6)}` : "non disponibili"; let addr = currentAddress || "non disponibile"; let refA = currentRefA || "non disponibile"; let refB = currentRefB || "non disponibile"; let refC = currentRefC || "non disponibile"; let introIT = "Attenzione Emergenza sono italiano uso il traduttore mi trovo in Emergenza"; let domandaIT = "il tuo messaggio di risposta verrà tradotto parla piano"; let italian = `${introIT}\n\n${noteIT}\n\nCoordinate: ${coord}\nIndirizzo: ${addr}\nSono vicino a (1): ${refA}\nSono vicino a (2): ${refB}\nSono vicino a (3): ${refC}\n\n${domandaIT}`; let introFR = await translateToFrench(introIT); let noteFR = await translateToFrench(noteIT); let addrFR = addr === "non disponibile" ? "non disponible" : await translateToFrench(addr); let refAFR = refA === "non disponibile" ? "non disponible" : await translateToFrench(refA); let refBFR = refB === "non disponibile" ? "non disponible" : await translateToFrench(refB); let refCFR = refC === "non disponibile" ? "non disponible" : await translateToFrench(refC); let domandaFR = await translateToFrench(domandaIT); let french = `${introFR}\n\n${noteFR}\n\nCoordonnées: ${coord}\nAdresse: ${addrFR}\nJe suis près de (1): ${refAFR}\nJe suis près de (2): ${refBFR}\nJe suis près de (3): ${refCFR}\n\n${domandaFR}`; return french + "\n\n-----\n\n" + italian; }
-async function copyBilingual() { gpsStatus.innerHTML = "⏳ Preparazione copia..."; let txt = await getBilingualCopy(); try { await navigator.clipboard.writeText(txt); gpsStatus.innerHTML = "📋 Copiato!"; let infoMessage = selectedSpecialMode ? "⚠️ NOTA SPECIALE: copiato solo il testo della nota." : "📋 Copiati: coordinate, indirizzo, riferimenti vicini e la nota selezionata (normale)."; showTemporaryMessage(copyInfoMsg, infoMessage, 15000); setTimeout(() => gpsStatus.innerHTML = "✅ Pronto.", 2000); } catch (e) { let ta = document.createElement('textarea'); ta.value = txt; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta); gpsStatus.innerHTML = "📋 Copiato manualmente"; let infoMessage = selectedSpecialMode ? "⚠️ NOTA SPECIALE: copiato solo il testo della nota." : "📋 Copiati tutti i dati (coordinate, indirizzo, riferimenti, nota)."; showTemporaryMessage(copyInfoMsg, infoMessage, 15000); } }
-function exportAllNotes() { let content = ""; content += "[NUMERI TELEFONO]\n"; for (let s of services) { let phone = getPhone(s) || defaultPhone[s]; content += `${s.toUpperCase()}=${phone}\n`; } content += "\n"; content += "[TESTI CONTATTI]\n"; for (let s of services) { if (s === 'clinica') continue; content += `${s.toUpperCase()}=${contactExtraText[s]}\n`; } content += "\n"; for (let s of services) { content += `[SERVIZIO: ${s.toUpperCase()}]\n`; content += `--- NOTE NORMALI ---\n`; const norm = normalNotes[s] || []; if (norm.length === 0) content += `(nessuna nota normale)\n`; else norm.forEach((note, idx) => { content += `${idx + 1}. Titolo: ${note.title}\n`; content += `   Descrizione: ${note.description}\n`; }); content += `--- NOTE SPECIALI ---\n`; const spec = specialNotes[s] || []; if (spec.length === 0) content += `(nessuna nota speciale)\n`; else spec.forEach((note, idx) => { content += `${idx + 1}. Titolo: ${note.title}\n`; content += `   Descrizione: ${note.description}\n`; }); content += `\n`; } const blob = new Blob([content], { type: 'text/plain' }); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `contatti_personali_notes_backup_${CURRENT_VERSION}.txt`; a.click(); URL.revokeObjectURL(a.href); gpsStatus.innerHTML = "📁 Backup completo salvato (note + contatti)."; setTimeout(() => gpsStatus.innerHTML = "✅ Pronto.", 2000); }
-function importAllNotes(file) { const reader = new FileReader(); reader.onload = (e) => { const content = e.target.result; const lines = content.split(/\r?\n/); let currentServiceImport = null; let currentSection = null; let newNormal = {}, newSpecial = {}; for (let s of services) { newNormal[s] = []; newSpecial[s] = []; } let currentTitle = "", currentDesc = ""; let inPhoneSection = false; let inContactTextSection = false; for (let line of lines) { line = line.trim(); if (line === "[NUMERI TELEFONO]") { inPhoneSection = true; inContactTextSection = false; continue; } if (line === "[TESTI CONTATTI]") { inContactTextSection = true; inPhoneSection = false; continue; } if (inPhoneSection && line.match(/^[A-Z]+=/)) { let [key, value] = line.split('='); let serv = key.toLowerCase(); if (services.includes(serv) && value) savePhone(serv, value); continue; } if (inContactTextSection && line.match(/^[A-Z]+=/)) { let [key, value] = line.split('='); let serv = key.toLowerCase(); if (services.includes(serv) && serv !== 'clinica') { contactExtraText[serv] = value; saveContactExtraText(); } continue; } if (line.startsWith("[SERVIZIO:")) { inPhoneSection = false; inContactTextSection = false; const match = line.match(/\[SERVIZIO:\s*(\w+)\]/i); if (match) { currentServiceImport = match[1].toLowerCase(); if (!services.includes(currentServiceImport)) currentServiceImport = null; } currentSection = null; continue; } if (line === "--- NOTE NORMALI ---") { currentSection = "normal"; continue; } if (line === "--- NOTE SPECIALI ---") { currentSection = "special"; continue; } if (line.startsWith("(nessuna nota") || line === "") continue; const titleMatch = line.match(/^\d+\.\s*Titolo:\s*(.*)/i); if (titleMatch && currentServiceImport && currentSection) { if (currentTitle !== "") { if (currentSection === "normal") { newNormal[currentServiceImport].push({ id: Date.now() + Math.random() * 10000 + newNormal[currentServiceImport].length, title: currentTitle, description: currentDesc }); } else { newSpecial[currentServiceImport].push({ id: Date.now() + Math.random() * 10000 + newSpecial[currentServiceImport].length, title: currentTitle, description: currentDesc }); } } currentTitle = titleMatch[1].trim(); currentDesc = ""; } else if (line.startsWith("   Descrizione:") && currentTitle !== "") { currentDesc = line.replace(/^\s*Descrizione:\s*/, "").trim(); } } if (currentTitle !== "" && currentServiceImport && currentSection) { if (currentSection === "normal") { newNormal[currentServiceImport].push({ id: Date.now() + Math.random() * 10000 + newNormal[currentServiceImport].length, title: currentTitle, description: currentDesc }); } else { newSpecial[currentServiceImport].push({ id: Date.now() + Math.random() * 10000 + newSpecial[currentServiceImport].length, title: currentTitle, description: currentDesc }); } } for (let s of services) { normalNotes[s] = newNormal[s]; specialNotes[s] = newSpecial[s]; saveNormalNotesForService(s); saveSpecialNotesForService(s); } if (currentService) { loadCurrentServiceNotes(); phoneInput.value = getPhone(currentService) || defaultPhone[currentService]; } updateContactButtons(); gpsStatus.innerHTML = "✅ Note, numeri e testi contatti ripristinati da file."; setTimeout(() => gpsStatus.innerHTML = "✅ Pronto.", 2000); }; reader.readAsText(file, "UTF-8"); }
-function showEmergency(s) { if (!licenseCheckPassed) { alert('Licenza non attiva o scaduta. Attivala dalla home.'); return; } currentService = s; let extra = contactExtraText[s]; let label = extra && extra.trim() !== "" ? `Contatto: ${extra}` : "Contatto:"; currentServiceDeco.innerText = label; phoneInput.value = getPhone(s) || defaultPhone[s]; loadCurrentServiceNotes(); loadOperatorTranslation(); loadSpeakTranslation(); resetCoords(); homePage.classList.add("hidden"); emergencyPage.classList.remove("hidden"); phoneSaveMsg.innerText = ""; requestWakeLock(); selectedSpecialMode = false; if (normalNoteInfo) normalNoteInfo.style.display = 'none'; if (specialNoteInfo) specialNoteInfo.style.display = 'none'; if (listenInfoMsg) listenInfoMsg.style.display = 'none'; if (copyInfoMsg) copyInfoMsg.style.display = 'none'; }
-function onSaveNumber() { let n = phoneInput.value.trim(); if (n) { savePhone(currentService, n); phoneSaveMsg.innerText = "✅ Numero salvato nell'archivio"; setTimeout(() => phoneSaveMsg.innerText = "", 2000); } else phoneSaveMsg.innerText = "⚠️ Inserisci un numero valido"; }
-function onClearResponse() { operatorResponse.value = ""; clearOperatorTranslation(); transcribeStatus.innerText = "🧹 Traduzione cancellata"; setTimeout(() => transcribeStatus.innerText = "", 2000); }
-function backHome() { emergencyPage.classList.add("hidden"); homePage.classList.remove("hidden"); currentService = null; releaseWakeLock(); }
-function init() { loadAdminCode(); loadAllNotes(); loadContactExtraText(); migratePhoneNumbers(); initHomeButtons(); saveNumberBtn.addEventListener('click', onSaveNumber); googleMapsBtn.addEventListener('click', () => window.open("https://maps.google.com", "_blank")); geolocationBtn.addEventListener('click', getLocationAndAddress); copyNoteBtn.addEventListener('click', copyBilingual); audioItBtn.addEventListener('click', speakItalian); audioFrBtn.addEventListener('click', speakFrench); backHomeBtn.addEventListener('click', backHome); listenResponseBtn.addEventListener('click', startListening30s); clearResponseBtn.addEventListener('click', onClearResponse); speakToOperatorBtn.addEventListener('click', startSpeakingItalian); clearSpeakBtn.addEventListener('click', clearSpeakTranslation); exportAllBtn.addEventListener('click', exportAllNotes); importAllBtn.addEventListener('click', () => globalImportFileInput.click()); globalImportFileInput.addEventListener('change', (e) => { if (e.target.files.length) importAllNotes(e.target.files[0]); globalImportFileInput.value = ''; }); initRecognitionOperator(); initRecognitionSpeak(); initLicense(); activateLicenseBtn.addEventListener('click', onActivateLicense); copyRequestBtn.addEventListener('click', copyRequest); }
-init();
+    function openSpeakDetailModal() {
+        if (!lastItalianText && !lastFrenchTranslation) { alert("Nessuna conversazione recente."); return; }
+        speakOriginalText.innerText = lastItalianText || ""; speakTranslatedText.innerText = lastFrenchTranslation || "";
+        speakDetailModal.style.display = 'flex';
+    }
+    function closeSpeakDetailModal() { speakDetailModal.style.display = 'none'; }
+    speakResultField.addEventListener('click', openSpeakDetailModal);
+    closeSpeakModalBtn.addEventListener('click', closeSpeakDetailModal);
+    speakDetailModal.addEventListener('click', (e) => { if (e.target === speakDetailModal) closeSpeakDetailModal(); });
+
+    function saveSpeakTranslation() {
+        if (currentService) localStorage.setItem(`speakTranslation_${currentService}_${CURRENT_VERSION}`, JSON.stringify({ italian: lastItalianText, french: lastFrenchTranslation }));
+    }
+    function loadSpeakTranslation() {
+        if (currentService) {
+            const saved = localStorage.getItem(`speakTranslation_${currentService}_${CURRENT_VERSION}`);
+            if (saved) {
+                try {
+                    const data = JSON.parse(saved);
+                    lastItalianText = data.italian || ""; lastFrenchTranslation = data.french || "";
+                    if (lastItalianText && lastFrenchTranslation) speakResultField.innerHTML = `<strong>Italiano:</strong> ${lastItalianText}<br><strong>Francese:</strong> ${lastFrenchTranslation}`;
+                    else speakResultField.innerHTML = "Traduzione Italiana e Francese";
+                } catch(e) { console.warn(e); }
+            } else speakResultField.innerHTML = "Traduzione Italiana e Francese";
+        }
+    }
+    function clearSpeakTranslation() {
+        lastItalianText = ""; lastFrenchTranslation = "";
+        speakResultField.innerHTML = "Traduzione Italiana e Francese";
+        if (currentService) localStorage.removeItem(`speakTranslation_${currentService}_${CURRENT_VERSION}`);
+        speakStatus.innerText = "🧹 Traduzione cancellata";
+        setTimeout(() => { if (speakStatus.innerText === "🧹 Traduzione cancellata") speakStatus.innerText = ""; }, 2000);
+    }
+
+    function closeEditModal() {
+        noteEditModal.style.display = 'none';
+        currentEditMode = null; currentEditId = null;
+        editNoteTitle.value = ""; editNoteDesc.value = "";
+    }
+    function openAddNoteModal(type) {
+        currentEditMode = type; currentEditId = null;
+        noteModalTitle.innerText = type === 'normal' ? "➕ Aggiungi Nota Normale" : "➕ Aggiungi Nota Speciale";
+        editNoteTitle.value = ""; editNoteDesc.value = "";
+        noteEditModal.style.display = 'flex';
+    }
+    function openEditNoteModal(type, noteId, currentTitle, currentDesc) {
+        currentEditMode = type; currentEditId = noteId;
+        noteModalTitle.innerText = type === 'normal' ? "✏️ Modifica Nota Normale" : "✏️ Modifica Nota Speciale";
+        editNoteTitle.value = currentTitle || ""; editNoteDesc.value = currentDesc || "";
+        noteEditModal.style.display = 'flex';
+    }
+    function saveNoteFromModal() {
+        const title = editNoteTitle.value.trim();
+        const description = editNoteDesc.value.trim();
+        if (title === "") { alert("Il titolo non può essere vuoto."); return; }
+        if (currentEditId === null) {
+            const newId = Date.now() + Math.floor(Math.random() * 10000);
+            if (currentEditMode === 'normal') {
+                normalNotes[currentService].push({ id: newId, title: title, description: description });
+                if (normalNotes[currentService].length === 1) selectedNormalNoteId = String(newId);
+                saveNormalNotesForService(currentService);
+                renderNormalNotes();
+                gpsStatus.innerHTML = "✅ Nota normale aggiunta";
+            } else {
+                specialNotes[currentService].push({ id: newId, title: title, description: description });
+                if (specialNotes[currentService].length === 1) selectedSpecialNoteId = String(newId);
+                saveSpecialNotesForService(currentService);
+                renderSpecialNotes();
+                gpsStatus.innerHTML = "✅ Nota speciale aggiunta";
+            }
+        } else {
+            if (currentEditMode === 'normal') {
+                const note = normalNotes[currentService].find(n => String(n.id) === currentEditId);
+                if (note) { note.title = title; note.description = description; saveNormalNotesForService(currentService); renderNormalNotes(); gpsStatus.innerHTML = "✅ Nota normale modificata"; }
+            } else {
+                const note = specialNotes[currentService].find(n => String(n.id) === currentEditId);
+                if (note) { note.title = title; note.description = description; saveSpecialNotesForService(currentService); renderSpecialNotes(); gpsStatus.innerHTML = "✅ Nota speciale modificata"; }
+            }
+        }
+        setTimeout(()=> gpsStatus.innerHTML = "✅ Pronto.", 2000);
+        closeEditModal();
+    }
+    cancelNoteBtn.addEventListener('click', closeEditModal);
+    saveNoteBtn.addEventListener('click', saveNoteFromModal);
+    noteEditModal.addEventListener('click', (e) => { if (e.target === noteEditModal) closeEditModal(); });
+
+    function showTemporaryMessage(element, message, duration = 15000) {
+        if (!element) return;
+        element.innerText = message;
+        element.style.display = 'block';
+        if (element._hideTimeout) clearTimeout(element._hideTimeout);
+        element._hideTimeout = setTimeout(() => { element.style.display = 'none'; }, duration);
+    }
+
+    // ==================== FUNZIONI TRADUZIONE ====================
+    async function translateToFrench(italianText) {
+        if (!italianText || italianText.trim() === "") return "";
+        try {
+            const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(italianText)}&langpair=it|fr`;
+            const resp = await fetch(url);
+            const data = await resp.json();
+            if (data && data.responseData && data.responseData.translatedText) return data.responseData.translatedText;
+        } catch(e) { console.warn(e); }
+        return italianText;
+    }
+    async function translateFrenchToItalian(frenchText) {
+        if (!frenchText || frenchText.trim() === "") return "";
+        try {
+            const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(frenchText)}&langpair=fr|it`;
+            const resp = await fetch(url);
+            const data = await resp.json();
+            if (data && data.responseData && data.responseData.translatedText) return data.responseData.translatedText;
+        } catch(e) { console.warn(e); }
+        return frenchText + " (traduzione fallita)";
+    }
+
+    // ==================== RICONOSCIMENTO VOCALE (operatore) ====================
+    function initRecognitionOperator() {
+        if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+            transcribeStatus.innerText = "❌ Riconoscimento non supportato";
+            return false;
+        }
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        recognitionOperator = new SpeechRecognition();
+        recognitionOperator.continuous = true;
+        recognitionOperator.interimResults = false;
+        recognitionOperator.lang = 'fr-FR';
+        return true;
+    }
+    async function startListening30s() {
+        if (!recognitionOperator && !initRecognitionOperator()) return;
+        if (recognitionTimeout) clearTimeout(recognitionTimeout);
+        showTemporaryMessage(listenInfoMsg, "🎤 Ascolto in corso per 30 secondi. La risposta dell'operatore verrà tradotta in italiano.", 15000);
+        transcribeStatus.innerText = "🎤 Ascolto francese per 30 secondi...";
+        recognitionOperator.start();
+        let finalTranscript = "";
+        recognitionOperator.onresult = (event) => {
+            for (let i = event.resultIndex; i < event.results.length; i++) {
+                if (event.results[i].isFinal) finalTranscript += event.results[i][0].transcript + " ";
+            }
+        };
+        recognitionOperator.onerror = (e) => { transcribeStatus.innerText = "❌ Errore microfono: " + e.error; };
+        recognitionOperator.onend = async () => {
+            if (finalTranscript.trim() !== "") {
+                transcribeStatus.innerText = "⏳ Traduzione...";
+                const italian = await translateFrenchToItalian(finalTranscript.trim());
+                if (operatorResponse.value.trim()) operatorResponse.value += "\n---\n" + italian;
+                else operatorResponse.value = italian;
+                saveOperatorTranslation(operatorResponse.value);
+                transcribeStatus.innerText = "✅ Testo tradotto (30s) e salvato permanentemente";
+            } else transcribeStatus.innerText = "⏹️ Nessun parlato";
+            setTimeout(() => { if (transcribeStatus.innerText.includes("Tradotto") || transcribeStatus.innerText.includes("Nessun parlato")) transcribeStatus.innerText = ""; }, 4000);
+        };
+        recognitionTimeout = setTimeout(() => { if (recognitionOperator && recognitionOperator.stop) recognitionOperator.stop(); }, 30000);
+    }
+
+    // ==================== RICONOSCIMENTO VOCALE (parla con operatore) ====================
+    function initRecognitionSpeak() {
+        if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+            speakStatus.innerText = "❌ Riconoscimento non supportato";
+            return false;
+        }
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        recognitionSpeak = new SpeechRecognition();
+        recognitionSpeak.continuous = true;
+        recognitionSpeak.interimResults = false;
+        recognitionSpeak.lang = 'it-IT';
+        return true;
+    }
+    async function speakFrenchWithMicroPause(text, langCode = 'fr-FR') {
+        if (!window.speechSynthesis) return;
+        speechSynthesis.cancel();
+        const words = text.split(/\s+/);
+        for (let i = 0; i < words.length; i++) {
+            const word = words[i];
+            const utterance = new SpeechSynthesisUtterance(word);
+            utterance.lang = langCode;
+            utterance.rate = 1.0;
+            speechSynthesis.speak(utterance);
+            await new Promise((resolve) => { utterance.onend = resolve; setTimeout(resolve, 1000); });
+            await new Promise(r => setTimeout(r, 0.1));
+        }
+    }
+    async function startSpeakingItalian() {
+        if (!recognitionSpeak && !initRecognitionSpeak()) return;
+        speakStatus.innerText = "🎤 Ascolto in corso...";
+        recognitionSpeak.start();
+        let finalTranscript = "";
+        recognitionSpeak.onresult = (event) => {
+            for (let i = event.resultIndex; i < event.results.length; i++) {
+                if (event.results[i].isFinal) finalTranscript += event.results[i][0].transcript + " ";
+            }
+        };
+        recognitionSpeak.onerror = (e) => { speakStatus.innerText = "❌ Errore microfono: " + e.error; };
+        recognitionSpeak.onend = async () => {
+            if (finalTranscript.trim() !== "") {
+                speakStatus.innerText = "⏳ Traduzione in corso...";
+                lastItalianText = finalTranscript.trim();
+                const french = await translateToFrench(lastItalianText);
+                lastFrenchTranslation = french;
+                speakResultField.innerHTML = `<strong>Italiano:</strong> ${lastItalianText}<br><strong>Francese:</strong> ${lastFrenchTranslation}`;
+                speakStatus.innerText = "✅ Testo tradotto. Tocca il campo per visualizzare dettaglio.";
+                showTemporaryMessage(speakStatus, "✅ Traduzione completata.", 15000);
+                saveSpeakTranslation();
+                if (lastFrenchTranslation) await speakFrenchWithMicroPause(lastFrenchTranslation, 'fr-FR');
+            } else {
+                speakStatus.innerText = "⏹️ Nessun parlato rilevato.";
+                speakResultField.innerHTML = "Traduzione Italiana e Francese";
+                lastItalianText = "";
+                lastFrenchTranslation = "";
+                saveSpeakTranslation();
+            }
+        };
+        setTimeout(() => { if (recognitionSpeak && recognitionSpeak.stop) recognitionSpeak.stop(); }, 30000);
+    }
+
+    function saveOperatorTranslation(text) {
+        if (currentService) localStorage.setItem(`operatorResponse_${currentService}_${CURRENT_VERSION}`, text);
+    }
+    function loadOperatorTranslation() {
+        if (currentService) {
+            const saved = localStorage.getItem(`operatorResponse_${currentService}_${CURRENT_VERSION}`);
+            if (saved !== null) operatorResponse.value = saved;
+            else operatorResponse.value = "";
+        }
+    }
+    function clearOperatorTranslation() {
+        if (currentService) localStorage.removeItem(`operatorResponse_${currentService}_${CURRENT_VERSION}`);
+        operatorResponse.value = "";
+    }
+
+    async function requestWakeLock() {
+        if ('wakeLock' in navigator) {
+            try {
+                wakeLock = await navigator.wakeLock.request('screen');
+                wakeLock.addEventListener('release', () => console.log('WakeLock rilasciato'));
+            } catch(err) { console.warn('WakeLock non supportato:', err); }
+        }
+    }
+    function releaseWakeLock() { if (wakeLock) { wakeLock.release(); wakeLock = null; } }
+
+    function migratePhoneNumbers() {
+        const oldVersions = ["0209", "0208", "0207"];
+        for (let s of services) {
+            if (localStorage.getItem(`phone_${s}_${CURRENT_VERSION}`)) continue;
+            for (let ver of oldVersions) {
+                let old = localStorage.getItem(`phone_${s}_${ver}`);
+                if (old) { localStorage.setItem(`phone_${s}_${CURRENT_VERSION}`, old); break; }
+            }
+        }
+    }
+    function savePhone(s,n) { localStorage.setItem(`phone_${s}_${CURRENT_VERSION}`, n); }
+    function getPhone(s) { return localStorage.getItem(`phone_${s}_${CURRENT_VERSION}`); }
+    const defaultPhone = { ambulanza:"118", polizia:"113", veterinario:"800123456", clinica:"800987654" };
+
+    // ==================== PERSISTENZA NOTE ====================
+    function getNormalNotesKey(s) { return `normalNotes_${s}_${CURRENT_VERSION}`; }
+    function getSpecialNotesKey(s) { return `specialNotes_${s}_${CURRENT_VERSION}`; }
+    function getSelectedNormalIdKey(s) { return `selectedNormalNote_${s}_${CURRENT_VERSION}`; }
+    function getSelectedSpecialIdKey(s) { return `selectedSpecialNote_${s}_${CURRENT_VERSION}`; }
+    function saveNormalNotesForService(s) { localStorage.setItem(getNormalNotesKey(s), JSON.stringify(normalNotes[s])); }
+    function saveSpecialNotesForService(s) { localStorage.setItem(getSpecialNotesKey(s), JSON.stringify(specialNotes[s])); }
+    function saveSelectedIds() {
+        if (selectedNormalNoteId) localStorage.setItem(getSelectedNormalIdKey(currentService), selectedNormalNoteId);
+        else localStorage.removeItem(getSelectedNormalIdKey(currentService));
+        if (selectedSpecialNoteId) localStorage.setItem(getSelectedSpecialIdKey(currentService), selectedSpecialNoteId);
+        else localStorage.removeItem(getSelectedSpecialIdKey(currentService));
+    }
+    function loadAllNotes() {
+        for (let s of services) {
+            let storedNormal = localStorage.getItem(getNormalNotesKey(s));
+            normalNotes[s] = storedNormal ? JSON.parse(storedNormal) : [];
+            let storedSpecial = localStorage.getItem(getSpecialNotesKey(s));
+            specialNotes[s] = storedSpecial ? JSON.parse(storedSpecial) : [];
+        }
+        if (currentService) loadCurrentServiceNotes();
+    }
+    function loadCurrentServiceNotes() {
+        if (!currentService) return;
+        let savedNormalId = localStorage.getItem(getSelectedNormalIdKey(currentService));
+        let savedSpecialId = localStorage.getItem(getSelectedSpecialIdKey(currentService));
+        selectedNormalNoteId = (savedNormalId && normalNotes[currentService].some(n => String(n.id) === savedNormalId)) ? savedNormalId : null;
+        selectedSpecialNoteId = (savedSpecialId && specialNotes[currentService].some(n => String(n.id) === savedSpecialId)) ? savedSpecialId : null;
+        renderCurrentNotes();
+    }
+
+    // ==================== RENDER NOTE ====================
+    function renderNormalNotes() {
+        const notes = normalNotes[currentService] || [];
+        if (!notes.length) { notesListArea.innerHTML = `<div style="font-size:0.7rem; color:#777;">Nessuna nota normale. Aggiungine una.</div>`; return; }
+        let html = '';
+        notes.forEach((note, idx) => {
+            const isSelected = (String(selectedNormalNoteId) === String(note.id));
+            const titleText = note.title && note.title.trim() !== "" ? note.title : "titolo nota";
+            html += `<div class="note-item" data-id="${note.id}" data-type="normal"><div class="note-row-buttons"><button class="edit-note-btn small-btn note-btn-edit" data-id="${note.id}" data-type="normal">✏️ Modifica</button><button class="delete-note-btn small-btn note-btn-delete" data-id="${note.id}" data-type="normal">🗑️ Cancella</button><button class="confirm-note-btn small-btn note-btn-confirm ${isSelected ? 'selected' : ''}" data-id="${note.id}" data-type="normal"><span class="dot"></span></button></div><div class="note-title-row"><div class="title-badge">Titolo</div><div class="title-field">${escapeHtml(titleText)}</div></div></div>`;
+        });
+        notesListArea.innerHTML = html;
+        document.querySelectorAll('.edit-note-btn[data-type="normal"]').forEach(btn => { btn.removeEventListener('click', handleEditNormal); btn.addEventListener('click', handleEditNormal); });
+        document.querySelectorAll('.delete-note-btn[data-type="normal"]').forEach(btn => { btn.removeEventListener('click', handleDeleteNormal); btn.addEventListener('click', handleDeleteNormal); });
+        document.querySelectorAll('.confirm-note-btn[data-type="normal"]').forEach(btn => { btn.removeEventListener('click', handleNormalConfirm); btn.addEventListener('click', handleNormalConfirm); });
+    }
+    function handleEditNormal(e) { e.stopPropagation(); const noteId = e.currentTarget.getAttribute('data-id'); const note = normalNotes[currentService].find(n => String(n.id) === noteId); if (note) openEditNoteModal('normal', noteId, note.title, note.description); }
+    function handleDeleteNormal(e) { e.stopPropagation(); const noteId = e.currentTarget.getAttribute('data-id'); normalNotes[currentService] = normalNotes[currentService].filter(n => String(n.id) !== noteId); if (String(selectedNormalNoteId) === noteId) selectedNormalNoteId = null; saveNormalNotesForService(currentService); saveSelectedIds(); renderNormalNotes(); gpsStatus.innerHTML = "✅ Nota normale eliminata"; setTimeout(()=> gpsStatus.innerHTML = "✅ Pronto.", 2000); }
+    function handleNormalConfirm(e) { e.stopPropagation(); const noteId = e.currentTarget.getAttribute('data-id'); selectNormalNote(noteId); }
+    function renderSpecialNotes() {
+        const notes = specialNotes[currentService] || [];
+        if (!notes.length) { specialNotesListArea.innerHTML = `<div style="font-size:0.7rem; color:#777;">Nessuna nota speciale. Aggiungine una.</div>`; return; }
+        let html = '';
+        notes.forEach((note, idx) => {
+            const isSelected = (String(selectedSpecialNoteId) === String(note.id));
+            const titleText = note.title && note.title.trim() !== "" ? note.title : "titolo nota";
+            html += `<div class="special-note-item" data-id="${note.id}" data-type="special"><div class="note-row-buttons"><button class="edit-special-note-btn small-btn note-btn-edit" data-id="${note.id}" data-type="special">✏️ Modifica</button><button class="delete-special-note-btn small-btn note-btn-delete" data-id="${note.id}" data-type="special">🗑️ Cancella</button><button class="confirm-note-btn small-btn note-btn-confirm ${isSelected ? 'selected' : ''}" data-id="${note.id}" data-type="special"><span class="dot"></span></button></div><div class="note-title-row"><div class="title-badge">Titolo</div><div class="title-field">${escapeHtml(titleText)}</div></div></div>`;
+        });
+        specialNotesListArea.innerHTML = html;
+        document.querySelectorAll('.edit-special-note-btn[data-type="special"]').forEach(btn => { btn.removeEventListener('click', handleEditSpecial); btn.addEventListener('click', handleEditSpecial); });
+        document.querySelectorAll('.delete-special-note-btn[data-type="special"]').forEach(btn => { btn.removeEventListener('click', handleDeleteSpecial); btn.addEventListener('click', handleDeleteSpecial); });
+        document.querySelectorAll('.confirm-note-btn[data-type="special"]').forEach(btn => { btn.removeEventListener('click', handleSpecialConfirm); btn.addEventListener('click', handleSpecialConfirm); });
+    }
+    function handleEditSpecial(e) { e.stopPropagation(); const noteId = e.currentTarget.getAttribute('data-id'); const note = specialNotes[currentService].find(n => String(n.id) === noteId); if (note) openEditNoteModal('special', noteId, note.title, note.description); }
+    function handleDeleteSpecial(e) { e.stopPropagation(); const noteId = e.currentTarget.getAttribute('data-id'); specialNotes[currentService] = specialNotes[currentService].filter(n => String(n.id) !== noteId); if (String(selectedSpecialNoteId) === noteId) selectedSpecialNoteId = null; saveSpecialNotesForService(currentService); saveSelectedIds(); renderSpecialNotes(); gpsStatus.innerHTML = "✅ Nota speciale eliminata"; setTimeout(()=> gpsStatus.innerHTML = "✅ Pronto.", 2000); }
+    function handleSpecialConfirm(e) { e.stopPropagation(); const noteId = e.currentTarget.getAttribute('data-id'); selectSpecialNote(noteId); }
+    function selectNormalNote(noteId) { selectedNormalNoteId = noteId; selectedSpecialNoteId = null; selectedSpecialMode = false; saveSelectedIds(); renderCurrentNotes(); if (normalNoteInfo) showTemporaryMessage(normalNoteInfo, "📌 Nota normale selezionata", 15000); if (specialNoteInfo) specialNoteInfo.style.display = 'none'; }
+    function selectSpecialNote(noteId) { selectedSpecialNoteId = noteId; selectedNormalNoteId = null; selectedSpecialMode = true; saveSelectedIds(); renderCurrentNotes(); if (specialNoteInfo) showTemporaryMessage(specialNoteInfo, "✨ Nota speciale selezionata", 15000); if (normalNoteInfo) normalNoteInfo.style.display = 'none'; }
+    function renderCurrentNotes() { renderNormalNotes(); renderSpecialNotes(); }
+    addNoteBtn.addEventListener('click', () => openAddNoteModal('normal'));
+    addSpecialNoteBtn.addEventListener('click', () => openAddNoteModal('special'));
+
+    // ==================== FUNZIONI UTILITY FINALI ====================
+    function playBeep() { try { let ctx = new (window.AudioContext || window.webkitAudioContext)(); let osc = ctx.createOscillator(); let gain = ctx.createGain(); osc.connect(gain); gain.connect(ctx.destination); osc.frequency.value = 880; gain.gain.value = 0.3; osc.type = "sine"; osc.start(); gain.gain.exponentialRampToValueAtTime(0.00001, ctx.currentTime + 0.8); osc.stop(ctx.currentTime + 0.8); ctx.resume(); } catch(e) { console.warn("beep fallito", e); } }
+    async function speakWords(msg, langCode, rate=1.0, wordPauseMs=200) { let words = msg.split(/\s+/); for (let w of words) { let u = new SpeechSynthesisUtterance(w); u.lang = langCode; u.rate = rate; speechSynthesis.speak(u); await new Promise(r=>setTimeout(r, wordPauseMs)); } }
+    async function speakCoords(text, langCode) { let chars = text.split(''); for (let ch of chars) { if (ch === ' ') continue; let word = (ch === '.') ? "punto" : (ch === ',') ? "virgola" : ch; let u = new SpeechSynthesisUtterance(word); u.lang = langCode; u.rate = 1.0; speechSynthesis.speak(u); await new Promise(r=>setTimeout(r, 2000)); } }
+    async function speakFull(lang) { if (!window.speechSynthesis) { alert(lang==='it'?"Sintesi non supportata":"Synthèse non supportée"); return; } speechSynthesis.cancel(); let note = getSelectedNoteDescription(); let isSpecial = selectedSpecialMode; if (!note) note = (lang==='it' ? "nessuna nota selezionata" : "aucune note sélectionnée"); let addr = currentAddress || (lang==='it'?"non disponibile":"non disponible"); let refA = currentRefA || (lang==='it'?"non disponibile":"non disponible"); let refB = currentRefB || (lang==='it'?"non disponibile":"non disponible"); let refC = currentRefC || (lang==='it'?"non disponibile":"non disponible"); let coord = (currentLat && currentLng) ? `${currentLat.toFixed(6)}, ${currentLng.toFixed(6)}` : (lang==='it'?"non disponibili":"non disponibles"); if (lang === 'fr') { gpsStatus.innerHTML = "⏳ Traduzione FR..."; note = await translateToFrench(note); if (currentAddress && currentAddress !== "non disponibile") addr = await translateToFrench(currentAddress); if (currentRefA && currentRefA !== "non disponibile") refA = await translateToFrench(currentRefA); if (currentRefB && currentRefB !== "non disponibile") refB = await translateToFrench(currentRefB); if (currentRefC && currentRefC !== "non disponibile") refC = await translateToFrench(currentRefC); gpsStatus.innerHTML = "🔊 Lettura FR..."; } else gpsStatus.innerHTML = "🔊 Lettura IT..."; let intro = (lang==='it') ? "Attenzione Emergenza sono italiano uso il traduttore mi trovo in Emergenza" : await translateToFrench("Attenzione Emergenza sono italiano uso il traduttore mi trovo in Emergenza"); await speakWords(intro, lang==='it'?'it-IT':'fr-FR', 1.0, 200); await speakWords(note, lang==='it'?'it-IT':'fr-FR', 1.0, 200); if (!isSpecial) { await speakWords("Coordinate", lang==='it'?'it-IT':'fr-FR', 1.0, 200); await speakCoords(coord, lang==='it'?'it-IT':'fr-FR'); await speakWords("Indirizzo", lang==='it'?'it-IT':'fr-FR', 1.0, 200); await speakWords(addr, lang==='it'?'it-IT':'fr-FR', 1.0, 200); await speakWords("Sono vicino a 1", lang==='it'?'it-IT':'fr-FR', 1.0, 200); await speakWords(refA, lang==='it'?'it-IT':'fr-FR', 1.0, 200); await speakWords("Sono vicino a 2", lang==='it'?'it-IT':'fr-FR', 1.0, 200); await speakWords(refB, lang==='it'?'it-IT':'fr-FR', 1.0, 200); await speakWords("Sono vicino a 3", lang==='it'?'it-IT':'fr-FR', 1.0, 200); await speakWords(refC, lang==='it'?'it-IT':'fr-FR', 1.0, 200); } let domanda = (lang==='it') ? "il tuo messaggio di risposta verrà tradotto parla piano" : await translateToFrench("il tuo messaggio di risposta verrà tradotto parla piano"); await speakWords(domanda, lang==='it'?'it-IT':'fr-FR', 1.0, 200); playBeep(); await new Promise(r=>setTimeout(r,800)); gpsStatus.innerHTML = "✅ Messaggio completo. Avvio ascolto operatore (30 secondi)..."; setTimeout(() => startListening30s(), 500); }
+    function speakItalian() { speakFull('it'); }
+    function speakFrench() { speakFull('fr'); }
+    function getSelectedNoteDescription() { if (selectedSpecialMode) return specialNotes[currentService].find(n => String(n.id) === String(selectedSpecialNoteId))?.description || null; else return normalNotes[currentService].find(n => String(n.id) === String(selectedNormalNoteId))?.description || null; }
+    function escapeHtml(str) { return str.replace(/[&<>]/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;' }[m])); }
+    async function getBilingualCopy() { let noteIT = getSelectedNoteDescription() || "nessuna nota"; let coord = (currentLat && currentLng) ? `${currentLat.toFixed(6)}, ${currentLng.toFixed(6)}` : "non disponibili"; let addr = currentAddress || "non disponibile"; let refA = currentRefA || "non disponibile"; let refB = currentRefB || "non disponibile"; let refC = currentRefC || "non disponibile"; let introIT = "Attenzione Emergenza sono italiano uso il traduttore mi trovo in Emergenza"; let domandaIT = "il tuo messaggio di risposta verrà tradotto parla piano"; let italian = `${introIT}\n\n${noteIT}\n\nCoordinate: ${coord}\nIndirizzo: ${addr}\nSono vicino a (1): ${refA}\nSono vicino a (2): ${refB}\nSono vicino a (3): ${refC}\n\n${domandaIT}`; let introFR = await translateToFrench(introIT); let noteFR = await translateToFrench(noteIT); let addrFR = addr === "non disponibile" ? "non disponible" : await translateToFrench(addr); let refAFR = refA === "non disponibile" ? "non disponible" : await translateToFrench(refA); let refBFR = refB === "non disponibile" ? "non disponible" : await translateToFrench(refB); let refCFR = refC === "non disponibile" ? "non disponible" : await translateToFrench(refC); let domandaFR = await translateToFrench(domandaIT); let french = `${introFR}\n\n${noteFR}\n\nCoordonnées: ${coord}\nAdresse: ${addrFR}\nJe suis près de (1): ${refAFR}\nJe suis près de (2): ${refBFR}\nJe suis près de (3): ${refCFR}\n\n${domandaFR}`; return french + "\n\n-----\n\n" + italian; }
+    async function copyBilingual() { gpsStatus.innerHTML = "⏳ Preparazione copia..."; let txt = await getBilingualCopy(); try { await navigator.clipboard.writeText(txt); gpsStatus.innerHTML = "📋 Copiato!"; let infoMessage = selectedSpecialMode ? "⚠️ NOTA SPECIALE: copiato solo il testo della nota." : "📋 Copiati: coordinate, indirizzo, riferimenti vicini e la nota selezionata (normale)."; showTemporaryMessage(copyInfoMsg, infoMessage, 15000); setTimeout(()=> gpsStatus.innerHTML = "✅ Pronto.", 2000); } catch(e) { let ta = document.createElement('textarea'); ta.value = txt; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta); gpsStatus.innerHTML = "📋 Copiato manualmente"; let infoMessage = selectedSpecialMode ? "⚠️ NOTA SPECIALE: copiato solo il testo della nota." : "📋 Copiati tutti i dati (coordinate, indirizzo, riferimenti, nota)."; showTemporaryMessage(copyInfoMsg, infoMessage, 15000); } }
+    function exportAllNotes() { let content = ""; content += "[NUMERI TELEFONO]\n"; for (let s of services) { let phone = getPhone(s) || defaultPhone[s]; content += `${s.toUpperCase()}=${phone}\n`; } content += "\n"; content += "[TESTI CONTATTI]\n"; for (let s of services) { if (s === 'clinica') continue; content += `${s.toUpperCase()}=${contactExtraText[s]}\n`; } content += "\n"; for (let s of services) { content += `[SERVIZIO: ${s.toUpperCase()}]\n`; content += `--- NOTE NORMALI ---\n`; const norm = normalNotes[s] || []; if (norm.length === 0) content += `(nessuna nota normale)\n`; else norm.forEach((note, idx) => { content += `${idx+1}. Titolo: ${note.title}\n`; content += `   Descrizione: ${note.description}\n`; }); content += `--- NOTE SPECIALI ---\n`; const spec = specialNotes[s] || []; if (spec.length === 0) content += `(nessuna nota speciale)\n`; else spec.forEach((note, idx) => { content += `${idx+1}. Titolo: ${note.title}\n`; content += `   Descrizione: ${note.description}\n`; }); content += `\n`; } const blob = new Blob([content], {type: 'text/plain'}); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `contatti_personali_notes_backup_${CURRENT_VERSION}.txt`; a.click(); URL.revokeObjectURL(a.href); gpsStatus.innerHTML = "📁 Backup completo salvato (note + contatti)."; setTimeout(() => gpsStatus.innerHTML = "✅ Pronto.", 2000); }
+    function importAllNotes(file) { const reader = new FileReader(); reader.onload = (e) => { const content = e.target.result; const lines = content.split(/\r?\n/); let currentServiceImport = null; let currentSection = null; let newNormal = {}, newSpecial = {}; for (let s of services) { newNormal[s] = []; newSpecial[s] = []; } let currentTitle = "", currentDesc = ""; let inPhoneSection = false; let inContactTextSection = false; for (let line of lines) { line = line.trim(); if (line === "[NUMERI TELEFONO]") { inPhoneSection = true; inContactTextSection = false; continue; } if (line === "[TESTI CONTATTI]") { inContactTextSection = true; inPhoneSection = false; continue; } if (inPhoneSection && line.match(/^[A-Z]+=/)) { let [key, value] = line.split('='); let serv = key.toLowerCase(); if (services.includes(serv) && value) savePhone(serv, value); continue; } if (inContactTextSection && line.match(/^[A-Z]+=/)) { let [key, value] = line.split('='); let serv = key.toLowerCase(); if (services.includes(serv) && serv !== 'clinica') { contactExtraText[serv] = value; saveContactExtraText(); } continue; } if (line.startsWith("[SERVIZIO:")) { inPhoneSection = false; inContactTextSection = false; const match = line.match(/\[SERVIZIO:\s*(\w+)\]/i); if (match) { currentServiceImport = match[1].toLowerCase(); if (!services.includes(currentServiceImport)) currentServiceImport = null; } currentSection = null; continue; } if (line === "--- NOTE NORMALI ---") { currentSection = "normal"; continue; } if (line === "--- NOTE SPECIALI ---") { currentSection = "special"; continue; } if (line.startsWith("(nessuna nota") || line === "") continue; const titleMatch = line.match(/^\d+\.\s*Titolo:\s*(.*)/i); if (titleMatch && currentServiceImport && currentSection) { if (currentTitle !== "") { if (currentSection === "normal") { newNormal[currentServiceImport].push({ id: Date.now() + Math.random() * 10000 + newNormal[currentServiceImport].length, title: currentTitle, description: currentDesc }); } else { newSpecial[currentServiceImport].push({ id: Date.now() + Math.random() * 10000 + newSpecial[currentServiceImport].length, title: currentTitle, description: currentDesc }); } } currentTitle = titleMatch[1].trim(); currentDesc = ""; } else if (line.startsWith("   Descrizione:") && currentTitle !== "") { currentDesc = line.replace(/^\s*Descrizione:\s*/, "").trim(); } } if (currentTitle !== "" && currentServiceImport && currentSection) { if (currentSection === "normal") { newNormal[currentServiceImport].push({ id: Date.now() + Math.random() * 10000 + newNormal[currentServiceImport].length, title: currentTitle, description: currentDesc }); } else { newSpecial[currentServiceImport].push({ id: Date.now() + Math.random() * 10000 + newSpecial[currentServiceImport].length, title: currentTitle, description: currentDesc }); } } for (let s of services) { normalNotes[s] = newNormal[s]; specialNotes[s] = newSpecial[s]; saveNormalNotesForService(s); saveSpecialNotesForService(s); } if (currentService) { loadCurrentServiceNotes(); phoneInput.value = getPhone(currentService) || defaultPhone[currentService]; } updateContactButtons(); gpsStatus.innerHTML = "✅ Note, numeri e testi contatti ripristinati da file."; setTimeout(() => gpsStatus.innerHTML = "✅ Pronto.", 2000); }; reader.readAsText(file, "UTF-8"); }
+    function showEmergency(s) { if (!licenseCheckPassed) { alert('Licenza non attiva o scaduta. Attivala dalla home.'); return; } currentService = s; let extra = contactExtraText[s]; let label = extra && extra.trim() !== "" ? `Contatto: ${extra}` : "Contatto:"; currentServiceDeco.innerText = label; phoneInput.value = getPhone(s) || defaultPhone[s]; loadCurrentServiceNotes(); loadOperatorTranslation(); loadSpeakTranslation(); resetCoords(); homePage.classList.add("hidden"); emergencyPage.classList.remove("hidden"); phoneSaveMsg.innerText = ""; requestWakeLock(); selectedSpecialMode = false; if (normalNoteInfo) normalNoteInfo.style.display = 'none'; if (specialNoteInfo) specialNoteInfo.style.display = 'none'; if (listenInfoMsg) listenInfoMsg.style.display = 'none'; if (copyInfoMsg) copyInfoMsg.style.display = 'none'; }
+    function onSaveNumber() { let n = phoneInput.value.trim(); if (n) { savePhone(currentService, n); phoneSaveMsg.innerText = "✅ Numero salvato nell'archivio"; setTimeout(()=>phoneSaveMsg.innerText="",2000); } else phoneSaveMsg.innerText = "⚠️ Inserisci un numero valido"; }
+    function onClearResponse() { operatorResponse.value = ""; clearOperatorTranslation(); transcribeStatus.innerText = "🧹 Traduzione cancellata"; setTimeout(() => transcribeStatus.innerText = "", 2000); }
+    function backHome() { emergencyPage.classList.add("hidden"); homePage.classList.remove("hidden"); currentService = null; releaseWakeLock(); }
+    function init() { loadAdminCode(); loadAllNotes(); loadContactExtraText(); migratePhoneNumbers(); initHomeButtons(); saveNumberBtn.addEventListener('click', onSaveNumber); googleMapsBtn.addEventListener('click', () => window.open("https://maps.google.com", "_blank")); geolocationBtn.addEventListener('click', getLocationAndAddress); copyNoteBtn.addEventListener('click', copyBilingual); audioItBtn.addEventListener('click', speakItalian); audioFrBtn.addEventListener('click', speakFrench); backHomeBtn.addEventListener('click', backHome); listenResponseBtn.addEventListener('click', startListening30s); clearResponseBtn.addEventListener('click', onClearResponse); speakToOperatorBtn.addEventListener('click', startSpeakingItalian); clearSpeakBtn.addEventListener('click', clearSpeakTranslation); exportAllBtn.addEventListener('click', exportAllNotes); importAllBtn.addEventListener('click', () => globalImportFileInput.click()); globalImportFileInput.addEventListener('change', (e) => { if (e.target.files.length) importAllNotes(e.target.files[0]); globalImportFileInput.value = ''; }); initRecognitionOperator(); initRecognitionSpeak(); initLicense(); activateLicenseBtn.addEventListener('click', onActivateLicense); copyRequestBtn.addEventListener('click', copyRequest); }
+    init();
 </script>
 </body>
 </html>
