@@ -3,10 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
-    <title>Contatti Personali - v0210</title>
-    <!-- PWA manifest -->
+    <title>Contatti Personali - v0211</title>
     <link rel="manifest" href="manifest.json">
-    <!-- iOS support -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Contatti">
@@ -41,15 +39,15 @@
         .hidden {
             display: none !important;
         }
-        /* Disabilita selezione e menu contestuale su tutti i pulsanti e aree tappabili */
+        /* Disabilita selezione e menu contestuale su tutti i tasti e testi */
         button, .big-btn, .small-btn, .title-btn, .speak-field, .note-title-row, .confirm-note-btn,
         .edit-note-btn, .delete-note-btn, .add-note-btn, .back-home, .export-import-row button,
-        #loadImageBtn, .uploaded-image, .image-container img {
+        #loadImageBtn, .uploaded-image, .image-container img, .image-top-title, .rete-button,
+        .back-button, .rete-container button {
             user-select: none;
             -webkit-touch-callout: none;
             -webkit-user-select: none;
         }
-        /* Nascondi il vecchio header della home */
         .version-header {
             display: none;
         }
@@ -142,12 +140,8 @@
         .export-import-row button:active {
             transform: scale(0.97);
         }
-        #exportAllBtn {
-            background: #283593;
-        }
-        #importAllBtn {
-            background: #558b2f;
-        }
+        #exportAllBtn { background: #283593; }
+        #importAllBtn { background: #558b2f; }
         .small-btn {
             padding: 8px 12px;
             font-size: 0.85rem;
@@ -161,30 +155,11 @@
             white-space: nowrap;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
-        .small-btn:active {
-            transform: scale(0.97);
-        }
-        .double-height {
-            padding: 16px 12px;
-            font-size: 1rem;
-        }
-        .section-title {
-            font-weight: bold;
-            font-size: 0.9rem;
-            color: #1e2a3a;
-            margin-bottom: 8px;
-            display: block;
-        }
-        .flex-row {
-            display: flex;
-            gap: 10px;
-            align-items: center;
-            flex-wrap: wrap;
-            margin: 12px 0;
-        }
-        .full-width {
-            width: 100%;
-        }
+        .small-btn:active { transform: scale(0.97); }
+        .double-height { padding: 16px 12px; font-size: 1rem; }
+        .section-title { font-weight: bold; font-size: 0.9rem; color: #1e2a3a; margin-bottom: 8px; display: block; }
+        .flex-row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin: 12px 0; }
+        .full-width { width: 100%; }
         input, textarea {
             width: 100%;
             padding: 12px 16px;
@@ -206,10 +181,7 @@
             flex-wrap: wrap;
             margin-bottom: 8px;
         }
-        .note-btn-edit, .note-btn-delete {
-            flex: 1;
-            text-align: center;
-        }
+        .note-btn-edit, .note-btn-delete { flex: 1; text-align: center; }
         .note-btn-confirm {
             flex: 0 0 50px;
             width: 50px;
@@ -225,9 +197,7 @@
             background-color: #283593;
             transition: background-color 0.1s;
         }
-        .note-btn-confirm.selected .dot {
-            background-color: white;
-        }
+        .note-btn-confirm.selected .dot { background-color: white; }
         .note-title-row {
             display: flex;
             gap: 10px;
@@ -258,12 +228,8 @@
             white-space: nowrap;
             cursor: default;
         }
-        .edit-note-btn, .edit-special-note-btn {
-            background: #6b8e23;
-        }
-        .delete-note-btn, .delete-special-note-btn {
-            background: #8e44ad;
-        }
+        .edit-note-btn, .edit-special-note-btn { background: #6b8e23; }
+        .delete-note-btn, .delete-special-note-btn { background: #8e44ad; }
         .add-note-btn {
             background: #283593 !important;
             color: white;
@@ -274,49 +240,15 @@
             align-items: center;
             padding: 8px 16px;
         }
-        .add-note-btn span:first-child {
-            text-align: left;
-        }
-        .add-note-btn span:last-child::before {
-            content: "●";
-            margin-right: 6px;
-            font-size: 1.2rem;
-        }
-        .back-home {
-            background: #e67e22 !important;
-            color: white;
-            margin: 16px 0;
-        }
-        .top-actions {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 12px;
-        }
-        .mid-actions {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 12px;
-        }
-        .copy-note-btn {
-            background: #283593 !important;
-            flex: 1;
-        }
-        .clear-btn {
-            background: #8e44ad !important;
-            flex-shrink: 0;
-            width: auto;
-        }
-        .listen-btn {
-            background: #FFC107 !important;
-            color: #1e2a3a !important;
-            width: 100%;
-            margin-top: 12px;
-        }
-        .audio-lang-btn {
-            background: #6b8e23 !important;
-            flex: 1;
-            text-align: center;
-        }
+        .add-note-btn span:first-child { text-align: left; }
+        .add-note-btn span:last-child::before { content: "●"; margin-right: 6px; font-size: 1.2rem; }
+        .back-home { background: #e67e22 !important; color: white; margin: 16px 0; }
+        .top-actions { display: flex; gap: 10px; margin-bottom: 12px; }
+        .mid-actions { display: flex; gap: 10px; margin-bottom: 12px; }
+        .copy-note-btn { background: #283593 !important; flex: 1; }
+        .clear-btn { background: #8e44ad !important; flex-shrink: 0; width: auto; }
+        .listen-btn { background: #FFC107 !important; color: #1e2a3a !important; width: 100%; margin-top: 12px; }
+        .audio-lang-btn { background: #6b8e23 !important; flex: 1; text-align: center; }
         .speak-box {
             background: #d2d6dc;
             border-left: 6px solid #2c3e50;
@@ -338,24 +270,10 @@
             min-height: 80px;
             word-break: break-word;
         }
-        .speak-field:active {
-            background: #f0f0f0;
-        }
-        .speak-btn {
-            background: #FFC107 !important;
-            color: #1e2a3a !important;
-            width: 100%;
-        }
-        .clear-speak-btn {
-            background: #8e44ad !important;
-            width: 100%;
-            margin-bottom: 8px;
-        }
-        .status-msg {
-            font-size: 0.7rem;
-            color: #2c3e66;
-            margin-top: 6px;
-        }
+        .speak-field:active { background: #f0f0f0; }
+        .speak-btn { background: #FFC107 !important; color: #1e2a3a !important; width: 100%; }
+        .clear-speak-btn { background: #8e44ad !important; width: 100%; margin-bottom: 8px; }
+        .status-msg { font-size: 0.7rem; color: #2c3e66; margin-top: 6px; }
         .adaptive-modal {
             position: fixed;
             top: 0;
@@ -401,17 +319,9 @@
             border: none;
             cursor: pointer;
         }
-        .note-edit-modal .adaptive-modal-content {
-            max-width: 500px;
-        }
-        .note-edit-modal .detail-label {
-            font-weight: bold;
-            margin-top: 12px;
-            color: #1e2a3a;
-        }
-        .note-edit-modal input, .note-edit-modal textarea {
-            margin-top: 4px;
-        }
+        .note-edit-modal .adaptive-modal-content { max-width: 500px; }
+        .note-edit-modal .detail-label { font-weight: bold; margin-top: 12px; color: #1e2a3a; }
+        .note-edit-modal input, .note-edit-modal textarea { margin-top: 4px; }
         .modal-buttons {
             display: flex;
             gap: 10px;
@@ -426,14 +336,8 @@
             border: none;
             cursor: pointer;
         }
-        .modal-buttons .save-btn {
-            background: #283593;
-            color: white;
-        }
-        .modal-buttons .cancel-btn {
-            background: #8e44ad;
-            color: white;
-        }
+        .modal-buttons .save-btn { background: #283593; color: white; }
+        .modal-buttons .cancel-btn { background: #8e44ad; color: white; }
         @media (max-width: 480px) {
             body { padding: 8px; }
             .page { padding: 16px 12px 24px; }
@@ -449,9 +353,7 @@
             .title-badge { font-size: 0.7rem; padding: 6px 10px; }
             .title-field { font-size: 0.8rem; padding: 6px 10px; white-space: normal; }
             .top-actions, .mid-actions { gap: 6px; }
-            .license-row {
-                flex-wrap: wrap;
-            }
+            .license-row { flex-wrap: wrap; }
         }
         .version-footer {
             text-align: center;
@@ -461,9 +363,7 @@
             padding-top: 12px;
             border-top: 1px solid #e9ecef;
         }
-        #saveNumberBtn, #geolocationBtn {
-            background: #283593 !important;
-        }
+        #saveNumberBtn, #geolocationBtn { background: #283593 !important; }
         #googleMapsBtn {
             background: black !important;
             color: white !important;
@@ -491,13 +391,7 @@
             margin-top: 8px;
             color: #1a237e;
         }
-        .info-text {
-            text-align: center;
-            font-size: 0.75rem;
-            color: #555;
-            margin-top: 8px;
-        }
-        .rubrica-info {
+        .info-text, .rubrica-info {
             text-align: center;
             font-size: 0.75rem;
             color: #555;
@@ -554,27 +448,12 @@
             flex-wrap: nowrap;
             margin-bottom: 12px;
         }
-        .license-row:last-child {
-            margin-bottom: 0;
-        }
-        .license-label {
-            font-weight: bold;
-            white-space: nowrap;
-        }
-        #clientCodeInput {
-            flex: 1;
-            min-width: 100px;
-        }
-        #copyRequestBtn {
-            flex-shrink: 0;
-        }
-        #unlockCodeInput {
-            flex: 2;
-            min-width: 160px;
-        }
-        #activateLicenseBtn {
-            flex-shrink: 0;
-        }
+        .license-row:last-child { margin-bottom: 0; }
+        .license-label { font-weight: bold; white-space: nowrap; }
+        #clientCodeInput { flex: 1; min-width: 100px; }
+        #copyRequestBtn { flex-shrink: 0; }
+        #unlockCodeInput { flex: 2; min-width: 160px; }
+        #activateLicenseBtn { flex-shrink: 0; }
         .admin-section {
             margin: 16px 0;
             padding: 12px;
@@ -583,9 +462,7 @@
             border-left: 6px solid #e67e22;
             display: none;
         }
-        .admin-section .flex-row {
-            margin-bottom: 8px;
-        }
+        .admin-section .flex-row { margin-bottom: 8px; }
         .days-line {
             text-align: center;
             font-size: 0.75rem;
@@ -600,7 +477,7 @@
             white-space: pre-wrap;
             word-break: break-word;
         }
-        /* Stili per la pagina immagini - nuovo layout */
+        /* Stili per la pagina immagini - nuovo layout con RETE */
         .image-top-box {
             background: #d2d6dc;
             border-radius: 24px;
@@ -617,14 +494,25 @@
         }
         .image-container {
             width: 100%;
-            max-height: 200px;
-            overflow: hidden;
+            min-height: 200px;
+            background: #e9ecef;
+            border-radius: 16px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            cursor: pointer;
+        }
+        .image-placeholder {
             display: flex;
             justify-content: center;
             align-items: center;
-            border-radius: 16px;
-            background: #e9ecef;
-            min-height: 100px;
+            width: 100%;
+            height: 100%;
+            min-height: 180px;
+            color: #6c757d;
+            font-size: 0.9rem;
         }
         .uploaded-image {
             max-width: 100%;
@@ -634,38 +522,56 @@
             border-radius: 16px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.1);
             cursor: pointer;
+            display: block;
         }
-        .image-page-header {
-            display: flex;
-            justify-content: flex-end;
-            align-items: center;
-            margin-bottom: 12px;
-        }
-        .image-page-header button {
+        .back-button {
             background: #e67e22;
-            padding: 8px 16px;
-        }
-        #loadImageBtn {
-            background: #283593;
+            color: white;
             width: 100%;
-            margin-bottom: 16px;
+            margin: 16px 0;
         }
-        .hidden-btn {
-            display: none !important;
+        .rete-container {
+            margin-top: 20px;
+        }
+        .rete-button {
+            background: #283593;
+            color: white;
+            width: 100%;
+            margin: 8px 0;
+            padding: 12px;
+            border-radius: 40px;
+            text-align: center;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.05s linear;
+        }
+        .rete-button:active {
+            transform: scale(0.97);
+        }
+        .rete-level-page {
+            background: white;
+            border-radius: 32px;
+            padding: 20px;
+            margin-top: 10px;
+        }
+        .rete-level-title {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 16px;
+            text-align: center;
+            word-break: break-word;
         }
     </style>
 </head>
 <body>
 <div class="container">
     <div id="homePage" class="page">
-        <!-- version-header rimosso come da richiesta -->
         <div class="title-btn" id="adminLongPressBtn">
             <span>📇</span>
             <span>CONTATTI PERSONALI</span>
             <span>📇</span>
         </div>
 
-        <!-- Sezione licenza -->
         <div class="license-section">
             <div class="license-row">
                 <span class="license-label">LICENZA</span>
@@ -678,7 +584,6 @@
             </div>
         </div>
 
-        <!-- Sezione admin (nascosta) -->
         <div id="adminSection" class="admin-section">
             <div style="font-weight: bold; margin-bottom: 8px;">🛠️ Area Amministratore</div>
             <div class="flex-row">
@@ -705,17 +610,17 @@
         <div class="info-text">Ogni contatto ha il proprio archivio note.<br>📍 Ricerca entro 300m di TUTTI i luoghi con nome<br>🔊 Ascolto automatico 30 secondi dopo il messaggio</div>
         <div class="info-text">Non Utilizzare APP per Situazioni di Emergenza di Salute</div>
         <div class="days-line" id="daysLeftDisplayHome">Giorni rimanenti: --</div>
-        <div class="info-text">💾 Il file SALVA NOTE si chiama: contatti_personali_notes_backup_0210.txt</div>
+        <div class="info-text">💾 Il file SALVA NOTE si chiama: contatti_personali_notes_backup_0211.txt</div>
 
         <div class="export-import-row">
             <button id="exportAllBtn">💾 SALVA NOTE</button>
             <button id="importAllBtn">📂 RIPRISTINA NOTE</button>
         </div>
         <input type="file" id="globalImportFileInput" accept=".txt" style="display:none;">
-        <div class="version-footer">versione 0210 – quarto contatto speciale con galleria immagini</div>
+        <div class="version-footer">versione 0211 – RETE dinamica con livelli</div>
     </div>
 
-    <!-- PAGINA EMERGENZA (invariata, per i primi tre contatti) -->
+    <!-- PAGINA EMERGENZA (invariata) -->
     <div id="emergencyPage" class="page hidden">
         <div id="currentServiceDeco" class="current-service-deco">Contatto:</div>
         <div class="dark-card"><div class="section-title">Numero servizio</div><div class="flex-row"><input type="tel" id="phoneNumber" placeholder="Numero" style="flex:2;"><button id="saveNumberBtn" class="small-btn" style="flex:0.4;">SALVA</button></div><div id="phoneSaveMsg" class="status-msg"></div></div>
@@ -726,23 +631,33 @@
         <div class="dark-card"><button id="addSpecialNoteBtn" class="small-btn add-note-btn"><span>🏠 AGGIUNGI NOTA SPECIALE</span><span>SELEZIONA</span></button><div id="specialNoteInfo" class="info-message"></div><div id="specialNotesListArea"><div style="font-size:0.7rem; color:#777;">Nessuna nota speciale. Aggiungine una.</div></div></div>
         <div class="dark-card"><div class="top-actions"><button id="audioItBtn" class="small-btn audio-lang-btn">LEGGI in IT</button><button id="audioFrBtn" class="small-btn audio-lang-btn">LEGGI in FR</button></div><div class="mid-actions"><button id="copyNoteBtn" class="small-btn copy-note-btn">COPIA NOTE</button><button id="clearResponseBtn" class="small-btn clear-btn">CANCELLA</button></div><textarea id="operatorResponse" rows="3" readonly placeholder="Traduzione italiana"></textarea><div id="listenInfoMsg" class="temp-message"></div><button id="listenResponseBtn" class="small-btn listen-btn double-height">🎤 ASCOLTA OPERATORE</button><div id="copyInfoMsg" class="temp-message"></div><div id="transcribeStatus" class="status-msg"></div></div>
         <div class="speak-box"><button id="clearSpeakBtn" class="small-btn clear-speak-btn">CANCELLA TRADUZIONE</button><div id="speakResultField" class="speak-field">Traduzione Italiana e Francese</div><button id="speakToOperatorBtn" class="small-btn double-height speak-btn">🎙️ PARLA CON OPERATORE</button><div id="speakStatus" class="status-msg"></div></div>
-        <div class="version-footer">versione 0210 – emergency invariata</div>
+        <div class="version-footer">versione 0211 – emergency invariata</div>
     </div>
 
-    <!-- NUOVA PAGINA PER IL QUARTO CONTATTO (immagini) con layout modificato -->
+    <!-- NUOVA PAGINA MONASTIR con RETE dinamica -->
     <div id="imagePage" class="page hidden">
-        <div class="image-page-header">
-            <button id="backFromImageBtn" class="small-btn" style="background:#e67e22;">◀ TORNA INDIETRO</button>
-        </div>
-        <!-- Box alto che contiene titolo + immagine -->
         <div class="image-top-box">
             <div class="image-top-title">MONASTIR: Facciamo Rete</div>
+            <!-- Area immagine: contiene il tasto di caricamento integrato -->
             <div id="imagePreviewArea" class="image-container">
-                <!-- L'immagine verrà mostrata qui -->
+                <div class="image-placeholder" id="imagePlaceholder">📸 Premi a lungo (10 sec) per caricare un'immagine</div>
             </div>
         </div>
-        <button id="loadImageBtn" class="small-btn" style="background:#283593; width:100%;">CARICA IMMAGINE</button>
-        <div class="version-footer">versione 0210 – galleria immagini</div>
+        <!-- Tasto TORNA INDIETRO (sotto la foto, sopra RETE) -->
+        <button id="backFromImageBtn" class="small-btn back-button">◀ TORNA INDIETRO</button>
+        <!-- Contenitore per i tasti RETE (dinamici) -->
+        <div id="reteRootContainer" class="rete-container">
+            <div id="reteLevelContainer"></div>
+        </div>
+        <div class="version-footer">versione 0211 – rete gerarchica</div>
+    </div>
+
+    <!-- PAGINA PER I SOTTOLIVELLI DELLA RETE (dinamica) -->
+    <div id="reteSubPage" class="page hidden">
+        <div id="reteSubHeader" class="rete-level-title"></div>
+        <div id="reteSubContainer" class="rete-container"></div>
+        <button id="backFromReteSubBtn" class="small-btn back-button">◀ TORNA INDIETRO</button>
+        <div class="version-footer">versione 0211 – sottorete</div>
     </div>
 
     <!-- MODALI ESISTENTI -->
@@ -750,20 +665,17 @@
     <div id="speakDetailModal" class="adaptive-modal" style="display:none;"><div class="adaptive-modal-content"><h3>📄 Dettaglio conversazione</h3><div class="detail-label">Italiano (originale)</div><div class="detail-text" id="speakOriginalText"></div><div class="detail-label">Francese (traduzione)</div><div class="detail-text" id="speakTranslatedText"></div><div class="modal-buttons"><button id="closeSpeakModalBtn" class="save-btn">CHIUDI</button></div></div></div>
     <div id="noteEditModal" class="adaptive-modal note-edit-modal" style="display:none;"><div class="adaptive-modal-content"><h3 id="noteModalTitle">➕ Aggiungi Nota</h3><label class="detail-label">Titolo</label><input type="text" id="editNoteTitle" placeholder="Inserisci il titolo"><label class="detail-label">Descrizione</label><textarea id="editNoteDesc" rows="4" placeholder="Inserisci la descrizione"></textarea><div class="modal-buttons"><button id="saveNoteBtn" class="save-btn">SALVA</button><button id="cancelNoteBtn" class="cancel-btn">ANNULLA</button></div></div></div>
     <div id="infoModal" class="adaptive-modal" style="display:none;"><div class="adaptive-modal-content"><h3>📋 Richiesta attivazione</h3><div id="infoModalText" class="modal-info-text"></div><div class="modal-buttons"><button id="closeInfoModalBtn" class="cancel-btn">CHIUDI</button></div></div></div>
-
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
 <script>
-    // ==================== VERSIONE 0210 COMPLETA ====================
-    // Modifiche:
-    // - Disabilitata selezione testo su tutti i pulsanti
-    // - Home: rimosso version-header (nascosto), riga giorni "Versione: 0210 - Giorni rimanenti: XX"
-    // - Pagina MONASTIR: nuovo box titolo+immagine, eliminato vecchio current-service-deco
-    // - Tasto CARICA IMMAGINE: long press 10s -> scompare dopo primo caricamento, cambio immagine con long press sull'immagine
-    // - Wake lock attivo nella pagina MONASTIR
+    // ==================== VERSIONE 0211 - MONASTIR RETE DINAMICA ====================
+    // Implementazione di una struttura ad albero per i tasti "RETE"
+    // Ogni nodo ha un titolo e un array di figli (sottotasti)
+    // La navigazione avviene tramite stack di livelli
+    // I dati vengono salvati in localStorage
     // =================================================================
 
-    const CURRENT_VERSION = "0210";
+    const CURRENT_VERSION = "0211";
     let currentService = "ambulanza";
     let currentLat = null, currentLng = null;
     let currentAddress = "";
@@ -796,10 +708,15 @@
     let adminCode = "admin2025";
     let adminAuthenticated = false;
 
-    // DOM elements
+    // DOM elements (principali)
     const homePage = document.getElementById('homePage');
     const emergencyPage = document.getElementById('emergencyPage');
     const imagePage = document.getElementById('imagePage');
+    const reteSubPage = document.getElementById('reteSubPage');
+    const reteLevelContainer = document.getElementById('reteLevelContainer');
+    const reteSubContainer = document.getElementById('reteSubContainer');
+    const reteSubHeader = document.getElementById('reteSubHeader');
+    const backFromReteSubBtn = document.getElementById('backFromReteSubBtn');
     const currentServiceDeco = document.getElementById('currentServiceDeco');
     const phoneInput = document.getElementById('phoneNumber');
     const saveNumberBtn = document.getElementById('saveNumberBtn');
@@ -867,8 +784,8 @@
     const infoModal = document.getElementById('infoModal');
     const infoModalText = document.getElementById('infoModalText');
     const closeInfoModalBtn = document.getElementById('closeInfoModalBtn');
-    // Elementi nuova pagina immagini
-    const loadImageBtn = document.getElementById('loadImageBtn');
+    // Elementi MONASTIR
+    const loadImageBtnOld = document.getElementById('loadImageBtn'); // non esiste più, lo rimuoviamo
     const backFromImageBtn = document.getElementById('backFromImageBtn');
     const imagePreviewArea = document.getElementById('imagePreviewArea');
 
@@ -880,67 +797,180 @@
     let lastItalianText = "";
     let lastFrenchTranslation = "";
 
+    // ==================== GESTIONE RETE DINAMICA (albero) ====================
+    let reteData = { title: "RETE", children: [] };  // radice
+    let currentStack = []; // stack dei nodi per la navigazione: array di {node, parentNode}
+
+    function saveReteData() {
+        localStorage.setItem('monastir_rete_data', JSON.stringify(reteData));
+    }
+
+    function loadReteData() {
+        const saved = localStorage.getItem('monastir_rete_data');
+        if (saved) {
+            try {
+                reteData = JSON.parse(saved);
+            } catch(e) { console.warn(e); }
+        }
+        if (!reteData.title) reteData = { title: "RETE", children: [] };
+        if (!reteData.children) reteData.children = [];
+    }
+
+    // Crea un nuovo tasto vuoto (figlio) per un dato nodo padre
+    function addEmptyChildToNode(parentNode) {
+        if (!parentNode.children) parentNode.children = [];
+        parentNode.children.push({ title: "", children: [] });
+        saveReteData();
+        return parentNode.children[parentNode.children.length - 1];
+    }
+
+    // Modifica il titolo di un nodo
+    function editNodeTitle(node, newTitle) {
+        node.title = newTitle;
+        saveReteData();
+    }
+
+    // Renderizza i tasti per un dato nodo (contenitore HTML)
+    function renderReteLevel(container, parentNode, levelStack) {
+        container.innerHTML = '';
+        if (!parentNode.children || parentNode.children.length === 0) {
+            const emptyMsg = document.createElement('div');
+            emptyMsg.style.textAlign = 'center';
+            emptyMsg.style.color = '#777';
+            emptyMsg.style.padding = '20px';
+            emptyMsg.innerText = 'Nessun tasto. Premi a lungo su "RETE" per crearne uno.';
+            container.appendChild(emptyMsg);
+        } else {
+            parentNode.children.forEach((child, index) => {
+                const btn = document.createElement('div');
+                btn.className = 'rete-button';
+                btn.innerText = child.title && child.title.trim() !== "" ? child.title : "[Tasto vuoto]";
+                // Pressione corta: naviga al livello inferiore
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    // Apri la pagina dei sottotasti
+                    openReteSubPage(child, parentNode, levelStack);
+                });
+                // Pressione lunga (10 secondi) per modificare il titolo
+                let pressTimer = null;
+                const startLongPress = () => {
+                    pressTimer = setTimeout(() => {
+                        const newTitle = prompt("Inserisci il nuovo titolo per questo tasto:", child.title);
+                        if (newTitle !== null && newTitle.trim() !== "") {
+                            editNodeTitle(child, newTitle.trim());
+                            renderReteLevel(container, parentNode, levelStack);
+                        } else if (newTitle !== null && newTitle.trim() === "") {
+                            alert("Il titolo non può essere vuoto.");
+                        }
+                    }, 10000);
+                };
+                const cancelLongPress = () => {
+                    if (pressTimer) clearTimeout(pressTimer);
+                };
+                btn.addEventListener('mousedown', startLongPress);
+                btn.addEventListener('mouseup', cancelLongPress);
+                btn.addEventListener('mouseleave', cancelLongPress);
+                btn.addEventListener('touchstart', startLongPress, { passive: true });
+                btn.addEventListener('touchend', cancelLongPress);
+                btn.addEventListener('touchcancel', cancelLongPress);
+                container.appendChild(btn);
+            });
+        }
+        // Pulsante per aggiungere un nuovo tasto vuoto (solo al livello radice e sottolivelli)
+        const addBtn = document.createElement('div');
+        addBtn.className = 'rete-button';
+        addBtn.style.background = '#558b2f';
+        addBtn.innerText = '+ AGGIUNGI TASTO';
+        let addPressTimer = null;
+        const startAddLongPress = () => {
+            addPressTimer = setTimeout(() => {
+                const newEmpty = addEmptyChildToNode(parentNode);
+                renderReteLevel(container, parentNode, levelStack);
+            }, 10000);
+        };
+        const cancelAddLongPress = () => {
+            if (addPressTimer) clearTimeout(addPressTimer);
+        };
+        addBtn.addEventListener('mousedown', startAddLongPress);
+        addBtn.addEventListener('mouseup', cancelAddLongPress);
+        addBtn.addEventListener('mouseleave', cancelAddLongPress);
+        addBtn.addEventListener('touchstart', startAddLongPress, { passive: true });
+        addBtn.addEventListener('touchend', cancelAddLongPress);
+        addBtn.addEventListener('touchcancel', cancelAddLongPress);
+        // Pressione corta: non fa nulla (solo long press)
+        container.appendChild(addBtn);
+    }
+
+    function openReteSubPage(node, parentNode, levelStack) {
+        // Salva lo stack corrente (per tornare indietro)
+        currentStack.push({ node: parentNode, parent: levelStack.length > 0 ? levelStack[levelStack.length-1] : null });
+        // Imposta l'intestazione della sottopagina
+        reteSubHeader.innerText = node.title && node.title.trim() !== "" ? node.title : "SottoRete";
+        // Renderizza i figli del nodo
+        renderReteLevel(reteSubContainer, node, [...levelStack, node]);
+        // Mostra la pagina dei sottolivelli
+        imagePage.classList.add('hidden');
+        reteSubPage.classList.remove('hidden');
+    }
+
+    function backFromReteSub() {
+        if (currentStack.length > 0) {
+            currentStack.pop();
+        }
+        // Torna alla pagina principale MONASTIR e ricarica il livello radice
+        reteSubPage.classList.add('hidden');
+        imagePage.classList.remove('hidden');
+        renderReteLevel(reteLevelContainer, reteData, [reteData]);
+    }
+
+    backFromReteSubBtn.addEventListener('click', backFromReteSub);
+
     // ==================== FUNZIONI PER LA PAGINA IMMAGINI (modificate) ====================
     let imagePressTimer = null;
     let currentImageData = null;
 
-    function startImageTimer() {
-        imagePressTimer = setTimeout(() => {
-            const input = document.createElement('input');
-            input.type = 'file';
-            input.accept = 'image/*';
-            input.onchange = (e) => {
-                const file = e.target.files[0];
-                if (file) {
-                    const reader = new FileReader();
-                    reader.onload = (event) => {
-                        const img = document.createElement('img');
-                        img.src = event.target.result;
-                        img.className = 'uploaded-image';
-                        img.style.maxWidth = '100%';
-                        img.style.maxHeight = '180px';
-                        img.style.borderRadius = '16px';
-                        // Sostituisci il contenuto
-                        imagePreviewArea.innerHTML = '';
-                        imagePreviewArea.appendChild(img);
-                        currentImageData = event.target.result;
-                        // Il tasto "CARICA IMMAGINE" scompare dopo il primo caricamento
-                        if (loadImageBtn) loadImageBtn.classList.add('hidden-btn');
-                        // Aggiungi long press sull'immagine per cambiarla
-                        attachImageLongPress(img);
-                    };
-                    reader.readAsDataURL(file);
-                }
-            };
-            input.click();
-        }, 10000);
-    }
-    function cancelImageTimer() {
-        if (imagePressTimer) {
-            clearTimeout(imagePressTimer);
-            imagePressTimer = null;
+    function setupImageArea() {
+        // Svuota e ricostruisci l'area immagine con la logica di long press
+        imagePreviewArea.innerHTML = '';
+        if (currentImageData) {
+            const img = document.createElement('img');
+            img.src = currentImageData;
+            img.className = 'uploaded-image';
+            img.style.maxWidth = '100%';
+            img.style.maxHeight = '180px';
+            img.style.borderRadius = '16px';
+            imagePreviewArea.appendChild(img);
+            attachImageLongPress(img);
+        } else {
+            const placeholder = document.createElement('div');
+            placeholder.className = 'image-placeholder';
+            placeholder.innerText = '📸 Premi a lungo (10 sec) per caricare un\'immagine';
+            imagePreviewArea.appendChild(placeholder);
+            attachPlaceholderLongPress(placeholder);
         }
     }
+
+    function attachPlaceholderLongPress(el) {
+        let pressTimer = null;
+        const start = () => {
+            pressTimer = setTimeout(() => {
+                openImageGallery();
+            }, 10000);
+        };
+        const cancel = () => { if (pressTimer) clearTimeout(pressTimer); };
+        el.addEventListener('mousedown', start);
+        el.addEventListener('mouseup', cancel);
+        el.addEventListener('mouseleave', cancel);
+        el.addEventListener('touchstart', start, { passive: true });
+        el.addEventListener('touchend', cancel);
+        el.addEventListener('touchcancel', cancel);
+    }
+
     function attachImageLongPress(imgElement) {
         let pressTimer = null;
         const start = () => {
             pressTimer = setTimeout(() => {
-                // Riapri galleria per cambiare immagine
-                const input = document.createElement('input');
-                input.type = 'file';
-                input.accept = 'image/*';
-                input.onchange = (e) => {
-                    const file = e.target.files[0];
-                    if (file) {
-                        const reader = new FileReader();
-                        reader.onload = (ev) => {
-                            imgElement.src = ev.target.result;
-                            currentImageData = ev.target.result;
-                        };
-                        reader.readAsDataURL(file);
-                    }
-                };
-                input.click();
+                openImageGallery(true); // true = sostituisci immagine
             }, 10000);
         };
         const cancel = () => { if (pressTimer) clearTimeout(pressTimer); };
@@ -951,40 +981,57 @@
         imgElement.addEventListener('touchend', cancel);
         imgElement.addEventListener('touchcancel', cancel);
     }
-    loadImageBtn.addEventListener('mousedown', startImageTimer);
-    loadImageBtn.addEventListener('mouseup', cancelImageTimer);
-    loadImageBtn.addEventListener('mouseleave', cancelImageTimer);
-    loadImageBtn.addEventListener('touchstart', startImageTimer, { passive: true });
-    loadImageBtn.addEventListener('touchend', cancelImageTimer);
-    loadImageBtn.addEventListener('touchcancel', cancelImageTimer);
-    
+
+    function openImageGallery(replace = false) {
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = 'image/*';
+        input.onchange = (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    currentImageData = event.target.result;
+                    setupImageArea();
+                    localStorage.setItem('monastir_image', currentImageData);
+                };
+                reader.readAsDataURL(file);
+            }
+        };
+        input.click();
+    }
+
+    // Carica immagine salvata
+    function loadSavedImage() {
+        const saved = localStorage.getItem('monastir_image');
+        if (saved) {
+            currentImageData = saved;
+            setupImageArea();
+        } else {
+            setupImageArea();
+        }
+    }
+
+    // Wake Lock
+    async function requestImagePageWakeLock() {
+        if ('wakeLock' in navigator) {
+            try {
+                imagePageWakeLock = await navigator.wakeLock.request('screen');
+            } catch(err) { console.warn('WakeLock fallito:', err); }
+        }
+    }
+    function releaseImagePageWakeLock() {
+        if (imagePageWakeLock) { imagePageWakeLock.release(); imagePageWakeLock = null; }
+    }
+
     backFromImageBtn.addEventListener('click', () => {
         imagePage.classList.add('hidden');
         homePage.classList.remove('hidden');
         releaseImagePageWakeLock();
     });
 
-    // Wake Lock per pagina MONASTIR
-    async function requestImagePageWakeLock() {
-        if ('wakeLock' in navigator) {
-            try {
-                imagePageWakeLock = await navigator.wakeLock.request('screen');
-                console.log('WakeLock attivo per MONASTIR');
-            } catch (err) { console.warn('WakeLock fallito:', err); }
-        }
-    }
-    function releaseImagePageWakeLock() {
-        if (imagePageWakeLock) {
-            imagePageWakeLock.release();
-            imagePageWakeLock = null;
-            console.log('WakeLock rilasciato');
-        }
-    }
-
-    // ==================== FUNZIONI LICENZA ====================
-    function generateRandomClientCode() {
-        return Math.floor(1000000000 + Math.random() * 9000000000).toString();
-    }
+    // ==================== FUNZIONI LICENZA (invariate) ====================
+    function generateRandomClientCode() { return Math.floor(1000000000 + Math.random() * 9000000000).toString(); }
     function hashTo20Digits(hash) {
         let hex = hash.toString(CryptoJS.enc.Hex);
         let decimal = BigInt('0x' + hex).toString();
@@ -1002,10 +1049,7 @@
             if (!res.ok) throw new Error();
             const data = await res.json();
             return new Date(data.utc_datetime);
-        } catch(e) {
-            console.warn("API oraria fallita, uso orario locale:", e);
-            return new Date();
-        }
+        } catch(e) { return new Date(); }
     }
     async function initLicense() {
         const now = await getCurrentUTCTime();
@@ -1028,18 +1072,12 @@
             localStorage.setItem('expiryDate', expiry);
         }
         const nowTime = now.getTime();
-        if (nowTime > expiry) {
-            licenseActive = false;
-            licenseCheckPassed = false;
-        } else {
-            licenseActive = activated;
-            licenseCheckPassed = true;
-        }
+        if (nowTime > expiry) { licenseActive = false; licenseCheckPassed = false; }
+        else { licenseActive = activated; licenseCheckPassed = true; }
         daysRemaining = Math.ceil((expiry - nowTime) / 86400000);
         updateLicenseUI();
         toggleAppAccess(!licenseCheckPassed);
         if (clientCodeInput) clientCodeInput.value = clientCode;
-        // MODIFICA HOME: visualizza "Versione: 0210 - Giorni rimanenti: X"
         if (daysHomeDisplay) daysHomeDisplay.innerText = `Versione: ${CURRENT_VERSION} - Giorni rimanenti: ${daysRemaining}`;
     }
     function updateLicenseUI() {
@@ -1053,28 +1091,16 @@
         }
     }
     function toggleAppAccess(block) {
-        const btns = document.querySelectorAll('.big-btn');
-        btns.forEach(btn => {
-            if (block) {
-                btn.style.pointerEvents = 'none';
-                btn.style.opacity = '0.5';
-            } else {
-                btn.style.pointerEvents = 'auto';
-                btn.style.opacity = '1';
-            }
+        document.querySelectorAll('.big-btn').forEach(btn => {
+            if (block) { btn.style.pointerEvents = 'none'; btn.style.opacity = '0.5'; }
+            else { btn.style.pointerEvents = 'auto'; btn.style.opacity = '1'; }
         });
     }
     async function onActivateLicense() {
         const unlockCode = unlockCodeInput.value.trim();
-        if (!/^\d{20}$/.test(unlockCode)) {
-            alert('Codice sblocco deve essere esattamente 20 cifre.');
-            return;
-        }
+        if (!/^\d{20}$/.test(unlockCode)) { alert('Codice sblocco deve essere esattamente 20 cifre.'); return; }
         const firstRun = localStorage.getItem('firstRun');
-        if (!firstRun) {
-            alert('Errore: primo avvio non rilevato.');
-            return;
-        }
+        if (!firstRun) { alert('Errore: primo avvio non rilevato.'); return; }
         if (verifyUnlockCode(clientCode, parseInt(firstRun), unlockCode)) {
             const firstRunNum = parseInt(firstRun);
             const newExpiry = firstRunNum + 365 * 86400000;
@@ -1082,16 +1108,11 @@
             localStorage.setItem('expiryDate', newExpiry);
             await initLicense();
             alert('Licenza attivata con successo! 365 giorni di utilizzo.');
-        } else {
-            alert('Codice di sblocco non valido.');
-        }
+        } else { alert('Codice di sblocco non valido.'); }
     }
     function copyRequest() {
         const firstRun = localStorage.getItem('firstRun');
-        if (!firstRun) {
-            alert('Errore: impossibile recuperare i dati.');
-            return;
-        }
+        if (!firstRun) { alert('Errore: impossibile recuperare i dati.'); return; }
         const clientCodeVal = clientCode;
         const fullMessage = `Dati copiati negli appunti!
 
@@ -1112,14 +1133,14 @@ gliamicidipaolino@gmail.com
 Risponderemo fornendoti il CODICE di SBLOCCO.
 
 Un caro Saluto.`;
-        navigator.clipboard.writeText(fullMessage).then(() => {}).catch(() => {});
+        navigator.clipboard.writeText(fullMessage);
         infoModalText.innerText = fullMessage;
         infoModal.style.display = 'flex';
     }
     closeInfoModalBtn.addEventListener('click', () => { infoModal.style.display = 'none'; });
     infoModal.addEventListener('click', (e) => { if (e.target === infoModal) infoModal.style.display = 'none'; });
 
-    // ==================== FUNZIONI ADMIN ====================
+    // ==================== FUNZIONI ADMIN (invariate) ====================
     function loadAdminCode() {
         const saved = localStorage.getItem('adminCode');
         if (saved && saved.trim() !== "") adminCode = saved;
@@ -1163,7 +1184,6 @@ Un caro Saluto.`;
     adminLongPressBtn.addEventListener('touchstart', startAdminTimer, { passive: true });
     adminLongPressBtn.addEventListener('touchend', cancelAdminTimer);
     adminLongPressBtn.addEventListener('touchcancel', cancelAdminTimer);
-
     generateUnlockBtn.addEventListener('click', onGenerateUnlock);
     copyGeneratedBtn.addEventListener('click', copyGenerated);
     hideAdminBtn.addEventListener('click', hideAdminSection);
@@ -1186,7 +1206,7 @@ Un caro Saluto.`;
             const saved = localStorage.getItem(`contactExtra_${s}_${CURRENT_VERSION}`);
             if (saved !== null) contactExtraText[s] = saved;
             else {
-                for (let oldVer of ["0209", "0208", "0207"]) {
+                for (let oldVer of ["0210", "0209"]) {
                     const old = localStorage.getItem(`contactExtra_${s}_${oldVer}`);
                     if (old !== null) { contactExtraText[s] = old; saveContactExtraText(); break; }
                 }
@@ -1194,9 +1214,7 @@ Un caro Saluto.`;
         }
     }
     function getContactButtonText(service) {
-        if (service === 'clinica') {
-            return "MONASTIR: Facciamo Rete";
-        }
+        if (service === 'clinica') return "MONASTIR: Facciamo Rete";
         let extra = contactExtraText[service];
         if (extra && extra.trim() !== "") return `Contatto: ${extra}`;
         else return `Contatto: premi 5 sc. per modifica`;
@@ -1240,6 +1258,9 @@ Un caro Saluto.`;
                     homePage.classList.add('hidden');
                     imagePage.classList.remove('hidden');
                     requestImagePageWakeLock();
+                    // Ricarica la visuale della rete principale
+                    renderReteLevel(reteLevelContainer, reteData, [reteData]);
+                    loadSavedImage();
                 } else {
                     showEmergency(service);
                 }
@@ -1259,7 +1280,7 @@ Un caro Saluto.`;
         });
     }
 
-    // ==================== FUNZIONI GEOLOCALIZZAZIONE ====================
+    // ==================== FUNZIONI GEOLOCALIZZAZIONE (identiche a versione 0210) ====================
     function haversine(lat1,lng1,lat2,lng2) {
         const R = 6371e3;
         const φ1 = lat1 * Math.PI/180, φ2 = lat2 * Math.PI/180;
@@ -1385,7 +1406,7 @@ Un caro Saluto.`;
         gpsStatus.innerHTML = "";
     }
 
-    // ==================== FUNZIONI NOTE E MODALI ====================
+    // ==================== FUNZIONI NOTE E MODALI (invariate) ====================
     function openAdaptiveModal() { modalTextarea.value = operatorResponse.value; adaptiveModal.style.display = 'flex'; }
     function closeAdaptiveModal() { adaptiveModal.style.display = 'none'; }
     operatorResponse.addEventListener('click', openAdaptiveModal);
@@ -1486,7 +1507,7 @@ Un caro Saluto.`;
         element._hideTimeout = setTimeout(() => { element.style.display = 'none'; }, duration);
     }
 
-    // ==================== FUNZIONI TRADUZIONE ====================
+    // ==================== TRADUZIONI ====================
     async function translateToFrench(italianText) {
         if (!italianText || italianText.trim() === "") return "";
         try {
@@ -1634,7 +1655,7 @@ Un caro Saluto.`;
     function releaseWakeLock() { if (wakeLock) { wakeLock.release(); wakeLock = null; } }
 
     function migratePhoneNumbers() {
-        const oldVersions = ["0209", "0208", "0207"];
+        const oldVersions = ["0210", "0209"];
         for (let s of services) {
             if (localStorage.getItem(`phone_${s}_${CURRENT_VERSION}`)) continue;
             for (let ver of oldVersions) {
@@ -1736,7 +1757,38 @@ Un caro Saluto.`;
     function onSaveNumber() { let n = phoneInput.value.trim(); if (n) { savePhone(currentService, n); phoneSaveMsg.innerText = "✅ Numero salvato nell'archivio"; setTimeout(()=>phoneSaveMsg.innerText="",2000); } else phoneSaveMsg.innerText = "⚠️ Inserisci un numero valido"; }
     function onClearResponse() { operatorResponse.value = ""; clearOperatorTranslation(); transcribeStatus.innerText = "🧹 Traduzione cancellata"; setTimeout(() => transcribeStatus.innerText = "", 2000); }
     function backHome() { emergencyPage.classList.add("hidden"); homePage.classList.remove("hidden"); currentService = null; releaseWakeLock(); }
-    function init() { loadAdminCode(); loadAllNotes(); loadContactExtraText(); migratePhoneNumbers(); initHomeButtons(); saveNumberBtn.addEventListener('click', onSaveNumber); googleMapsBtn.addEventListener('click', () => window.open("https://maps.google.com", "_blank")); geolocationBtn.addEventListener('click', getLocationAndAddress); copyNoteBtn.addEventListener('click', copyBilingual); audioItBtn.addEventListener('click', speakItalian); audioFrBtn.addEventListener('click', speakFrench); backHomeBtn.addEventListener('click', backHome); listenResponseBtn.addEventListener('click', startListening30s); clearResponseBtn.addEventListener('click', onClearResponse); speakToOperatorBtn.addEventListener('click', startSpeakingItalian); clearSpeakBtn.addEventListener('click', clearSpeakTranslation); exportAllBtn.addEventListener('click', exportAllNotes); importAllBtn.addEventListener('click', () => globalImportFileInput.click()); globalImportFileInput.addEventListener('change', (e) => { if (e.target.files.length) importAllNotes(e.target.files[0]); globalImportFileInput.value = ''; }); initRecognitionOperator(); initRecognitionSpeak(); initLicense(); activateLicenseBtn.addEventListener('click', onActivateLicense); copyRequestBtn.addEventListener('click', copyRequest); }
+    function init() {
+        loadAdminCode();
+        loadAllNotes();
+        loadContactExtraText();
+        migratePhoneNumbers();
+        initHomeButtons();
+        loadReteData();  // carica la struttura RETE
+        saveNumberBtn.addEventListener('click', onSaveNumber);
+        googleMapsBtn.addEventListener('click', () => window.open("https://maps.google.com", "_blank"));
+        geolocationBtn.addEventListener('click', getLocationAndAddress);
+        copyNoteBtn.addEventListener('click', copyBilingual);
+        audioItBtn.addEventListener('click', speakItalian);
+        audioFrBtn.addEventListener('click', speakFrench);
+        backHomeBtn.addEventListener('click', backHome);
+        listenResponseBtn.addEventListener('click', startListening30s);
+        clearResponseBtn.addEventListener('click', onClearResponse);
+        speakToOperatorBtn.addEventListener('click', startSpeakingItalian);
+        clearSpeakBtn.addEventListener('click', clearSpeakTranslation);
+        exportAllBtn.addEventListener('click', exportAllNotes);
+        importAllBtn.addEventListener('click', () => globalImportFileInput.click());
+        globalImportFileInput.addEventListener('change', (e) => { if (e.target.files.length) importAllNotes(e.target.files[0]); globalImportFileInput.value = ''; });
+        initRecognitionOperator();
+        initRecognitionSpeak();
+        initLicense();
+        activateLicenseBtn.addEventListener('click', onActivateLicense);
+        copyRequestBtn.addEventListener('click', copyRequest);
+        // Inizializza la rete principale con un tasto "RETE" se non esiste
+        if (!reteData.children || reteData.children.length === 0) {
+            reteData.children = [];
+            saveReteData();
+        }
+    }
     init();
 </script>
 </body>
