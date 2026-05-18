@@ -43,7 +43,7 @@
         .edit-note-btn, .delete-note-btn, .add-note-btn, .back-home, .export-import-row button,
         .uploaded-image, .image-container img, .image-top-title, .rete-button,
         .back-button, .rete-container button, .image-placeholder, .info-mini-img, .rete-delete-btn,
-        .special-action-btn, .rete-level-title-btn {
+        .special-action-btn, .rete-level-title-btn, .coord-toggle-btn {
             user-select: none;
             -webkit-touch-callout: none;
             -webkit-user-select: none;
@@ -157,20 +157,27 @@
             background: #fff;
             font-family: monospace;
         }
-        .note-item, .special-note-item {
+        .note-item {
             background: transparent;
             margin: 16px 0;
             border-bottom: 1px solid rgba(0,0,0,0.1);
         }
-        .note-row-buttons { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-bottom: 8px; }
-        .note-btn-edit, .note-btn-delete { flex: 1; text-align: center; }
+        .note-row-buttons { 
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            justify-content: flex-end;
+            margin-bottom: 8px;
+        }
         .note-btn-confirm {
-            flex: 0 0 50px;
-            width: 50px;
+            width: 40px;
+            height: 40px;
             background: #283593;
+            border-radius: 50%;
             display: inline-flex;
             align-items: center;
             justify-content: center;
+            cursor: pointer;
         }
         .note-btn-confirm .dot {
             width: 20px;
@@ -210,8 +217,6 @@
             white-space: nowrap;
             cursor: default;
         }
-        .edit-note-btn { background: #6b8e23; }
-        .delete-note-btn { background: #8e44ad; }
         .add-note-btn {
             background: #283593 !important;
             color: white;
@@ -330,7 +335,7 @@
             .dark-card { padding: 12px; }
             .speak-box { padding: 12px; }
             .note-row-buttons { gap: 6px; }
-            .note-btn-confirm { width: 40px; }
+            .note-btn-confirm { width: 36px; height: 36px; }
             .note-btn-confirm .dot { width: 16px; height: 16px; }
             .title-badge { font-size: 0.7rem; padding: 6px 10px; }
             .title-field { font-size: 0.8rem; padding: 6px 10px; white-space: normal; }
@@ -643,15 +648,40 @@
         .hidden-btn {
             display: none !important;
         }
-        .coord-display-area {
-            background: #f0f0f0;
-            border-radius: 20px;
-            padding: 8px 12px;
-            margin-top: 8px;
-            font-size: 0.85rem;
+        .coord-toggle-btn {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: #283593;
+            color: white;
+            font-weight: bold;
+            font-size: 1.2rem;
+            border: none;
+            cursor: pointer;
+            transition: 0.05s linear;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .coord-toggle-btn.active {
+            background: #4caf50;
+            box-shadow: 0 0 0 2px white, 0 0 0 4px #4caf50;
+        }
+        .coord-toggle-btn:active { transform: scale(0.95); }
+        .coord-label {
+            background: #6c757d;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 40px;
+            font-weight: bold;
+            font-size: 0.9rem;
+            flex: 1;
             text-align: center;
-            font-family: monospace;
-            word-break: break-all;
+        }
+        .note-action-buttons {
+            display: flex;
+            gap: 10px;
+            margin: 16px 0 8px;
         }
     </style>
 </head>
@@ -734,29 +764,44 @@
             <div id="gpsStatus" class="status-msg"></div>
         </div>
 
-        <!-- BLOCCO NOTE NORMALI (modificato) -->
+        <!-- BLOCCO NOTE NORMALI -->
         <div class="dark-card">
             <button id="addNoteBtn" class="small-btn add-note-btn"><span>➕ AGGIUNGI NOTE</span><span>SELEZIONA</span></button>
             
-            <!-- NUOVI PULSANTI LEGGI IT/FR -->
+            <!-- Pulsanti LEGGI IT/FR -->
             <div class="flex-row" style="margin-top: 8px; margin-bottom: 8px;">
                 <button id="audioItBtn" class="small-btn audio-lang-btn">🇮🇹 LEGGI in IT</button>
                 <button id="audioFrBtn" class="small-btn audio-lang-btn">🇫🇷 LEGGI in FR</button>
             </div>
             
-            <!-- NUOVO PULSANTE COORDINATE S/N -->
-            <button id="coordSnBtn" class="small-btn" style="background:#283593; width:100%; margin-bottom:8px;">📍 COORDINATE S/N</button>
-            <div id="coordSnDisplay" class="coord-display-area">Coordinate: --</div>
+            <!-- Riga COORDINATE con pallini S/N -->
+            <div class="flex-row" style="justify-content: space-between; margin-bottom: 8px;">
+                <div class="coord-label">📍 COORDINATE</div>
+                <div style="display: flex; gap: 12px;">
+                    <button id="coordSN" class="coord-toggle-btn">S</button>
+                    <button id="coordNN" class="coord-toggle-btn">N</button>
+                </div>
+            </div>
             
+            <!-- Pulsante COPIA NOTE (spostato sotto) -->
+            <button id="copyNoteBtn" class="small-btn copy-note-btn" style="margin-bottom: 12px;">📋 COPIA NOTE</button>
+            
+            <!-- Area lista note (solo titoli con pallino di selezione) -->
             <div id="normalNoteInfo" class="info-message"></div>
             <div id="notesListArea"><div style="font-size:0.7rem; color:#777;">Nessuna nota. Aggiungine una.</div></div>
+            
+            <!-- Pulsanti MODIFICA e CANCELLA (agiscono sulla nota selezionata) -->
+            <div class="note-action-buttons">
+                <button id="editSelectedNoteBtn" class="small-btn" style="background:#6b8e23; flex:1;">✏️ MODIFICA NOTA</button>
+                <button id="deleteSelectedNoteBtn" class="small-btn" style="background:#8e44ad; flex:1;">🗑️ CANCELLA NOTA</button>
+            </div>
         </div>
         
         <button id="backHomeBtn" class="small-btn back-home" style="width:100%;">◀ TORNA INDIETRO</button>
         
-        <!-- TRADUZIONE OPERATORE e SPEECH (invariati) -->
+        <!-- TRADUZIONE OPERATORE e SPEECH -->
         <div class="dark-card">
-            <div class="top-actions"><button id="copyNoteBtn" class="small-btn copy-note-btn">COPIA NOTE</button><button id="clearResponseBtn" class="small-btn clear-btn">CANCELLA</button></div>
+            <div class="top-actions"><button id="clearResponseBtn" class="small-btn clear-btn">CANCELLA</button></div>
             <textarea id="operatorResponse" rows="3" readonly placeholder="Traduzione italiana"></textarea>
             <div id="listenInfoMsg" class="temp-message"></div>
             <button id="listenResponseBtn" class="small-btn listen-btn double-height">🎤 ASCOLTA OPERATORE</button>
@@ -787,11 +832,10 @@
         <div class="version-footer">versione 0216 – rete gerarchica</div>
     </div>
 
-    <!-- PAGINA ATTIVITA' (sottolivelli RETE con info e foto) invariata -->
+    <!-- PAGINA ATTIVITA' (sottolivelli RETE) invariata -->
     <div id="reteSubPage" class="page hidden">
         <button id="reteSubHeaderBtn" class="rete-level-title-btn">ATTIVITÀ</button>
         <div id="reteSubContainer" class="rete-container"></div>
-        
         <div id="infoSection" class="info-section">
             <div class="info-section-title">📋 INFORMAZIONI ATTIVITÀ</div>
             <div id="infoTextDisplay" class="info-text-display">Nessuna informazione aggiuntiva.</div>
@@ -801,19 +845,16 @@
                 <button id="editImageBtn" class="small-btn" style="background:#6b8e23;">📸 CARICA FOTO (3 sec)</button>
             </div>
         </div>
-        
         <button id="backFromReteSubBtn" class="small-btn back-button">◀ TORNA INDIETRO</button>
-
         <div id="specialActionsContainer" class="special-actions-container">
             <div id="coordButton" class="special-action-btn">📍 COORDINATE</div>
             <div id="coordHint" class="coord-hint">Premi per aprire Google Maps</div>
             <div id="webButton" class="special-action-btn">🌐 SITO WEB</div>
         </div>
-
         <div class="version-footer">versione 0216 – attività con strumenti aggiuntivi</div>
     </div>
 
-    <!-- MODALI (invariate) -->
+    <!-- MODALI -->
     <div id="adaptiveModal" class="adaptive-modal" style="display:none;"><div class="adaptive-modal-content"><textarea id="modalTextarea" readonly></textarea><button id="closeAdaptiveBtn">CHIUDI</button></div></div>
     <div id="speakDetailModal" class="adaptive-modal" style="display:none;"><div class="adaptive-modal-content"><h3>📄 Dettaglio conversazione</h3><div class="detail-label">Italiano (originale)</div><div class="detail-text" id="speakOriginalText"></div><div class="detail-label">Francese (traduzione)</div><div class="detail-text" id="speakTranslatedText"></div><div class="modal-buttons"><button id="closeSpeakModalBtn" class="save-btn">CHIUDI</button></div></div></div>
     <div id="noteEditModal" class="adaptive-modal note-edit-modal" style="display:none;"><div class="adaptive-modal-content"><h3 id="noteModalTitle">➕ Aggiungi Nota</h3><label class="detail-label">Titolo</label><input type="text" id="editNoteTitle" placeholder="Inserisci il titolo"><label class="detail-label">Descrizione</label><textarea id="editNoteDesc" rows="4" placeholder="Inserisci la descrizione"></textarea><div class="modal-buttons"><button id="saveNoteBtn" class="save-btn">SALVA</button><button id="cancelNoteBtn" class="cancel-btn">ANNULLA</button></div></div></div>
@@ -822,13 +863,14 @@
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
 <script>
-    // ==================== VERSIONE 0216 - MODIFICATA SECONDO RICHIESTE ====================
-    // - Eliminate frasi precompilate da lettura e copia note (solo testo nota)
-    // - Eliminate note speciali e tutte le funzioni collegate
+    // ==================== VERSIONE 0216 - MODIFICATA SECONDO RICHIESTE FINALI ====================
+    // - Eliminate frasi precompilate e note speciali
     // - Rinominato pulsante "AGGIUNGI NOTE"
-    // - Spostati pulsanti LEGGI in IT/FR all'interno del box note, sotto il pulsante aggiungi
-    // - Aggiunto pulsante "COORDINATE S/N" con visualizzazione coordinate formato N/S
-    // ====================================================================================
+    // - Spostati LEGGI IT/FR sotto il pulsante aggiungi
+    // - Aggiunti pulsanti S/N per gestire inclusione coordinate nella copia
+    // - Pulsante COPIA NOTE spostato sotto i pulsanti coordinate
+    // - Pulsanti MODIFICA e CANCELLA (singoli) sotto l'elenco note, agiscono sulla nota selezionata
+    // ============================================================================================
 
     const CURRENT_VERSION = "0216";
     let currentService = "ambulanza";
@@ -839,6 +881,7 @@
     let selectedNormalNoteId = null;
     let wakeLock = null;
     let imagePageWakeLock = null;
+    let includeCoordinatesInCopy = false;  // true = S, false = N
 
     let contactExtraText = {
         ambulanza: "",
@@ -946,10 +989,11 @@
     const coordButton = document.getElementById('coordButton');
     const coordHint = document.getElementById('coordHint');
     const webButton = document.getElementById('webButton');
-    const coordSnBtn = document.getElementById('coordSnBtn');
-    const coordSnDisplay = document.getElementById('coordSnDisplay');
+    const coordSN = document.getElementById('coordSN');
+    const coordNN = document.getElementById('coordNN');
+    const editSelectedNoteBtn = document.getElementById('editSelectedNoteBtn');
+    const deleteSelectedNoteBtn = document.getElementById('deleteSelectedNoteBtn');
 
-    let currentEditMode = null;
     let currentEditId = null;
     let recognitionOperator = null;
     let recognitionSpeak = null;
@@ -1901,7 +1945,6 @@ Un caro Saluto.`;
             refADisplay.innerText = ref1;
             refBDisplay.innerText = ref2;
             refCDisplay.innerText = ref3;
-            updateCoordSnDisplay();
             gpsStatus.innerHTML = "✅ Posizione e riferimenti aggiornati!";
             setTimeout(()=> gpsStatus.innerHTML = "✅ Pronto.", 3000);
         } catch(e) { gpsStatus.innerHTML = `❌ Errore GPS: ${e.message}`; }
@@ -1909,29 +1952,47 @@ Un caro Saluto.`;
     function resetCoords() {
         currentLat=currentLng=null; currentAddress=""; currentRefA=""; currentRefB=""; currentRefC="";
         latLonDisplay.innerText = addressDisplay.innerText = refADisplay.innerText = refBDisplay.innerText = refCDisplay.innerText = "---";
-        updateCoordSnDisplay();
         gpsStatus.innerHTML = "";
     }
     
-    // Funzione per aggiornare il display delle coordinate S/N
-    function updateCoordSnDisplay() {
-        if (currentLat !== null && currentLng !== null) {
-            const latDir = currentLat >= 0 ? "N" : "S";
-            const lngDir = currentLng >= 0 ? "E" : "O";
-            coordSnDisplay.innerText = `📍 Coordinate: ${Math.abs(currentLat).toFixed(6)}° ${latDir}, ${Math.abs(currentLng).toFixed(6)}° ${lngDir}`;
+    // Gestione pulsanti S/N
+    function updateCoordToggleUI() {
+        if (includeCoordinatesInCopy) {
+            coordSN.classList.add('active');
+            coordNN.classList.remove('active');
         } else {
-            coordSnDisplay.innerText = "Coordinate: --";
+            coordNN.classList.add('active');
+            coordSN.classList.remove('active');
         }
+        // Salva stato per il servizio corrente
+        localStorage.setItem(`includeCoords_${currentService}_${CURRENT_VERSION}`, includeCoordinatesInCopy ? 'S' : 'N');
     }
-    
-    async function onCoordSnClick() {
+    function loadCoordToggleState() {
+        const saved = localStorage.getItem(`includeCoords_${currentService}_${CURRENT_VERSION}`);
+        if (saved === 'S') includeCoordinatesInCopy = true;
+        else if (saved === 'N') includeCoordinatesInCopy = false;
+        else includeCoordinatesInCopy = false; // default N
+        updateCoordToggleUI();
+    }
+    coordSN.addEventListener('click', () => {
+        includeCoordinatesInCopy = true;
+        updateCoordToggleUI();
+        // Se non ci sono coordinate, le acquisiamo automaticamente?
         if (currentLat === null || currentLng === null) {
-            await getLocationAndAddress();
+            getLocationAndAddress().then(() => {
+                gpsStatus.innerHTML = "Coordinate acquisite. Ora puoi copiare la nota con le coordinate.";
+            });
         } else {
-            updateCoordSnDisplay();
-            alert(`Coordinate attuali: ${Math.abs(currentLat).toFixed(6)}° ${currentLat>=0?"N":"S"}, ${Math.abs(currentLng).toFixed(6)}° ${currentLng>=0?"E":"O"}`);
+            gpsStatus.innerHTML = "Modalità S attiva: le coordinate verranno incluse nella copia.";
+            setTimeout(() => gpsStatus.innerHTML = "✅ Pronto.", 2000);
         }
-    }
+    });
+    coordNN.addEventListener('click', () => {
+        includeCoordinatesInCopy = false;
+        updateCoordToggleUI();
+        gpsStatus.innerHTML = "Modalità N attiva: le coordinate NON verranno incluse nella copia.";
+        setTimeout(() => gpsStatus.innerHTML = "✅ Pronto.", 2000);
+    });
 
     // Funzioni note (solo normali)
     function getNormalNotesKey(s) { return `normalNotes_${s}_${CURRENT_VERSION}`; }
@@ -1962,17 +2023,29 @@ Un caro Saluto.`;
         notes.forEach((note) => {
             const isSelected = (String(selectedNormalNoteId) === String(note.id));
             const titleText = note.title && note.title.trim() !== "" ? note.title : "titolo nota";
-            html += `<div class="note-item" data-id="${note.id}"><div class="note-row-buttons"><button class="edit-note-btn small-btn note-btn-edit" data-id="${note.id}">✏️ Modifica</button><button class="delete-note-btn small-btn note-btn-delete" data-id="${note.id}">🗑️ Cancella</button><button class="confirm-note-btn small-btn note-btn-confirm ${isSelected ? 'selected' : ''}" data-id="${note.id}"><span class="dot"></span></button></div><div class="note-title-row"><div class="title-badge">Titolo</div><div class="title-field">${escapeHtml(titleText)}</div></div></div>`;
+            html += `<div class="note-item" data-id="${note.id}">
+                        <div class="note-row-buttons">
+                            <button class="confirm-note-btn note-btn-confirm ${isSelected ? 'selected' : ''}" data-id="${note.id}"><span class="dot"></span></button>
+                        </div>
+                        <div class="note-title-row">
+                            <div class="title-badge">Titolo</div>
+                            <div class="title-field">${escapeHtml(titleText)}</div>
+                        </div>
+                     </div>`;
         });
         notesListArea.innerHTML = html;
-        document.querySelectorAll('.edit-note-btn').forEach(btn => { btn.removeEventListener('click', handleEditNote); btn.addEventListener('click', handleEditNote); });
-        document.querySelectorAll('.delete-note-btn').forEach(btn => { btn.removeEventListener('click', handleDeleteNote); btn.addEventListener('click', handleDeleteNote); });
-        document.querySelectorAll('.confirm-note-btn').forEach(btn => { btn.removeEventListener('click', handleConfirmNote); btn.addEventListener('click', handleConfirmNote); });
+        document.querySelectorAll('.confirm-note-btn').forEach(btn => {
+            btn.removeEventListener('click', handleConfirmNote);
+            btn.addEventListener('click', handleConfirmNote);
+        });
     }
-    function handleEditNote(e) { e.stopPropagation(); const noteId = e.currentTarget.getAttribute('data-id'); const note = normalNotes[currentService].find(n => String(n.id) === noteId); if (note) openEditNoteModal(noteId, note.title, note.description); }
-    function handleDeleteNote(e) { e.stopPropagation(); const noteId = e.currentTarget.getAttribute('data-id'); normalNotes[currentService] = normalNotes[currentService].filter(n => String(n.id) !== noteId); if (String(selectedNormalNoteId) === noteId) selectedNormalNoteId = null; saveNormalNotesForService(currentService); saveSelectedNormalId(); renderNormalNotes(); gpsStatus.innerHTML = "✅ Nota eliminata"; setTimeout(()=> gpsStatus.innerHTML = "✅ Pronto.", 2000); }
     function handleConfirmNote(e) { e.stopPropagation(); const noteId = e.currentTarget.getAttribute('data-id'); selectNormalNote(noteId); }
-    function selectNormalNote(noteId) { selectedNormalNoteId = noteId; saveSelectedNormalId(); renderNormalNotes(); if (normalNoteInfo) showTemporaryMessage(normalNoteInfo, "📌 Nota selezionata", 15000); }
+    function selectNormalNote(noteId) { 
+        selectedNormalNoteId = noteId; 
+        saveSelectedNormalId(); 
+        renderNormalNotes(); 
+        if (normalNoteInfo) showTemporaryMessage(normalNoteInfo, "📌 Nota selezionata", 15000);
+    }
     function openAddNoteModal() {
         currentEditId = null;
         noteModalTitle.innerText = "➕ Aggiungi Nota";
@@ -2013,6 +2086,33 @@ Un caro Saluto.`;
     noteEditModal.addEventListener('click', (e) => { if (e.target === noteEditModal) closeEditModal(); });
     addNoteBtn.addEventListener('click', openAddNoteModal);
     
+    // Modifica e Cancella nota selezionata
+    function editSelectedNote() {
+        if (!selectedNormalNoteId) {
+            alert("Nessuna nota selezionata. Tocca il pallino di una nota per selezionarla.");
+            return;
+        }
+        const note = normalNotes[currentService].find(n => String(n.id) === selectedNormalNoteId);
+        if (note) openEditNoteModal(selectedNormalNoteId, note.title, note.description);
+    }
+    function deleteSelectedNote() {
+        if (!selectedNormalNoteId) {
+            alert("Nessuna nota selezionata.");
+            return;
+        }
+        if (confirm("Eliminare la nota selezionata?")) {
+            normalNotes[currentService] = normalNotes[currentService].filter(n => String(n.id) !== selectedNormalNoteId);
+            selectedNormalNoteId = null;
+            saveNormalNotesForService(currentService);
+            saveSelectedNormalId();
+            renderNormalNotes();
+            gpsStatus.innerHTML = "✅ Nota eliminata";
+            setTimeout(()=> gpsStatus.innerHTML = "✅ Pronto.", 2000);
+        }
+    }
+    editSelectedNoteBtn.addEventListener('click', editSelectedNote);
+    deleteSelectedNoteBtn.addEventListener('click', deleteSelectedNote);
+    
     function getSelectedNoteDescription() {
         if (selectedNormalNoteId) {
             const note = normalNotes[currentService].find(n => String(n.id) === String(selectedNormalNoteId));
@@ -2040,21 +2140,28 @@ Un caro Saluto.`;
     function speakItalianNote() { speakNoteOnly('it'); }
     function speakFrenchNote() { speakNoteOnly('fr'); }
 
-    // Nuova funzione per copiare solo la nota selezionata
-    async function copyNoteOnly() {
+    // Funzione per copiare la nota selezionata, con o senza coordinate in base allo stato S/N
+    async function copyNoteWithOptionalCoords() {
         let note = getSelectedNoteDescription();
         if (!note) {
             alert("Nessuna nota selezionata.");
             return;
         }
+        let textToCopy = note;
+        if (includeCoordinatesInCopy && currentLat !== null && currentLng !== null) {
+            const latDir = currentLat >= 0 ? "N" : "S";
+            const lngDir = currentLng >= 0 ? "E" : "O";
+            const coordStr = `${Math.abs(currentLat).toFixed(6)}° ${latDir}, ${Math.abs(currentLng).toFixed(6)}° ${lngDir}`;
+            textToCopy = `${note}\n\nCoordinate: ${coordStr}`;
+        }
         try {
-            await navigator.clipboard.writeText(note);
+            await navigator.clipboard.writeText(textToCopy);
             gpsStatus.innerHTML = "📋 Nota copiata!";
             showTemporaryMessage(copyInfoMsg, "📋 Nota copiata negli appunti.", 15000);
             setTimeout(()=> gpsStatus.innerHTML = "✅ Pronto.", 2000);
         } catch(e) {
             let ta = document.createElement('textarea');
-            ta.value = note;
+            ta.value = textToCopy;
             document.body.appendChild(ta);
             ta.select();
             document.execCommand('copy');
@@ -2384,6 +2491,7 @@ Un caro Saluto.`;
         loadCurrentServiceNotes();
         loadOperatorTranslation();
         loadSpeakTranslation();
+        loadCoordToggleState();
         resetCoords();
         homePage.classList.add("hidden");
         emergencyPage.classList.remove("hidden");
@@ -2408,7 +2516,7 @@ Un caro Saluto.`;
         saveNumberBtn.addEventListener('click', onSaveNumber);
         googleMapsBtn.addEventListener('click', () => window.open("https://maps.google.com", "_blank"));
         geolocationBtn.addEventListener('click', getLocationAndAddress);
-        copyNoteBtn.addEventListener('click', copyNoteOnly);
+        copyNoteBtn.addEventListener('click', copyNoteWithOptionalCoords);
         audioItBtn.addEventListener('click', speakItalianNote);
         audioFrBtn.addEventListener('click', speakFrenchNote);
         backHomeBtn.addEventListener('click', backHome);
@@ -2428,7 +2536,6 @@ Un caro Saluto.`;
             reteData.children = [];
             saveReteData();
         }
-        coordSnBtn.addEventListener('click', onCoordSnClick);
     }
     init();
 </script>
