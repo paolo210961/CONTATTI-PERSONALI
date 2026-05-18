@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
-    <title>Contatti Personali - v0218</title>
+    <title>Contatti Personali - v0216</title>
     <link rel="manifest" href="manifest.json">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -679,14 +679,14 @@
         <div class="info-text">Ogni contatto ha il proprio archivio note.<br>📍 Ricerca entro 300m di TUTTI i luoghi con nome<br>🔊 Ascolto automatico 30 secondi dopo il messaggio</div>
         <div class="info-text">Non Utilizzare APP per Situazioni di Emergenza di Salute</div>
         <div class="days-line" id="daysLeftDisplayHome">Giorni rimanenti: --</div>
-        <div class="info-text">💾 Il file SALVA NOTE si chiama: contatti_personali_notes_backup_0218.txt</div>
+        <div class="info-text">💾 Il file SALVA NOTE si chiama: contatti_personali_notes_backup_0216.txt</div>
 
         <div class="export-import-row">
             <button id="exportAllBtn">💾 SALVA NOTE</button>
             <button id="importAllBtn">📂 RIPRISTINA NOTE</button>
         </div>
         <input type="file" id="globalImportFileInput" accept=".txt" style="display:none;">
-        <div class="version-footer">versione 0218 – navigazione stabile con ID</div>
+        <div class="version-footer">versione 0216 – coordinate e sito web in attività</div>
     </div>
 
     <!-- PAGINA EMERGENZA (CONTATTI) invariata -->
@@ -700,7 +700,7 @@
         <div class="dark-card"><button id="addSpecialNoteBtn" class="small-btn add-note-btn"><span>🏠 AGGIUNGI NOTA SPECIALE</span><span>SELEZIONA</span></button><div id="specialNoteInfo" class="info-message"></div><div id="specialNotesListArea"><div style="font-size:0.7rem; color:#777;">Nessuna nota speciale. Aggiungine una.</div></div></div>
         <div class="dark-card"><div class="top-actions"><button id="audioItBtn" class="small-btn audio-lang-btn">LEGGI in IT</button><button id="audioFrBtn" class="small-btn audio-lang-btn">LEGGI in FR</button></div><div class="mid-actions"><button id="copyNoteBtn" class="small-btn copy-note-btn">COPIA NOTE</button><button id="clearResponseBtn" class="small-btn clear-btn">CANCELLA</button></div><textarea id="operatorResponse" rows="3" readonly placeholder="Traduzione italiana"></textarea><div id="listenInfoMsg" class="temp-message"></div><button id="listenResponseBtn" class="small-btn listen-btn double-height">🎤 ASCOLTA OPERATORE</button><div id="copyInfoMsg" class="temp-message"></div><div id="transcribeStatus" class="status-msg"></div></div>
         <div class="speak-box"><button id="clearSpeakBtn" class="small-btn clear-speak-btn">CANCELLA TRADUZIONE</button><div id="speakResultField" class="speak-field">Traduzione Italiana e Francese</div><button id="speakToOperatorBtn" class="small-btn double-height speak-btn">🎙️ PARLA CON OPERATORE</button><div id="speakStatus" class="status-msg"></div></div>
-        <div class="version-footer">versione 0218 – emergenza invariata</div>
+        <div class="version-footer">versione 0216 – emergenza invariata</div>
     </div>
 
     <!-- PAGINA FOTO (MONASTIR) -->
@@ -715,7 +715,8 @@
         <div id="reteRootContainer" class="rete-container">
             <div id="reteLevelContainer"></div>
         </div>
-        <div class="version-footer">versione 0218 – rete gerarchica</div>
+        <!-- Messaggio admin rimosso come da richiesta -->
+        <div class="version-footer">versione 0216 – rete gerarchica</div>
     </div>
 
     <!-- PAGINA ATTIVITA' (sottolivelli RETE con info e foto) -->
@@ -723,10 +724,13 @@
         <div id="reteSubHeader" class="rete-level-title"></div>
         <div id="reteSubContainer" class="rete-container"></div>
         
+        <!-- Sezione informazioni attività -->
         <div id="infoSection" class="info-section">
             <div class="info-section-title">📋 INFORMAZIONI ATTIVITÀ</div>
             <div id="infoTextDisplay" class="info-text-display">Nessuna informazione aggiuntiva.</div>
-            <div id="infoImageContainer"></div>
+            <div id="infoImageContainer">
+                <!-- mini immagine o placeholder -->
+            </div>
             <div id="infoEditButtons" class="info-edit-buttons hidden-btn">
                 <button id="editInfoBtn" class="small-btn" style="background:#283593;">✏️ MODIFICA TESTO</button>
                 <button id="editImageBtn" class="small-btn" style="background:#6b8e23;">📸 CARICA FOTO (3 sec)</button>
@@ -735,13 +739,14 @@
         
         <button id="backFromReteSubBtn" class="small-btn back-button">◀ TORNA INDIETRO</button>
 
+        <!-- NUOVI PULSANTI SPECIALI (COORDINATE e SITO WEB) - posizionati DOPO il tasto TORNA INDIETRO -->
         <div id="specialActionsContainer" class="special-actions-container">
             <div id="coordButton" class="special-action-btn">📍 COORDINATE</div>
             <div id="coordHint" class="coord-hint">Premi per aprire Google Maps</div>
             <div id="webButton" class="special-action-btn">🌐 SITO WEB</div>
         </div>
 
-        <div class="version-footer">versione 0218 – attività con strumenti aggiuntivi</div>
+        <div class="version-footer">versione 0216 – attività con strumenti aggiuntivi</div>
     </div>
 
     <!-- MODALI -->
@@ -753,8 +758,13 @@
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
 <script>
-    // ==================== VERSIONE 0218 - NAVIGAZIONE STABILE CON ID ====================
-    const CURRENT_VERSION = "0218";
+    // ==================== VERSIONE 0216 - COORDINATE E SITO WEB IN ATTIVITÀ ====================
+    // Aggiunti pulsanti speciali: COORDINATE (modificabile solo admin, apre Maps) e SITO WEB (testo fisso, URL modificabile solo admin)
+    // Rimossa la scritta admin in fondo alla pagina FOTO
+    // I tasti nella pagina FOTO mostrano solo il titolo (nessuna descrizione aggiuntiva)
+    // ============================================================================================
+
+    const CURRENT_VERSION = "0216";
     let currentService = "ambulanza";
     let currentLat = null, currentLng = null;
     let currentAddress = "";
@@ -796,6 +806,73 @@
     const reteSubContainer = document.getElementById('reteSubContainer');
     const reteSubHeader = document.getElementById('reteSubHeader');
     const backFromReteSubBtn = document.getElementById('backFromReteSubBtn');
+    const currentServiceDeco = document.getElementById('currentServiceDeco');
+    const phoneInput = document.getElementById('phoneNumber');
+    const saveNumberBtn = document.getElementById('saveNumberBtn');
+    const googleMapsBtn = document.getElementById('googleMapsBtn');
+    const geolocationBtn = document.getElementById('geolocationBtn');
+    const latLonDisplay = document.getElementById('latLonDisplay');
+    const addressDisplay = document.getElementById('addressDisplay');
+    const refADisplay = document.getElementById('refADisplay');
+    const refBDisplay = document.getElementById('refBDisplay');
+    const refCDisplay = document.getElementById('refCDisplay');
+    const gpsStatus = document.getElementById('gpsStatus');
+    const addNoteBtn = document.getElementById('addNoteBtn');
+    const addSpecialNoteBtn = document.getElementById('addSpecialNoteBtn');
+    const notesListArea = document.getElementById('notesListArea');
+    const specialNotesListArea = document.getElementById('specialNotesListArea');
+    const copyNoteBtn = document.getElementById('copyNoteBtn');
+    const audioItBtn = document.getElementById('audioItBtn');
+    const audioFrBtn = document.getElementById('audioFrBtn');
+    const backHomeBtn = document.getElementById('backHomeBtn');
+    const phoneSaveMsg = document.getElementById('phoneSaveMsg');
+    const operatorResponse = document.getElementById('operatorResponse');
+    const listenResponseBtn = document.getElementById('listenResponseBtn');
+    const clearResponseBtn = document.getElementById('clearResponseBtn');
+    const transcribeStatus = document.getElementById('transcribeStatus');
+    const listenInfoMsg = document.getElementById('listenInfoMsg');
+    const copyInfoMsg = document.getElementById('copyInfoMsg');
+    const normalNoteInfo = document.getElementById('normalNoteInfo');
+    const specialNoteInfo = document.getElementById('specialNoteInfo');
+    const speakToOperatorBtn = document.getElementById('speakToOperatorBtn');
+    const speakResultField = document.getElementById('speakResultField');
+    const speakStatus = document.getElementById('speakStatus');
+    const clearSpeakBtn = document.getElementById('clearSpeakBtn');
+    const speakDetailModal = document.getElementById('speakDetailModal');
+    const speakOriginalText = document.getElementById('speakOriginalText');
+    const speakTranslatedText = document.getElementById('speakTranslatedText');
+    const closeSpeakModalBtn = document.getElementById('closeSpeakModalBtn');
+    const adaptiveModal = document.getElementById('adaptiveModal');
+    const modalTextarea = document.getElementById('modalTextarea');
+    const closeAdaptiveBtn = document.getElementById('closeAdaptiveBtn');
+    const noteEditModal = document.getElementById('noteEditModal');
+    const editNoteTitle = document.getElementById('editNoteTitle');
+    const editNoteDesc = document.getElementById('editNoteDesc');
+    const saveNoteBtn = document.getElementById('saveNoteBtn');
+    const cancelNoteBtn = document.getElementById('cancelNoteBtn');
+    const noteModalTitle = document.getElementById('noteModalTitle');
+    const exportAllBtn = document.getElementById('exportAllBtn');
+    const importAllBtn = document.getElementById('importAllBtn');
+    const globalImportFileInput = document.getElementById('globalImportFileInput');
+    const contactsGrid = document.getElementById('contactsGrid');
+    const clientCodeInput = document.getElementById('clientCodeInput');
+    const unlockCodeInput = document.getElementById('unlockCodeInput');
+    const activateLicenseBtn = document.getElementById('activateLicenseBtn');
+    const copyRequestBtn = document.getElementById('copyRequestBtn');
+    const adminSection = document.getElementById('adminSection');
+    const adminClientCode = document.getElementById('adminClientCode');
+    const adminFirstRun = document.getElementById('adminFirstRun');
+    const generateUnlockBtn = document.getElementById('generateUnlockBtn');
+    const generatedCode = document.getElementById('generatedCode');
+    const copyGeneratedBtn = document.getElementById('copyGeneratedBtn');
+    const hideAdminBtn = document.getElementById('hideAdminBtn');
+    const adminLongPressBtn = document.getElementById('adminLongPressBtn');
+    const newAdminCode = document.getElementById('newAdminCode');
+    const changeAdminCodeBtn = document.getElementById('changeAdminCodeBtn');
+    const daysHomeDisplay = document.getElementById('daysLeftDisplayHome');
+    const infoModal = document.getElementById('infoModal');
+    const infoModalText = document.getElementById('infoModalText');
+    const closeInfoModalBtn = document.getElementById('closeInfoModalBtn');
     const backFromImageBtn = document.getElementById('backFromImageBtn');
     const imagePreviewArea = document.getElementById('imagePreviewArea');
     const infoTextDisplay = document.getElementById('infoTextDisplay');
@@ -807,6 +884,7 @@
     const infoTextarea = document.getElementById('infoTextarea');
     const saveInfoTextBtn = document.getElementById('saveInfoTextBtn');
     const cancelInfoTextBtn = document.getElementById('cancelInfoTextBtn');
+    // Nuovi elementi
     const coordButton = document.getElementById('coordButton');
     const coordHint = document.getElementById('coordHint');
     const webButton = document.getElementById('webButton');
@@ -819,134 +897,82 @@
     let lastItalianText = "";
     let lastFrenchTranslation = "";
 
-    // ==================== GESTIONE RETE DINAMICA CON ID ====================
-    let reteData = { id: "root", title: "RETE", children: [], infoText: "", infoImage: null, coordinate: "", websiteUrl: "" };
-    let currentStack = [];
-    let currentNodeId = "root";
-
-    function generateId() {
-        return Date.now() + '-' + Math.random().toString(36).substr(2, 8);
-    }
-
-    function findNodeById(node, id) {
-        if (node.id === id) return node;
-        if (node.children) {
-            for (let child of node.children) {
-                const found = findNodeById(child, id);
-                if (found) return found;
-            }
-        }
-        return null;
-    }
-
-    function getCurrentNode() {
-        return findNodeById(reteData, currentNodeId);
-    }
+    // ==================== GESTIONE RETE DINAMICA (albero con info e foto) ====================
+    let reteData = { title: "RETE", children: [] };
+    let currentStack = []; // stack per navigazione
+    let currentNodeForInfo = null; // nodo attualmente visualizzato nella pagina ATTIVITA'
 
     function saveReteData() {
         localStorage.setItem('monastir_rete_data', JSON.stringify(reteData));
     }
-
     function loadReteData() {
         const saved = localStorage.getItem('monastir_rete_data');
         if (saved) {
             try {
                 reteData = JSON.parse(saved);
-                function ensureIds(node) {
-                    if (!node.id) node.id = generateId();
+                function ensureFields(node) {
                     if (!node.infoText) node.infoText = "";
                     if (!node.infoImage) node.infoImage = null;
                     if (!node.coordinate) node.coordinate = "";
                     if (!node.websiteUrl) node.websiteUrl = "";
-                    if (node.children) node.children.forEach(ensureIds);
+                    if (node.children) node.children.forEach(ensureFields);
                 }
-                ensureIds(reteData);
+                ensureFields(reteData);
             } catch(e) { console.warn(e); }
         }
-        if (!reteData.id) reteData.id = "root";
-        if (!reteData.title) reteData.title = "RETE";
+        if (!reteData.title) reteData = { title: "RETE", children: [] };
         if (!reteData.children) reteData.children = [];
         if (!reteData.infoText) reteData.infoText = "";
         if (!reteData.infoImage) reteData.infoImage = null;
         if (!reteData.coordinate) reteData.coordinate = "";
         if (!reteData.websiteUrl) reteData.websiteUrl = "";
-        currentNodeId = "root";
-        currentStack = [];
     }
-    function addEmptyChildToParent(parentId) {
+
+    function addEmptyChildToNode(parentNode) {
         if (!adminAuthenticated) {
             alert("Solo l'amministratore può aggiungere nuovi tasti.");
             return null;
         }
-        const parent = findNodeById(reteData, parentId);
-        if (!parent) return null;
-        if (!parent.children) parent.children = [];
-        const newId = generateId();
-        const newNode = {
-            id: newId,
-            title: "",
+        if (!parentNode.children) parentNode.children = [];
+        parentNode.children.push({ 
+            title: "", 
             children: [],
             infoText: "",
             infoImage: null,
             coordinate: "",
             websiteUrl: ""
-        };
-        parent.children.push(newNode);
+        });
         saveReteData();
-        return newNode;
+        return parentNode.children[parentNode.children.length - 1];
     }
 
-    function editNodeTitle(nodeId, newTitle) {
+    function editNodeTitle(node, newTitle) {
         if (!adminAuthenticated) {
             alert("Solo l'amministratore può modificare i titoli.");
             return false;
         }
-        const node = findNodeById(reteData, nodeId);
-        if (node) {
-            node.title = newTitle;
-            saveReteData();
-            return true;
-        }
-        return false;
+        node.title = newTitle;
+        saveReteData();
+        return true;
     }
 
-    function deleteNode(nodeId) {
+    function deleteNode(parentNode, nodeToDelete) {
         if (!adminAuthenticated) {
             alert("Solo l'amministratore può eliminare tasti.");
             return false;
         }
-        function findParent(parent, targetId) {
-            if (parent.children) {
-                for (let i = 0; i < parent.children.length; i++) {
-                    if (parent.children[i].id === targetId) {
-                        parent.children.splice(i, 1);
-                        return true;
-                    }
-                    if (findParent(parent.children[i], targetId)) return true;
-                }
-            }
-            return false;
-        }
-        const result = findParent(reteData, nodeId);
-        if (result) {
+        const index = parentNode.children.findIndex(c => c === nodeToDelete);
+        if (index !== -1) {
+            parentNode.children.splice(index, 1);
             saveReteData();
-            if (currentNodeId === nodeId) {
-                if (currentStack.length > 0) {
-                    currentNodeId = currentStack.pop();
-                } else {
-                    currentNodeId = "root";
-                }
-                backToImagePage();
-            }
             return true;
         }
         return false;
     }
 
-    function renderReteLevel(container, parentId, levelStack) {
+    // Render dei tasti (livello corrente) con pulsante elimina per admin - solo titolo
+    function renderReteLevel(container, parentNode, levelStack) {
         container.innerHTML = '';
-        const parentNode = findNodeById(reteData, parentId);
-        if (!parentNode) return;
         if (!parentNode.children || parentNode.children.length === 0) {
             const emptyMsg = document.createElement('div');
             emptyMsg.style.textAlign = 'center';
@@ -959,37 +985,41 @@
             parentNode.children.forEach((child) => {
                 const itemDiv = document.createElement('div');
                 itemDiv.className = 'rete-item';
+                
                 const btn = document.createElement('div');
                 btn.className = 'rete-button';
                 btn.innerText = child.title && child.title.trim() !== "" ? child.title : "[Tasto vuoto]";
-                // Navigazione: click corto -> entra nella pagina ATTIVITA' del nodo figlio
+                // Navigazione
                 btn.addEventListener('click', (e) => {
                     e.stopPropagation();
-                    openReteSubPage(child.id, parentId);
+                    openReteSubPage(child, parentNode, levelStack);
                 });
-                // Long press per modificare titolo (solo admin)
-                if (adminAuthenticated) {
-                    let pressTimer = null;
-                    const startLongPress = () => {
-                        pressTimer = setTimeout(() => {
-                            const newTitle = prompt("Inserisci il nuovo titolo per questo tasto:", child.title);
-                            if (newTitle !== null && newTitle.trim() !== "") {
-                                editNodeTitle(child.id, newTitle.trim());
-                                renderReteLevel(container, parentId, levelStack);
-                            } else if (newTitle !== null && newTitle.trim() === "") {
-                                alert("Il titolo non può essere vuoto.");
-                            }
-                        }, 3000);
-                    };
-                    const cancelLongPress = () => { if (pressTimer) clearTimeout(pressTimer); };
-                    btn.addEventListener('mousedown', startLongPress);
-                    btn.addEventListener('mouseup', cancelLongPress);
-                    btn.addEventListener('mouseleave', cancelLongPress);
-                    btn.addEventListener('touchstart', startLongPress, { passive: true });
-                    btn.addEventListener('touchend', cancelLongPress);
-                    btn.addEventListener('touchcancel', cancelLongPress);
-                }
+                // Modifica titolo: solo admin con 3 sec
+                let pressTimer = null;
+                const startLongPress = () => {
+                    pressTimer = setTimeout(() => {
+                        if (!adminAuthenticated) {
+                            alert("Solo l'amministratore può modificare questo tasto.");
+                            return;
+                        }
+                        const newTitle = prompt("Inserisci il nuovo titolo per questo tasto:", child.title);
+                        if (newTitle !== null && newTitle.trim() !== "") {
+                            editNodeTitle(child, newTitle.trim());
+                            renderReteLevel(container, parentNode, levelStack);
+                        } else if (newTitle !== null && newTitle.trim() === "") {
+                            alert("Il titolo non può essere vuoto.");
+                        }
+                    }, 3000);
+                };
+                const cancelLongPress = () => { if (pressTimer) clearTimeout(pressTimer); };
+                btn.addEventListener('mousedown', startLongPress);
+                btn.addEventListener('mouseup', cancelLongPress);
+                btn.addEventListener('mouseleave', cancelLongPress);
+                btn.addEventListener('touchstart', startLongPress, { passive: true });
+                btn.addEventListener('touchend', cancelLongPress);
+                btn.addEventListener('touchcancel', cancelLongPress);
                 itemDiv.appendChild(btn);
+                
                 // Pulsante elimina (solo admin)
                 if (adminAuthenticated) {
                     const deleteBtn = document.createElement('button');
@@ -998,8 +1028,8 @@
                     deleteBtn.addEventListener('click', (e) => {
                         e.stopPropagation();
                         if (confirm(`Eliminare definitivamente il tasto "${child.title || 'Senza titolo'}" e tutti i suoi sotto-tasti?`)) {
-                            deleteNode(child.id);
-                            renderReteLevel(container, parentId, levelStack);
+                            deleteNode(parentNode, child);
+                            renderReteLevel(container, parentNode, levelStack);
                         }
                     });
                     itemDiv.appendChild(deleteBtn);
@@ -1007,7 +1037,7 @@
                 container.appendChild(itemDiv);
             });
         }
-        // Pulsante aggiungi tasto (solo admin)
+        // Pulsante aggiungi tasto: solo admin
         if (adminAuthenticated) {
             const addBtn = document.createElement('div');
             addBtn.className = 'rete-button';
@@ -1016,8 +1046,12 @@
             let addPressTimer = null;
             const startAddLongPress = () => {
                 addPressTimer = setTimeout(() => {
-                    const newChild = addEmptyChildToParent(parentId);
-                    if (newChild) renderReteLevel(container, parentId, levelStack);
+                    if (!adminAuthenticated) {
+                        alert("Solo l'amministratore può aggiungere nuovi tasti.");
+                        return;
+                    }
+                    const newEmpty = addEmptyChildToNode(parentNode);
+                    if (newEmpty) renderReteLevel(container, parentNode, levelStack);
                 }, 3000);
             };
             const cancelAddLongPress = () => { if (addPressTimer) clearTimeout(addPressTimer); };
@@ -1031,16 +1065,15 @@
         }
     }
 
-    function openReteSubPage(childId, parentId) {
-        currentStack.push(currentNodeId);
-        currentNodeId = childId;
-        const node = getCurrentNode();
-        if (!node) return;
+    // Apre la pagina ATTIVITA' per un nodo
+    function openReteSubPage(node, parentNode, levelStack) {
+        currentNodeForInfo = node;
+        currentStack.push({ node: parentNode, parent: levelStack.length > 0 ? levelStack[levelStack.length-1] : null });
         const titleName = node.title && node.title.trim() !== "" ? node.title : "Senza titolo";
         reteSubHeader.innerText = `ATTIVITÀ: ${titleName}`;
-        renderReteLevel(reteSubContainer, childId, currentStack);
+        renderReteLevel(reteSubContainer, node, [...levelStack, node]);
         loadInfoForCurrentNode();
-        loadSpecialActions();
+        loadSpecialActions(); // carica coordinate e url del nodo
         if (adminAuthenticated) {
             infoEditButtons.classList.remove('hidden-btn');
         } else {
@@ -1050,26 +1083,7 @@
         reteSubPage.classList.remove('hidden');
     }
 
-    function backFromReteSub() {
-        if (currentStack.length > 0) {
-            currentNodeId = currentStack.pop();
-        } else {
-            currentNodeId = "root";
-        }
-        reteSubPage.classList.add('hidden');
-        imagePage.classList.remove('hidden');
-        renderReteLevel(reteLevelContainer, "root", []);
-        currentNodeId = "root";
-    }
-
-    function backToImagePage() {
-        reteSubPage.classList.add('hidden');
-        imagePage.classList.remove('hidden');
-        renderReteLevel(reteLevelContainer, "root", []);
-        currentNodeId = "root";
-        currentStack = [];
-    }
-
+    // Funzione per convertire il testo in HTML con link cliccabili
     function linkifyText(text) {
         if (!text) return "Nessuna informazione aggiuntiva.";
         const urlRegex = /(https?:\/\/[^\s]+)/g;
@@ -1078,28 +1092,146 @@
         }).replace(/\n/g, '<br>');
     }
 
+    // Carica testo e immagine informativa del nodo corrente
     function loadInfoForCurrentNode() {
-        const node = getCurrentNode();
-        if (!node) return;
-        const infoText = node.infoText || "";
-        infoTextDisplay.innerHTML = linkifyText(infoText);
+        if (!currentNodeForInfo) return;
+        const infoText = currentNodeForInfo.infoText || "";
+        const linkedHtml = linkifyText(infoText);
+        infoTextDisplay.innerHTML = linkedHtml === "" ? "Nessuna informazione aggiuntiva." : linkedHtml;
+        
         infoImageContainer.innerHTML = '';
-        if (node.infoImage) {
+        if (currentNodeForInfo.infoImage) {
             const img = document.createElement('img');
-            img.src = node.infoImage;
+            img.src = currentNodeForInfo.infoImage;
             img.className = 'info-mini-img';
             img.style.maxWidth = '100%';
             img.style.maxHeight = '90px';
             img.style.objectFit = 'contain';
             img.style.borderRadius = '12px';
             infoImageContainer.appendChild(img);
-            if (adminAuthenticated) attachInfoImageLongPress(img);
+            if (adminAuthenticated) {
+                attachInfoImageLongPress(img);
+            }
         } else {
             const placeholder = document.createElement('div');
             placeholder.className = 'info-mini-placeholder';
             placeholder.innerText = adminAuthenticated ? "📸 Premi a lungo (3 sec) per aggiungere una foto" : "Nessuna foto disponibile";
             infoImageContainer.appendChild(placeholder);
-            if (adminAuthenticated) attachInfoPlaceholderLongPress(placeholder);
+            if (adminAuthenticated) {
+                attachInfoPlaceholderLongPress(placeholder);
+            }
+        }
+    }
+
+    // Carica i pulsanti speciali (coordinate e sito web)
+    function loadSpecialActions() {
+        if (!currentNodeForInfo) return;
+        // Gestione pulsante coordinate
+        const coordValue = currentNodeForInfo.coordinate || "";
+        if (coordValue.trim() !== "") {
+            coordButton.innerText = `📍 ${coordValue}`;
+        } else {
+            coordButton.innerText = "📍 COORDINATE (non impostate)";
+        }
+        // Il testo del pulsante SITO WEB è fisso, ma l'URL è interno
+        // La modifica è solo admin
+        // Non mostriamo l'URL al cliente
+        // Pulsante web: gestione modifica admin
+        // Rimuovo eventuali listener precedenti e li riattacco
+        setupCoordButton();
+        setupWebButton();
+    }
+
+    function setupCoordButton() {
+        // Rimuovi vecchi listener
+        const newCoordBtn = coordButton.cloneNode(true);
+        coordButton.parentNode.replaceChild(newCoordBtn, coordButton);
+        window.coordButton = newCoordBtn;
+        
+        // Click corto: apri Google Maps con le coordinate
+        newCoordBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const coord = currentNodeForInfo?.coordinate || "";
+            if (coord && coord.trim() !== "") {
+                // Formatta la stringa delle coordinate (es. "43.841977, 11.170855")
+                let url = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(coord)}`;
+                window.open(url, '_blank');
+            } else {
+                alert("Nessuna coordinata impostata per questa attività.");
+            }
+        });
+        // Long press (3 sec) solo admin per modificare le coordinate
+        if (adminAuthenticated) {
+            let pressTimer = null;
+            const startLongPress = () => {
+                pressTimer = setTimeout(() => {
+                    const newCoord = prompt("Inserisci le coordinate nel formato: latitudine, longitudine (es. 43.841977, 11.170855)", currentNodeForInfo?.coordinate || "");
+                    if (newCoord !== null && newCoord.trim() !== "") {
+                        // Validazione semplice: deve contenere una virgola e due numeri
+                        if (newCoord.includes(',') && !isNaN(parseFloat(newCoord.split(',')[0])) && !isNaN(parseFloat(newCoord.split(',')[1]))) {
+                            currentNodeForInfo.coordinate = newCoord.trim();
+                            saveReteData();
+                            loadSpecialActions();
+                        } else {
+                            alert("Formato non valido. Usa: latitudine, longitudine (es. 43.841977, 11.170855)");
+                        }
+                    } else if (newCoord !== null && newCoord.trim() === "") {
+                        currentNodeForInfo.coordinate = "";
+                        saveReteData();
+                        loadSpecialActions();
+                    }
+                }, 3000);
+            };
+            const cancelLongPress = () => { if (pressTimer) clearTimeout(pressTimer); };
+            newCoordBtn.addEventListener('mousedown', startLongPress);
+            newCoordBtn.addEventListener('mouseup', cancelLongPress);
+            newCoordBtn.addEventListener('mouseleave', cancelLongPress);
+            newCoordBtn.addEventListener('touchstart', startLongPress, { passive: true });
+            newCoordBtn.addEventListener('touchend', cancelLongPress);
+            newCoordBtn.addEventListener('touchcancel', cancelLongPress);
+        }
+    }
+
+    function setupWebButton() {
+        const newWebBtn = webButton.cloneNode(true);
+        webButton.parentNode.replaceChild(newWebBtn, webButton);
+        window.webButton = newWebBtn;
+        
+        // Click corto: apri l'URL salvato
+        newWebBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const url = currentNodeForInfo?.websiteUrl || "";
+            if (url && url.trim() !== "") {
+                let fullUrl = url.trim();
+                if (!fullUrl.startsWith('http://') && !fullUrl.startsWith('https://')) {
+                    fullUrl = 'https://' + fullUrl;
+                }
+                window.open(fullUrl, '_blank');
+            } else {
+                alert("Nessun sito web associato a questa attività.");
+            }
+        });
+        // Long press (3 sec) solo admin per modificare l'URL
+        if (adminAuthenticated) {
+            let pressTimer = null;
+            const startLongPress = () => {
+                pressTimer = setTimeout(() => {
+                    const newUrl = prompt("Inserisci l'indirizzo del sito web (es. https://www.example.com):", currentNodeForInfo?.websiteUrl || "");
+                    if (newUrl !== null) {
+                        currentNodeForInfo.websiteUrl = newUrl.trim();
+                        saveReteData();
+                        // Non c'è bisogno di aggiornare il testo del pulsante (è fisso)
+                        loadSpecialActions();
+                    }
+                }, 3000);
+            };
+            const cancelLongPress = () => { if (pressTimer) clearTimeout(pressTimer); };
+            newWebBtn.addEventListener('mousedown', startLongPress);
+            newWebBtn.addEventListener('mouseup', cancelLongPress);
+            newWebBtn.addEventListener('mouseleave', cancelLongPress);
+            newWebBtn.addEventListener('touchstart', startLongPress, { passive: true });
+            newWebBtn.addEventListener('touchend', cancelLongPress);
+            newWebBtn.addEventListener('touchcancel', cancelLongPress);
         }
     }
 
@@ -1146,9 +1278,8 @@
             if (file) {
                 const reader = new FileReader();
                 reader.onload = (event) => {
-                    const node = getCurrentNode();
-                    if (node) {
-                        node.infoImage = event.target.result;
+                    if (currentNodeForInfo) {
+                        currentNodeForInfo.infoImage = event.target.result;
                         saveReteData();
                         loadInfoForCurrentNode();
                     }
@@ -1161,19 +1292,15 @@
 
     function openInfoTextModal() {
         if (!adminAuthenticated) return;
-        const node = getCurrentNode();
-        if (node) infoTextarea.value = node.infoText || "";
+        infoTextarea.value = currentNodeForInfo?.infoText || "";
         infoTextModalDiv.style.display = 'flex';
     }
     function closeInfoTextModal() { infoTextModalDiv.style.display = 'none'; }
     function saveInfoText() {
-        if (adminAuthenticated) {
-            const node = getCurrentNode();
-            if (node) {
-                node.infoText = infoTextarea.value;
-                saveReteData();
-                loadInfoForCurrentNode();
-            }
+        if (currentNodeForInfo && adminAuthenticated) {
+            currentNodeForInfo.infoText = infoTextarea.value;
+            saveReteData();
+            loadInfoForCurrentNode();
         }
         closeInfoTextModal();
     }
@@ -1182,94 +1309,13 @@
     cancelInfoTextBtn.addEventListener('click', closeInfoTextModal);
     infoTextModalDiv.addEventListener('click', (e) => { if (e.target === infoTextModalDiv) closeInfoTextModal(); });
 
-    function loadSpecialActions() {
-        const node = getCurrentNode();
-        if (!node) return;
-        const coordValue = node.coordinate || "";
-        coordButton.innerText = coordValue.trim() !== "" ? `📍 ${coordValue}` : "📍 COORDINATE (non impostate)";
-        setupCoordButton(node);
-        setupWebButton(node);
+    function backFromReteSub() {
+        if (currentStack.length > 0) currentStack.pop();
+        reteSubPage.classList.add('hidden');
+        imagePage.classList.remove('hidden');
+        renderReteLevel(reteLevelContainer, reteData, [reteData]);
+        currentNodeForInfo = null;
     }
-
-    function setupCoordButton(node) {
-        const newCoordBtn = coordButton.cloneNode(true);
-        coordButton.parentNode.replaceChild(newCoordBtn, coordButton);
-        window.coordButton = newCoordBtn;
-        newCoordBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            const coord = node.coordinate || "";
-            if (coord && coord.trim() !== "") {
-                const url = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(coord)}`;
-                window.open(url, '_blank');
-            } else {
-                alert("Nessuna coordinata impostata per questa attività.");
-            }
-        });
-        if (adminAuthenticated) {
-            let pressTimer = null;
-            const startLongPress = () => {
-                pressTimer = setTimeout(() => {
-                    const newCoord = prompt("Inserisci le coordinate (es. 43.841977, 11.170855):", node.coordinate || "");
-                    if (newCoord !== null) {
-                        if (newCoord.trim() === "") {
-                            node.coordinate = "";
-                        } else if (newCoord.includes(',') && !isNaN(parseFloat(newCoord.split(',')[0])) && !isNaN(parseFloat(newCoord.split(',')[1]))) {
-                            node.coordinate = newCoord.trim();
-                        } else {
-                            alert("Formato non valido. Usa: latitudine, longitudine (es. 43.841977, 11.170855)");
-                        }
-                        saveReteData();
-                        loadSpecialActions();
-                    }
-                }, 3000);
-            };
-            const cancelLongPress = () => { if (pressTimer) clearTimeout(pressTimer); };
-            newCoordBtn.addEventListener('mousedown', startLongPress);
-            newCoordBtn.addEventListener('mouseup', cancelLongPress);
-            newCoordBtn.addEventListener('mouseleave', cancelLongPress);
-            newCoordBtn.addEventListener('touchstart', startLongPress, { passive: true });
-            newCoordBtn.addEventListener('touchend', cancelLongPress);
-            newCoordBtn.addEventListener('touchcancel', cancelLongPress);
-        }
-    }
-
-    function setupWebButton(node) {
-        const newWebBtn = webButton.cloneNode(true);
-        webButton.parentNode.replaceChild(newWebBtn, webButton);
-        window.webButton = newWebBtn;
-        newWebBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            const url = node.websiteUrl || "";
-            if (url && url.trim() !== "") {
-                let fullUrl = url.trim();
-                if (!fullUrl.startsWith('http://') && !fullUrl.startsWith('https://')) fullUrl = 'https://' + fullUrl;
-                window.open(fullUrl, '_blank');
-            } else {
-                alert("Nessun sito web associato a questa attività.");
-            }
-        });
-        if (adminAuthenticated) {
-            let pressTimer = null;
-            const startLongPress = () => {
-                pressTimer = setTimeout(() => {
-                    const newUrl = prompt("Inserisci l'indirizzo del sito web (es. https://www.example.com):", node.websiteUrl || "");
-                    if (newUrl !== null) {
-                        node.websiteUrl = newUrl.trim();
-                        saveReteData();
-                        loadSpecialActions();
-                    }
-                }, 3000);
-            };
-            const cancelLongPress = () => { if (pressTimer) clearTimeout(pressTimer); };
-            newWebBtn.addEventListener('mousedown', startLongPress);
-            newWebBtn.addEventListener('mouseup', cancelLongPress);
-            newWebBtn.addEventListener('mouseleave', cancelLongPress);
-            newWebBtn.addEventListener('touchstart', startLongPress, { passive: true });
-            newWebBtn.addEventListener('touchend', cancelLongPress);
-            newWebBtn.addEventListener('touchcancel', cancelLongPress);
-        }
-    }
-
     backFromReteSubBtn.addEventListener('click', backFromReteSub);
 
     // ==================== FUNZIONI PER LA PAGINA FOTO (IMMAGINE PRINCIPALE) ====================
@@ -1382,39 +1428,141 @@
 
     // ==================== FUNZIONI LICENZA E ADMIN ====================
     function generateRandomClientCode() { return Math.floor(1000000000 + Math.random() * 9000000000).toString(); }
-    function hashTo20Digits(hash) { let hex = hash.toString(CryptoJS.enc.Hex); let decimal = BigInt('0x' + hex).toString(); return decimal.slice(0,20).padStart(20,'0'); }
-    function verifyUnlockCode(clientCode, firstRun, unlockCode) { const message = `${clientCode}|${firstRun}`; const hash = CryptoJS.HmacSHA256(message, SECRET_KEY); const expected = hashTo20Digits(hash); return expected === unlockCode; }
-    async function getCurrentUTCTime() { try { const res = await fetch('https://worldtimeapi.org/api/timezone/Etc/UTC'); if (!res.ok) throw new Error(); const data = await res.json(); return new Date(data.utc_datetime); } catch(e) { return new Date(); } }
+    function hashTo20Digits(hash) {
+        let hex = hash.toString(CryptoJS.enc.Hex);
+        let decimal = BigInt('0x' + hex).toString();
+        return decimal.slice(0,20).padStart(20,'0');
+    }
+    function verifyUnlockCode(clientCode, firstRun, unlockCode) {
+        const message = `${clientCode}|${firstRun}`;
+        const hash = CryptoJS.HmacSHA256(message, SECRET_KEY);
+        const expected = hashTo20Digits(hash);
+        return expected === unlockCode;
+    }
+    async function getCurrentUTCTime() {
+        try {
+            const res = await fetch('https://worldtimeapi.org/api/timezone/Etc/UTC');
+            if (!res.ok) throw new Error();
+            const data = await res.json();
+            return new Date(data.utc_datetime);
+        } catch(e) { return new Date(); }
+    }
     async function initLicense() {
         const now = await getCurrentUTCTime();
         let firstRun = localStorage.getItem('firstRun');
-        if (!firstRun) { firstRun = now.getTime(); localStorage.setItem('firstRun', firstRun); let newClientCode = generateRandomClientCode(); localStorage.setItem('clientCode', newClientCode); localStorage.setItem('activated', 'false'); localStorage.setItem('expiryDate', firstRun + 90 * 86400000); }
+        if (!firstRun) {
+            firstRun = now.getTime();
+            localStorage.setItem('firstRun', firstRun);
+            let newClientCode = generateRandomClientCode();
+            localStorage.setItem('clientCode', newClientCode);
+            localStorage.setItem('activated', 'false');
+            localStorage.setItem('expiryDate', firstRun + 90 * 86400000);
+        }
         firstRun = parseInt(firstRun);
         clientCode = localStorage.getItem('clientCode') || generateRandomClientCode();
         if (!localStorage.getItem('clientCode')) localStorage.setItem('clientCode', clientCode);
         const activated = localStorage.getItem('activated') === 'true';
         let expiry = parseInt(localStorage.getItem('expiryDate'));
-        if (activated && expiry < firstRun + 365 * 86400000) { expiry = firstRun + 365 * 86400000; localStorage.setItem('expiryDate', expiry); }
+        if (activated && expiry < firstRun + 365 * 86400000) {
+            expiry = firstRun + 365 * 86400000;
+            localStorage.setItem('expiryDate', expiry);
+        }
         const nowTime = now.getTime();
-        if (nowTime > expiry) { licenseActive = false; licenseCheckPassed = false; } else { licenseActive = activated; licenseCheckPassed = true; }
+        if (nowTime > expiry) { licenseActive = false; licenseCheckPassed = false; }
+        else { licenseActive = activated; licenseCheckPassed = true; }
         daysRemaining = Math.ceil((expiry - nowTime) / 86400000);
         updateLicenseUI();
         toggleAppAccess(!licenseCheckPassed);
         if (clientCodeInput) clientCodeInput.value = clientCode;
         if (daysHomeDisplay) daysHomeDisplay.innerText = `Versione: ${CURRENT_VERSION} - Giorni rimanenti: ${daysRemaining}`;
     }
-    function updateLicenseUI() { const activated = localStorage.getItem('activated') === 'true'; if (activated) { if (unlockCodeInput) unlockCodeInput.disabled = true; if (activateLicenseBtn) activateLicenseBtn.disabled = true; } else { if (unlockCodeInput) unlockCodeInput.disabled = false; if (activateLicenseBtn) activateLicenseBtn.disabled = false; } }
-    function toggleAppAccess(block) { document.querySelectorAll('.big-btn').forEach(btn => { if (block) { btn.style.pointerEvents = 'none'; btn.style.opacity = '0.5'; } else { btn.style.pointerEvents = 'auto'; btn.style.opacity = '1'; } }); }
-    async function onActivateLicense() { const unlockCode = unlockCodeInput.value.trim(); if (!/^\d{20}$/.test(unlockCode)) { alert('Codice sblocco deve essere esattamente 20 cifre.'); return; } const firstRun = localStorage.getItem('firstRun'); if (!firstRun) { alert('Errore: primo avvio non rilevato.'); return; } if (verifyUnlockCode(clientCode, parseInt(firstRun), unlockCode)) { const firstRunNum = parseInt(firstRun); const newExpiry = firstRunNum + 365 * 86400000; localStorage.setItem('activated', 'true'); localStorage.setItem('expiryDate', newExpiry); await initLicense(); alert('Licenza attivata con successo! 365 giorni di utilizzo.'); } else { alert('Codice di sblocco non valido.'); } }
-    function copyRequest() { const firstRun = localStorage.getItem('firstRun'); if (!firstRun) { alert('Errore: impossibile recuperare i dati.'); return; } const clientCodeVal = clientCode; const fullMessage = `Dati copiati negli appunti!\n\nCODICE CLIENTE: ${clientCodeVal}\n\nPer Attivare il tuo Abbonamento,\n\nPRIMO PASSAGGIO:\nInvia il bonifico bancario:\nIBAN: IT31R 033951 29000 527025 73770\nIntestato a: Paolo Maiorana\nImporto Annuale: €. 48,00\nCausale: inserisci solo il codice cliente\n\nSECONDO PASSAGGIO:\nInviaci una email col tuo CODICE CLIENTE a:\ngliamicidipaolino@gmail.com\nRisponderemo fornendoti il CODICE di SBLOCCO.\n\nUn caro Saluto.`; navigator.clipboard.writeText(fullMessage); infoModalText.innerText = fullMessage; infoModal.style.display = 'flex'; }
+    function updateLicenseUI() {
+        const activated = localStorage.getItem('activated') === 'true';
+        if (activated) {
+            if (unlockCodeInput) unlockCodeInput.disabled = true;
+            if (activateLicenseBtn) activateLicenseBtn.disabled = true;
+        } else {
+            if (unlockCodeInput) unlockCodeInput.disabled = false;
+            if (activateLicenseBtn) activateLicenseBtn.disabled = false;
+        }
+    }
+    function toggleAppAccess(block) {
+        document.querySelectorAll('.big-btn').forEach(btn => {
+            if (block) { btn.style.pointerEvents = 'none'; btn.style.opacity = '0.5'; }
+            else { btn.style.pointerEvents = 'auto'; btn.style.opacity = '1'; }
+        });
+    }
+    async function onActivateLicense() {
+        const unlockCode = unlockCodeInput.value.trim();
+        if (!/^\d{20}$/.test(unlockCode)) { alert('Codice sblocco deve essere esattamente 20 cifre.'); return; }
+        const firstRun = localStorage.getItem('firstRun');
+        if (!firstRun) { alert('Errore: primo avvio non rilevato.'); return; }
+        if (verifyUnlockCode(clientCode, parseInt(firstRun), unlockCode)) {
+            const firstRunNum = parseInt(firstRun);
+            const newExpiry = firstRunNum + 365 * 86400000;
+            localStorage.setItem('activated', 'true');
+            localStorage.setItem('expiryDate', newExpiry);
+            await initLicense();
+            alert('Licenza attivata con successo! 365 giorni di utilizzo.');
+        } else { alert('Codice di sblocco non valido.'); }
+    }
+    function copyRequest() {
+        const firstRun = localStorage.getItem('firstRun');
+        if (!firstRun) { alert('Errore: impossibile recuperare i dati.'); return; }
+        const clientCodeVal = clientCode;
+        const fullMessage = `Dati copiati negli appunti!
+
+CODICE CLIENTE: ${clientCodeVal}
+
+Per Attivare il tuo Abbonamento,
+
+PRIMO PASSAGGIO:
+Invia il bonifico bancario:
+IBAN: IT31R 033951 29000 527025 73770
+Intestato a: Paolo Maiorana
+Importo Annuale: €. 48,00
+Causale: inserisci solo il codice cliente
+
+SECONDO PASSAGGIO:
+Inviaci una email col tuo CODICE CLIENTE a:
+gliamicidipaolino@gmail.com
+Risponderemo fornendoti il CODICE di SBLOCCO.
+
+Un caro Saluto.`;
+        navigator.clipboard.writeText(fullMessage);
+        infoModalText.innerText = fullMessage;
+        infoModal.style.display = 'flex';
+    }
     closeInfoModalBtn.addEventListener('click', () => { infoModal.style.display = 'none'; });
     infoModal.addEventListener('click', (e) => { if (e.target === infoModal) infoModal.style.display = 'none'; });
 
-    function loadAdminCode() { const saved = localStorage.getItem('adminCode'); if (saved && saved.trim() !== "") adminCode = saved; else { adminCode = "admin2025"; localStorage.setItem('adminCode', adminCode); } }
-    function saveAdminCode(newCode) { if (newCode && newCode.trim() !== "") { adminCode = newCode; localStorage.setItem('adminCode', adminCode); alert("Codice amministratore cambiato!"); } else alert("Codice non valido."); }
-    function generateUnlockCodeAdmin(clientCode, firstRun) { const message = `${clientCode}|${firstRun}`; const hash = CryptoJS.HmacSHA256(message, SECRET_KEY); return hashTo20Digits(hash); }
-    function onGenerateUnlock() { let clientCodeVal = adminClientCode.value.trim(); let firstRunVal = adminFirstRun.value.trim(); if (!/^\d{6,10}$/.test(clientCodeVal)) { alert('Codice cliente 6-10 cifre.'); return; } if (!/^\d+$/.test(firstRunVal) || firstRunVal.length < 10) { alert('FIRST_RUN valido?'); return; } generatedCode.value = generateUnlockCodeAdmin(clientCodeVal, firstRunVal); }
-    function copyGenerated() { if (!generatedCode.value) { alert('Nessun codice generato.'); return; } navigator.clipboard.writeText(generatedCode.value); alert('Codice copiato.'); }
+    // Admin autenticazione a 3 secondi
+    function loadAdminCode() {
+        const saved = localStorage.getItem('adminCode');
+        if (saved && saved.trim() !== "") adminCode = saved;
+        else { adminCode = "admin2025"; localStorage.setItem('adminCode', adminCode); }
+    }
+    function saveAdminCode(newCode) {
+        if (newCode && newCode.trim() !== "") { adminCode = newCode; localStorage.setItem('adminCode', adminCode); alert("Codice amministratore cambiato!"); }
+        else alert("Codice non valido.");
+    }
+    function generateUnlockCodeAdmin(clientCode, firstRun) {
+        const message = `${clientCode}|${firstRun}`;
+        const hash = CryptoJS.HmacSHA256(message, SECRET_KEY);
+        return hashTo20Digits(hash);
+    }
+    function onGenerateUnlock() {
+        let clientCodeVal = adminClientCode.value.trim();
+        let firstRunVal = adminFirstRun.value.trim();
+        if (!/^\d{6,10}$/.test(clientCodeVal)) { alert('Codice cliente 6-10 cifre.'); return; }
+        if (!/^\d+$/.test(firstRunVal) || firstRunVal.length < 10) { alert('FIRST_RUN valido?'); return; }
+        generatedCode.value = generateUnlockCodeAdmin(clientCodeVal, firstRunVal);
+    }
+    function copyGenerated() {
+        if (!generatedCode.value) { alert('Nessun codice generato.'); return; }
+        navigator.clipboard.writeText(generatedCode.value);
+        alert('Codice copiato.');
+    }
     function showAdminSection() { adminSection.style.display = 'block'; }
     function hideAdminSection() { adminSection.style.display = 'none'; }
     let pressTimer = null;
@@ -1426,15 +1574,16 @@
                 showAdminSection(); 
                 alert("Accesso amministratore autorizzato.");
                 if (imagePage && !imagePage.classList.contains('hidden')) {
-                    renderReteLevel(reteLevelContainer, "root", []);
+                    renderReteLevel(reteLevelContainer, reteData, [reteData]);
                     loadSavedImage();
                 }
-                if (reteSubPage && !reteSubPage.classList.contains('hidden')) {
-                    loadInfoForCurrentNode();
-                    loadSpecialActions();
+                if (reteSubPage && !reteSubPage.classList.contains('hidden') && currentNodeForInfo) {
                     infoEditButtons.classList.remove('hidden-btn');
+                    loadInfoForCurrentNode();
+                    loadSpecialActions(); // ricarica i pulsanti speciali in modalità admin
                 }
-            } else if (code !== null) alert("Codice errato.");
+            }
+            else if (code !== null) alert("Codice errato.");
         }, 3000);
     }
     function cancelAdminTimer() { if (pressTimer) { clearTimeout(pressTimer); pressTimer = null; } }
@@ -1447,13 +1596,61 @@
     generateUnlockBtn.addEventListener('click', onGenerateUnlock);
     copyGeneratedBtn.addEventListener('click', copyGenerated);
     hideAdminBtn.addEventListener('click', hideAdminSection);
-    changeAdminCodeBtn.addEventListener('click', () => { const newCode = newAdminCode.value.trim(); if (newCode) saveAdminCode(newCode); else alert("Inserisci un nuovo codice."); });
+    changeAdminCodeBtn.addEventListener('click', () => {
+        const newCode = newAdminCode.value.trim();
+        if (newCode) saveAdminCode(newCode);
+        else alert("Inserisci un nuovo codice.");
+    });
+
     // ==================== FUNZIONI PER I CONTATTI (HOME) ====================
-    function saveContactExtraText() { for (let s of services) { if (s === 'clinica') continue; localStorage.setItem(`contactExtra_${s}_${CURRENT_VERSION}`, contactExtraText[s]); } }
-    function loadContactExtraText() { for (let s of services) { const saved = localStorage.getItem(`contactExtra_${s}_${CURRENT_VERSION}`); if (saved !== null) contactExtraText[s] = saved; else { if (s === 'clinica') contactExtraText[s] = "MONASTIR: Facciamo Rete"; else contactExtraText[s] = ""; } } }
-    function getContactButtonText(service) { let extra = contactExtraText[service]; if (extra && extra.trim() !== "") return extra; else if (service === 'clinica') return "MONASTIR: Facciamo Rete"; else return `Contatto: premi 5 sc. per modifica`; }
-    function updateContactButtons() { document.querySelectorAll('.big-btn').forEach(btn => { const s = btn.getAttribute('data-service'); if (s) btn.innerText = getContactButtonText(s); }); }
-    function showCustomPrompt(service, currentExtra) { if (service === 'clinica') return; const overlay = document.createElement('div'); overlay.className = 'custom-prompt'; overlay.innerHTML = `<div class="custom-prompt-content"><h3>Modifica testo aggiuntivo</h3><p>Testo attuale: "${currentExtra}"</p><input type="text" id="customPromptInput" maxlength="14" placeholder="Max 14 caratteri" value="${currentExtra}"><div><button id="customPromptOk">OK</button><button id="customPromptCancel">ANNULLA</button></div></div>`; document.body.appendChild(overlay); const input = overlay.querySelector('#customPromptInput'); const okBtn = overlay.querySelector('#customPromptOk'); const cancelBtn = overlay.querySelector('#customPromptCancel'); const close = () => overlay.remove(); okBtn.onclick = () => { let newText = input.value.trim(); if (newText.length > 14) newText = newText.substring(0, 14); contactExtraText[service] = newText; saveContactExtraText(); updateContactButtons(); close(); }; cancelBtn.onclick = close; input.focus(); }
+    function saveContactExtraText() {
+        for (let s of services) {
+            localStorage.setItem(`contactExtra_${s}_${CURRENT_VERSION}`, contactExtraText[s]);
+        }
+    }
+    function loadContactExtraText() {
+        for (let s of services) {
+            const saved = localStorage.getItem(`contactExtra_${s}_${CURRENT_VERSION}`);
+            if (saved !== null) contactExtraText[s] = saved;
+            else {
+                if (s === 'clinica') contactExtraText[s] = "MONASTIR: Facciamo Rete";
+                else contactExtraText[s] = "";
+            }
+        }
+    }
+    function getContactButtonText(service) {
+        let extra = contactExtraText[service];
+        if (extra && extra.trim() !== "") return extra;
+        else if (service === 'clinica') return "MONASTIR: Facciamo Rete";
+        else return `Contatto: premi 5 sc. per modifica`;
+    }
+    function updateContactButtons() {
+        document.querySelectorAll('.big-btn').forEach(btn => {
+            const s = btn.getAttribute('data-service');
+            if (s) btn.innerText = getContactButtonText(s);
+        });
+    }
+    function showCustomPrompt(service, currentExtra) {
+        if (service === 'clinica') return;
+        const overlay = document.createElement('div');
+        overlay.className = 'custom-prompt';
+        overlay.innerHTML = `<div class="custom-prompt-content"><h3>Modifica testo aggiuntivo</h3><p>Testo attuale: "${currentExtra}"</p><input type="text" id="customPromptInput" maxlength="14" placeholder="Max 14 caratteri" value="${currentExtra}"><div><button id="customPromptOk">OK</button><button id="customPromptCancel">ANNULLA</button></div></div>`;
+        document.body.appendChild(overlay);
+        const input = overlay.querySelector('#customPromptInput');
+        const okBtn = overlay.querySelector('#customPromptOk');
+        const cancelBtn = overlay.querySelector('#customPromptCancel');
+        const close = () => overlay.remove();
+        okBtn.onclick = () => {
+            let newText = input.value.trim();
+            if (newText.length > 14) newText = newText.substring(0, 14);
+            contactExtraText[service] = newText;
+            saveContactExtraText();
+            updateContactButtons();
+            close();
+        };
+        cancelBtn.onclick = close;
+        input.focus();
+    }
     function initHomeButtons() {
         contactsGrid.innerHTML = '';
         services.forEach(service => {
@@ -1466,10 +1663,8 @@
                     homePage.classList.add('hidden');
                     imagePage.classList.remove('hidden');
                     requestImagePageWakeLock();
-                    renderReteLevel(reteLevelContainer, "root", []);
+                    renderReteLevel(reteLevelContainer, reteData, [reteData]);
                     loadSavedImage();
-                    currentNodeId = "root";
-                    currentStack = [];
                 } else {
                     showEmergency(service);
                 }
@@ -1488,9 +1683,18 @@
                 let adminPressTimer = null;
                 const startAdminLongPress = () => {
                     adminPressTimer = setTimeout(() => {
-                        if (!adminAuthenticated) { alert("Solo l'amministratore può modificare il titolo di MONASTIR."); return; }
+                        if (!adminAuthenticated) {
+                            alert("Solo l'amministratore può modificare il titolo di MONASTIR.");
+                            return;
+                        }
                         const newText = prompt("Inserisci il nuovo testo per il pulsante MONASTIR:", contactExtraText['clinica']);
-                        if (newText !== null && newText.trim() !== "") { contactExtraText['clinica'] = newText.trim(); saveContactExtraText(); updateContactButtons(); } else if (newText !== null && newText.trim() === "") { alert("Il testo non può essere vuoto."); }
+                        if (newText !== null && newText.trim() !== "") {
+                            contactExtraText['clinica'] = newText.trim();
+                            saveContactExtraText();
+                            updateContactButtons();
+                        } else if (newText !== null && newText.trim() === "") {
+                            alert("Il testo non può essere vuoto.");
+                        }
                     }, 3000);
                 };
                 const cancelAdminLongPress = () => { if (adminPressTimer) clearTimeout(adminPressTimer); };
@@ -1505,53 +1709,388 @@
         });
     }
 
-    // ==================== GEOLOCALIZZAZIONE ====================
-    function haversine(lat1,lng1,lat2,lng2) { const R = 6371e3; const φ1 = lat1 * Math.PI/180, φ2 = lat2 * Math.PI/180; const Δφ = (lat2-lat1) * Math.PI/180, Δλ = (lng2-lng1) * Math.PI/180; const a = Math.sin(Δφ/2)**2 + Math.cos(φ1)*Math.cos(φ2)*Math.sin(Δλ/2)**2; return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); }
-    async function snapToRoad(lat,lng) { let url = `https://overpass-api.de/api/interpreter?data=[out:json];way(around:50,${lat},${lng})["highway"];out center;`; try { let resp = await fetch(url); let data = await resp.json(); if (!data.elements?.length) return {lat,lng}; let way = data.elements[0]; let clat = way.center?.lat || way.lat; let clng = way.center?.lon || way.lon; if (clat && clng && haversine(lat,lng,clat,clng) < 50) return {lat:clat, lng:clng}; return {lat,lng}; } catch(e) { return {lat,lng}; } }
-    async function fetchAllNamedPlaces(lat, lng) { const excludeTags = ["information","bench","waste_basket","toilets","telephone","recycling","fountain","drinking_water"]; let query = `[out:json];(node(around:300,${lat},${lng})[name];way(around:300,${lat},${lng})[name];);out center;`; let url = `https://overpass-api.de/api/interpreter?data=${encodeURIComponent(query)}`; try { let resp = await fetch(url); let data = await resp.json(); if (!data.elements?.length) return []; let items = []; for (let el of data.elements) { let latEl = el.lat || el.center?.lat; let lonEl = el.lon || el.center?.lon; if (!latEl) continue; let tags = el.tags || {}; let name = tags.name; if (!name || name.trim() === "") continue; let cat = tags.amenity || tags.shop || tags.tourism || tags.office || tags.leisure || tags.historic || tags.place || tags.aeroway || tags.railway; if (cat && excludeTags.includes(cat)) continue; let dist = haversine(lat, lng, latEl, lonEl); let display = name; if (cat) { let catMap = { "pharmacy":"Farmacia","hospital":"Ospedale","police":"Commissariato","post_office":"Posta","bank":"Banca", "library":"Biblioteca","fire_station":"Caserma","townhall":"Municipio","supermarket":"Supermercato","convenience":"Alimentari", "cafe":"Bar","restaurant":"Ristorante","pub":"Pub","fast_food":"Fast food","museum":"Museo","monument":"Monumento", "attraction":"Attrazione","square":"Piazza","garden":"Giardino","park":"Parco","bus_station":"Stazione bus","train_station":"Stazione", "church":"Chiesa","services":"Area di servizio","motorway_junction":"Uscita autostradale","aeroway":"Aeroporto","railway":"Stazione", "shop":"Negozio","office":"Ufficio","leisure":"Tempo libero","historic":"Sito storico","place":"Luogo","industrial":"Azienda" }; let readable = catMap[cat] || (cat.charAt(0).toUpperCase() + cat.slice(1)); display = `${name} (${readable})`; } items.push({ display, dist }); } const unique = new Map(); for (let item of items) { if (!unique.has(item.display.split(' (')[0])) unique.set(item.display.split(' (')[0], item); } let uniqueItems = Array.from(unique.values()); uniqueItems.sort((a,b) => a.dist - b.dist); let refs = uniqueItems.slice(0,3).map(i => `${i.display} a ${Math.round(i.dist)} metri`); while(refs.length < 3) refs.push("Nessun riferimento"); return refs; } catch(e) { console.warn("Errore ricerca nomi", e); return ["Nessun riferimento","Nessun riferimento","Nessun riferimento"]; } }
-    async function reverseGeocode(lat,lng) { try { let url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1&accept-language=it`; let resp = await fetch(url, {headers:{'User-Agent':'SOSDrive/1.0'}}); let data = await resp.json(); return data.display_name || "Indirizzo non trovato"; } catch(e) { return "Indirizzo non disponibile"; } }
-    async function getAveragePosition() { return new Promise((resolve,reject) => { let attempts=0, positions=[]; let success = (pos) => { positions.push({lat:pos.coords.latitude, lng:pos.coords.longitude}); attempts++; if (attempts>=5) { let sumLat=0, sumLng=0; positions.forEach(p=>{sumLat+=p.lat; sumLng+=p.lng;}); resolve({lat:sumLat/positions.length, lng:sumLng/positions.length}); } else navigator.geolocation.getCurrentPosition(success, error, {enableHighAccuracy:true, timeout:5000}); }; let error = (err) => { if (positions.length) { let sumLat=0, sumLng=0; positions.forEach(p=>{sumLat+=p.lat; sumLng+=p.lng;}); resolve({lat:sumLat/positions.length, lng:sumLng/positions.length}); } else reject(err); }; navigator.geolocation.getCurrentPosition(success, error, {enableHighAccuracy:true, timeout:5000}); }); }
-    async function getLocationAndAddress() { if (!navigator.geolocation) { gpsStatus.innerHTML = "❌ GPS non supportato"; return; } gpsStatus.innerHTML = "⏳ Acquisizione 5 letture GPS..."; try { let avg = await getAveragePosition(); gpsStatus.innerHTML = "📍 Elaborazione map matching..."; let snapped = await snapToRoad(avg.lat, avg.lng); let finalLat = snapped.lat, finalLng = snapped.lng; let address = await reverseGeocode(finalLat, finalLng); gpsStatus.innerHTML = "🔍 Ricerca luoghi con nome entro 300m..."; let [ref1, ref2, ref3] = await fetchAllNamedPlaces(finalLat, finalLng); currentLat = finalLat; currentLng = finalLng; currentAddress = address; currentRefA = ref1; currentRefB = ref2; currentRefC = ref3; latLonDisplay.innerText = `${finalLat.toFixed(6)}, ${finalLng.toFixed(6)}`; addressDisplay.innerText = address; refADisplay.innerText = ref1; refBDisplay.innerText = ref2; refCDisplay.innerText = ref3; gpsStatus.innerHTML = "✅ Posizione e riferimenti aggiornati!"; setTimeout(()=> gpsStatus.innerHTML = "✅ Pronto.", 3000); } catch(e) { gpsStatus.innerHTML = `❌ Errore GPS: ${e.message}`; } }
-    function resetCoords() { currentLat=currentLng=null; currentAddress=""; currentRefA=""; currentRefB=""; currentRefC=""; latLonDisplay.innerText = addressDisplay.innerText = refADisplay.innerText = refBDisplay.innerText = refCDisplay.innerText = "---"; gpsStatus.innerHTML = ""; }
+    // ==================== GEOLOCALIZZAZIONE, NOTE, TRADUZIONI, VOCE (invariati) ====================
+    // (Tutte le funzioni dalla v0215 sono identiche. Per brevità nel codice finale sono incluse)
+    // In questa soluzione le includo per completezza.
+    function haversine(lat1,lng1,lat2,lng2) {
+        const R = 6371e3;
+        const φ1 = lat1 * Math.PI/180, φ2 = lat2 * Math.PI/180;
+        const Δφ = (lat2-lat1) * Math.PI/180, Δλ = (lng2-lng1) * Math.PI/180;
+        const a = Math.sin(Δφ/2)**2 + Math.cos(φ1)*Math.cos(φ2)*Math.sin(Δλ/2)**2;
+        return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    }
+    async function snapToRoad(lat,lng) {
+        let url = `https://overpass-api.de/api/interpreter?data=[out:json];way(around:50,${lat},${lng})["highway"];out center;`;
+        try {
+            let resp = await fetch(url);
+            let data = await resp.json();
+            if (!data.elements?.length) return {lat,lng};
+            let way = data.elements[0];
+            let clat = way.center?.lat || way.lat;
+            let clng = way.center?.lon || way.lon;
+            if (clat && clng && haversine(lat,lng,clat,clng) < 50) return {lat:clat, lng:clng};
+            return {lat,lng};
+        } catch(e) { return {lat,lng}; }
+    }
+    async function fetchAllNamedPlaces(lat, lng) {
+        const excludeTags = ["information","bench","waste_basket","toilets","telephone","recycling","fountain","drinking_water"];
+        let query = `[out:json];(node(around:300,${lat},${lng})[name];way(around:300,${lat},${lng})[name];);out center;`;
+        let url = `https://overpass-api.de/api/interpreter?data=${encodeURIComponent(query)}`;
+        try {
+            let resp = await fetch(url);
+            let data = await resp.json();
+            if (!data.elements?.length) return [];
+            let items = [];
+            for (let el of data.elements) {
+                let latEl = el.lat || el.center?.lat;
+                let lonEl = el.lon || el.center?.lon;
+                if (!latEl) continue;
+                let tags = el.tags || {};
+                let name = tags.name;
+                if (!name || name.trim() === "") continue;
+                let cat = tags.amenity || tags.shop || tags.tourism || tags.office || tags.leisure || tags.historic || tags.place || tags.aeroway || tags.railway;
+                if (cat && excludeTags.includes(cat)) continue;
+                let dist = haversine(lat, lng, latEl, lonEl);
+                let display = name;
+                if (cat) {
+                    let catMap = {
+                        "pharmacy":"Farmacia","hospital":"Ospedale","police":"Commissariato","post_office":"Posta","bank":"Banca",
+                        "library":"Biblioteca","fire_station":"Caserma","townhall":"Municipio","supermarket":"Supermercato","convenience":"Alimentari",
+                        "cafe":"Bar","restaurant":"Ristorante","pub":"Pub","fast_food":"Fast food","museum":"Museo","monument":"Monumento",
+                        "attraction":"Attrazione","square":"Piazza","garden":"Giardino","park":"Parco","bus_station":"Stazione bus","train_station":"Stazione",
+                        "church":"Chiesa","services":"Area di servizio","motorway_junction":"Uscita autostradale","aeroway":"Aeroporto","railway":"Stazione",
+                        "shop":"Negozio","office":"Ufficio","leisure":"Tempo libero","historic":"Sito storico","place":"Luogo","industrial":"Azienda"
+                    };
+                    let readable = catMap[cat] || (cat.charAt(0).toUpperCase() + cat.slice(1));
+                    display = `${name} (${readable})`;
+                }
+                items.push({ display, dist });
+            }
+            const unique = new Map();
+            for (let item of items) {
+                if (!unique.has(item.display.split(' (')[0])) unique.set(item.display.split(' (')[0], item);
+            }
+            let uniqueItems = Array.from(unique.values());
+            uniqueItems.sort((a,b) => a.dist - b.dist);
+            let refs = uniqueItems.slice(0,3).map(i => `${i.display} a ${Math.round(i.dist)} metri`);
+            while(refs.length < 3) refs.push("Nessun riferimento");
+            return refs;
+        } catch(e) {
+            console.warn("Errore ricerca nomi", e);
+            return ["Nessun riferimento","Nessun riferimento","Nessun riferimento"];
+        }
+    }
+    async function reverseGeocode(lat,lng) {
+        try {
+            let url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1&accept-language=it`;
+            let resp = await fetch(url, {headers:{'User-Agent':'SOSDrive/1.0'}});
+            let data = await resp.json();
+            return data.display_name || "Indirizzo non trovato";
+        } catch(e) { return "Indirizzo non disponibile"; }
+    }
+    async function getAveragePosition() {
+        return new Promise((resolve,reject) => {
+            let attempts=0, positions=[];
+            let success = (pos) => {
+                positions.push({lat:pos.coords.latitude, lng:pos.coords.longitude});
+                attempts++;
+                if (attempts>=5) {
+                    let sumLat=0, sumLng=0;
+                    positions.forEach(p=>{sumLat+=p.lat; sumLng+=p.lng;});
+                    resolve({lat:sumLat/positions.length, lng:sumLng/positions.length});
+                } else navigator.geolocation.getCurrentPosition(success, error, {enableHighAccuracy:true, timeout:5000});
+            };
+            let error = (err) => {
+                if (positions.length) {
+                    let sumLat=0, sumLng=0;
+                    positions.forEach(p=>{sumLat+=p.lat; sumLng+=p.lng;});
+                    resolve({lat:sumLat/positions.length, lng:sumLng/positions.length});
+                } else reject(err);
+            };
+            navigator.geolocation.getCurrentPosition(success, error, {enableHighAccuracy:true, timeout:5000});
+        });
+    }
+    async function getLocationAndAddress() {
+        if (!navigator.geolocation) { gpsStatus.innerHTML = "❌ GPS non supportato"; return; }
+        gpsStatus.innerHTML = "⏳ Acquisizione 5 letture GPS...";
+        try {
+            let avg = await getAveragePosition();
+            gpsStatus.innerHTML = "📍 Elaborazione map matching...";
+            let snapped = await snapToRoad(avg.lat, avg.lng);
+            let finalLat = snapped.lat, finalLng = snapped.lng;
+            let address = await reverseGeocode(finalLat, finalLng);
+            gpsStatus.innerHTML = "🔍 Ricerca luoghi con nome entro 300m...";
+            let [ref1, ref2, ref3] = await fetchAllNamedPlaces(finalLat, finalLng);
+            currentLat = finalLat; currentLng = finalLng; currentAddress = address; currentRefA = ref1; currentRefB = ref2; currentRefC = ref3;
+            latLonDisplay.innerText = `${finalLat.toFixed(6)}, ${finalLng.toFixed(6)}`;
+            addressDisplay.innerText = address;
+            refADisplay.innerText = ref1;
+            refBDisplay.innerText = ref2;
+            refCDisplay.innerText = ref3;
+            gpsStatus.innerHTML = "✅ Posizione e riferimenti aggiornati!";
+            setTimeout(()=> gpsStatus.innerHTML = "✅ Pronto.", 3000);
+        } catch(e) { gpsStatus.innerHTML = `❌ Errore GPS: ${e.message}`; }
+    }
+    function resetCoords() {
+        currentLat=currentLng=null; currentAddress=""; currentRefA=""; currentRefB=""; currentRefC="";
+        latLonDisplay.innerText = addressDisplay.innerText = refADisplay.innerText = refBDisplay.innerText = refCDisplay.innerText = "---";
+        gpsStatus.innerHTML = "";
+    }
 
-    // ==================== FUNZIONI NOTE E MODALI ====================
+    // ==================== FUNZIONI NOTE, MODALI, TRADUZIONI, VOCE (invariate) ====================
     function openAdaptiveModal() { modalTextarea.value = operatorResponse.value; adaptiveModal.style.display = 'flex'; }
     function closeAdaptiveModal() { adaptiveModal.style.display = 'none'; }
     operatorResponse.addEventListener('click', openAdaptiveModal);
     closeAdaptiveBtn.addEventListener('click', closeAdaptiveModal);
     adaptiveModal.addEventListener('click', (e) => { if (e.target === adaptiveModal) closeAdaptiveModal(); });
-    function openSpeakDetailModal() { if (!lastItalianText && !lastFrenchTranslation) { alert("Nessuna conversazione recente."); return; } speakOriginalText.innerText = lastItalianText || ""; speakTranslatedText.innerText = lastFrenchTranslation || ""; speakDetailModal.style.display = 'flex'; }
+
+    function openSpeakDetailModal() {
+        if (!lastItalianText && !lastFrenchTranslation) { alert("Nessuna conversazione recente."); return; }
+        speakOriginalText.innerText = lastItalianText || ""; speakTranslatedText.innerText = lastFrenchTranslation || "";
+        speakDetailModal.style.display = 'flex';
+    }
     function closeSpeakDetailModal() { speakDetailModal.style.display = 'none'; }
     speakResultField.addEventListener('click', openSpeakDetailModal);
     closeSpeakModalBtn.addEventListener('click', closeSpeakDetailModal);
     speakDetailModal.addEventListener('click', (e) => { if (e.target === speakDetailModal) closeSpeakDetailModal(); });
-    function saveSpeakTranslation() { if (currentService) localStorage.setItem(`speakTranslation_${currentService}_${CURRENT_VERSION}`, JSON.stringify({ italian: lastItalianText, french: lastFrenchTranslation })); }
-    function loadSpeakTranslation() { if (currentService) { const saved = localStorage.getItem(`speakTranslation_${currentService}_${CURRENT_VERSION}`); if (saved) { try { const data = JSON.parse(saved); lastItalianText = data.italian || ""; lastFrenchTranslation = data.french || ""; if (lastItalianText && lastFrenchTranslation) speakResultField.innerHTML = `<strong>Italiano:</strong> ${lastItalianText}<br><strong>Francese:</strong> ${lastFrenchTranslation}`; else speakResultField.innerHTML = "Traduzione Italiana e Francese"; } catch(e) { console.warn(e); } } else speakResultField.innerHTML = "Traduzione Italiana e Francese"; } }
-    function clearSpeakTranslation() { lastItalianText = ""; lastFrenchTranslation = ""; speakResultField.innerHTML = "Traduzione Italiana e Francese"; if (currentService) localStorage.removeItem(`speakTranslation_${currentService}_${CURRENT_VERSION}`); speakStatus.innerText = "🧹 Traduzione cancellata"; setTimeout(() => { if (speakStatus.innerText === "🧹 Traduzione cancellata") speakStatus.innerText = ""; }, 2000); }
-    function closeEditModal() { noteEditModal.style.display = 'none'; currentEditMode = null; currentEditId = null; editNoteTitle.value = ""; editNoteDesc.value = ""; }
-    function openAddNoteModal(type) { currentEditMode = type; currentEditId = null; noteModalTitle.innerText = type === 'normal' ? "➕ Aggiungi Nota Normale" : "➕ Aggiungi Nota Speciale"; editNoteTitle.value = ""; editNoteDesc.value = ""; noteEditModal.style.display = 'flex'; }
-    function openEditNoteModal(type, noteId, currentTitle, currentDesc) { currentEditMode = type; currentEditId = noteId; noteModalTitle.innerText = type === 'normal' ? "✏️ Modifica Nota Normale" : "✏️ Modifica Nota Speciale"; editNoteTitle.value = currentTitle || ""; editNoteDesc.value = currentDesc || ""; noteEditModal.style.display = 'flex'; }
-    function saveNoteFromModal() { const title = editNoteTitle.value.trim(); const description = editNoteDesc.value.trim(); if (title === "") { alert("Il titolo non può essere vuoto."); return; } if (currentEditId === null) { const newId = Date.now() + Math.floor(Math.random() * 10000); if (currentEditMode === 'normal') { normalNotes[currentService].push({ id: newId, title: title, description: description }); if (normalNotes[currentService].length === 1) selectedNormalNoteId = String(newId); saveNormalNotesForService(currentService); renderNormalNotes(); gpsStatus.innerHTML = "✅ Nota normale aggiunta"; } else { specialNotes[currentService].push({ id: newId, title: title, description: description }); if (specialNotes[currentService].length === 1) selectedSpecialNoteId = String(newId); saveSpecialNotesForService(currentService); renderSpecialNotes(); gpsStatus.innerHTML = "✅ Nota speciale aggiunta"; } } else { if (currentEditMode === 'normal') { const note = normalNotes[currentService].find(n => String(n.id) === currentEditId); if (note) { note.title = title; note.description = description; saveNormalNotesForService(currentService); renderNormalNotes(); gpsStatus.innerHTML = "✅ Nota normale modificata"; } } else { const note = specialNotes[currentService].find(n => String(n.id) === currentEditId); if (note) { note.title = title; note.description = description; saveSpecialNotesForService(currentService); renderSpecialNotes(); gpsStatus.innerHTML = "✅ Nota speciale modificata"; } } } setTimeout(()=> gpsStatus.innerHTML = "✅ Pronto.", 2000); closeEditModal(); }
+
+    function saveSpeakTranslation() {
+        if (currentService) localStorage.setItem(`speakTranslation_${currentService}_${CURRENT_VERSION}`, JSON.stringify({ italian: lastItalianText, french: lastFrenchTranslation }));
+    }
+    function loadSpeakTranslation() {
+        if (currentService) {
+            const saved = localStorage.getItem(`speakTranslation_${currentService}_${CURRENT_VERSION}`);
+            if (saved) {
+                try {
+                    const data = JSON.parse(saved);
+                    lastItalianText = data.italian || ""; lastFrenchTranslation = data.french || "";
+                    if (lastItalianText && lastFrenchTranslation) speakResultField.innerHTML = `<strong>Italiano:</strong> ${lastItalianText}<br><strong>Francese:</strong> ${lastFrenchTranslation}`;
+                    else speakResultField.innerHTML = "Traduzione Italiana e Francese";
+                } catch(e) { console.warn(e); }
+            } else speakResultField.innerHTML = "Traduzione Italiana e Francese";
+        }
+    }
+    function clearSpeakTranslation() {
+        lastItalianText = ""; lastFrenchTranslation = "";
+        speakResultField.innerHTML = "Traduzione Italiana e Francese";
+        if (currentService) localStorage.removeItem(`speakTranslation_${currentService}_${CURRENT_VERSION}`);
+        speakStatus.innerText = "🧹 Traduzione cancellata";
+        setTimeout(() => { if (speakStatus.innerText === "🧹 Traduzione cancellata") speakStatus.innerText = ""; }, 2000);
+    }
+
+    function closeEditModal() {
+        noteEditModal.style.display = 'none';
+        currentEditMode = null; currentEditId = null;
+        editNoteTitle.value = ""; editNoteDesc.value = "";
+    }
+    function openAddNoteModal(type) {
+        currentEditMode = type; currentEditId = null;
+        noteModalTitle.innerText = type === 'normal' ? "➕ Aggiungi Nota Normale" : "➕ Aggiungi Nota Speciale";
+        editNoteTitle.value = ""; editNoteDesc.value = "";
+        noteEditModal.style.display = 'flex';
+    }
+    function openEditNoteModal(type, noteId, currentTitle, currentDesc) {
+        currentEditMode = type; currentEditId = noteId;
+        noteModalTitle.innerText = type === 'normal' ? "✏️ Modifica Nota Normale" : "✏️ Modifica Nota Speciale";
+        editNoteTitle.value = currentTitle || ""; editNoteDesc.value = currentDesc || "";
+        noteEditModal.style.display = 'flex';
+    }
+    function saveNoteFromModal() {
+        const title = editNoteTitle.value.trim();
+        const description = editNoteDesc.value.trim();
+        if (title === "") { alert("Il titolo non può essere vuoto."); return; }
+        if (currentEditId === null) {
+            const newId = Date.now() + Math.floor(Math.random() * 10000);
+            if (currentEditMode === 'normal') {
+                normalNotes[currentService].push({ id: newId, title: title, description: description });
+                if (normalNotes[currentService].length === 1) selectedNormalNoteId = String(newId);
+                saveNormalNotesForService(currentService);
+                renderNormalNotes();
+                gpsStatus.innerHTML = "✅ Nota normale aggiunta";
+            } else {
+                specialNotes[currentService].push({ id: newId, title: title, description: description });
+                if (specialNotes[currentService].length === 1) selectedSpecialNoteId = String(newId);
+                saveSpecialNotesForService(currentService);
+                renderSpecialNotes();
+                gpsStatus.innerHTML = "✅ Nota speciale aggiunta";
+            }
+        } else {
+            if (currentEditMode === 'normal') {
+                const note = normalNotes[currentService].find(n => String(n.id) === currentEditId);
+                if (note) { note.title = title; note.description = description; saveNormalNotesForService(currentService); renderNormalNotes(); gpsStatus.innerHTML = "✅ Nota normale modificata"; }
+            } else {
+                const note = specialNotes[currentService].find(n => String(n.id) === currentEditId);
+                if (note) { note.title = title; note.description = description; saveSpecialNotesForService(currentService); renderSpecialNotes(); gpsStatus.innerHTML = "✅ Nota speciale modificata"; }
+            }
+        }
+        setTimeout(()=> gpsStatus.innerHTML = "✅ Pronto.", 2000);
+        closeEditModal();
+    }
     cancelNoteBtn.addEventListener('click', closeEditModal);
     saveNoteBtn.addEventListener('click', saveNoteFromModal);
     noteEditModal.addEventListener('click', (e) => { if (e.target === noteEditModal) closeEditModal(); });
-    function showTemporaryMessage(element, message, duration = 15000) { if (!element) return; element.innerText = message; element.style.display = 'block'; if (element._hideTimeout) clearTimeout(element._hideTimeout); element._hideTimeout = setTimeout(() => { element.style.display = 'none'; }, duration); }
 
-    async function translateToFrench(italianText) { if (!italianText || italianText.trim() === "") return ""; try { const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(italianText)}&langpair=it|fr`; const resp = await fetch(url); const data = await resp.json(); if (data && data.responseData && data.responseData.translatedText) return data.responseData.translatedText; } catch(e) { console.warn(e); } return italianText; }
-    async function translateFrenchToItalian(frenchText) { if (!frenchText || frenchText.trim() === "") return ""; try { const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(frenchText)}&langpair=fr|it`; const resp = await fetch(url); const data = await resp.json(); if (data && data.responseData && data.responseData.translatedText) return data.responseData.translatedText; } catch(e) { console.warn(e); } return frenchText + " (traduzione fallita)"; }
+    function showTemporaryMessage(element, message, duration = 15000) {
+        if (!element) return;
+        element.innerText = message;
+        element.style.display = 'block';
+        if (element._hideTimeout) clearTimeout(element._hideTimeout);
+        element._hideTimeout = setTimeout(() => { element.style.display = 'none'; }, duration);
+    }
 
-    function initRecognitionOperator() { if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) { transcribeStatus.innerText = "❌ Riconoscimento non supportato"; return false; } const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition; recognitionOperator = new SpeechRecognition(); recognitionOperator.continuous = true; recognitionOperator.interimResults = false; recognitionOperator.lang = 'fr-FR'; return true; }
-    async function startListening30s() { if (!recognitionOperator && !initRecognitionOperator()) return; if (recognitionTimeout) clearTimeout(recognitionTimeout); showTemporaryMessage(listenInfoMsg, "🎤 Ascolto in corso per 30 secondi. La risposta dell'operatore verrà tradotta in italiano.", 15000); transcribeStatus.innerText = "🎤 Ascolto francese per 30 secondi..."; recognitionOperator.start(); let finalTranscript = ""; recognitionOperator.onresult = (event) => { for (let i = event.resultIndex; i < event.results.length; i++) { if (event.results[i].isFinal) finalTranscript += event.results[i][0].transcript + " "; } }; recognitionOperator.onerror = (e) => { transcribeStatus.innerText = "❌ Errore microfono: " + e.error; }; recognitionOperator.onend = async () => { if (finalTranscript.trim() !== "") { transcribeStatus.innerText = "⏳ Traduzione..."; const italian = await translateFrenchToItalian(finalTranscript.trim()); if (operatorResponse.value.trim()) operatorResponse.value += "\n---\n" + italian; else operatorResponse.value = italian; saveOperatorTranslation(operatorResponse.value); transcribeStatus.innerText = "✅ Testo tradotto (30s) e salvato permanentemente"; } else transcribeStatus.innerText = "⏹️ Nessun parlato"; setTimeout(() => { if (transcribeStatus.innerText.includes("Tradotto") || transcribeStatus.innerText.includes("Nessun parlato")) transcribeStatus.innerText = ""; }, 4000); }; recognitionTimeout = setTimeout(() => { if (recognitionOperator && recognitionOperator.stop) recognitionOperator.stop(); }, 30000); }
-    function initRecognitionSpeak() { if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) { speakStatus.innerText = "❌ Riconoscimento non supportato"; return false; } const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition; recognitionSpeak = new SpeechRecognition(); recognitionSpeak.continuous = true; recognitionSpeak.interimResults = false; recognitionSpeak.lang = 'it-IT'; return true; }
-    async function speakFrenchWithMicroPause(text, langCode = 'fr-FR') { if (!window.speechSynthesis) return; speechSynthesis.cancel(); const words = text.split(/\s+/); for (let i = 0; i < words.length; i++) { const word = words[i]; const utterance = new SpeechSynthesisUtterance(word); utterance.lang = langCode; utterance.rate = 1.0; speechSynthesis.speak(utterance); await new Promise((resolve) => { utterance.onend = resolve; setTimeout(resolve, 1000); }); await new Promise(r => setTimeout(r, 0.1)); } }
-    async function startSpeakingItalian() { if (!recognitionSpeak && !initRecognitionSpeak()) return; speakStatus.innerText = "🎤 Ascolto in corso..."; recognitionSpeak.start(); let finalTranscript = ""; recognitionSpeak.onresult = (event) => { for (let i = event.resultIndex; i < event.results.length; i++) { if (event.results[i].isFinal) finalTranscript += event.results[i][0].transcript + " "; } }; recognitionSpeak.onerror = (e) => { speakStatus.innerText = "❌ Errore microfono: " + e.error; }; recognitionSpeak.onend = async () => { if (finalTranscript.trim() !== "") { speakStatus.innerText = "⏳ Traduzione in corso..."; lastItalianText = finalTranscript.trim(); const french = await translateToFrench(lastItalianText); lastFrenchTranslation = french; speakResultField.innerHTML = `<strong>Italiano:</strong> ${lastItalianText}<br><strong>Francese:</strong> ${lastFrenchTranslation}`; speakStatus.innerText = "✅ Testo tradotto. Tocca il campo per visualizzare dettaglio."; showTemporaryMessage(speakStatus, "✅ Traduzione completata.", 15000); saveSpeakTranslation(); if (lastFrenchTranslation) await speakFrenchWithMicroPause(lastFrenchTranslation, 'fr-FR'); } else { speakStatus.innerText = "⏹️ Nessun parlato rilevato."; speakResultField.innerHTML = "Traduzione Italiana e Francese"; lastItalianText = ""; lastFrenchTranslation = ""; saveSpeakTranslation(); } }; setTimeout(() => { if (recognitionSpeak && recognitionSpeak.stop) recognitionSpeak.stop(); }, 30000); }
-    function saveOperatorTranslation(text) { if (currentService) localStorage.setItem(`operatorResponse_${currentService}_${CURRENT_VERSION}`, text); }
-    function loadOperatorTranslation() { if (currentService) { const saved = localStorage.getItem(`operatorResponse_${currentService}_${CURRENT_VERSION}`); if (saved !== null) operatorResponse.value = saved; else operatorResponse.value = ""; } }
-    function clearOperatorTranslation() { if (currentService) localStorage.removeItem(`operatorResponse_${currentService}_${CURRENT_VERSION}`); operatorResponse.value = ""; }
-    async function requestWakeLock() { if ('wakeLock' in navigator) { try { wakeLock = await navigator.wakeLock.request('screen'); wakeLock.addEventListener('release', () => console.log('WakeLock rilasciato')); } catch(err) { console.warn('WakeLock non supportato:', err); } } }
+    async function translateToFrench(italianText) {
+        if (!italianText || italianText.trim() === "") return "";
+        try {
+            const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(italianText)}&langpair=it|fr`;
+            const resp = await fetch(url);
+            const data = await resp.json();
+            if (data && data.responseData && data.responseData.translatedText) return data.responseData.translatedText;
+        } catch(e) { console.warn(e); }
+        return italianText;
+    }
+    async function translateFrenchToItalian(frenchText) {
+        if (!frenchText || frenchText.trim() === "") return "";
+        try {
+            const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(frenchText)}&langpair=fr|it`;
+            const resp = await fetch(url);
+            const data = await resp.json();
+            if (data && data.responseData && data.responseData.translatedText) return data.responseData.translatedText;
+        } catch(e) { console.warn(e); }
+        return frenchText + " (traduzione fallita)";
+    }
+
+    function initRecognitionOperator() {
+        if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+            transcribeStatus.innerText = "❌ Riconoscimento non supportato";
+            return false;
+        }
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        recognitionOperator = new SpeechRecognition();
+        recognitionOperator.continuous = true;
+        recognitionOperator.interimResults = false;
+        recognitionOperator.lang = 'fr-FR';
+        return true;
+    }
+    async function startListening30s() {
+        if (!recognitionOperator && !initRecognitionOperator()) return;
+        if (recognitionTimeout) clearTimeout(recognitionTimeout);
+        showTemporaryMessage(listenInfoMsg, "🎤 Ascolto in corso per 30 secondi. La risposta dell'operatore verrà tradotta in italiano.", 15000);
+        transcribeStatus.innerText = "🎤 Ascolto francese per 30 secondi...";
+        recognitionOperator.start();
+        let finalTranscript = "";
+        recognitionOperator.onresult = (event) => {
+            for (let i = event.resultIndex; i < event.results.length; i++) {
+                if (event.results[i].isFinal) finalTranscript += event.results[i][0].transcript + " ";
+            }
+        };
+        recognitionOperator.onerror = (e) => { transcribeStatus.innerText = "❌ Errore microfono: " + e.error; };
+        recognitionOperator.onend = async () => {
+            if (finalTranscript.trim() !== "") {
+                transcribeStatus.innerText = "⏳ Traduzione...";
+                const italian = await translateFrenchToItalian(finalTranscript.trim());
+                if (operatorResponse.value.trim()) operatorResponse.value += "\n---\n" + italian;
+                else operatorResponse.value = italian;
+                saveOperatorTranslation(operatorResponse.value);
+                transcribeStatus.innerText = "✅ Testo tradotto (30s) e salvato permanentemente";
+            } else transcribeStatus.innerText = "⏹️ Nessun parlato";
+            setTimeout(() => { if (transcribeStatus.innerText.includes("Tradotto") || transcribeStatus.innerText.includes("Nessun parlato")) transcribeStatus.innerText = ""; }, 4000);
+        };
+        recognitionTimeout = setTimeout(() => { if (recognitionOperator && recognitionOperator.stop) recognitionOperator.stop(); }, 30000);
+    }
+
+    function initRecognitionSpeak() {
+        if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+            speakStatus.innerText = "❌ Riconoscimento non supportato";
+            return false;
+        }
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        recognitionSpeak = new SpeechRecognition();
+        recognitionSpeak.continuous = true;
+        recognitionSpeak.interimResults = false;
+        recognitionSpeak.lang = 'it-IT';
+        return true;
+    }
+    async function speakFrenchWithMicroPause(text, langCode = 'fr-FR') {
+        if (!window.speechSynthesis) return;
+        speechSynthesis.cancel();
+        const words = text.split(/\s+/);
+        for (let i = 0; i < words.length; i++) {
+            const word = words[i];
+            const utterance = new SpeechSynthesisUtterance(word);
+            utterance.lang = langCode;
+            utterance.rate = 1.0;
+            speechSynthesis.speak(utterance);
+            await new Promise((resolve) => { utterance.onend = resolve; setTimeout(resolve, 1000); });
+            await new Promise(r => setTimeout(r, 0.1));
+        }
+    }
+    async function startSpeakingItalian() {
+        if (!recognitionSpeak && !initRecognitionSpeak()) return;
+        speakStatus.innerText = "🎤 Ascolto in corso...";
+        recognitionSpeak.start();
+        let finalTranscript = "";
+        recognitionSpeak.onresult = (event) => {
+            for (let i = event.resultIndex; i < event.results.length; i++) {
+                if (event.results[i].isFinal) finalTranscript += event.results[i][0].transcript + " ";
+            }
+        };
+        recognitionSpeak.onerror = (e) => { speakStatus.innerText = "❌ Errore microfono: " + e.error; };
+        recognitionSpeak.onend = async () => {
+            if (finalTranscript.trim() !== "") {
+                speakStatus.innerText = "⏳ Traduzione in corso...";
+                lastItalianText = finalTranscript.trim();
+                const french = await translateToFrench(lastItalianText);
+                lastFrenchTranslation = french;
+                speakResultField.innerHTML = `<strong>Italiano:</strong> ${lastItalianText}<br><strong>Francese:</strong> ${lastFrenchTranslation}`;
+                speakStatus.innerText = "✅ Testo tradotto. Tocca il campo per visualizzare dettaglio.";
+                showTemporaryMessage(speakStatus, "✅ Traduzione completata.", 15000);
+                saveSpeakTranslation();
+                if (lastFrenchTranslation) await speakFrenchWithMicroPause(lastFrenchTranslation, 'fr-FR');
+            } else {
+                speakStatus.innerText = "⏹️ Nessun parlato rilevato.";
+                speakResultField.innerHTML = "Traduzione Italiana e Francese";
+                lastItalianText = "";
+                lastFrenchTranslation = "";
+                saveSpeakTranslation();
+            }
+        };
+        setTimeout(() => { if (recognitionSpeak && recognitionSpeak.stop) recognitionSpeak.stop(); }, 30000);
+    }
+
+    function saveOperatorTranslation(text) {
+        if (currentService) localStorage.setItem(`operatorResponse_${currentService}_${CURRENT_VERSION}`, text);
+    }
+    function loadOperatorTranslation() {
+        if (currentService) {
+            const saved = localStorage.getItem(`operatorResponse_${currentService}_${CURRENT_VERSION}`);
+            if (saved !== null) operatorResponse.value = saved;
+            else operatorResponse.value = "";
+        }
+    }
+    function clearOperatorTranslation() {
+        if (currentService) localStorage.removeItem(`operatorResponse_${currentService}_${CURRENT_VERSION}`);
+        operatorResponse.value = "";
+    }
+    async function requestWakeLock() {
+        if ('wakeLock' in navigator) {
+            try {
+                wakeLock = await navigator.wakeLock.request('screen');
+                wakeLock.addEventListener('release', () => console.log('WakeLock rilasciato'));
+            } catch(err) { console.warn('WakeLock non supportato:', err); }
+        }
+    }
     function releaseWakeLock() { if (wakeLock) { wakeLock.release(); wakeLock = null; } }
 
-    function migratePhoneNumbers() { const oldVersions = ["0217", "0216"]; for (let s of services) { if (localStorage.getItem(`phone_${s}_${CURRENT_VERSION}`)) continue; for (let ver of oldVersions) { let old = localStorage.getItem(`phone_${s}_${ver}`); if (old) { localStorage.setItem(`phone_${s}_${CURRENT_VERSION}`, old); break; } } } }
+    function migratePhoneNumbers() {
+        const oldVersions = ["0215", "0214"];
+        for (let s of services) {
+            if (localStorage.getItem(`phone_${s}_${CURRENT_VERSION}`)) continue;
+            for (let ver of oldVersions) {
+                let old = localStorage.getItem(`phone_${s}_${ver}`);
+                if (old) { localStorage.setItem(`phone_${s}_${CURRENT_VERSION}`, old); break; }
+            }
+        }
+    }
     function savePhone(s,n) { localStorage.setItem(`phone_${s}_${CURRENT_VERSION}`, n); }
     function getPhone(s) { return localStorage.getItem(`phone_${s}_${CURRENT_VERSION}`); }
     const defaultPhone = { ambulanza:"118", polizia:"113", veterinario:"800123456", clinica:"800987654" };
@@ -1562,15 +2101,61 @@
     function getSelectedSpecialIdKey(s) { return `selectedSpecialNote_${s}_${CURRENT_VERSION}`; }
     function saveNormalNotesForService(s) { localStorage.setItem(getNormalNotesKey(s), JSON.stringify(normalNotes[s])); }
     function saveSpecialNotesForService(s) { localStorage.setItem(getSpecialNotesKey(s), JSON.stringify(specialNotes[s])); }
-    function saveSelectedIds() { if (selectedNormalNoteId) localStorage.setItem(getSelectedNormalIdKey(currentService), selectedNormalNoteId); else localStorage.removeItem(getSelectedNormalIdKey(currentService)); if (selectedSpecialNoteId) localStorage.setItem(getSelectedSpecialIdKey(currentService), selectedSpecialNoteId); else localStorage.removeItem(getSelectedSpecialIdKey(currentService)); }
-    function loadAllNotes() { for (let s of services) { let storedNormal = localStorage.getItem(getNormalNotesKey(s)); normalNotes[s] = storedNormal ? JSON.parse(storedNormal) : []; let storedSpecial = localStorage.getItem(getSpecialNotesKey(s)); specialNotes[s] = storedSpecial ? JSON.parse(storedSpecial) : []; } if (currentService) loadCurrentServiceNotes(); }
-    function loadCurrentServiceNotes() { if (!currentService) return; let savedNormalId = localStorage.getItem(getSelectedNormalIdKey(currentService)); let savedSpecialId = localStorage.getItem(getSelectedSpecialIdKey(currentService)); selectedNormalNoteId = (savedNormalId && normalNotes[currentService].some(n => String(n.id) === savedNormalId)) ? savedNormalId : null; selectedSpecialNoteId = (savedSpecialId && specialNotes[currentService].some(n => String(n.id) === savedSpecialId)) ? savedSpecialId : null; renderCurrentNotes(); }
+    function saveSelectedIds() {
+        if (selectedNormalNoteId) localStorage.setItem(getSelectedNormalIdKey(currentService), selectedNormalNoteId);
+        else localStorage.removeItem(getSelectedNormalIdKey(currentService));
+        if (selectedSpecialNoteId) localStorage.setItem(getSelectedSpecialIdKey(currentService), selectedSpecialNoteId);
+        else localStorage.removeItem(getSelectedSpecialIdKey(currentService));
+    }
+    function loadAllNotes() {
+        for (let s of services) {
+            let storedNormal = localStorage.getItem(getNormalNotesKey(s));
+            normalNotes[s] = storedNormal ? JSON.parse(storedNormal) : [];
+            let storedSpecial = localStorage.getItem(getSpecialNotesKey(s));
+            specialNotes[s] = storedSpecial ? JSON.parse(storedSpecial) : [];
+        }
+        if (currentService) loadCurrentServiceNotes();
+    }
+    function loadCurrentServiceNotes() {
+        if (!currentService) return;
+        let savedNormalId = localStorage.getItem(getSelectedNormalIdKey(currentService));
+        let savedSpecialId = localStorage.getItem(getSelectedSpecialIdKey(currentService));
+        selectedNormalNoteId = (savedNormalId && normalNotes[currentService].some(n => String(n.id) === savedNormalId)) ? savedNormalId : null;
+        selectedSpecialNoteId = (savedSpecialId && specialNotes[currentService].some(n => String(n.id) === savedSpecialId)) ? savedSpecialId : null;
+        renderCurrentNotes();
+    }
 
-    function renderNormalNotes() { const notes = normalNotes[currentService] || []; if (!notes.length) { notesListArea.innerHTML = `<div style="font-size:0.7rem; color:#777;">Nessuna nota normale. Aggiungine una.</div>`; return; } let html = ''; notes.forEach((note) => { const isSelected = (String(selectedNormalNoteId) === String(note.id)); const titleText = note.title && note.title.trim() !== "" ? note.title : "titolo nota"; html += `<div class="note-item" data-id="${note.id}" data-type="normal"><div class="note-row-buttons"><button class="edit-note-btn small-btn note-btn-edit" data-id="${note.id}" data-type="normal">✏️ Modifica</button><button class="delete-note-btn small-btn note-btn-delete" data-id="${note.id}" data-type="normal">🗑️ Cancella</button><button class="confirm-note-btn small-btn note-btn-confirm ${isSelected ? 'selected' : ''}" data-id="${note.id}" data-type="normal"><span class="dot"></span></button></div><div class="note-title-row"><div class="title-badge">Titolo</div><div class="title-field">${escapeHtml(titleText)}</div></div></div>`; }); notesListArea.innerHTML = html; document.querySelectorAll('.edit-note-btn[data-type="normal"]').forEach(btn => { btn.removeEventListener('click', handleEditNormal); btn.addEventListener('click', handleEditNormal); }); document.querySelectorAll('.delete-note-btn[data-type="normal"]').forEach(btn => { btn.removeEventListener('click', handleDeleteNormal); btn.addEventListener('click', handleDeleteNormal); }); document.querySelectorAll('.confirm-note-btn[data-type="normal"]').forEach(btn => { btn.removeEventListener('click', handleNormalConfirm); btn.addEventListener('click', handleNormalConfirm); }); }
+    function renderNormalNotes() {
+        const notes = normalNotes[currentService] || [];
+        if (!notes.length) { notesListArea.innerHTML = `<div style="font-size:0.7rem; color:#777;">Nessuna nota normale. Aggiungine una.</div>`; return; }
+        let html = '';
+        notes.forEach((note) => {
+            const isSelected = (String(selectedNormalNoteId) === String(note.id));
+            const titleText = note.title && note.title.trim() !== "" ? note.title : "titolo nota";
+            html += `<div class="note-item" data-id="${note.id}" data-type="normal"><div class="note-row-buttons"><button class="edit-note-btn small-btn note-btn-edit" data-id="${note.id}" data-type="normal">✏️ Modifica</button><button class="delete-note-btn small-btn note-btn-delete" data-id="${note.id}" data-type="normal">🗑️ Cancella</button><button class="confirm-note-btn small-btn note-btn-confirm ${isSelected ? 'selected' : ''}" data-id="${note.id}" data-type="normal"><span class="dot"></span></button></div><div class="note-title-row"><div class="title-badge">Titolo</div><div class="title-field">${escapeHtml(titleText)}</div></div></div>`;
+        });
+        notesListArea.innerHTML = html;
+        document.querySelectorAll('.edit-note-btn[data-type="normal"]').forEach(btn => { btn.removeEventListener('click', handleEditNormal); btn.addEventListener('click', handleEditNormal); });
+        document.querySelectorAll('.delete-note-btn[data-type="normal"]').forEach(btn => { btn.removeEventListener('click', handleDeleteNormal); btn.addEventListener('click', handleDeleteNormal); });
+        document.querySelectorAll('.confirm-note-btn[data-type="normal"]').forEach(btn => { btn.removeEventListener('click', handleNormalConfirm); btn.addEventListener('click', handleNormalConfirm); });
+    }
     function handleEditNormal(e) { e.stopPropagation(); const noteId = e.currentTarget.getAttribute('data-id'); const note = normalNotes[currentService].find(n => String(n.id) === noteId); if (note) openEditNoteModal('normal', noteId, note.title, note.description); }
     function handleDeleteNormal(e) { e.stopPropagation(); const noteId = e.currentTarget.getAttribute('data-id'); normalNotes[currentService] = normalNotes[currentService].filter(n => String(n.id) !== noteId); if (String(selectedNormalNoteId) === noteId) selectedNormalNoteId = null; saveNormalNotesForService(currentService); saveSelectedIds(); renderNormalNotes(); gpsStatus.innerHTML = "✅ Nota normale eliminata"; setTimeout(()=> gpsStatus.innerHTML = "✅ Pronto.", 2000); }
     function handleNormalConfirm(e) { e.stopPropagation(); const noteId = e.currentTarget.getAttribute('data-id'); selectNormalNote(noteId); }
-    function renderSpecialNotes() { const notes = specialNotes[currentService] || []; if (!notes.length) { specialNotesListArea.innerHTML = `<div style="font-size:0.7rem; color:#777;">Nessuna nota speciale. Aggiungine una.</div>`; return; } let html = ''; notes.forEach((note) => { const isSelected = (String(selectedSpecialNoteId) === String(note.id)); const titleText = note.title && note.title.trim() !== "" ? note.title : "titolo nota"; html += `<div class="special-note-item" data-id="${note.id}" data-type="special"><div class="note-row-buttons"><button class="edit-special-note-btn small-btn note-btn-edit" data-id="${note.id}" data-type="special">✏️ Modifica</button><button class="delete-special-note-btn small-btn note-btn-delete" data-id="${note.id}" data-type="special">🗑️ Cancella</button><button class="confirm-note-btn small-btn note-btn-confirm ${isSelected ? 'selected' : ''}" data-id="${note.id}" data-type="special"><span class="dot"></span></button></div><div class="note-title-row"><div class="title-badge">Titolo</div><div class="title-field">${escapeHtml(titleText)}</div></div></div>`; }); specialNotesListArea.innerHTML = html; document.querySelectorAll('.edit-special-note-btn[data-type="special"]').forEach(btn => { btn.removeEventListener('click', handleEditSpecial); btn.addEventListener('click', handleEditSpecial); }); document.querySelectorAll('.delete-special-note-btn[data-type="special"]').forEach(btn => { btn.removeEventListener('click', handleDeleteSpecial); btn.addEventListener('click', handleDeleteSpecial); }); document.querySelectorAll('.confirm-note-btn[data-type="special"]').forEach(btn => { btn.removeEventListener('click', handleSpecialConfirm); btn.addEventListener('click', handleSpecialConfirm); }); }
+    function renderSpecialNotes() {
+        const notes = specialNotes[currentService] || [];
+        if (!notes.length) { specialNotesListArea.innerHTML = `<div style="font-size:0.7rem; color:#777;">Nessuna nota speciale. Aggiungine una.</div>`; return; }
+        let html = '';
+        notes.forEach((note) => {
+            const isSelected = (String(selectedSpecialNoteId) === String(note.id));
+            const titleText = note.title && note.title.trim() !== "" ? note.title : "titolo nota";
+            html += `<div class="special-note-item" data-id="${note.id}" data-type="special"><div class="note-row-buttons"><button class="edit-special-note-btn small-btn note-btn-edit" data-id="${note.id}" data-type="special">✏️ Modifica</button><button class="delete-special-note-btn small-btn note-btn-delete" data-id="${note.id}" data-type="special">🗑️ Cancella</button><button class="confirm-note-btn small-btn note-btn-confirm ${isSelected ? 'selected' : ''}" data-id="${note.id}" data-type="special"><span class="dot"></span></button></div><div class="note-title-row"><div class="title-badge">Titolo</div><div class="title-field">${escapeHtml(titleText)}</div></div></div>`;
+        });
+        specialNotesListArea.innerHTML = html;
+        document.querySelectorAll('.edit-special-note-btn[data-type="special"]').forEach(btn => { btn.removeEventListener('click', handleEditSpecial); btn.addEventListener('click', handleEditSpecial); });
+        document.querySelectorAll('.delete-special-note-btn[data-type="special"]').forEach(btn => { btn.removeEventListener('click', handleDeleteSpecial); btn.addEventListener('click', handleDeleteSpecial); });
+        document.querySelectorAll('.confirm-note-btn[data-type="special"]').forEach(btn => { btn.removeEventListener('click', handleSpecialConfirm); btn.addEventListener('click', handleSpecialConfirm); });
+    }
     function handleEditSpecial(e) { e.stopPropagation(); const noteId = e.currentTarget.getAttribute('data-id'); const note = specialNotes[currentService].find(n => String(n.id) === noteId); if (note) openEditNoteModal('special', noteId, note.title, note.description); }
     function handleDeleteSpecial(e) { e.stopPropagation(); const noteId = e.currentTarget.getAttribute('data-id'); specialNotes[currentService] = specialNotes[currentService].filter(n => String(n.id) !== noteId); if (String(selectedSpecialNoteId) === noteId) selectedSpecialNoteId = null; saveSpecialNotesForService(currentService); saveSelectedIds(); renderSpecialNotes(); gpsStatus.innerHTML = "✅ Nota speciale eliminata"; setTimeout(()=> gpsStatus.innerHTML = "✅ Pronto.", 2000); }
     function handleSpecialConfirm(e) { e.stopPropagation(); const noteId = e.currentTarget.getAttribute('data-id'); selectSpecialNote(noteId); }
@@ -1622,7 +2207,10 @@
         initLicense();
         activateLicenseBtn.addEventListener('click', onActivateLicense);
         copyRequestBtn.addEventListener('click', copyRequest);
-        renderReteLevel(reteLevelContainer, "root", []);
+        if (!reteData.children || reteData.children.length === 0) {
+            reteData.children = [];
+            saveReteData();
+        }
     }
     init();
 </script>
