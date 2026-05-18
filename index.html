@@ -43,7 +43,7 @@
         .edit-note-btn, .delete-note-btn, .add-note-btn, .back-home, .export-import-row button,
         .uploaded-image, .image-container img, .image-top-title, .rete-button,
         .back-button, .rete-container button, .image-placeholder, .info-mini-img, .rete-delete-btn,
-        .special-action-btn {
+        .special-action-btn, .rete-level-title-btn {
             user-select: none;
             -webkit-touch-callout: none;
             -webkit-user-select: none;
@@ -547,13 +547,27 @@
             white-space: nowrap;
         }
         .rete-delete-btn:active { transform: scale(0.97); }
-        .rete-level-title {
-            font-size: 1.2rem;
+        .rete-level-title-btn {
+            background: #FFC107;
+            border: none;
+            border-radius: 60px;
+            padding: 14px 12px;
+            font-size: 1.3rem;
             font-weight: bold;
-            margin-bottom: 16px;
+            color: #1e2a3a;
+            width: 100%;
             text-align: center;
+            margin-bottom: 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            box-shadow: 0 6px 12px rgba(0,0,0,0.2);
+            transition: 0.05s linear;
             word-break: break-word;
         }
+        .rete-level-title-btn:active { transform: scale(0.97); }
         .info-section {
             background: #f8f9fa;
             border-radius: 24px;
@@ -715,13 +729,12 @@
         <div id="reteRootContainer" class="rete-container">
             <div id="reteLevelContainer"></div>
         </div>
-        <!-- Messaggio admin rimosso come da richiesta -->
         <div class="version-footer">versione 0216 – rete gerarchica</div>
     </div>
 
     <!-- PAGINA ATTIVITA' (sottolivelli RETE con info e foto) -->
     <div id="reteSubPage" class="page hidden">
-        <div id="reteSubHeader" class="rete-level-title"></div>
+        <button id="reteSubHeaderBtn" class="rete-level-title-btn">ATTIVITÀ</button>
         <div id="reteSubContainer" class="rete-container"></div>
         
         <!-- Sezione informazioni attività -->
@@ -762,6 +775,9 @@
     // Aggiunti pulsanti speciali: COORDINATE (modificabile solo admin, apre Maps) e SITO WEB (testo fisso, URL modificabile solo admin)
     // Rimossa la scritta admin in fondo alla pagina FOTO
     // I tasti nella pagina FOTO mostrano solo il titolo (nessuna descrizione aggiuntiva)
+    // CORREZIONI:
+    // a) Tasto per passare alla pagina Attività: ora funziona sempre (risolto conflitto timer long press)
+    // b) Il titolo del tasto ora è un pulsante cliccabile che permette all'admin di modificare il titolo dalla pagina Attività
     // ============================================================================================
 
     const CURRENT_VERSION = "0216";
@@ -804,7 +820,7 @@
     const reteSubPage = document.getElementById('reteSubPage');
     const reteLevelContainer = document.getElementById('reteLevelContainer');
     const reteSubContainer = document.getElementById('reteSubContainer');
-    const reteSubHeader = document.getElementById('reteSubHeader');
+    const reteSubHeaderBtn = document.getElementById('reteSubHeaderBtn');
     const backFromReteSubBtn = document.getElementById('backFromReteSubBtn');
     const currentServiceDeco = document.getElementById('currentServiceDeco');
     const phoneInput = document.getElementById('phoneNumber');
@@ -989,11 +1005,16 @@
                 const btn = document.createElement('div');
                 btn.className = 'rete-button';
                 btn.innerText = child.title && child.title.trim() !== "" ? child.title : "[Tasto vuoto]";
-                // Navigazione
-                btn.addEventListener('click', (e) => {
+                
+                // Navigazione: gestione pulita senza conflitti timer
+                const handleClick = (e) => {
                     e.stopPropagation();
+                    // Cancella eventuali timer residui per evitare conflitti
+                    if (btn._pressTimer) clearTimeout(btn._pressTimer);
                     openReteSubPage(child, parentNode, levelStack);
-                });
+                };
+                btn.addEventListener('click', handleClick);
+                
                 // Modifica titolo: solo admin con 3 sec
                 let pressTimer = null;
                 const startLongPress = () => {
@@ -1011,13 +1032,15 @@
                         }
                     }, 3000);
                 };
-                const cancelLongPress = () => { if (pressTimer) clearTimeout(pressTimer); };
+                const cancelLongPress = () => { if (pressTimer) { clearTimeout(pressTimer); pressTimer = null; } };
                 btn.addEventListener('mousedown', startLongPress);
                 btn.addEventListener('mouseup', cancelLongPress);
                 btn.addEventListener('mouseleave', cancelLongPress);
                 btn.addEventListener('touchstart', startLongPress, { passive: true });
                 btn.addEventListener('touchend', cancelLongPress);
                 btn.addEventListener('touchcancel', cancelLongPress);
+                // Memorizza il timer per pulizia al click
+                btn._pressTimer = pressTimer;
                 itemDiv.appendChild(btn);
                 
                 // Pulsante elimina (solo admin)
@@ -1065,12 +1088,21 @@
         }
     }
 
+    // Aggiorna il titolo del pulsante di intestazione nella pagina Attività
+    function updateSubHeaderTitle() {
+        if (currentNodeForInfo) {
+            const titleName = currentNodeForInfo.title && currentNodeForInfo.title.trim() !== "" ? currentNodeForInfo.title : "Senza titolo";
+            reteSubHeaderBtn.innerHTML = `<span>📌</span> ${titleName} <span>✏️</span>`;
+        } else {
+            reteSubHeaderBtn.innerHTML = `<span>📌</span> ATTIVITÀ <span>✏️</span>`;
+        }
+    }
+
     // Apre la pagina ATTIVITA' per un nodo
     function openReteSubPage(node, parentNode, levelStack) {
         currentNodeForInfo = node;
         currentStack.push({ node: parentNode, parent: levelStack.length > 0 ? levelStack[levelStack.length-1] : null });
-        const titleName = node.title && node.title.trim() !== "" ? node.title : "Senza titolo";
-        reteSubHeader.innerText = `ATTIVITÀ: ${titleName}`;
+        updateSubHeaderTitle();
         renderReteLevel(reteSubContainer, node, [...levelStack, node]);
         loadInfoForCurrentNode();
         loadSpecialActions(); // carica coordinate e url del nodo
@@ -1134,10 +1166,6 @@
             coordButton.innerText = "📍 COORDINATE (non impostate)";
         }
         // Il testo del pulsante SITO WEB è fisso, ma l'URL è interno
-        // La modifica è solo admin
-        // Non mostriamo l'URL al cliente
-        // Pulsante web: gestione modifica admin
-        // Rimuovo eventuali listener precedenti e li riattacco
         setupCoordButton();
         setupWebButton();
     }
@@ -1153,7 +1181,6 @@
             e.stopPropagation();
             const coord = currentNodeForInfo?.coordinate || "";
             if (coord && coord.trim() !== "") {
-                // Formatta la stringa delle coordinate (es. "43.841977, 11.170855")
                 let url = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(coord)}`;
                 window.open(url, '_blank');
             } else {
@@ -1167,7 +1194,6 @@
                 pressTimer = setTimeout(() => {
                     const newCoord = prompt("Inserisci le coordinate nel formato: latitudine, longitudine (es. 43.841977, 11.170855)", currentNodeForInfo?.coordinate || "");
                     if (newCoord !== null && newCoord.trim() !== "") {
-                        // Validazione semplice: deve contenere una virgola e due numeri
                         if (newCoord.includes(',') && !isNaN(parseFloat(newCoord.split(',')[0])) && !isNaN(parseFloat(newCoord.split(',')[1]))) {
                             currentNodeForInfo.coordinate = newCoord.trim();
                             saveReteData();
@@ -1220,7 +1246,6 @@
                     if (newUrl !== null) {
                         currentNodeForInfo.websiteUrl = newUrl.trim();
                         saveReteData();
-                        // Non c'è bisogno di aggiornare il testo del pulsante (è fisso)
                         loadSpecialActions();
                     }
                 }, 3000);
@@ -1308,6 +1333,35 @@
     saveInfoTextBtn.addEventListener('click', saveInfoText);
     cancelInfoTextBtn.addEventListener('click', closeInfoTextModal);
     infoTextModalDiv.addEventListener('click', (e) => { if (e.target === infoTextModalDiv) closeInfoTextModal(); });
+
+    // Gestione del titolo della pagina Attività: pulsante modificabile dall'admin
+    function setupSubHeaderEdit() {
+        let pressTimer = null;
+        const startLongPress = () => {
+            pressTimer = setTimeout(() => {
+                if (!adminAuthenticated) {
+                    alert("Solo l'amministratore può modificare il titolo dell'attività.");
+                    return;
+                }
+                if (!currentNodeForInfo) return;
+                const newTitle = prompt("Inserisci il nuovo titolo per questa attività:", currentNodeForInfo.title);
+                if (newTitle !== null && newTitle.trim() !== "") {
+                    editNodeTitle(currentNodeForInfo, newTitle.trim());
+                    updateSubHeaderTitle();
+                    // Aggiorna anche il nodo nel menu padre se necessario (il rendering ricorsivo lo farà al ritorno)
+                } else if (newTitle !== null && newTitle.trim() === "") {
+                    alert("Il titolo non può essere vuoto.");
+                }
+            }, 3000);
+        };
+        const cancelLongPress = () => { if (pressTimer) { clearTimeout(pressTimer); pressTimer = null; } };
+        reteSubHeaderBtn.addEventListener('mousedown', startLongPress);
+        reteSubHeaderBtn.addEventListener('mouseup', cancelLongPress);
+        reteSubHeaderBtn.addEventListener('mouseleave', cancelLongPress);
+        reteSubHeaderBtn.addEventListener('touchstart', startLongPress, { passive: true });
+        reteSubHeaderBtn.addEventListener('touchend', cancelLongPress);
+        reteSubHeaderBtn.addEventListener('touchcancel', cancelLongPress);
+    }
 
     function backFromReteSub() {
         if (currentStack.length > 0) currentStack.pop();
@@ -2188,6 +2242,7 @@ Un caro Saluto.`;
         migratePhoneNumbers();
         initHomeButtons();
         loadReteData();
+        setupSubHeaderEdit(); // Abilita la modifica del titolo nella pagina Attività
         saveNumberBtn.addEventListener('click', onSaveNumber);
         googleMapsBtn.addEventListener('click', () => window.open("https://maps.google.com", "_blank"));
         geolocationBtn.addEventListener('click', getLocationAndAddress);
