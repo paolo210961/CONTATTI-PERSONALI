@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
-    <title>Contatti Personali - v0221</title>
+    <title>Contatti Personali - v0222</title>
     <link rel="manifest" href="manifest.json">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -347,6 +347,22 @@
         .coord-toggle-modal-btn.active#modalCoordN {
             background: #dc3545 !important;
         }
+        .modal-audio-row {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            margin: 12px 0;
+        }
+        .modal-audio-btn {
+            flex: 1;
+            background: #6b8e23;
+            color: white;
+            border: none;
+            border-radius: 40px;
+            padding: 8px 16px;
+            font-weight: bold;
+            cursor: pointer;
+        }
         @media (max-width: 480px) {
             body { padding: 8px; }
             .page { padding: 16px 12px 24px; }
@@ -673,9 +689,9 @@
             background: black;
             color: white;
             border-radius: 50%;
-            width: 44px;
-            height: 44px;
-            font-size: 1.6rem;
+            width: 40px;
+            height: 40px;
+            font-size: 1.5rem;
             font-weight: normal;
             font-family: 'Times New Roman', serif;
             font-style: italic;
@@ -761,17 +777,17 @@
         <div class="info-text">Ogni contatto ha il proprio archivio note.<br>📍 Ricerca entro 300m di TUTTI i luoghi con nome<br>🔊 Ascolto automatico 30 secondi dopo il messaggio</div>
         <div class="info-text">Non Utilizzare APP per Situazioni di Emergenza di Salute</div>
         <div class="days-line" id="daysLeftDisplayHome">Giorni rimanenti: --</div>
-        <div class="info-text">💾 Il file SALVA NOTE si chiama: contatti_personali_notes_backup_0221.txt</div>
+        <div class="info-text">💾 Il file SALVA NOTE si chiama: contatti_personali_notes_backup_0222.txt</div>
 
         <div class="export-import-row">
             <button id="exportAllBtn">💾 SALVA NOTE</button>
             <button id="importAllBtn">📂 RIPRISTINA NOTE</button>
         </div>
         <input type="file" id="globalImportFileInput" accept=".txt" style="display:none;">
-        <div class="version-footer">versione 0221 – click note, i affiancata a cancella</div>
+        <div class="version-footer">versione 0222 – note e traduzioni ottimizzate</div>
     </div>
 
-    <!-- PAGINA EMERGENZA (CONTATTI) MODIFICATA v0221 -->
+    <!-- PAGINA EMERGENZA (CONTATTI) MODIFICATA v0222 -->
     <div id="emergencyPage" class="page hidden">
         <div id="currentServiceDeco" class="current-service-deco">Contatto:</div>
         
@@ -794,16 +810,12 @@
             <div id="gpsStatus" class="status-msg"></div>
         </div>
 
-        <!-- BLOCCO NOTE NORMALI -->
+        <!-- BLOCCO NOTE NORMALI (senza tasti LEGGI IT/FR, ora solo nella modale) -->
         <div class="dark-card">
             <button id="copyNoteBtn" class="small-btn copy-note-btn">📋 COPIA NOTE DA INVIARE WhatsApp</button>
             
-            <div class="flex-row" style="margin-top: 8px; margin-bottom: 8px;">
-                <button id="audioItBtn" class="small-btn audio-lang-btn">🇮🇹 LEGGI in IT</button>
-                <button id="audioFrBtn" class="small-btn audio-lang-btn">🇹🇳 LEGGI in FR</button>
-            </div>
+            <!-- I tasti LEGGI IT/FR sono stati rimossi dalla UI principale -->
             
-            <!-- Riga con pulsante AGGIUNGI NOTE e pallino info a destra -->
             <div class="add-note-wrapper">
                 <button id="addNoteBtn" class="small-btn add-note-btn">➕ AGGIUNGI NOTE</button>
                 <button id="infoNoteBtn" class="info-circle-btn">𝒊</button>
@@ -815,7 +827,7 @@
         
         <button id="backHomeBtn" class="small-btn back-home" style="width:100%;">◀ TORNA INDIETRO</button>
         
-        <!-- BOX ASCOLTA OPERATORE (con pulsante "i" affiancato a CANCELLA TRADUZIONE) -->
+        <!-- BOX ASCOLTA OPERATORE -->
         <div class="listen-box">
             <div class="cancel-row">
                 <button id="clearResponseBtn" class="small-btn clear-speak-btn">CANCELLA TRADUZIONE</button>
@@ -828,7 +840,7 @@
             <div id="transcribeStatus" class="status-msg"></div>
         </div>
         
-        <!-- BOX PARLA CON OPERATORE (con pulsante "i" affiancato a CANCELLA TRADUZIONE) -->
+        <!-- BOX PARLA CON OPERATORE (campo bianco ripristinato per aprire dettaglio conversazione) -->
         <div class="speak-box">
             <div class="cancel-row">
                 <button id="clearSpeakBtn" class="small-btn clear-speak-btn">CANCELLA TRADUZIONE</button>
@@ -838,7 +850,7 @@
             <button id="speakToOperatorBtn" class="small-btn double-height speak-btn">🎙️ PARLA CON OPERATORE</button>
             <div id="speakStatus" class="status-msg"></div>
         </div>
-        <div class="version-footer">versione 0221 – click nota e layout ottimizzato</div>
+        <div class="version-footer">versione 0222 – modale note con lettura IT/FR</div>
     </div>
 
     <!-- PAGINA FOTO (MONASTIR) invariata -->
@@ -853,7 +865,7 @@
         <div id="reteRootContainer" class="rete-container">
             <div id="reteLevelContainer"></div>
         </div>
-        <div class="version-footer">versione 0221 – rete gerarchica</div>
+        <div class="version-footer">versione 0222 – rete gerarchica</div>
     </div>
 
     <!-- PAGINA ATTIVITA' invariata -->
@@ -875,7 +887,7 @@
             <div id="coordHint" class="coord-hint">Premi per aprire Google Maps</div>
             <div id="webButton" class="special-action-btn">🌐 SITO WEB</div>
         </div>
-        <div class="version-footer">versione 0221 – attività con strumenti aggiuntivi</div>
+        <div class="version-footer">versione 0222 – attività con strumenti aggiuntivi</div>
     </div>
 
     <!-- MODALI -->
@@ -893,6 +905,11 @@
                 <button id="modalCoordS" class="coord-toggle-modal-btn">S</button>
                 <button id="modalCoordN" class="coord-toggle-modal-btn">N</button>
             </div>
+            <!-- Pulsanti LEGGI IT/FR aggiunti accanto a S/N -->
+            <div class="modal-audio-row">
+                <button id="modalAudioIt" class="modal-audio-btn">🇮🇹 LEGGI in IT</button>
+                <button id="modalAudioFr" class="modal-audio-btn">🇹🇳 LEGGI in FR</button>
+            </div>
             <div class="modal-buttons">
                 <button id="deleteNoteModalBtn" class="delete-btn" style="display:none;">🗑️ CANCELLA NOTA</button>
                 <button id="saveNoteModalBtn" class="save-btn">SALVA</button>
@@ -905,14 +922,14 @@
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
 <script>
-    // ==================== VERSIONE 0221 - CLICK NOTE, i AFFIANCATA A CANCELLA ====================
-    // - Apertura nota con click normale sul campo titolo (invece di long press)
-    // - Campo bianco in "PARLA CON OPERATORE" ora apre la modale della nota selezionata
-    // - Spostato pulsante "i" a fianco destro di "CANCELLA TRADUZIONE" in entrambi i box
-    // - Mantenuta la funzionalità di dettaglio conversazione nel box ascolta? No, anche quello ora apre nota? No, ascolta ha campo bianco che apre modale traduzione (giusto). Per coerenza, solo parla operatore apre nota.
-    // ===========================================================================================
+    // ==================== VERSIONE 0222 - MODIFICHE RICHIESTE ====================
+    // - Pulsanti "i" ridotti a 40x40px (stessa altezza pulsanti affiancati)
+    // - Rimossi tasti LEGGI IT/FR dalla UI principale, inseriti nella modale di modifica nota (affiancati a S/N)
+    // - Campo bianco di "PARLA CON OPERATORE" ripristinato per aprire speakDetailModal (dettaglio conversazione)
+    // - Mantenuta geolocalizzazione, wake lock, gestione rete, ecc.
+    // ============================================================================
 
-    const CURRENT_VERSION = "0221";
+    const CURRENT_VERSION = "0222";
     let currentService = "ambulanza";
     let currentLat = null, currentLng = null;
     let currentAddress = "";
@@ -964,8 +981,6 @@
     const addNoteBtn = document.getElementById('addNoteBtn');
     const notesListArea = document.getElementById('notesListArea');
     const copyNoteBtn = document.getElementById('copyNoteBtn');
-    const audioItBtn = document.getElementById('audioItBtn');
-    const audioFrBtn = document.getElementById('audioFrBtn');
     const backHomeBtn = document.getElementById('backHomeBtn');
     const backHomeBtnDuplicate = document.getElementById('backHomeBtnDuplicate');
     const phoneSaveMsg = document.getElementById('phoneSaveMsg');
@@ -996,6 +1011,8 @@
     const noteModalTitle = document.getElementById('noteModalTitle');
     const modalCoordS = document.getElementById('modalCoordS');
     const modalCoordN = document.getElementById('modalCoordN');
+    const modalAudioIt = document.getElementById('modalAudioIt');
+    const modalAudioFr = document.getElementById('modalAudioFr');
     const exportAllBtn = document.getElementById('exportAllBtn');
     const importAllBtn = document.getElementById('importAllBtn');
     const globalImportFileInput = document.getElementById('globalImportFileInput');
@@ -2046,7 +2063,7 @@ Un caro Saluto.`;
             btn.removeEventListener('click', handleConfirmNote);
             btn.addEventListener('click', handleConfirmNote);
         });
-        // Click sul campo titolo: apre modale di modifica (click normale, non long press)
+        // Click normale sul titolo apre la modale di modifica
         document.querySelectorAll('.title-field').forEach(field => {
             field.removeEventListener('click', handleTitleClick);
             field.addEventListener('click', handleTitleClick);
@@ -2101,6 +2118,40 @@ Un caro Saluto.`;
         currentEditIncludeCoords = false;
         updateModalCoordButtons();
     });
+    // Funzioni per leggere la nota corrente dalla modale (usando i dati del nodo attualmente aperto)
+    async function speakNoteFromModal(lang) {
+        const title = editNoteTitle.value.trim();
+        const description = editNoteDesc.value.trim();
+        let noteText = description ? description : (title ? title : "Nota vuota");
+        if (lang === 'fr') {
+            gpsStatus.innerHTML = "⏳ Traduzione FR...";
+            noteText = await translateToFrench(noteText);
+        }
+        const includeCoordsModal = currentEditIncludeCoords;
+        let fullText = noteText;
+        if (includeCoordsModal && currentLat !== null && currentLng !== null) {
+            const coordText = getFormattedCoordinatesForSpeech(lang);
+            if (coordText) {
+                if (lang === 'fr') {
+                    const translatedCoord = await translateToFrench(coordText);
+                    fullText = noteText + ". " + translatedCoord;
+                } else {
+                    fullText = noteText + ". " + coordText;
+                }
+            } else {
+                fullText = noteText + (lang === 'it' ? ". Coordinate non disponibili." : ". Coordonnées non disponibles.");
+            }
+        }
+        if (lang === 'fr') {
+            await speakWords(fullText, 'fr-FR', 1.0, 200);
+        } else {
+            await speakWords(fullText, 'it-IT', 1.0, 200);
+        }
+        playBeep();
+    }
+    modalAudioIt.addEventListener('click', () => speakNoteFromModal('it'));
+    modalAudioFr.addEventListener('click', () => speakNoteFromModal('fr'));
+    
     function saveNoteFromModal() {
         const title = editNoteTitle.value.trim();
         const description = editNoteDesc.value.trim();
@@ -2426,15 +2477,9 @@ Un caro Saluto.`;
     operatorResponseDisplay.addEventListener('click', openAdaptiveModal);
     closeAdaptiveBtn.addEventListener('click', closeAdaptiveModal);
     adaptiveModal.addEventListener('click', (e) => { if (e.target === adaptiveModal) closeAdaptiveModal(); });
-    // Il campo bianco nel box "PARLA CON OPERATORE" ora apre la modale della nota selezionata
+    // Campo bianco di PARLA OPERATORE ripristinato per aprire dettaglio conversazione
     speakResultField.removeEventListener('click', openSpeakDetailModal);
-    speakResultField.addEventListener('click', () => {
-        if (selectedNormalNoteId) {
-            openEditNoteModal(selectedNormalNoteId);
-        } else {
-            alert("Nessuna nota selezionata. Tocca il pallino di una nota per selezionarla.");
-        }
-    });
+    speakResultField.addEventListener('click', openSpeakDetailModal);
     function openSpeakDetailModal() {
         if (!lastItalianText && !lastFrenchTranslation) { alert("Nessuna conversazione recente."); return; }
         speakOriginalText.innerText = lastItalianText || ""; speakTranslatedText.innerText = lastFrenchTranslation || "";
@@ -2572,7 +2617,7 @@ Un caro Saluto.`;
     function getPhone(s) { return localStorage.getItem(`phone_${s}_${CURRENT_VERSION}`); }
     const defaultPhone = { ambulanza:"118", polizia:"113", veterinario:"800123456", clinica:"800987654" };
     function migratePhoneNumbers() {
-        const oldVersions = ["0220", "0219", "0218"];
+        const oldVersions = ["0221", "0220", "0219"];
         for (let s of services) {
             if (localStorage.getItem(`phone_${s}_${CURRENT_VERSION}`)) continue;
             for (let ver of oldVersions) {
@@ -2676,8 +2721,7 @@ Un caro Saluto.`;
         googleMapsBtn.addEventListener('click', () => window.open("https://maps.google.com", "_blank"));
         geolocationBtn.addEventListener('click', getLocationAndAddress);
         copyNoteBtn.addEventListener('click', copyNoteWithOptionalCoords);
-        audioItBtn.addEventListener('click', speakItalianNote);
-        audioFrBtn.addEventListener('click', speakFrenchNote);
+        // I tasti LEGGI IT/FR sono stati rimossi dalla UI principale (ora solo in modale)
         backHomeBtn.addEventListener('click', backHome);
         backHomeBtnDuplicate.addEventListener('click', backHome);
         listenResponseBtn.addEventListener('click', startListening30s);
