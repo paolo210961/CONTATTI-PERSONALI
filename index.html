@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
-    <title>Contatti Personali - v0215</title>
+    <title>Contatti Personali - v0216</title>
     <link rel="manifest" href="manifest.json">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -42,7 +42,8 @@
         button, .big-btn, .small-btn, .title-btn, .speak-field, .note-title-row, .confirm-note-btn,
         .edit-note-btn, .delete-note-btn, .add-note-btn, .back-home, .export-import-row button,
         .uploaded-image, .image-container img, .image-top-title, .rete-button,
-        .back-button, .rete-container button, .image-placeholder, .info-mini-img, .rete-delete-btn {
+        .back-button, .rete-container button, .image-placeholder, .info-mini-img, .rete-delete-btn,
+        .special-action-btn {
             user-select: none;
             -webkit-touch-callout: none;
             -webkit-user-select: none;
@@ -336,6 +337,7 @@
             .top-actions, .mid-actions { gap: 6px; }
             .license-row { flex-wrap: wrap; }
             .rete-delete-btn { font-size: 0.7rem; padding: 4px 8px; }
+            .special-action-btn { font-size: 0.85rem; padding: 10px; }
         }
         .version-footer {
             text-align: center;
@@ -552,12 +554,6 @@
             text-align: center;
             word-break: break-word;
         }
-        .admin-only-msg {
-            font-size: 0.7rem;
-            color: #e67e22;
-            text-align: center;
-            margin-top: 8px;
-        }
         .info-section {
             background: #f8f9fa;
             border-radius: 24px;
@@ -605,6 +601,31 @@
             display: flex;
             gap: 10px;
             margin-top: 12px;
+        }
+        .special-actions-container {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 20px;
+        }
+        .special-action-btn {
+            background: #2c3e50;
+            color: white;
+            width: 100%;
+            padding: 14px;
+            border-radius: 40px;
+            text-align: center;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.05s linear;
+            border: none;
+        }
+        .special-action-btn:active { transform: scale(0.97); }
+        .coord-hint {
+            font-size: 0.7rem;
+            color: #aaa;
+            text-align: center;
+            margin-top: 4px;
         }
         .hidden-btn {
             display: none !important;
@@ -658,14 +679,14 @@
         <div class="info-text">Ogni contatto ha il proprio archivio note.<br>📍 Ricerca entro 300m di TUTTI i luoghi con nome<br>🔊 Ascolto automatico 30 secondi dopo il messaggio</div>
         <div class="info-text">Non Utilizzare APP per Situazioni di Emergenza di Salute</div>
         <div class="days-line" id="daysLeftDisplayHome">Giorni rimanenti: --</div>
-        <div class="info-text">💾 Il file SALVA NOTE si chiama: contatti_personali_notes_backup_0215.txt</div>
+        <div class="info-text">💾 Il file SALVA NOTE si chiama: contatti_personali_notes_backup_0216.txt</div>
 
         <div class="export-import-row">
             <button id="exportAllBtn">💾 SALVA NOTE</button>
             <button id="importAllBtn">📂 RIPRISTINA NOTE</button>
         </div>
         <input type="file" id="globalImportFileInput" accept=".txt" style="display:none;">
-        <div class="version-footer">versione 0215 – admin 3 sec, elimina tasti, link cliccabili</div>
+        <div class="version-footer">versione 0216 – coordinate e sito web in attività</div>
     </div>
 
     <!-- PAGINA EMERGENZA (CONTATTI) invariata -->
@@ -679,7 +700,7 @@
         <div class="dark-card"><button id="addSpecialNoteBtn" class="small-btn add-note-btn"><span>🏠 AGGIUNGI NOTA SPECIALE</span><span>SELEZIONA</span></button><div id="specialNoteInfo" class="info-message"></div><div id="specialNotesListArea"><div style="font-size:0.7rem; color:#777;">Nessuna nota speciale. Aggiungine una.</div></div></div>
         <div class="dark-card"><div class="top-actions"><button id="audioItBtn" class="small-btn audio-lang-btn">LEGGI in IT</button><button id="audioFrBtn" class="small-btn audio-lang-btn">LEGGI in FR</button></div><div class="mid-actions"><button id="copyNoteBtn" class="small-btn copy-note-btn">COPIA NOTE</button><button id="clearResponseBtn" class="small-btn clear-btn">CANCELLA</button></div><textarea id="operatorResponse" rows="3" readonly placeholder="Traduzione italiana"></textarea><div id="listenInfoMsg" class="temp-message"></div><button id="listenResponseBtn" class="small-btn listen-btn double-height">🎤 ASCOLTA OPERATORE</button><div id="copyInfoMsg" class="temp-message"></div><div id="transcribeStatus" class="status-msg"></div></div>
         <div class="speak-box"><button id="clearSpeakBtn" class="small-btn clear-speak-btn">CANCELLA TRADUZIONE</button><div id="speakResultField" class="speak-field">Traduzione Italiana e Francese</div><button id="speakToOperatorBtn" class="small-btn double-height speak-btn">🎙️ PARLA CON OPERATORE</button><div id="speakStatus" class="status-msg"></div></div>
-        <div class="version-footer">versione 0215 – emergenza invariata</div>
+        <div class="version-footer">versione 0216 – emergenza invariata</div>
     </div>
 
     <!-- PAGINA FOTO (MONASTIR) -->
@@ -694,8 +715,8 @@
         <div id="reteRootContainer" class="rete-container">
             <div id="reteLevelContainer"></div>
         </div>
-        <div id="adminOnlyMessage" class="admin-only-msg">🔐 Solo amministratore può aggiungere/modificare/eliminare tasti RETE (pressione 3 sec)</div>
-        <div class="version-footer">versione 0215 – rete gerarchica</div>
+        <!-- Messaggio admin rimosso come da richiesta -->
+        <div class="version-footer">versione 0216 – rete gerarchica</div>
     </div>
 
     <!-- PAGINA ATTIVITA' (sottolivelli RETE con info e foto) -->
@@ -717,7 +738,15 @@
         </div>
         
         <button id="backFromReteSubBtn" class="small-btn back-button">◀ TORNA INDIETRO</button>
-        <div class="version-footer">versione 0215 – attività</div>
+
+        <!-- NUOVI PULSANTI SPECIALI (COORDINATE e SITO WEB) - posizionati DOPO il tasto TORNA INDIETRO -->
+        <div id="specialActionsContainer" class="special-actions-container">
+            <div id="coordButton" class="special-action-btn">📍 COORDINATE</div>
+            <div id="coordHint" class="coord-hint">Premi per aprire Google Maps</div>
+            <div id="webButton" class="special-action-btn">🌐 SITO WEB</div>
+        </div>
+
+        <div class="version-footer">versione 0216 – attività con strumenti aggiuntivi</div>
     </div>
 
     <!-- MODALI -->
@@ -729,8 +758,13 @@
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
 <script>
-    // ==================== VERSIONE 0215 - ADMIN 3 SEC, ELIMINA TASTI, LINK CLICCABILI ====================
-    const CURRENT_VERSION = "0215";
+    // ==================== VERSIONE 0216 - COORDINATE E SITO WEB IN ATTIVITÀ ====================
+    // Aggiunti pulsanti speciali: COORDINATE (modificabile solo admin, apre Maps) e SITO WEB (testo fisso, URL modificabile solo admin)
+    // Rimossa la scritta admin in fondo alla pagina FOTO
+    // I tasti nella pagina FOTO mostrano solo il titolo (nessuna descrizione aggiuntiva)
+    // ============================================================================================
+
+    const CURRENT_VERSION = "0216";
     let currentService = "ambulanza";
     let currentLat = null, currentLng = null;
     let currentAddress = "";
@@ -841,7 +875,6 @@
     const closeInfoModalBtn = document.getElementById('closeInfoModalBtn');
     const backFromImageBtn = document.getElementById('backFromImageBtn');
     const imagePreviewArea = document.getElementById('imagePreviewArea');
-    const adminOnlyMessage = document.getElementById('adminOnlyMessage');
     const infoTextDisplay = document.getElementById('infoTextDisplay');
     const infoImageContainer = document.getElementById('infoImageContainer');
     const infoEditButtons = document.getElementById('infoEditButtons');
@@ -851,6 +884,10 @@
     const infoTextarea = document.getElementById('infoTextarea');
     const saveInfoTextBtn = document.getElementById('saveInfoTextBtn');
     const cancelInfoTextBtn = document.getElementById('cancelInfoTextBtn');
+    // Nuovi elementi
+    const coordButton = document.getElementById('coordButton');
+    const coordHint = document.getElementById('coordHint');
+    const webButton = document.getElementById('webButton');
 
     let currentEditMode = null;
     let currentEditId = null;
@@ -860,7 +897,7 @@
     let lastItalianText = "";
     let lastFrenchTranslation = "";
 
-    // ==================== GESTIONE RETE DINAMICA (albero con info e immagine) ====================
+    // ==================== GESTIONE RETE DINAMICA (albero con info e foto) ====================
     let reteData = { title: "RETE", children: [] };
     let currentStack = []; // stack per navigazione
     let currentNodeForInfo = null; // nodo attualmente visualizzato nella pagina ATTIVITA'
@@ -876,6 +913,8 @@
                 function ensureFields(node) {
                     if (!node.infoText) node.infoText = "";
                     if (!node.infoImage) node.infoImage = null;
+                    if (!node.coordinate) node.coordinate = "";
+                    if (!node.websiteUrl) node.websiteUrl = "";
                     if (node.children) node.children.forEach(ensureFields);
                 }
                 ensureFields(reteData);
@@ -885,6 +924,8 @@
         if (!reteData.children) reteData.children = [];
         if (!reteData.infoText) reteData.infoText = "";
         if (!reteData.infoImage) reteData.infoImage = null;
+        if (!reteData.coordinate) reteData.coordinate = "";
+        if (!reteData.websiteUrl) reteData.websiteUrl = "";
     }
 
     function addEmptyChildToNode(parentNode) {
@@ -897,7 +938,9 @@
             title: "", 
             children: [],
             infoText: "",
-            infoImage: null
+            infoImage: null,
+            coordinate: "",
+            websiteUrl: ""
         });
         saveReteData();
         return parentNode.children[parentNode.children.length - 1];
@@ -927,7 +970,7 @@
         return false;
     }
 
-    // Render dei tasti (livello corrente) con pulsante elimina per admin
+    // Render dei tasti (livello corrente) con pulsante elimina per admin - solo titolo
     function renderReteLevel(container, parentNode, levelStack) {
         container.innerHTML = '';
         if (!parentNode.children || parentNode.children.length === 0) {
@@ -1030,6 +1073,7 @@
         reteSubHeader.innerText = `ATTIVITÀ: ${titleName}`;
         renderReteLevel(reteSubContainer, node, [...levelStack, node]);
         loadInfoForCurrentNode();
+        loadSpecialActions(); // carica coordinate e url del nodo
         if (adminAuthenticated) {
             infoEditButtons.classList.remove('hidden-btn');
         } else {
@@ -1076,6 +1120,118 @@
             if (adminAuthenticated) {
                 attachInfoPlaceholderLongPress(placeholder);
             }
+        }
+    }
+
+    // Carica i pulsanti speciali (coordinate e sito web)
+    function loadSpecialActions() {
+        if (!currentNodeForInfo) return;
+        // Gestione pulsante coordinate
+        const coordValue = currentNodeForInfo.coordinate || "";
+        if (coordValue.trim() !== "") {
+            coordButton.innerText = `📍 ${coordValue}`;
+        } else {
+            coordButton.innerText = "📍 COORDINATE (non impostate)";
+        }
+        // Il testo del pulsante SITO WEB è fisso, ma l'URL è interno
+        // La modifica è solo admin
+        // Non mostriamo l'URL al cliente
+        // Pulsante web: gestione modifica admin
+        // Rimuovo eventuali listener precedenti e li riattacco
+        setupCoordButton();
+        setupWebButton();
+    }
+
+    function setupCoordButton() {
+        // Rimuovi vecchi listener
+        const newCoordBtn = coordButton.cloneNode(true);
+        coordButton.parentNode.replaceChild(newCoordBtn, coordButton);
+        window.coordButton = newCoordBtn;
+        
+        // Click corto: apri Google Maps con le coordinate
+        newCoordBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const coord = currentNodeForInfo?.coordinate || "";
+            if (coord && coord.trim() !== "") {
+                // Formatta la stringa delle coordinate (es. "43.841977, 11.170855")
+                let url = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(coord)}`;
+                window.open(url, '_blank');
+            } else {
+                alert("Nessuna coordinata impostata per questa attività.");
+            }
+        });
+        // Long press (3 sec) solo admin per modificare le coordinate
+        if (adminAuthenticated) {
+            let pressTimer = null;
+            const startLongPress = () => {
+                pressTimer = setTimeout(() => {
+                    const newCoord = prompt("Inserisci le coordinate nel formato: latitudine, longitudine (es. 43.841977, 11.170855)", currentNodeForInfo?.coordinate || "");
+                    if (newCoord !== null && newCoord.trim() !== "") {
+                        // Validazione semplice: deve contenere una virgola e due numeri
+                        if (newCoord.includes(',') && !isNaN(parseFloat(newCoord.split(',')[0])) && !isNaN(parseFloat(newCoord.split(',')[1]))) {
+                            currentNodeForInfo.coordinate = newCoord.trim();
+                            saveReteData();
+                            loadSpecialActions();
+                        } else {
+                            alert("Formato non valido. Usa: latitudine, longitudine (es. 43.841977, 11.170855)");
+                        }
+                    } else if (newCoord !== null && newCoord.trim() === "") {
+                        currentNodeForInfo.coordinate = "";
+                        saveReteData();
+                        loadSpecialActions();
+                    }
+                }, 3000);
+            };
+            const cancelLongPress = () => { if (pressTimer) clearTimeout(pressTimer); };
+            newCoordBtn.addEventListener('mousedown', startLongPress);
+            newCoordBtn.addEventListener('mouseup', cancelLongPress);
+            newCoordBtn.addEventListener('mouseleave', cancelLongPress);
+            newCoordBtn.addEventListener('touchstart', startLongPress, { passive: true });
+            newCoordBtn.addEventListener('touchend', cancelLongPress);
+            newCoordBtn.addEventListener('touchcancel', cancelLongPress);
+        }
+    }
+
+    function setupWebButton() {
+        const newWebBtn = webButton.cloneNode(true);
+        webButton.parentNode.replaceChild(newWebBtn, webButton);
+        window.webButton = newWebBtn;
+        
+        // Click corto: apri l'URL salvato
+        newWebBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const url = currentNodeForInfo?.websiteUrl || "";
+            if (url && url.trim() !== "") {
+                let fullUrl = url.trim();
+                if (!fullUrl.startsWith('http://') && !fullUrl.startsWith('https://')) {
+                    fullUrl = 'https://' + fullUrl;
+                }
+                window.open(fullUrl, '_blank');
+            } else {
+                alert("Nessun sito web associato a questa attività.");
+            }
+        });
+        // Long press (3 sec) solo admin per modificare l'URL
+        if (adminAuthenticated) {
+            let pressTimer = null;
+            const startLongPress = () => {
+                pressTimer = setTimeout(() => {
+                    const newUrl = prompt("Inserisci l'indirizzo del sito web (es. https://www.example.com):", currentNodeForInfo?.websiteUrl || "");
+                    if (newUrl !== null) {
+                        currentNodeForInfo.websiteUrl = newUrl.trim();
+                        saveReteData();
+                        // Non c'è bisogno di aggiornare il testo del pulsante (è fisso)
+                        loadSpecialActions();
+                    }
+                }, 3000);
+            };
+            const cancelLongPress = () => { if (pressTimer) clearTimeout(pressTimer); };
+            newWebBtn.addEventListener('mousedown', startLongPress);
+            newWebBtn.addEventListener('mouseup', cancelLongPress);
+            newWebBtn.addEventListener('mouseleave', cancelLongPress);
+            newWebBtn.addEventListener('touchstart', startLongPress, { passive: true });
+            newWebBtn.addEventListener('touchend', cancelLongPress);
+            newWebBtn.addEventListener('touchcancel', cancelLongPress);
         }
     }
 
@@ -1380,7 +1536,7 @@ Un caro Saluto.`;
     closeInfoModalBtn.addEventListener('click', () => { infoModal.style.display = 'none'; });
     infoModal.addEventListener('click', (e) => { if (e.target === infoModal) infoModal.style.display = 'none'; });
 
-    // Admin autenticazione - ridotta a 3 secondi
+    // Admin autenticazione a 3 secondi
     function loadAdminCode() {
         const saved = localStorage.getItem('adminCode');
         if (saved && saved.trim() !== "") adminCode = saved;
@@ -1411,26 +1567,24 @@ Un caro Saluto.`;
     function hideAdminSection() { adminSection.style.display = 'none'; }
     let pressTimer = null;
     function startAdminTimer() {
-        // MODIFICA: timeout ridotto a 3000 ms (3 secondi)
         pressTimer = setTimeout(() => {
             const code = prompt("Inserisci il codice amministratore:");
             if (code === adminCode) { 
                 adminAuthenticated = true; 
                 showAdminSection(); 
                 alert("Accesso amministratore autorizzato.");
-                // Aggiorna UI
                 if (imagePage && !imagePage.classList.contains('hidden')) {
                     renderReteLevel(reteLevelContainer, reteData, [reteData]);
                     loadSavedImage();
                 }
-                if (adminOnlyMessage) adminOnlyMessage.classList.add('hidden-btn');
                 if (reteSubPage && !reteSubPage.classList.contains('hidden') && currentNodeForInfo) {
                     infoEditButtons.classList.remove('hidden-btn');
                     loadInfoForCurrentNode();
+                    loadSpecialActions(); // ricarica i pulsanti speciali in modalità admin
                 }
             }
             else if (code !== null) alert("Codice errato.");
-        }, 3000); // 3 secondi
+        }, 3000);
     }
     function cancelAdminTimer() { if (pressTimer) { clearTimeout(pressTimer); pressTimer = null; } }
     adminLongPressBtn.addEventListener('mousedown', startAdminTimer);
@@ -1511,8 +1665,6 @@ Un caro Saluto.`;
                     requestImagePageWakeLock();
                     renderReteLevel(reteLevelContainer, reteData, [reteData]);
                     loadSavedImage();
-                    if (!adminAuthenticated && adminOnlyMessage) adminOnlyMessage.classList.remove('hidden-btn');
-                    else if (adminAuthenticated && adminOnlyMessage) adminOnlyMessage.classList.add('hidden-btn');
                 } else {
                     showEmergency(service);
                 }
@@ -1557,11 +1709,9 @@ Un caro Saluto.`;
         });
     }
 
-    // ==================== GEOLOCALIZZAZIONE, NOTE, TRADUZIONI, VOCE (invariati dalla v0214) ====================
-    // Per brevità, qui includo solo le funzioni essenziali. Nel codice finale sono tutte presenti.
-    // (Le funzioni sono le stesse della v0214, le riporto per completezza nel codice finale)
-    // ----------------------------------------------------------------------------------------------
-    
+    // ==================== GEOLOCALIZZAZIONE, NOTE, TRADUZIONI, VOCE (invariati) ====================
+    // (Tutte le funzioni dalla v0215 sono identiche. Per brevità nel codice finale sono incluse)
+    // In questa soluzione le includo per completezza.
     function haversine(lat1,lng1,lat2,lng2) {
         const R = 6371e3;
         const φ1 = lat1 * Math.PI/180, φ2 = lat2 * Math.PI/180;
@@ -1687,7 +1837,7 @@ Un caro Saluto.`;
         gpsStatus.innerHTML = "";
     }
 
-    // ==================== FUNZIONI NOTE, MODALI, TRADUZIONI (identiche v0214) ====================
+    // ==================== FUNZIONI NOTE, MODALI, TRADUZIONI, VOCE (invariate) ====================
     function openAdaptiveModal() { modalTextarea.value = operatorResponse.value; adaptiveModal.style.display = 'flex'; }
     function closeAdaptiveModal() { adaptiveModal.style.display = 'none'; }
     operatorResponse.addEventListener('click', openAdaptiveModal);
@@ -1932,7 +2082,7 @@ Un caro Saluto.`;
     function releaseWakeLock() { if (wakeLock) { wakeLock.release(); wakeLock = null; } }
 
     function migratePhoneNumbers() {
-        const oldVersions = ["0214", "0213"];
+        const oldVersions = ["0215", "0214"];
         for (let s of services) {
             if (localStorage.getItem(`phone_${s}_${CURRENT_VERSION}`)) continue;
             for (let ver of oldVersions) {
@@ -2061,8 +2211,6 @@ Un caro Saluto.`;
             reteData.children = [];
             saveReteData();
         }
-        if (!adminAuthenticated && adminOnlyMessage) adminOnlyMessage.classList.remove('hidden-btn');
-        else if (adminAuthenticated && adminOnlyMessage) adminOnlyMessage.classList.add('hidden-btn');
     }
     init();
 </script>
