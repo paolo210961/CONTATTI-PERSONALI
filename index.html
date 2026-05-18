@@ -39,7 +39,7 @@
         .hidden {
             display: none !important;
         }
-        button, .big-btn, .small-btn, .title-btn, .speak-field, .note-title-row, .confirm-note-btn,
+        button, .big-btn, .small-btn, .title-btn, .speak-field, .note-item, .confirm-note-btn,
         .edit-note-btn, .delete-note-btn, .add-note-btn, .back-home, .export-import-row button,
         .uploaded-image, .image-container img, .image-top-title, .rete-button,
         .back-button, .rete-container button, .image-placeholder, .info-mini-img, .rete-delete-btn,
@@ -159,15 +159,13 @@
         }
         .note-item {
             background: transparent;
-            margin: 16px 0;
+            margin: 12px 0;
+            padding: 8px 0;
             border-bottom: 1px solid rgba(0,0,0,0.1);
-        }
-        .note-row-buttons { 
             display: flex;
-            gap: 10px;
             align-items: center;
-            justify-content: flex-end;
-            margin-bottom: 8px;
+            gap: 8px;
+            flex-wrap: nowrap;
         }
         .note-btn-confirm {
             width: 40px;
@@ -178,6 +176,7 @@
             align-items: center;
             justify-content: center;
             cursor: pointer;
+            flex-shrink: 0;
         }
         .note-btn-confirm .dot {
             width: 20px;
@@ -187,18 +186,12 @@
             transition: background-color 0.1s;
         }
         .note-btn-confirm.selected .dot { background-color: white; }
-        .note-title-row {
-            display: flex;
-            gap: 10px;
-            align-items: center;
-            width: 100%;
-        }
         .title-badge {
             background: #e91e63;
             color: white;
             font-weight: bold;
-            font-size: 0.85rem;
-            padding: 8px 12px;
+            font-size: 0.8rem;
+            padding: 6px 10px;
             border-radius: 32px;
             white-space: nowrap;
             flex-shrink: 0;
@@ -208,7 +201,7 @@
             background: white;
             border: 1px solid #ced4da;
             border-radius: 32px;
-            padding: 8px 12px;
+            padding: 6px 10px;
             flex: 1;
             font-size: 0.9rem;
             color: black;
@@ -340,11 +333,11 @@
             .title-btn { font-size: 1.2rem; padding: 12px; gap: 6px; }
             .dark-card { padding: 12px; }
             .speak-box { padding: 12px; }
-            .note-row-buttons { gap: 6px; }
-            .note-btn-confirm { width: 36px; height: 36px; }
-            .note-btn-confirm .dot { width: 16px; height: 16px; }
-            .title-badge { font-size: 0.7rem; padding: 6px 10px; }
-            .title-field { font-size: 0.8rem; padding: 6px 10px; white-space: normal; }
+            .note-item { gap: 6px; }
+            .note-btn-confirm { width: 32px; height: 32px; }
+            .note-btn-confirm .dot { width: 14px; height: 14px; }
+            .title-badge { font-size: 0.7rem; padding: 4px 8px; }
+            .title-field { font-size: 0.8rem; padding: 4px 8px; white-space: normal; }
             .top-actions, .mid-actions { gap: 6px; }
             .license-row { flex-wrap: wrap; }
             .rete-delete-btn { font-size: 0.7rem; padding: 4px 8px; }
@@ -788,7 +781,7 @@
         <!-- BLOCCO NOTE NORMALI (con modifiche layout) -->
         <div class="dark-card">
             <!-- COPIA NOTE (spostato per primo) -->
-            <button id="copyNoteBtn" class="small-btn copy-note-btn">📋 COPIA NOTE</button>
+            <button id="copyNoteBtn" class="small-btn copy-note-btn">📋 COPIA NOTE DA INVIARE WhatsApp</button>
             
             <!-- AGGIUNGI NOTE (ora secondo) -->
             <button id="addNoteBtn" class="small-btn add-note-btn"><span>➕ AGGIUNGI NOTE</span><span>SELEZIONA</span></button>
@@ -808,7 +801,7 @@
                 </div>
             </div>
             
-            <!-- Area lista note (solo titoli con pallino di selezione) -->
+            <!-- Area lista note (ora ogni nota è su un'unica riga: pallino + badge + titolo) -->
             <div id="normalNoteInfo" class="info-message"></div>
             <div id="notesListArea"><div style="font-size:0.7rem; color:#777;">Nessuna nota. Aggiungine una.</div></div>
             
@@ -889,16 +882,12 @@
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
 <script>
-    // ==================== VERSIONE 0217 - MODIFICHE LAYOUT E FUNZIONALITÀ ====================
-    // - Spostato pulsante CARICA COORDINATE dentro box coordinate e rinominato
-    // - Duplicato pulsante TORNA INDIETRO sotto APRI GOOGLE MAPS
-    // - Modificata etichetta "Titolo" in "TITOLO NOTA"
-    // - Resi pulsanti S/N stessa altezza del tasto descrittivo COORDINATE
-    // - Invertito ordine: COPIA NOTE ora prima di AGGIUNGI NOTE
-    // - Pulsante COPIA NOTE full-width
-    // - Tasto CANCELLA in box ascolta operatore ora full-width come nel box parla con operatore
-    // - WakeLock sempre attivo (schermo sempre acceso) finché l'app è aperta
-    // ====================================================================================
+    // ==================== VERSIONE 0217 - MODIFICHE FINALI ====================
+    // - Lettura note: se S attivo, legge nota + coordinate; se N, solo nota
+    // - Schermo sempre acceso (WakeLock globale già attivo)
+    // - Righe note: pallino + "TITOLO NOTA" + campo titolo su un'unica riga
+    // - Testo pulsante copia note: "COPIA NOTE DA INVIARE WhatsApp"
+    // ========================================================================
 
     const CURRENT_VERSION = "0217";
     let currentService = "ambulanza";
@@ -907,7 +896,7 @@
     let currentRefA = "", currentRefB = "", currentRefC = "";
     let normalNotes = {};
     let selectedNormalNoteId = null;
-    let globalWakeLock = null;  // wakeLock persistente per tutta l'app
+    let globalWakeLock = null;
     let imagePageWakeLock = null;
 
     let includeCoordinatesInCopy = false;  // true = S, false = N
@@ -1037,6 +1026,12 @@
             try {
                 globalWakeLock = await navigator.wakeLock.request('screen');
                 console.log('WakeLock globale attivo');
+                // Rinnova il wake lock se necessario (rimane attivo finché la pagina è visibile)
+                document.addEventListener('visibilitychange', async () => {
+                    if (document.visibilityState === 'visible' && globalWakeLock === null) {
+                        globalWakeLock = await navigator.wakeLock.request('screen');
+                    }
+                });
             } catch(err) { console.warn('WakeLock globale fallito:', err); }
         }
     }
@@ -2025,21 +2020,21 @@ Un caro Saluto.`;
         updateCoordToggleUI();
         if (currentLat === null || currentLng === null) {
             getLocationAndAddress().then(() => {
-                gpsStatus.innerHTML = "Coordinate acquisite. Ora puoi copiare la nota con le coordinate.";
+                gpsStatus.innerHTML = "Coordinate acquisite. Ora puoi copiare o leggere la nota con le coordinate.";
             });
         } else {
-            gpsStatus.innerHTML = "Modalità S attiva: le coordinate verranno incluse nella copia.";
+            gpsStatus.innerHTML = "Modalità S attiva: le coordinate verranno incluse nella copia e nella lettura.";
             setTimeout(() => gpsStatus.innerHTML = "✅ Pronto.", 2000);
         }
     });
     coordNN.addEventListener('click', () => {
         includeCoordinatesInCopy = false;
         updateCoordToggleUI();
-        gpsStatus.innerHTML = "Modalità N attiva: le coordinate NON verranno incluse nella copia.";
+        gpsStatus.innerHTML = "Modalità N attiva: le coordinate NON verranno incluse nella copia e nella lettura.";
         setTimeout(() => gpsStatus.innerHTML = "✅ Pronto.", 2000);
     });
 
-    // Funzioni note (solo normali)
+    // Funzioni per le note (solo normali)
     function getNormalNotesKey(s) { return `normalNotes_${s}_${CURRENT_VERSION}`; }
     function getSelectedNormalIdKey(s) { return `selectedNormalNote_${s}_${CURRENT_VERSION}`; }
     function saveNormalNotesForService(s) { localStorage.setItem(getNormalNotesKey(s), JSON.stringify(normalNotes[s])); }
@@ -2061,6 +2056,7 @@ Un caro Saluto.`;
         renderNormalNotes();
     }
     
+    // Render note su una singola riga: pallino + "TITOLO NOTA" + titolo
     function renderNormalNotes() {
         const notes = normalNotes[currentService] || [];
         if (!notes.length) { notesListArea.innerHTML = `<div style="font-size:0.7rem; color:#777;">Nessuna nota. Aggiungine una.</div>`; return; }
@@ -2069,13 +2065,9 @@ Un caro Saluto.`;
             const isSelected = (String(selectedNormalNoteId) === String(note.id));
             const titleText = note.title && note.title.trim() !== "" ? note.title : "titolo nota";
             html += `<div class="note-item" data-id="${note.id}">
-                        <div class="note-row-buttons">
-                            <button class="confirm-note-btn note-btn-confirm ${isSelected ? 'selected' : ''}" data-id="${note.id}"><span class="dot"></span></button>
-                        </div>
-                        <div class="note-title-row">
-                            <div class="title-badge">TITOLO NOTA</div>
-                            <div class="title-field">${escapeHtml(titleText)}</div>
-                        </div>
+                        <button class="confirm-note-btn note-btn-confirm ${isSelected ? 'selected' : ''}" data-id="${note.id}"><span class="dot"></span></button>
+                        <div class="title-badge">TITOLO NOTA</div>
+                        <div class="title-field">${escapeHtml(titleText)}</div>
                      </div>`;
         });
         notesListArea.innerHTML = html;
@@ -2165,7 +2157,22 @@ Un caro Saluto.`;
         return null;
     }
 
-    async function speakNoteOnly(lang) {
+    // Funzione per ottenere la stringa delle coordinate formattata per la lettura (in italiano o francese)
+    function getFormattedCoordinatesForSpeech(lang) {
+        if (currentLat === null || currentLng === null) return null;
+        const latDir = currentLat >= 0 ? (lang === 'it' ? "Nord" : "Nord") : (lang === 'it' ? "Sud" : "Sud");
+        const lngDir = currentLng >= 0 ? (lang === 'it' ? "Est" : "Est") : (lang === 'it' ? "Ovest" : "Ouest");
+        const latAbs = Math.abs(currentLat).toFixed(6);
+        const lngAbs = Math.abs(currentLng).toFixed(6);
+        if (lang === 'it') {
+            return `Coordinate: ${latAbs} gradi ${latDir}, ${lngAbs} gradi ${lngDir}`;
+        } else {
+            return `Coordonnées: ${latAbs} degrés ${latDir}, ${lngAbs} degrés ${lngDir}`;
+        }
+    }
+
+    // Funzione di lettura nota + coordinate opzionali
+    async function speakNoteWithOptionalCoords(lang) {
         if (!window.speechSynthesis) { alert(lang==='it'?"Sintesi non supportata":"Synthèse non supportée"); return; }
         speechSynthesis.cancel();
         let note = getSelectedNoteDescription();
@@ -2173,16 +2180,37 @@ Un caro Saluto.`;
         if (lang === 'fr') {
             gpsStatus.innerHTML = "⏳ Traduzione FR...";
             note = await translateToFrench(note);
+        }
+        let fullText = note;
+        if (includeCoordinatesInCopy) {
+            const coordText = getFormattedCoordinatesForSpeech(lang);
+            if (coordText) {
+                if (lang === 'fr') {
+                    const translatedCoord = await translateToFrench(coordText);
+                    fullText = note + ". " + translatedCoord;
+                } else {
+                    fullText = note + ". " + coordText;
+                }
+            } else {
+                if (lang === 'it') fullText = note + ". Coordinate non disponibili.";
+                else fullText = note + ". Coordonnées non disponibles.";
+            }
+        }
+        if (lang === 'fr') {
             gpsStatus.innerHTML = "🔊 Lettura FR...";
-        } else gpsStatus.innerHTML = "🔊 Lettura IT...";
-        await speakWords(note, lang==='it'?'it-IT':'fr-FR', 1.0, 200);
+            await speakWords(fullText, 'fr-FR', 1.0, 200);
+        } else {
+            gpsStatus.innerHTML = "🔊 Lettura IT...";
+            await speakWords(fullText, 'it-IT', 1.0, 200);
+        }
         playBeep();
         gpsStatus.innerHTML = "✅ Messaggio completato. Avvio ascolto operatore (30 secondi)...";
         setTimeout(() => startListening30s(), 500);
     }
-    function speakItalianNote() { speakNoteOnly('it'); }
-    function speakFrenchNote() { speakNoteOnly('fr'); }
+    function speakItalianNote() { speakNoteWithOptionalCoords('it'); }
+    function speakFrenchNote() { speakNoteWithOptionalCoords('fr'); }
 
+    // Copia nota con o senza coordinate
     async function copyNoteWithOptionalCoords() {
         let note = getSelectedNoteDescription();
         if (!note) {
@@ -2199,7 +2227,7 @@ Un caro Saluto.`;
         try {
             await navigator.clipboard.writeText(textToCopy);
             gpsStatus.innerHTML = "📋 Nota copiata!";
-            showTemporaryMessage(copyInfoMsg, "📋 Nota copiata negli appunti.", 15000);
+            showTemporaryMessage(copyInfoMsg, "📋 Nota copiata negli appunti. Puoi incollarla su WhatsApp.", 15000);
             setTimeout(()=> gpsStatus.innerHTML = "✅ Pronto.", 2000);
         } catch(e) {
             let ta = document.createElement('textarea');
@@ -2209,10 +2237,11 @@ Un caro Saluto.`;
             document.execCommand('copy');
             document.body.removeChild(ta);
             gpsStatus.innerHTML = "📋 Nota copiata manualmente";
-            showTemporaryMessage(copyInfoMsg, "📋 Nota copiata.", 15000);
+            showTemporaryMessage(copyInfoMsg, "📋 Nota copiata. Incolla su WhatsApp.", 15000);
         }
     }
 
+    // Funzioni di traduzione e ascolto operatore (invariate)
     async function translateToFrench(italianText) {
         if (!italianText || italianText.trim() === "") return "";
         try {
@@ -2539,7 +2568,7 @@ Un caro Saluto.`;
         emergencyPage.classList.add("hidden"); 
         homePage.classList.remove("hidden"); 
         currentService = null;
-        // Rilascia il wakeLock solo se si torna alla home? No, manteniamo globale sempre acceso.
+        // WakeLock globale rimane attivo, non viene rilasciato
     }
     
     function init() {
@@ -2574,7 +2603,7 @@ Un caro Saluto.`;
             reteData.children = [];
             saveReteData();
         }
-        // Attivazione wakeLock globale all'avvio dell'app
+        // WakeLock globale attivo per tutta la durata dell'app
         requestGlobalWakeLock();
     }
     init();
