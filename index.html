@@ -15,8 +15,7 @@
         .container{max-width:600px;width:100%;margin:0 auto}
         .page{background:white;border-radius:32px;padding:24px 20px 32px;box-shadow:0 8px 24px rgba(0,0,0,0.05)}
         .hidden{display:none !important}
-        button,.big-btn,.small-btn,.title-btn,.speak-field,.note-item,.confirm-note-btn,.add-note-btn,.back-home,.export-import-row button,.uploaded-image,.image-container img,.image-top-title,.rete-button,.back-button,.rete-container button,.image-placeholder,.info-mini-img,.rete-delete-btn,.special-action-btn,.rete-level-title-btn,.coord-toggle-btn{user-select:none;-webkit-touch-callout:none;-webkit-user-select:none}
-        .version-header{display:none}
+        button,.big-btn,.small-btn,.title-btn,.speak-field,.note-item,.confirm-note-btn,.add-note-btn,.export-import-row button,.uploaded-image,.image-container img,.image-top-title,.info-circle-btn,.rete-button{user-select:none;-webkit-touch-callout:none;-webkit-user-select:none}
         .title-btn{background:#FFC107;border:none;border-radius:60px;padding:14px 12px;font-size:1.5rem;font-weight:bold;color:#1e2a3a;width:100%;text-align:center;margin-bottom:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:12px;box-shadow:0 6px 12px rgba(0,0,0,0.2);transition:0.05s linear}
         .title-btn:active{transform:scale(0.97)}
         .current-service-deco{background:#6c757d;border:none;border-radius:60px;padding:14px 12px;font-size:1.3rem;font-weight:bold;color:white;width:100%;text-align:center;margin-bottom:20px;box-shadow:0 4px 8px rgba(0,0,0,0.2)}
@@ -34,7 +33,6 @@
         .double-height{padding:16px 12px;font-size:1rem}
         .section-title{font-weight:bold;font-size:0.9rem;color:#1e2a3a;margin-bottom:8px;display:block}
         .flex-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:12px 0}
-        .full-width{width:100%}
         input,textarea{width:100%;padding:12px 16px;border-radius:32px;border:1px solid #ced4da;font-size:0.9rem;background:#fff;font-family:monospace}
         .note-item{background:transparent;margin:12px 0;padding:8px 0;border-bottom:1px solid rgba(0,0,0,0.1);display:flex;align-items:center;gap:8px;flex-wrap:nowrap}
         .note-btn-confirm{width:40px;height:40px;background:#283593;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0}
@@ -44,10 +42,7 @@
         .title-field{background:white;border:1px solid #ced4da;border-radius:32px;padding:6px 10px;flex:1;font-size:0.9rem;color:black;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:pointer;transition:background 0.1s}
         .title-field:active{background:#f0f0f0}
         .add-note-btn{background:#283593 !important;color:white;flex:1;text-align:center;padding:8px 16px}
-        .back-home{background:#e67e22 !important;color:white;margin:16px 0}
         .copy-note-btn{background:#FFC107 !important;color:#1e2a3a !important;width:100%;margin-bottom:12px;display:block;text-align:center;font-weight:bold}
-        .clear-btn{background:#8e44ad !important;width:100%;margin:0}
-        .listen-btn{background:#FFC107 !important;color:#1e2a3a !important;width:100%;margin-top:12px}
         .speak-box,.listen-box{background:#d2d6dc;border-left:6px solid #2c3e50;border-radius:24px;padding:16px;margin:16px 0;box-shadow:none}
         .speak-field,.listen-field{background:white;border:1px solid #ced4da;border-radius:32px;padding:12px 16px;margin-bottom:8px;cursor:pointer;transition:background 0.1s;color:#1e2a3a;font-size:0.9rem;min-height:80px;word-break:break-word}
         .speak-field:active,.listen-field:active{background:#f0f0f0}
@@ -72,8 +67,7 @@
         .coord-toggle-modal-btn.active#modalCoordN{background:#dc3545 !important}
         .modal-audio-row{display:flex;gap:12px;justify-content:center;margin:12px 0}
         .modal-audio-btn{flex:1;background:#6b8e23;color:white;border:none;border-radius:40px;padding:8px 16px;font-weight:bold;cursor:pointer}
-        @media (max-width:480px){body{padding:8px}.page{padding:16px 12px 24px}.big-btn{font-size:1rem;padding:12px 10px;white-space:normal;word-break:break-word}.small-btn{padding:6px 10px;font-size:0.75rem}.double-height{padding:12px 10px;font-size:0.9rem}.title-btn{font-size:1.2rem;padding:12px;gap:6px}.dark-card{padding:12px}.speak-box,.listen-box{padding:12px}.note-item{gap:6px}.note-btn-confirm{width:32px;height:32px}.note-btn-confirm .dot{width:14px;height:14px}.title-badge{font-size:0.7rem;padding:4px 8px}.title-field{font-size:0.8rem;padding:4px 8px;white-space:normal}.license-row{flex-wrap:wrap}.rete-delete-btn{font-size:0.7rem;padding:4px 8px}.special-action-btn{font-size:0.85rem;padding:10px}}
-        .version-footer{text-align:center;font-size:0.65rem;color:#adb5bd;margin-top:24px;padding-top:12px;border-top:1px solid #e9ecef}
+        @media (max-width:480px){body{padding:8px}.page{padding:16px 12px 24px}.big-btn{font-size:1rem;padding:12px 10px;white-space:normal;word-break:break-word}.small-btn{padding:6px 10px;font-size:0.75rem}.double-height{padding:12px 10px;font-size:0.9rem}.title-btn{font-size:1.2rem;padding:12px;gap:6px}.dark-card{padding:12px}.speak-box,.listen-box{padding:12px}.note-item{gap:6px}.note-btn-confirm{width:32px;height:32px}.note-btn-confirm .dot{width:14px;height:14px}.title-badge{font-size:0.7rem;padding:4px 8px}.title-field{font-size:0.8rem;padding:4px 8px;white-space:normal}.license-row{flex-wrap:wrap}.rete-delete-btn{font-size:0.7rem;padding:4px 8px}}
         #saveNumberBtn,#geolocationBtn{background:#283593 !important}
         #googleMapsBtn{background:black !important;color:white !important;border:none !important;font-weight:bold !important;box-shadow:none !important;margin:4px 0}
         .info-message{background:#e8f5e9;padding:6px 12px;border-radius:20px;margin-bottom:8px;font-size:0.75rem;font-weight:500;color:#2e7d32;display:none}
@@ -88,46 +82,33 @@
         .license-row:last-child{margin-bottom:0}
         .license-label{font-weight:bold;white-space:nowrap}
         #clientCodeInput{flex:1;min-width:100px}
-        #copyRequestBtn{flex-shrink:0}
         #unlockCodeInput{flex:2;min-width:160px}
         #activateLicenseBtn{flex-shrink:0}
         .admin-section{margin:16px 0;padding:12px;background:#ffe0b5;border-radius:24px;border-left:6px solid #e67e22;display:none}
         .admin-section .flex-row{margin-bottom:8px}
-        .days-line{text-align:center;font-size:0.75rem;color:#555;margin-top:8px;font-weight:bold}
+        .days-line{text-align:center;font-size:0.9rem;color:#1e2a3a;margin-top:12px;font-weight:bold;display:flex;justify-content:center;align-items:center;gap:12px;flex-wrap:wrap;background:#e9ecef;padding:8px 12px;border-radius:40px}
+        .days-line button{background:#e67e22;color:white;border:none;padding:4px 12px;border-radius:40px;font-size:0.8rem;cursor:pointer;font-weight:bold}
         .modal-info-text{font-size:0.85rem;line-height:1.4;margin-bottom:16px;white-space:pre-wrap;word-break:break-word}
         .image-top-box{background:#d2d6dc;border-radius:24px;margin-bottom:20px;padding:12px;text-align:center;border-left:6px solid #2c3e50}
         .image-top-title{font-size:1.3rem;font-weight:bold;color:#1e2a3a;margin-bottom:12px}
         .image-container{width:100%;min-height:200px;background:#e9ecef;border-radius:16px;display:flex;flex-direction:column;justify-content:center;align-items:center;position:relative;cursor:pointer}
         .image-placeholder{display:flex;justify-content:center;align-items:center;width:100%;height:100%;min-height:180px;color:#6c757d;font-size:0.9rem}
         .uploaded-image{max-width:100%;max-height:180px;width:auto;height:auto;border-radius:16px;box-shadow:0 2px 8px rgba(0,0,0,0.1);cursor:pointer;display:block}
-        .back-button{background:#e67e22;color:white;width:100%;margin:16px 0}
+        .info-circle-btn{background:black;color:white;border-radius:50%;width:40px;height:40px;font-size:1.5rem;font-weight:normal;font-family:'Times New Roman',serif;font-style:italic;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;border:none;transition:0.05s linear;flex-shrink:0}
+        .info-circle-btn:active{transform:scale(0.95)}
+        .add-note-wrapper{display:flex;gap:10px;align-items:center;margin:12px 0}
+        .cancel-row{display:flex;gap:10px;align-items:center;margin-bottom:12px}
+        .cancel-row .small-btn{flex:1}
         .rete-container{margin-top:20px}
         .rete-item{display:flex;align-items:center;gap:8px;margin:8px 0}
         .rete-button{background:#283593;color:white;flex:1;padding:12px;border-radius:40px;text-align:center;font-weight:bold;cursor:pointer;transition:0.05s linear}
         .rete-button:active{transform:scale(0.97)}
         .rete-delete-btn{background:#8e44ad;color:white;padding:8px 12px;border-radius:40px;font-size:0.8rem;font-weight:bold;cursor:pointer;border:none;white-space:nowrap}
         .rete-delete-btn:active{transform:scale(0.97)}
-        .rete-level-title-btn{background:#FFC107;border:none;border-radius:60px;padding:14px 12px;font-size:1.3rem;font-weight:bold;color:#1e2a3a;width:100%;text-align:center;margin-bottom:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:12px;box-shadow:0 6px 12px rgba(0,0,0,0.2);transition:0.05s linear;word-break:break-word}
-        .rete-level-title-btn:active{transform:scale(0.97)}
-        .info-section{background:#f8f9fa;border-radius:24px;padding:16px;margin:20px 0 0;border-left:6px solid #283593}
-        .info-section-title{font-weight:bold;margin-bottom:12px;color:#1e2a3a}
-        .info-text-display{background:white;border-radius:16px;padding:12px;margin-bottom:16px;white-space:pre-wrap;word-break:break-word;border:1px solid #dee2e6}
-        .info-text-display a{color:#283593;text-decoration:underline;word-break:break-all}
-        .info-mini-img{width:100%;max-height:90px;object-fit:contain;border-radius:12px;margin-top:8px;cursor:pointer}
-        .info-mini-placeholder{background:#e9ecef;border-radius:12px;padding:20px;text-align:center;color:#6c757d;font-size:0.8rem;margin-top:8px}
-        .info-edit-buttons{display:flex;gap:10px;margin-top:12px}
-        .special-actions-container{display:flex;flex-direction:column;gap:12px;margin-top:20px}
-        .special-action-btn{background:#2c3e50;color:white;width:100%;padding:14px;border-radius:40px;text-align:center;font-weight:bold;cursor:pointer;transition:0.05s linear;border:none}
-        .special-action-btn:active{transform:scale(0.97)}
-        .coord-hint{font-size:0.7rem;color:#aaa;text-align:center;margin-top:4px}
+        .info-mini-img{max-width:100%;max-height:100px;border-radius:12px;margin-top:8px;cursor:pointer;object-fit:contain}
+        .info-edit-buttons{margin-top:16px;display:flex;gap:12px}
+        .info-edit-buttons button{flex:1}
         .hidden-btn{display:none !important}
-        .info-circle-btn{background:black;color:white;border-radius:50%;width:40px;height:40px;font-size:1.5rem;font-weight:normal;font-family:'Times New Roman',serif;font-style:italic;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;border:none;transition:0.05s linear;flex-shrink:0}
-        .info-circle-btn:active{transform:scale(0.95)}
-        .flex-row-buttons{display:flex;gap:10px;margin-top:12px;align-items:center}
-        .flex-row-buttons .small-btn{flex:1}
-        .add-note-wrapper{display:flex;gap:10px;align-items:center;margin:12px 0}
-        .cancel-row{display:flex;gap:10px;align-items:center;margin-bottom:12px}
-        .cancel-row .small-btn{flex:1}
     </style>
 </head>
 <body>
@@ -143,7 +124,6 @@
             <div class="license-row">
                 <span class="license-label">LICENZA</span>
                 <input type="text" id="clientCodeInput" placeholder="Codice Cliente" inputmode="numeric" readonly>
-                <button id="copyRequestBtn" class="small-btn" style="background:#e67e22;">📋 Richiedi attivazione</button>
             </div>
             <div class="license-row">
                 <input type="text" id="unlockCodeInput" placeholder="Codice Attivazione (20 cifre)" maxlength="20" inputmode="numeric">
@@ -184,22 +164,17 @@
             <button id="importAllBtn">📂 RIPRISTINA NOTE</button>
         </div>
         <input type="file" id="globalImportFileInput" accept=".txt" style="display:none;">
-        <div class="version-footer">versione 0223 – navigazione migliorata</div>
     </div>
 
-    <!-- PAGINA EMERGENZA (CONTATTI) MODIFICATA v0223 -->
+    <!-- PAGINA EMERGENZA -->
     <div id="emergencyPage" class="page hidden">
         <div id="currentServiceDeco" class="current-service-deco">Contatto:</div>
-        
         <div class="dark-card">
             <div class="section-title">Numero servizio</div>
             <div class="flex-row"><input type="tel" id="phoneNumber" placeholder="Numero" style="flex:2;"><button id="saveNumberBtn" class="small-btn" style="flex:0.4;">SALVA</button></div>
             <div id="phoneSaveMsg" class="status-msg"></div>
         </div>
-        
         <button id="googleMapsBtn" class="small-btn" style="width:100%; margin:4px 0;">🗺️ APRI GOOGLE MAPS</button>
-        <button id="backHomeBtnDuplicate" class="small-btn back-home" style="width:100%; margin:4px 0;">◀ TORNA INDIETRO</button>
-        
         <div id="coordsContainer" class="dark-card">
             <div><strong>📌 COORDINATE:</strong> <span id="latLonDisplay">---</span></div>
             <div><strong>🏠 INDIRIZZO:</strong> <span id="addressDisplay">---</span></div>
@@ -209,23 +184,15 @@
             <button id="geolocationBtn" class="small-btn" style="width:100%; margin:8px 0 0 0;">📍 CARICA COORDINATE</button>
             <div id="gpsStatus" class="status-msg"></div>
         </div>
-
-        <!-- BLOCCO NOTE NORMALI -->
         <div class="dark-card">
             <button id="copyNoteBtn" class="small-btn copy-note-btn">📋 COPIA NOTE DA INVIARE WhatsApp</button>
-            
             <div class="add-note-wrapper">
                 <button id="addNoteBtn" class="small-btn add-note-btn">➕ AGGIUNGI NOTE</button>
                 <button id="infoNoteBtn" class="info-circle-btn">𝒊</button>
             </div>
-            
             <div id="normalNoteInfo" class="info-message"></div>
             <div id="notesListArea"><div style="font-size:0.7rem; color:#777;">Nessuna nota. Aggiungine una.</div></div>
         </div>
-        
-        <button id="backHomeBtn" class="small-btn back-home" style="width:100%;">◀ TORNA INDIETRO</button>
-        
-        <!-- BOX ASCOLTA OPERATORE -->
         <div class="listen-box">
             <div class="cancel-row">
                 <button id="clearResponseBtn" class="small-btn clear-speak-btn">CANCELLA TRADUZIONE</button>
@@ -237,8 +204,6 @@
             <div id="copyInfoMsg" class="temp-message"></div>
             <div id="transcribeStatus" class="status-msg"></div>
         </div>
-        
-        <!-- BOX PARLA CON OPERATORE (campo bianco ora apre adaptiveModal come ascolta) -->
         <div class="speak-box">
             <div class="cancel-row">
                 <button id="clearSpeakBtn" class="small-btn clear-speak-btn">CANCELLA TRADUZIONE</button>
@@ -248,9 +213,9 @@
             <button id="speakToOperatorBtn" class="small-btn double-height speak-btn">🎙️ PARLA CON OPERATORE</button>
             <div id="speakStatus" class="status-msg"></div>
         </div>
-        <!-- RIMOSSA L'ULTIMA RIGA (versione footer) -->
     </div>
-    <!-- PAGINA FOTO (MONASTIR) invariata -->
+
+    <!-- PAGINA FOTO (MONASTIR) -->
     <div id="imagePage" class="page hidden">
         <div class="image-top-box">
             <div class="image-top-title">MONASTIR: Facciamo Rete</div>
@@ -258,33 +223,9 @@
                 <div class="image-placeholder" id="imagePlaceholder">📸 Solo amministratore: premi a lungo (3 sec) per caricare un'immagine</div>
             </div>
         </div>
-        <button id="backFromImageBtn" class="small-btn back-button">◀ TORNA INDIETRO</button>
         <div id="reteRootContainer" class="rete-container">
             <div id="reteLevelContainer"></div>
         </div>
-        <div class="version-footer">versione 0223 – rete gerarchica</div>
-    </div>
-
-    <!-- PAGINA ATTIVITA' invariata -->
-    <div id="reteSubPage" class="page hidden">
-        <button id="reteSubHeaderBtn" class="rete-level-title-btn">ATTIVITÀ</button>
-        <div id="reteSubContainer" class="rete-container"></div>
-        <div id="infoSection" class="info-section">
-            <div class="info-section-title">📋 INFORMAZIONI ATTIVITÀ</div>
-            <div id="infoTextDisplay" class="info-text-display">Nessuna informazione aggiuntiva.</div>
-            <div id="infoImageContainer"></div>
-            <div id="infoEditButtons" class="info-edit-buttons hidden-btn">
-                <button id="editInfoBtn" class="small-btn" style="background:#283593;">✏️ MODIFICA TESTO</button>
-                <button id="editImageBtn" class="small-btn" style="background:#6b8e23;">📸 CARICA FOTO (3 sec)</button>
-            </div>
-        </div>
-        <button id="backFromReteSubBtn" class="small-btn back-button">◀ TORNA INDIETRO</button>
-        <div id="specialActionsContainer" class="special-actions-container">
-            <div id="coordButton" class="special-action-btn">📍 COORDINATE</div>
-            <div id="coordHint" class="coord-hint">Premi per aprire Google Maps</div>
-            <div id="webButton" class="special-action-btn">🌐 SITO WEB</div>
-        </div>
-        <div class="version-footer">versione 0223 – attività con strumenti aggiuntivi</div>
     </div>
 
     <!-- MODALI -->
@@ -313,18 +254,30 @@
             </div>
         </div>
     </div>
-    <div id="infoTextModal" class="adaptive-modal" style="display:none;"><div class="adaptive-modal-content"><h3>✏️ Modifica informazioni attività</h3><textarea id="infoTextarea" rows="6" placeholder="Inserisci qui le informazioni... Puoi usare link http:// o https://"></textarea><div class="modal-buttons"><button id="saveInfoTextBtn" class="save-btn">SALVA</button><button id="cancelInfoTextBtn" class="cancel-btn">ANNULLA</button></div></div></div>
     <div id="infoModal" class="adaptive-modal" style="display:none;"><div class="adaptive-modal-content"><h3>📋 Richiesta attivazione</h3><div id="infoModalText" class="modal-info-text"></div><div class="modal-buttons"><button id="closeInfoModalBtn" class="cancel-btn">CHIUDI</button></div></div></div>
+
+    <!-- MODALE ATTIVITÀ -->
+    <div id="activityModal" class="adaptive-modal" style="display:none;">
+        <div class="adaptive-modal-content">
+            <h3 id="activityModalTitle">Attività</h3>
+            <div id="activityInfoText" class="modal-info-text" style="white-space: pre-wrap; word-break: break-word;"></div>
+            <div id="activityImageContainer" style="text-align:center; margin:10px 0;"></div>
+            <div class="modal-buttons" style="justify-content:center; gap:12px;">
+                <button id="activityCoordBtn" class="small-btn" style="background:#283593;">📍 APRI MAPPA</button>
+                <button id="activityWebBtn" class="small-btn" style="background:#2c3e50;">🌐 APRI SITO</button>
+            </div>
+            <div id="activityAdminButtons" class="info-edit-buttons hidden-btn" style="margin-top:20px;">
+                <button id="activityEditTextBtn" class="small-btn" style="background:#283593;">✏️ MODIFICA TESTO</button>
+                <button id="activityEditImageBtn" class="small-btn" style="background:#6b8e23;">📸 CARICA FOTO</button>
+            </div>
+            <div class="modal-buttons">
+                <button id="closeActivityModalBtn" class="cancel-btn">CHIUDI</button>
+            </div>
+        </div>
+    </div>
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
 <script>
-    // ==================== VERSIONE 0223 - MODIFICHE RICHIESTE ====================
-    // - Gestione tasto indietro con history.pushState e popstate
-    // - Rimossa ultima riga (footer) dalla pagina emergenza
-    // - Layout "Richiedi attivazione" corretto con flex-wrap
-    // - Campo bianco "PARLA CON OPERATORE" ora apre adaptiveModal (come ascolta)
-    // ============================================================================
-
     const CURRENT_VERSION = "0223";
     let currentService = "ambulanza";
     let currentLat = null, currentLng = null;
@@ -334,7 +287,6 @@
     let selectedNormalNoteId = null;
     let globalWakeLock = null;
     let imagePageWakeLock = null;
-
     let contactExtraText = {
         ambulanza: "",
         polizia: "",
@@ -343,20 +295,13 @@
     };
     const services = ["ambulanza", "polizia", "veterinario", "clinica"];
     for (let s of services) normalNotes[s] = [];
-
     let licenseActive = false, daysRemaining = 0, licenseCheckPassed = false, clientCode = "";
     const SECRET_KEY = "ChiaveSegreta123";
     let adminCode = "admin2025", adminAuthenticated = false;
-
-    // DOM elements
     const homePage = document.getElementById('homePage');
     const emergencyPage = document.getElementById('emergencyPage');
     const imagePage = document.getElementById('imagePage');
-    const reteSubPage = document.getElementById('reteSubPage');
     const reteLevelContainer = document.getElementById('reteLevelContainer');
-    const reteSubContainer = document.getElementById('reteSubContainer');
-    const reteSubHeaderBtn = document.getElementById('reteSubHeaderBtn');
-    const backFromReteSubBtn = document.getElementById('backFromReteSubBtn');
     const currentServiceDeco = document.getElementById('currentServiceDeco');
     const phoneInput = document.getElementById('phoneNumber');
     const saveNumberBtn = document.getElementById('saveNumberBtn');
@@ -371,8 +316,6 @@
     const addNoteBtn = document.getElementById('addNoteBtn');
     const notesListArea = document.getElementById('notesListArea');
     const copyNoteBtn = document.getElementById('copyNoteBtn');
-    const backHomeBtn = document.getElementById('backHomeBtn');
-    const backHomeBtnDuplicate = document.getElementById('backHomeBtnDuplicate');
     const phoneSaveMsg = document.getElementById('phoneSaveMsg');
     const listenResponseBtn = document.getElementById('listenResponseBtn');
     const clearResponseBtn = document.getElementById('clearResponseBtn');
@@ -410,7 +353,6 @@
     const clientCodeInput = document.getElementById('clientCodeInput');
     const unlockCodeInput = document.getElementById('unlockCodeInput');
     const activateLicenseBtn = document.getElementById('activateLicenseBtn');
-    const copyRequestBtn = document.getElementById('copyRequestBtn');
     const adminSection = document.getElementById('adminSection');
     const adminClientCode = document.getElementById('adminClientCode');
     const adminFirstRun = document.getElementById('adminFirstRun');
@@ -425,24 +367,21 @@
     const infoModal = document.getElementById('infoModal');
     const infoModalText = document.getElementById('infoModalText');
     const closeInfoModalBtn = document.getElementById('closeInfoModalBtn');
-    const backFromImageBtn = document.getElementById('backFromImageBtn');
     const imagePreviewArea = document.getElementById('imagePreviewArea');
-    const infoTextDisplay = document.getElementById('infoTextDisplay');
-    const infoImageContainer = document.getElementById('infoImageContainer');
-    const infoEditButtons = document.getElementById('infoEditButtons');
-    const editInfoBtn = document.getElementById('editInfoBtn');
-    const editImageBtn = document.getElementById('editImageBtn');
-    const infoTextModalDiv = document.getElementById('infoTextModal');
-    const infoTextarea = document.getElementById('infoTextarea');
-    const saveInfoTextBtn = document.getElementById('saveInfoTextBtn');
-    const cancelInfoTextBtn = document.getElementById('cancelInfoTextBtn');
-    const coordButton = document.getElementById('coordButton');
-    const coordHint = document.getElementById('coordHint');
-    const webButton = document.getElementById('webButton');
     const infoNoteBtn = document.getElementById('infoNoteBtn');
     const infoOperatorBtn = document.getElementById('infoOperatorBtn');
     const infoSpeakBtn = document.getElementById('infoSpeakBtn');
-
+    const activityModal = document.getElementById('activityModal');
+    const activityModalTitle = document.getElementById('activityModalTitle');
+    const activityInfoText = document.getElementById('activityInfoText');
+    const activityImageContainer = document.getElementById('activityImageContainer');
+    const activityCoordBtn = document.getElementById('activityCoordBtn');
+    const activityWebBtn = document.getElementById('activityWebBtn');
+    const activityAdminButtons = document.getElementById('activityAdminButtons');
+    const activityEditTextBtn = document.getElementById('activityEditTextBtn');
+    const activityEditImageBtn = document.getElementById('activityEditImageBtn');
+    const closeActivityModalBtn = document.getElementById('closeActivityModalBtn');
+    let currentActivityNode = null;
     let currentEditId = null;
     let currentEditIncludeCoords = false;
     let recognitionOperator = null;
@@ -451,58 +390,49 @@
     let lastItalianText = "";
     let lastFrenchTranslation = "";
 
-    // ==================== WAKE LOCK GLOBALE ====================
     async function requestGlobalWakeLock() {
         if ('wakeLock' in navigator) {
             try {
                 globalWakeLock = await navigator.wakeLock.request('screen');
-                console.log('WakeLock globale attivo');
                 document.addEventListener('visibilitychange', async () => {
                     if (document.visibilityState === 'visible' && globalWakeLock === null) {
                         globalWakeLock = await navigator.wakeLock.request('screen');
                     }
                 });
-            } catch(err) { console.warn('WakeLock globale fallito:', err); }
+            } catch(err) { console.warn(err); }
         }
     }
-
-    // ==================== GESTIONE TASTO INDIETRO ====================
     let currentPage = 'home';
-
     function updateHistoryState(page) {
         if (currentPage !== page) {
             history.pushState({ page: page }, '');
             currentPage = page;
         }
     }
-
     function closeAllModals() {
         let closed = false;
         if (adaptiveModal.style.display === 'flex') { adaptiveModal.style.display = 'none'; closed = true; }
         if (speakDetailModal.style.display === 'flex') { speakDetailModal.style.display = 'none'; closed = true; }
         if (noteEditModal.style.display === 'flex') { noteEditModal.style.display = 'none'; closed = true; }
-        if (infoTextModalDiv.style.display === 'flex') { infoTextModalDiv.style.display = 'none'; closed = true; }
         if (infoModal.style.display === 'flex') { infoModal.style.display = 'none'; closed = true; }
+        if (activityModal.style.display === 'flex') { activityModal.style.display = 'none'; closed = true; }
         return closed;
     }
-
     function goBackHome() {
         if (!homePage.classList.contains('hidden')) return;
         homePage.classList.remove('hidden');
         emergencyPage.classList.add('hidden');
         imagePage.classList.add('hidden');
-        reteSubPage.classList.add('hidden');
         currentPage = 'home';
-        if (globalWakeLock) releaseWakeLock();
         releaseImagePageWakeLock();
         requestGlobalWakeLock();
     }
-
     function goBackFromSubPage() {
-        if (!reteSubPage.classList.contains('hidden')) {
-            backFromReteSub();
-        } else if (!imagePage.classList.contains('hidden')) {
-            backFromImage();
+        if (!imagePage.classList.contains('hidden')) {
+            imagePage.classList.add('hidden');
+            homePage.classList.remove('hidden');
+            releaseImagePageWakeLock();
+            currentPage = 'home';
         } else if (!emergencyPage.classList.contains('hidden')) {
             emergencyPage.classList.add('hidden');
             homePage.classList.remove('hidden');
@@ -512,22 +442,12 @@
             goBackHome();
         }
     }
-
     window.addEventListener('popstate', (event) => {
         if (closeAllModals()) return;
-        if (currentPage !== 'home') {
-            goBackFromSubPage();
-        }
+        if (currentPage !== 'home') goBackFromSubPage();
     });
-
-    // ==================== GESTIONE RETE DINAMICA ====================
     let reteData = { title: "RETE", children: [] };
-    let currentStack = [];
-    let currentNodeForInfo = null;
-
-    function saveReteData() {
-        localStorage.setItem('monastir_rete_data', JSON.stringify(reteData));
-    }
+    function saveReteData() { localStorage.setItem('monastir_rete_data', JSON.stringify(reteData)); }
     function loadReteData() {
         const saved = localStorage.getItem('monastir_rete_data');
         if (saved) {
@@ -541,479 +461,224 @@
                     if (node.children) node.children.forEach(ensureFields);
                 }
                 ensureFields(reteData);
-            } catch(e) { console.warn(e); }
+            } catch(e) {}
         }
         if (!reteData.title) reteData = { title: "RETE", children: [] };
         if (!reteData.children) reteData.children = [];
-        if (!reteData.infoText) reteData.infoText = "";
-        if (!reteData.infoImage) reteData.infoImage = null;
-        if (!reteData.coordinate) reteData.coordinate = "";
-        if (!reteData.websiteUrl) reteData.websiteUrl = "";
     }
-
     function addEmptyChildToNode(parentNode) {
-        if (!adminAuthenticated) {
-            alert("Solo l'amministratore può aggiungere nuovi tasti.");
-            return null;
-        }
+        if (!adminAuthenticated) { alert("Solo amministratore."); return null; }
         if (!parentNode.children) parentNode.children = [];
-        parentNode.children.push({ 
-            title: "", 
-            children: [],
-            infoText: "",
-            infoImage: null,
-            coordinate: "",
-            websiteUrl: ""
-        });
+        parentNode.children.push({ title: "", children: [], infoText: "", infoImage: null, coordinate: "", websiteUrl: "" });
         saveReteData();
         return parentNode.children[parentNode.children.length - 1];
     }
-
     function editNodeTitle(node, newTitle) {
-        if (!adminAuthenticated) {
-            alert("Solo l'amministratore può modificare i titoli.");
-            return false;
-        }
+        if (!adminAuthenticated) { alert("Solo amministratore."); return false; }
         node.title = newTitle;
         saveReteData();
         return true;
     }
-
     function deleteNode(parentNode, nodeToDelete) {
-        if (!adminAuthenticated) {
-            alert("Solo l'amministratore può eliminare tasti.");
-            return false;
-        }
+        if (!adminAuthenticated) { alert("Solo amministratore."); return false; }
         const index = parentNode.children.findIndex(c => c === nodeToDelete);
-        if (index !== -1) {
-            parentNode.children.splice(index, 1);
-            saveReteData();
-            return true;
-        }
+        if (index !== -1) { parentNode.children.splice(index,1); saveReteData(); return true; }
         return false;
     }
-
-    function renderReteLevel(container, parentNode, levelStack) {
-        container.innerHTML = '';
-        if (!parentNode.children || parentNode.children.length === 0) {
-            const emptyMsg = document.createElement('div');
-            emptyMsg.style.textAlign = 'center';
-            emptyMsg.style.color = '#777';
-            emptyMsg.style.padding = '20px';
-            emptyMsg.innerText = 'Nessun tasto.';
-            if (adminAuthenticated) emptyMsg.innerText += ' Solo admin può aggiungerne (pressione 3 sec su "+ AGGIUNGI TASTO")';
-            container.appendChild(emptyMsg);
-        } else {
-            parentNode.children.forEach((child) => {
-                const itemDiv = document.createElement('div');
-                itemDiv.className = 'rete-item';
-                const btn = document.createElement('div');
-                btn.className = 'rete-button';
-                btn.innerText = child.title && child.title.trim() !== "" ? child.title : "[Tasto vuoto]";
-                const handleClick = (e) => {
-                    e.stopPropagation();
-                    if (btn._pressTimer) clearTimeout(btn._pressTimer);
-                    openReteSubPage(child, parentNode, levelStack);
-                    updateHistoryState('reteSub');
-                };
-                btn.addEventListener('click', handleClick);
-                let pressTimer = null;
-                const startLongPress = () => {
-                    pressTimer = setTimeout(() => {
-                        if (!adminAuthenticated) {
-                            alert("Solo l'amministratore può modificare questo tasto.");
-                            return;
-                        }
-                        const newTitle = prompt("Inserisci il nuovo titolo per questo tasto:", child.title);
-                        if (newTitle !== null && newTitle.trim() !== "") {
-                            editNodeTitle(child, newTitle.trim());
-                            renderReteLevel(container, parentNode, levelStack);
-                        } else if (newTitle !== null && newTitle.trim() === "") {
-                            alert("Il titolo non può essere vuoto.");
-                        }
-                    }, 3000);
-                };
-                const cancelLongPress = () => { if (pressTimer) { clearTimeout(pressTimer); pressTimer = null; } };
-                btn.addEventListener('mousedown', startLongPress);
-                btn.addEventListener('mouseup', cancelLongPress);
-                btn.addEventListener('mouseleave', cancelLongPress);
-                btn.addEventListener('touchstart', startLongPress, { passive: true });
-                btn.addEventListener('touchend', cancelLongPress);
-                btn.addEventListener('touchcancel', cancelLongPress);
-                btn._pressTimer = pressTimer;
-                itemDiv.appendChild(btn);
-                if (adminAuthenticated) {
-                    const deleteBtn = document.createElement('button');
-                    deleteBtn.innerText = '🗑️ Elimina';
-                    deleteBtn.className = 'rete-delete-btn';
-                    deleteBtn.addEventListener('click', (e) => {
-                        e.stopPropagation();
-                        if (confirm(`Eliminare definitivamente il tasto "${child.title || 'Senza titolo'}" e tutti i suoi sotto-tasti?`)) {
-                            deleteNode(parentNode, child);
-                            renderReteLevel(container, parentNode, levelStack);
-                        }
-                    });
-                    itemDiv.appendChild(deleteBtn);
-                }
-                container.appendChild(itemDiv);
-            });
-        }
-        if (adminAuthenticated) {
-            const addBtn = document.createElement('div');
-            addBtn.className = 'rete-button';
-            addBtn.style.background = '#558b2f';
-            addBtn.innerText = '+ AGGIUNGI TASTO (solo admin, premi 3 sec)';
-            let addPressTimer = null;
-            const startAddLongPress = () => {
-                addPressTimer = setTimeout(() => {
-                    if (!adminAuthenticated) {
-                        alert("Solo l'amministratore può aggiungere nuovi tasti.");
-                        return;
-                    }
-                    const newEmpty = addEmptyChildToNode(parentNode);
-                    if (newEmpty) renderReteLevel(container, parentNode, levelStack);
-                }, 3000);
-            };
-            const cancelAddLongPress = () => { if (addPressTimer) clearTimeout(addPressTimer); };
-            addBtn.addEventListener('mousedown', startAddLongPress);
-            addBtn.addEventListener('mouseup', cancelAddLongPress);
-            addBtn.addEventListener('mouseleave', cancelAddLongPress);
-            addBtn.addEventListener('touchstart', startAddLongPress, { passive: true });
-            addBtn.addEventListener('touchend', cancelAddLongPress);
-            addBtn.addEventListener('touchcancel', cancelAddLongPress);
-            container.appendChild(addBtn);
-        }
-    }
-
-    function updateSubHeaderTitle() {
-        if (currentNodeForInfo) {
-            const titleName = currentNodeForInfo.title && currentNodeForInfo.title.trim() !== "" ? currentNodeForInfo.title : "Senza titolo";
-            reteSubHeaderBtn.innerHTML = `<span>📌</span> ${titleName} <span>✏️</span>`;
-        } else {
-            reteSubHeaderBtn.innerHTML = `<span>📌</span> ATTIVITÀ <span>✏️</span>`;
-        }
-    }
-
-    function openReteSubPage(node, parentNode, levelStack) {
-        currentNodeForInfo = node;
-        currentStack.push({ node: parentNode, parent: levelStack.length > 0 ? levelStack[levelStack.length-1] : null });
-        updateSubHeaderTitle();
-        renderReteLevel(reteSubContainer, node, [...levelStack, node]);
-        loadInfoForCurrentNode();
-        loadSpecialActions();
-        if (adminAuthenticated) infoEditButtons.classList.remove('hidden-btn');
-        else infoEditButtons.classList.add('hidden-btn');
-        imagePage.classList.add('hidden');
-        reteSubPage.classList.remove('hidden');
-    }
-
     function linkifyText(text) {
         if (!text) return "Nessuna informazione aggiuntiva.";
         const urlRegex = /(https?:\/\/[^\s]+)/g;
-        return text.replace(urlRegex, function(url) {
-            return `<a href="${url}" target="_blank" rel="noopener noreferrer">${url}</a>`;
-        }).replace(/\n/g, '<br>');
+        return text.replace(urlRegex, url => `<a href="${url}" target="_blank">${url}</a>`).replace(/\n/g,'<br>');
     }
-
-    function loadInfoForCurrentNode() {
-        if (!currentNodeForInfo) return;
-        const infoText = currentNodeForInfo.infoText || "";
-        const linkedHtml = linkifyText(infoText);
-        infoTextDisplay.innerHTML = linkedHtml === "" ? "Nessuna informazione aggiuntiva." : linkedHtml;
-        infoImageContainer.innerHTML = '';
-        if (currentNodeForInfo.infoImage) {
-            const img = document.createElement('img');
-            img.src = currentNodeForInfo.infoImage;
+    function showActivityModal(node) {
+        currentActivityNode = node;
+        activityModalTitle.innerText = (node.title && node.title.trim()) ? node.title : "Attività senza titolo";
+        const infoText = node.infoText || "Nessuna informazione aggiuntiva.";
+        activityInfoText.innerHTML = linkifyText(infoText);
+        activityImageContainer.innerHTML = '';
+        if (node.infoImage) {
+            let img = document.createElement('img');
+            img.src = node.infoImage;
             img.className = 'info-mini-img';
             img.style.maxWidth = '100%';
-            img.style.maxHeight = '90px';
+            img.style.maxHeight = '120px';
             img.style.objectFit = 'contain';
-            img.style.borderRadius = '12px';
-            infoImageContainer.appendChild(img);
-            if (adminAuthenticated) attachInfoImageLongPress(img);
+            activityImageContainer.appendChild(img);
+            if (adminAuthenticated) {
+                let timer;
+                img.onmousedown = () => { timer = setTimeout(() => openActivityImageGallery(node), 3000); };
+                img.onmouseup = img.onmouseleave = () => clearTimeout(timer);
+                img.ontouchstart = () => { timer = setTimeout(() => openActivityImageGallery(node), 3000); };
+                img.ontouchend = img.ontouchcancel = () => clearTimeout(timer);
+            }
         } else {
-            const placeholder = document.createElement('div');
+            let placeholder = document.createElement('div');
             placeholder.className = 'info-mini-placeholder';
             placeholder.innerText = adminAuthenticated ? "📸 Premi a lungo (3 sec) per aggiungere una foto" : "Nessuna foto disponibile";
-            infoImageContainer.appendChild(placeholder);
-            if (adminAuthenticated) attachInfoPlaceholderLongPress(placeholder);
+            activityImageContainer.appendChild(placeholder);
+            if (adminAuthenticated) {
+                let timer;
+                placeholder.onmousedown = () => { timer = setTimeout(() => openActivityImageGallery(node), 3000); };
+                placeholder.onmouseup = placeholder.onmouseleave = () => clearTimeout(timer);
+                placeholder.ontouchstart = () => { timer = setTimeout(() => openActivityImageGallery(node), 3000); };
+                placeholder.ontouchend = placeholder.ontouchcancel = () => clearTimeout(timer);
+            }
         }
-    }
-
-    function loadSpecialActions() {
-        if (!currentNodeForInfo) return;
-        const coordValue = currentNodeForInfo.coordinate || "";
-        if (coordValue.trim() !== "") {
-            coordButton.innerText = `📍 ${coordValue}`;
+        const coord = node.coordinate || "";
+        const web = node.websiteUrl || "";
+        activityCoordBtn.onclick = () => {
+            if (coord.trim()) window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(coord)}`, '_blank');
+            else alert("Nessuna coordinata.");
+        };
+        activityWebBtn.onclick = () => {
+            if (web.trim()) {
+                let full = web.trim();
+                if (!full.startsWith('http')) full = 'https://' + full;
+                window.open(full, '_blank');
+            } else alert("Nessun sito web.");
+        };
+        if (adminAuthenticated) {
+            activityAdminButtons.classList.remove('hidden-btn');
+            activityEditTextBtn.onclick = () => openActivityTextModal(node);
+            activityEditImageBtn.onclick = () => openActivityImageGallery(node);
         } else {
-            coordButton.innerText = "📍 COORDINATE (non impostate)";
+            activityAdminButtons.classList.add('hidden-btn');
         }
-        setupCoordButton();
-        setupWebButton();
+        activityModal.style.display = 'flex';
     }
-
-    function setupCoordButton() {
-        const newCoordBtn = coordButton.cloneNode(true);
-        coordButton.parentNode.replaceChild(newCoordBtn, coordButton);
-        window.coordButton = newCoordBtn;
-        newCoordBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            const coord = currentNodeForInfo?.coordinate || "";
-            if (coord && coord.trim() !== "") {
-                let url = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(coord)}`;
-                window.open(url, '_blank');
-            } else {
-                alert("Nessuna coordinata impostata per questa attività.");
-            }
-        });
-        if (adminAuthenticated) {
-            let pressTimer = null;
-            const startLongPress = () => {
-                pressTimer = setTimeout(() => {
-                    const newCoord = prompt("Inserisci le coordinate nel formato: latitudine, longitudine (es. 43.841977, 11.170855)", currentNodeForInfo?.coordinate || "");
-                    if (newCoord !== null && newCoord.trim() !== "") {
-                        if (newCoord.includes(',') && !isNaN(parseFloat(newCoord.split(',')[0])) && !isNaN(parseFloat(newCoord.split(',')[1]))) {
-                            currentNodeForInfo.coordinate = newCoord.trim();
-                            saveReteData();
-                            loadSpecialActions();
-                        } else {
-                            alert("Formato non valido. Usa: latitudine, longitudine (es. 43.841977, 11.170855)");
-                        }
-                    } else if (newCoord !== null && newCoord.trim() === "") {
-                        currentNodeForInfo.coordinate = "";
-                        saveReteData();
-                        loadSpecialActions();
-                    }
-                }, 3000);
-            };
-            const cancelLongPress = () => { if (pressTimer) clearTimeout(pressTimer); };
-            newCoordBtn.addEventListener('mousedown', startLongPress);
-            newCoordBtn.addEventListener('mouseup', cancelLongPress);
-            newCoordBtn.addEventListener('mouseleave', cancelLongPress);
-            newCoordBtn.addEventListener('touchstart', startLongPress, { passive: true });
-            newCoordBtn.addEventListener('touchend', cancelLongPress);
-            newCoordBtn.addEventListener('touchcancel', cancelLongPress);
-        }
-    }
-
-    function setupWebButton() {
-        const newWebBtn = webButton.cloneNode(true);
-        webButton.parentNode.replaceChild(newWebBtn, webButton);
-        window.webButton = newWebBtn;
-        newWebBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            const url = currentNodeForInfo?.websiteUrl || "";
-            if (url && url.trim() !== "") {
-                let fullUrl = url.trim();
-                if (!fullUrl.startsWith('http://') && !fullUrl.startsWith('https://')) {
-                    fullUrl = 'https://' + fullUrl;
-                }
-                window.open(fullUrl, '_blank');
-            } else {
-                alert("Nessun sito web associato a questa attività.");
-            }
-        });
-        if (adminAuthenticated) {
-            let pressTimer = null;
-            const startLongPress = () => {
-                pressTimer = setTimeout(() => {
-                    const newUrl = prompt("Inserisci l'indirizzo del sito web (es. https://www.example.com):", currentNodeForInfo?.websiteUrl || "");
-                    if (newUrl !== null) {
-                        currentNodeForInfo.websiteUrl = newUrl.trim();
-                        saveReteData();
-                        loadSpecialActions();
-                    }
-                }, 3000);
-            };
-            const cancelLongPress = () => { if (pressTimer) clearTimeout(pressTimer); };
-            newWebBtn.addEventListener('mousedown', startLongPress);
-            newWebBtn.addEventListener('mouseup', cancelLongPress);
-            newWebBtn.addEventListener('mouseleave', cancelLongPress);
-            newWebBtn.addEventListener('touchstart', startLongPress, { passive: true });
-            newWebBtn.addEventListener('touchend', cancelLongPress);
-            newWebBtn.addEventListener('touchcancel', cancelLongPress);
-        }
-    }
-
-    function attachInfoImageLongPress(imgElement) {
-        let pressTimer = null;
-        const start = () => {
-            pressTimer = setTimeout(() => {
-                if (!adminAuthenticated) return;
-                openInfoImageGallery();
-            }, 3000);
-        };
-        const cancel = () => { if (pressTimer) clearTimeout(pressTimer); };
-        imgElement.addEventListener('mousedown', start);
-        imgElement.addEventListener('mouseup', cancel);
-        imgElement.addEventListener('mouseleave', cancel);
-        imgElement.addEventListener('touchstart', start, { passive: true });
-        imgElement.addEventListener('touchend', cancel);
-        imgElement.addEventListener('touchcancel', cancel);
-    }
-
-    function attachInfoPlaceholderLongPress(el) {
-        let pressTimer = null;
-        const start = () => {
-            pressTimer = setTimeout(() => {
-                if (!adminAuthenticated) return;
-                openInfoImageGallery();
-            }, 3000);
-        };
-        const cancel = () => { if (pressTimer) clearTimeout(pressTimer); };
-        el.addEventListener('mousedown', start);
-        el.addEventListener('mouseup', cancel);
-        el.addEventListener('mouseleave', cancel);
-        el.addEventListener('touchstart', start, { passive: true });
-        el.addEventListener('touchend', cancel);
-        el.addEventListener('touchcancel', cancel);
-    }
-
-    function openInfoImageGallery() {
-        const input = document.createElement('input');
+    function openActivityImageGallery(node) {
+        let input = document.createElement('input');
         input.type = 'file';
         input.accept = 'image/*';
         input.onchange = (e) => {
-            const file = e.target.files[0];
+            let file = e.target.files[0];
             if (file) {
-                const reader = new FileReader();
-                reader.onload = (event) => {
-                    if (currentNodeForInfo) {
-                        currentNodeForInfo.infoImage = event.target.result;
-                        saveReteData();
-                        loadInfoForCurrentNode();
-                    }
+                let reader = new FileReader();
+                reader.onload = (ev) => {
+                    node.infoImage = ev.target.result;
+                    saveReteData();
+                    if (currentActivityNode === node) showActivityModal(node);
                 };
                 reader.readAsDataURL(file);
             }
         };
         input.click();
     }
-
-    function openInfoTextModal() {
-        if (!adminAuthenticated) return;
-        infoTextarea.value = currentNodeForInfo?.infoText || "";
-        infoTextModalDiv.style.display = 'flex';
+    function openActivityTextModal(node) {
+        let overlay = document.createElement('div');
+        overlay.className = 'adaptive-modal';
+        overlay.style.display = 'flex';
+        overlay.innerHTML = `<div class="adaptive-modal-content"><h3>✏️ Modifica informazioni</h3><textarea id="tempActivityText" rows="6">${escapeHtml(node.infoText || "")}</textarea><div class="modal-buttons"><button id="tempSaveBtn" class="save-btn">SALVA</button><button id="tempCancelBtn" class="cancel-btn">ANNULLA</button></div></div>`;
+        document.body.appendChild(overlay);
+        let textarea = overlay.querySelector('#tempActivityText');
+        let saveBtn = overlay.querySelector('#tempSaveBtn');
+        let cancelBtn = overlay.querySelector('#tempCancelBtn');
+        let close = () => overlay.remove();
+        saveBtn.onclick = () => { node.infoText = textarea.value; saveReteData(); if (currentActivityNode === node) showActivityModal(node); close(); };
+        cancelBtn.onclick = close;
+        overlay.onclick = (e) => { if (e.target === overlay) close(); };
     }
-    function closeInfoTextModal() { infoTextModalDiv.style.display = 'none'; }
-    function saveInfoText() {
-        if (currentNodeForInfo && adminAuthenticated) {
-            currentNodeForInfo.infoText = infoTextarea.value;
-            saveReteData();
-            loadInfoForCurrentNode();
+    function renderReteLevel(container, parentNode) {
+        container.innerHTML = '';
+        if (!parentNode.children || parentNode.children.length === 0) {
+            let empty = document.createElement('div');
+            empty.style.textAlign = 'center';
+            empty.style.padding = '20px';
+            empty.innerText = adminAuthenticated ? 'Nessun tasto. Premi a lungo su "+ AGGIUNGI TASTO" per aggiungere.' : 'Nessun tasto disponibile.';
+            container.appendChild(empty);
+        } else {
+            parentNode.children.forEach(child => {
+                let div = document.createElement('div');
+                div.className = 'rete-item';
+                let btn = document.createElement('div');
+                btn.className = 'rete-button';
+                btn.innerText = (child.title && child.title.trim()) ? child.title : "[Tasto vuoto]";
+                btn.onclick = (e) => { e.stopPropagation(); if (btn._pt) clearTimeout(btn._pt); showActivityModal(child); };
+                let pressTimer = null;
+                let startLong = () => {
+                    pressTimer = setTimeout(() => {
+                        if (!adminAuthenticated) { alert("Solo amministratore."); return; }
+                        let newTitle = prompt("Nuovo titolo:", child.title);
+                        if (newTitle !== null && newTitle.trim() !== "") {
+                            editNodeTitle(child, newTitle.trim());
+                            renderReteLevel(container, parentNode);
+                        } else if (newTitle !== null && newTitle.trim() === "") alert("Titolo vuoto non permesso.");
+                    }, 3000);
+                };
+                let cancelLong = () => { if (pressTimer) clearTimeout(pressTimer); };
+                btn.addEventListener('mousedown', startLong);
+                btn.addEventListener('mouseup', cancelLong);
+                btn.addEventListener('mouseleave', cancelLong);
+                btn.addEventListener('touchstart', startLong, { passive: true });
+                btn.addEventListener('touchend', cancelLong);
+                btn.addEventListener('touchcancel', cancelLong);
+                div.appendChild(btn);
+                if (adminAuthenticated) {
+                    let del = document.createElement('button');
+                    del.innerText = '🗑️ Elimina';
+                    del.className = 'rete-delete-btn';
+                    del.onclick = (e) => { e.stopPropagation(); if (confirm("Eliminare?")) { deleteNode(parentNode, child); renderReteLevel(container, parentNode); } };
+                    div.appendChild(del);
+                }
+                container.appendChild(div);
+            });
         }
-        closeInfoTextModal();
+        if (adminAuthenticated) {
+            let addBtn = document.createElement('div');
+            addBtn.className = 'rete-button';
+            addBtn.style.background = '#558b2f';
+            addBtn.innerText = '+ AGGIUNGI TASTO (premi 3 sec)';
+            let addTimer = null;
+            addBtn.onmousedown = () => { addTimer = setTimeout(() => { let newEmpty = addEmptyChildToNode(parentNode); if (newEmpty) renderReteLevel(container, parentNode); }, 3000); };
+            addBtn.onmouseup = addBtn.onmouseleave = () => clearTimeout(addTimer);
+            addBtn.ontouchstart = () => { addTimer = setTimeout(() => { let newEmpty = addEmptyChildToNode(parentNode); if (newEmpty) renderReteLevel(container, parentNode); }, 3000); };
+            addBtn.ontouchend = addBtn.ontouchcancel = () => clearTimeout(addTimer);
+            container.appendChild(addBtn);
+        }
     }
-    editInfoBtn.addEventListener('click', openInfoTextModal);
-    saveInfoTextBtn.addEventListener('click', saveInfoText);
-    cancelInfoTextBtn.addEventListener('click', closeInfoTextModal);
-    infoTextModalDiv.addEventListener('click', (e) => { if (e.target === infoTextModalDiv) closeInfoTextModal(); });
-
-    function setupSubHeaderEdit() {
-        let pressTimer = null;
-        const startLongPress = () => {
-            pressTimer = setTimeout(() => {
-                if (!adminAuthenticated) {
-                    alert("Solo l'amministratore può modificare il titolo dell'attività.");
-                    return;
-                }
-                if (!currentNodeForInfo) return;
-                const newTitle = prompt("Inserisci il nuovo titolo per questa attività:", currentNodeForInfo.title);
-                if (newTitle !== null && newTitle.trim() !== "") {
-                    editNodeTitle(currentNodeForInfo, newTitle.trim());
-                    updateSubHeaderTitle();
-                } else if (newTitle !== null && newTitle.trim() === "") {
-                    alert("Il titolo non può essere vuoto.");
-                }
-            }, 3000);
-        };
-        const cancelLongPress = () => { if (pressTimer) { clearTimeout(pressTimer); pressTimer = null; } };
-        reteSubHeaderBtn.addEventListener('mousedown', startLongPress);
-        reteSubHeaderBtn.addEventListener('mouseup', cancelLongPress);
-        reteSubHeaderBtn.addEventListener('mouseleave', cancelLongPress);
-        reteSubHeaderBtn.addEventListener('touchstart', startLongPress, { passive: true });
-        reteSubHeaderBtn.addEventListener('touchend', cancelLongPress);
-        reteSubHeaderBtn.addEventListener('touchcancel', cancelLongPress);
-    }
-
-    function backFromReteSub() {
-        if (currentStack.length > 0) currentStack.pop();
-        reteSubPage.classList.add('hidden');
-        imagePage.classList.remove('hidden');
-        renderReteLevel(reteLevelContainer, reteData, [reteData]);
-        currentNodeForInfo = null;
-        currentPage = 'image';
-    }
-    backFromReteSubBtn.addEventListener('click', backFromReteSub);
-    // ==================== FUNZIONI PER LA PAGINA FOTO ====================
     let currentImageData = null;
     function setupImageArea() {
         imagePreviewArea.innerHTML = '';
         if (currentImageData) {
-            const img = document.createElement('img');
+            let img = document.createElement('img');
             img.src = currentImageData;
             img.className = 'uploaded-image';
             img.style.maxWidth = '100%';
             img.style.maxHeight = '180px';
-            img.style.borderRadius = '16px';
             imagePreviewArea.appendChild(img);
             attachMainImageLongPress(img);
         } else {
-            const placeholder = document.createElement('div');
-            placeholder.className = 'image-placeholder';
-            placeholder.innerText = adminAuthenticated ? '📸 Premi a lungo (3 sec) per caricare un\'immagine' : '🔐 Solo amministratore può caricare immagini';
-            imagePreviewArea.appendChild(placeholder);
-            attachMainPlaceholderLongPress(placeholder);
+            let ph = document.createElement('div');
+            ph.className = 'image-placeholder';
+            ph.innerText = adminAuthenticated ? '📸 Premi a lungo (3 sec) per caricare un\'immagine' : '🔐 Solo amministratore';
+            imagePreviewArea.appendChild(ph);
+            attachMainPlaceholderLongPress(ph);
         }
     }
     function attachMainPlaceholderLongPress(el) {
-        let pressTimer = null;
-        const start = () => {
-            pressTimer = setTimeout(() => {
-                if (!adminAuthenticated) {
-                    alert("Solo l'amministratore può caricare immagini.");
-                    return;
-                }
-                openMainImageGallery();
-            }, 3000);
-        };
-        const cancel = () => { if (pressTimer) clearTimeout(pressTimer); };
-        el.addEventListener('mousedown', start);
-        el.addEventListener('mouseup', cancel);
-        el.addEventListener('mouseleave', cancel);
-        el.addEventListener('touchstart', start, { passive: true });
-        el.addEventListener('touchend', cancel);
-        el.addEventListener('touchcancel', cancel);
+        let timer;
+        el.onmousedown = () => { timer = setTimeout(() => { if (adminAuthenticated) openMainImageGallery(); }, 3000); };
+        el.onmouseup = el.onmouseleave = () => clearTimeout(timer);
+        el.ontouchstart = () => { timer = setTimeout(() => { if (adminAuthenticated) openMainImageGallery(); }, 3000); };
+        el.ontouchend = el.ontouchcancel = () => clearTimeout(timer);
     }
-    function attachMainImageLongPress(imgElement) {
-        let pressTimer = null;
-        const start = () => {
-            pressTimer = setTimeout(() => {
-                if (!adminAuthenticated) {
-                    alert("Solo l'amministratore può sostituire l'immagine.");
-                    return;
-                }
-                openMainImageGallery(true);
-            }, 3000);
-        };
-        const cancel = () => { if (pressTimer) clearTimeout(pressTimer); };
-        imgElement.addEventListener('mousedown', start);
-        imgElement.addEventListener('mouseup', cancel);
-        imgElement.addEventListener('mouseleave', cancel);
-        imgElement.addEventListener('touchstart', start, { passive: true });
-        imgElement.addEventListener('touchend', cancel);
-        imgElement.addEventListener('touchcancel', cancel);
+    function attachMainImageLongPress(img) {
+        let timer;
+        img.onmousedown = () => { timer = setTimeout(() => { if (adminAuthenticated) openMainImageGallery(true); }, 3000); };
+        img.onmouseup = img.onmouseleave = () => clearTimeout(timer);
+        img.ontouchstart = () => { timer = setTimeout(() => { if (adminAuthenticated) openMainImageGallery(true); }, 3000); };
+        img.ontouchend = img.ontouchcancel = () => clearTimeout(timer);
     }
     function openMainImageGallery() {
-        const input = document.createElement('input');
+        let input = document.createElement('input');
         input.type = 'file';
         input.accept = 'image/*';
         input.onchange = (e) => {
-            const file = e.target.files[0];
+            let file = e.target.files[0];
             if (file) {
-                const reader = new FileReader();
-                reader.onload = (event) => {
-                    currentImageData = event.target.result;
+                let reader = new FileReader();
+                reader.onload = (ev) => {
+                    currentImageData = ev.target.result;
                     setupImageArea();
                     localStorage.setItem('monastir_image', currentImageData);
                 };
@@ -1023,41 +688,16 @@
         input.click();
     }
     function loadSavedImage() {
-        const saved = localStorage.getItem('monastir_image');
+        let saved = localStorage.getItem('monastir_image');
         if (saved) { currentImageData = saved; setupImageArea(); }
-        else { setupImageArea(); }
+        else setupImageArea();
     }
     async function requestImagePageWakeLock() { if ('wakeLock' in navigator) { try { imagePageWakeLock = await navigator.wakeLock.request('screen'); } catch(e) {} } }
     function releaseImagePageWakeLock() { if (imagePageWakeLock) { imagePageWakeLock.release(); imagePageWakeLock = null; } }
-    function backFromImage() {
-        imagePage.classList.add('hidden');
-        homePage.classList.remove('hidden');
-        releaseImagePageWakeLock();
-        currentPage = 'home';
-    }
-    backFromImageBtn.addEventListener('click', backFromImage);
-
-    // ==================== FUNZIONI LICENZA E ADMIN ====================
     function generateRandomClientCode() { return Math.floor(1000000000 + Math.random() * 9000000000).toString(); }
-    function hashTo20Digits(hash) {
-        let hex = hash.toString(CryptoJS.enc.Hex);
-        let decimal = BigInt('0x' + hex).toString();
-        return decimal.slice(0,20).padStart(20,'0');
-    }
-    function verifyUnlockCode(clientCode, firstRun, unlockCode) {
-        const message = `${clientCode}|${firstRun}`;
-        const hash = CryptoJS.HmacSHA256(message, SECRET_KEY);
-        const expected = hashTo20Digits(hash);
-        return expected === unlockCode;
-    }
-    async function getCurrentUTCTime() {
-        try {
-            const res = await fetch('https://worldtimeapi.org/api/timezone/Etc/UTC');
-            if (!res.ok) throw new Error();
-            const data = await res.json();
-            return new Date(data.utc_datetime);
-        } catch(e) { return new Date(); }
-    }
+    function hashTo20Digits(hash) { let hex = hash.toString(CryptoJS.enc.Hex); let decimal = BigInt('0x' + hex).toString(); return decimal.slice(0,20).padStart(20,'0'); }
+    function verifyUnlockCode(clientCode, firstRun, unlockCode) { const message = `${clientCode}|${firstRun}`; const hash = CryptoJS.HmacSHA256(message, SECRET_KEY); const expected = hashTo20Digits(hash); return expected === unlockCode; }
+    async function getCurrentUTCTime() { try { let res = await fetch('https://worldtimeapi.org/api/timezone/Etc/UTC'); if (!res.ok) throw new Error(); let data = await res.json(); return new Date(data.utc_datetime); } catch(e) { return new Date(); } }
     async function initLicense() {
         const now = await getCurrentUTCTime();
         let firstRun = localStorage.getItem('firstRun');
@@ -1074,10 +714,7 @@
         if (!localStorage.getItem('clientCode')) localStorage.setItem('clientCode', clientCode);
         const activated = localStorage.getItem('activated') === 'true';
         let expiry = parseInt(localStorage.getItem('expiryDate'));
-        if (activated && expiry < firstRun + 365 * 86400000) {
-            expiry = firstRun + 365 * 86400000;
-            localStorage.setItem('expiryDate', expiry);
-        }
+        if (activated && expiry < firstRun + 365 * 86400000) { expiry = firstRun + 365 * 86400000; localStorage.setItem('expiryDate', expiry); }
         const nowTime = now.getTime();
         if (nowTime > expiry) { licenseActive = false; licenseCheckPassed = false; }
         else { licenseActive = activated; licenseCheckPassed = true; }
@@ -1085,211 +722,112 @@
         updateLicenseUI();
         toggleAppAccess(!licenseCheckPassed);
         if (clientCodeInput) clientCodeInput.value = clientCode;
-        if (daysHomeDisplay) daysHomeDisplay.innerText = `Versione: ${CURRENT_VERSION} - Giorni rimanenti: ${daysRemaining}`;
-    }
-    function updateLicenseUI() {
-        const activated = localStorage.getItem('activated') === 'true';
-        if (activated) {
-            if (unlockCodeInput) unlockCodeInput.disabled = true;
-            if (activateLicenseBtn) activateLicenseBtn.disabled = true;
-        } else {
-            if (unlockCodeInput) unlockCodeInput.disabled = false;
-            if (activateLicenseBtn) activateLicenseBtn.disabled = false;
+        if (daysHomeDisplay) {
+            daysHomeDisplay.innerHTML = `v${CURRENT_VERSION} - Scade: ${daysRemaining} giorni <button id="copyRequestBtnMoved" class="small-btn" style="background:#e67e22;">📋 Richiedi attivazione</button>`;
+            let moved = document.getElementById('copyRequestBtnMoved');
+            if (moved) moved.onclick = copyRequest;
         }
     }
-    function toggleAppAccess(block) {
-        document.querySelectorAll('.big-btn').forEach(btn => {
-            if (block) { btn.style.pointerEvents = 'none'; btn.style.opacity = '0.5'; }
-            else { btn.style.pointerEvents = 'auto'; btn.style.opacity = '1'; }
-        });
+    function updateLicenseUI() {
+        let activated = localStorage.getItem('activated') === 'true';
+        if (activated) { unlockCodeInput.disabled = true; activateLicenseBtn.disabled = true; }
+        else { unlockCodeInput.disabled = false; activateLicenseBtn.disabled = false; }
     }
+    function toggleAppAccess(block) { document.querySelectorAll('.big-btn').forEach(btn => { btn.style.pointerEvents = block ? 'none' : 'auto'; btn.style.opacity = block ? '0.5' : '1'; }); }
     async function onActivateLicense() {
-        const unlockCode = unlockCodeInput.value.trim();
-        if (!/^\d{20}$/.test(unlockCode)) { alert('Codice sblocco deve essere esattamente 20 cifre.'); return; }
-        const firstRun = localStorage.getItem('firstRun');
-        if (!firstRun) { alert('Errore: primo avvio non rilevato.'); return; }
+        let unlockCode = unlockCodeInput.value.trim();
+        if (!/^\d{20}$/.test(unlockCode)) { alert('20 cifre.'); return; }
+        let firstRun = localStorage.getItem('firstRun');
+        if (!firstRun) { alert('Errore primo avvio.'); return; }
         if (verifyUnlockCode(clientCode, parseInt(firstRun), unlockCode)) {
-            const firstRunNum = parseInt(firstRun);
-            const newExpiry = firstRunNum + 365 * 86400000;
+            let newExpiry = parseInt(firstRun) + 365 * 86400000;
             localStorage.setItem('activated', 'true');
             localStorage.setItem('expiryDate', newExpiry);
             await initLicense();
-            alert('Licenza attivata con successo! 365 giorni di utilizzo.');
-        } else { alert('Codice di sblocco non valido.'); }
+            alert('Licenza attivata per 365 giorni.');
+        } else alert('Codice non valido.');
     }
     function copyRequest() {
-        const firstRun = localStorage.getItem('firstRun');
-        if (!firstRun) { alert('Errore: impossibile recuperare i dati.'); return; }
-        const clientCodeVal = clientCode;
-        const fullMessage = `Dati copiati negli appunti!\n\nCODICE CLIENTE: ${clientCodeVal}\n\nPer Attivare il tuo Abbonamento,\n\nPRIMO PASSAGGIO:\nInvia il bonifico bancario:\nIBAN: IT31R 033951 29000 527025 73770\nIntestato a: Paolo Maiorana\nImporto Annuale: €. 48,00\nCausale: inserisci solo il codice cliente\n\nSECONDO PASSAGGIO:\nInviaci una email col tuo CODICE CLIENTE a:\ngliamicidipaolino@gmail.com\nRisponderemo fornendoti il CODICE di SBLOCCO.\n\nUn caro Saluto.`;
-        navigator.clipboard.writeText(fullMessage);
-        infoModalText.innerText = fullMessage;
+        let firstRun = localStorage.getItem('firstRun');
+        if (!firstRun) return;
+        let msg = `CODICE CLIENTE: ${clientCode}\n\nBonifico a Paolo Maiorana IBAN: IT31R0339512900052702573770 €48,00 causale: ${clientCode}\nInvia email a gli amicidipaolino@gmail.com con codice cliente.`;
+        navigator.clipboard.writeText(msg);
+        infoModalText.innerText = msg;
         infoModal.style.display = 'flex';
     }
-    closeInfoModalBtn.addEventListener('click', () => { infoModal.style.display = 'none'; });
-    infoModal.addEventListener('click', (e) => { if (e.target === infoModal) infoModal.style.display = 'none'; });
-
-    function loadAdminCode() {
-        const saved = localStorage.getItem('adminCode');
-        if (saved && saved.trim() !== "") adminCode = saved;
-        else { adminCode = "admin2025"; localStorage.setItem('adminCode', adminCode); }
-    }
-    function saveAdminCode(newCode) {
-        if (newCode && newCode.trim() !== "") { adminCode = newCode; localStorage.setItem('adminCode', adminCode); alert("Codice amministratore cambiato!"); }
-        else alert("Codice non valido.");
-    }
-    function generateUnlockCodeAdmin(clientCode, firstRun) {
-        const message = `${clientCode}|${firstRun}`;
-        const hash = CryptoJS.HmacSHA256(message, SECRET_KEY);
-        return hashTo20Digits(hash);
-    }
-    function onGenerateUnlock() {
-        let clientCodeVal = adminClientCode.value.trim();
-        let firstRunVal = adminFirstRun.value.trim();
-        if (!/^\d{6,10}$/.test(clientCodeVal)) { alert('Codice cliente 6-10 cifre.'); return; }
-        if (!/^\d+$/.test(firstRunVal) || firstRunVal.length < 10) { alert('FIRST_RUN valido?'); return; }
-        generatedCode.value = generateUnlockCodeAdmin(clientCodeVal, firstRunVal);
-    }
-    function copyGenerated() {
-        if (!generatedCode.value) { alert('Nessun codice generato.'); return; }
-        navigator.clipboard.writeText(generatedCode.value);
-        alert('Codice copiato.');
-    }
+    closeInfoModalBtn.onclick = () => infoModal.style.display = 'none';
+    infoModal.onclick = (e) => { if (e.target === infoModal) infoModal.style.display = 'none'; };
+    function loadAdminCode() { let saved = localStorage.getItem('adminCode'); if (saved && saved.trim()) adminCode = saved; else { adminCode = "admin2025"; localStorage.setItem('adminCode', adminCode); } }
+    function saveAdminCode(newCode) { if (newCode && newCode.trim()) { adminCode = newCode; localStorage.setItem('adminCode', adminCode); alert("Codice admin cambiato."); } else alert("Codice non valido."); }
+    function generateUnlockCodeAdmin(clientCode, firstRun) { const message = `${clientCode}|${firstRun}`; const hash = CryptoJS.HmacSHA256(message, SECRET_KEY); return hashTo20Digits(hash); }
+    function onGenerateUnlock() { let cc = adminClientCode.value.trim(); let fr = adminFirstRun.value.trim(); if (!/^\d{6,10}$/.test(cc)) { alert("Codice cliente 6-10 cifre."); return; } if (!/^\d+$/.test(fr) || fr.length<10) { alert("First Run non valido."); return; } generatedCode.value = generateUnlockCodeAdmin(cc, fr); }
+    function copyGenerated() { if (generatedCode.value) { navigator.clipboard.writeText(generatedCode.value); alert("Copiato."); } else alert("Nessun codice."); }
     function showAdminSection() { adminSection.style.display = 'block'; }
     function hideAdminSection() { adminSection.style.display = 'none'; }
-    let pressTimer = null;
-    function startAdminTimer() {
-        pressTimer = setTimeout(() => {
-            const code = prompt("Inserisci il codice amministratore:");
-            if (code === adminCode) {
-                adminAuthenticated = true;
-                showAdminSection();
-                alert("Accesso amministratore autorizzato.");
-                if (imagePage && !imagePage.classList.contains('hidden')) { renderReteLevel(reteLevelContainer, reteData, [reteData]); loadSavedImage(); }
-                if (reteSubPage && !reteSubPage.classList.contains('hidden') && currentNodeForInfo) { infoEditButtons.classList.remove('hidden-btn'); loadInfoForCurrentNode(); loadSpecialActions(); }
-            } else if (code !== null) alert("Codice errato.");
-        }, 3000);
-    }
-    function cancelAdminTimer() { if (pressTimer) { clearTimeout(pressTimer); pressTimer = null; } }
+    let adminTimer = null;
+    function startAdminTimer() { adminTimer = setTimeout(() => { let code = prompt("Codice amministratore:"); if (code === adminCode) { adminAuthenticated = true; showAdminSection(); alert("Accesso admin."); if (imagePage && !imagePage.classList.contains('hidden')) { renderReteLevel(reteLevelContainer, reteData); loadSavedImage(); } } else if (code !== null) alert("Codice errato."); }, 3000); }
+    function cancelAdminTimer() { if (adminTimer) clearTimeout(adminTimer); }
     adminLongPressBtn.addEventListener('mousedown', startAdminTimer);
     adminLongPressBtn.addEventListener('mouseup', cancelAdminTimer);
     adminLongPressBtn.addEventListener('mouseleave', cancelAdminTimer);
     adminLongPressBtn.addEventListener('touchstart', startAdminTimer, { passive: true });
     adminLongPressBtn.addEventListener('touchend', cancelAdminTimer);
     adminLongPressBtn.addEventListener('touchcancel', cancelAdminTimer);
-    generateUnlockBtn.addEventListener('click', onGenerateUnlock);
-    copyGeneratedBtn.addEventListener('click', copyGenerated);
-    hideAdminBtn.addEventListener('click', hideAdminSection);
-    changeAdminCodeBtn.addEventListener('click', () => { const newCode = newAdminCode.value.trim(); if (newCode) saveAdminCode(newCode); else alert("Inserisci un nuovo codice."); });
-
-    // ==================== FUNZIONI PER I CONTATTI (HOME) ====================
-    function saveContactExtraText() {
-        for (let s of services) { localStorage.setItem(`contactExtra_${s}_${CURRENT_VERSION}`, contactExtraText[s]); }
-    }
-    function loadContactExtraText() {
-        for (let s of services) {
-            const saved = localStorage.getItem(`contactExtra_${s}_${CURRENT_VERSION}`);
-            if (saved !== null) contactExtraText[s] = saved;
-            else {
-                if (s === 'clinica') contactExtraText[s] = "MONASTIR: Facciamo Rete";
-                else contactExtraText[s] = "";
-            }
-        }
-    }
-    function getContactButtonText(service) {
-        let extra = contactExtraText[service];
-        if (extra && extra.trim() !== "") return extra;
-        else if (service === 'clinica') return "MONASTIR: Facciamo Rete";
-        else return `Contatto: premi 5 sc. per modifica`;
-    }
-    function updateContactButtons() {
-        document.querySelectorAll('.big-btn').forEach(btn => {
-            const s = btn.getAttribute('data-service');
-            if (s) btn.innerText = getContactButtonText(s);
-        });
-    }
+    generateUnlockBtn.onclick = onGenerateUnlock;
+    copyGeneratedBtn.onclick = copyGenerated;
+    hideAdminBtn.onclick = hideAdminSection;
+    changeAdminCodeBtn.onclick = () => { let nc = newAdminCode.value.trim(); if (nc) saveAdminCode(nc); else alert("Inserisci nuovo codice."); };
+    function saveContactExtraText() { services.forEach(s => localStorage.setItem(`contactExtra_${s}_${CURRENT_VERSION}`, contactExtraText[s])); }
+    function loadContactExtraText() { services.forEach(s => { let saved = localStorage.getItem(`contactExtra_${s}_${CURRENT_VERSION}`); if (saved !== null) contactExtraText[s] = saved; else contactExtraText[s] = (s === 'clinica') ? "MONASTIR: Facciamo Rete" : ""; }); }
+    function getContactButtonText(s) { let extra = contactExtraText[s]; if (extra && extra.trim()) return extra; if (s === 'clinica') return "MONASTIR: Facciamo Rete"; return `Contatto: premi 5 sc. per modifica`; }
+    function updateContactButtons() { document.querySelectorAll('.big-btn').forEach(btn => { let s = btn.getAttribute('data-service'); if (s) btn.innerText = getContactButtonText(s); }); }
     function showCustomPrompt(service, currentExtra) {
         if (service === 'clinica') return;
-        const overlay = document.createElement('div');
-        overlay.className = 'custom-prompt';
-        overlay.innerHTML = `<div class="custom-prompt-content"><h3>Modifica testo aggiuntivo</h3><p>Testo attuale: "${currentExtra}"</p><input type="text" id="customPromptInput" maxlength="14" placeholder="Max 14 caratteri" value="${currentExtra}"><div><button id="customPromptOk">OK</button><button id="customPromptCancel">ANNULLA</button></div></div>`;
-        document.body.appendChild(overlay);
-        const input = overlay.querySelector('#customPromptInput');
-        const okBtn = overlay.querySelector('#customPromptOk');
-        const cancelBtn = overlay.querySelector('#customPromptCancel');
-        const close = () => overlay.remove();
-        okBtn.onclick = () => {
-            let newText = input.value.trim();
-            if (newText.length > 14) newText = newText.substring(0, 14);
-            contactExtraText[service] = newText;
-            saveContactExtraText();
-            updateContactButtons();
-            close();
-        };
-        cancelBtn.onclick = close;
-        input.focus();
+        let ov = document.createElement('div'); ov.className = 'custom-prompt';
+        ov.innerHTML = `<div class="custom-prompt-content"><h3>Modifica testo</h3><input id="custInp" maxlength="14" value="${currentExtra}"><div><button id="okBtn">OK</button><button id="cancelBtn">ANNULLA</button></div></div>`;
+        document.body.appendChild(ov);
+        let inp = ov.querySelector('#custInp'); let ok = ov.querySelector('#okBtn'); let cancel = ov.querySelector('#cancelBtn');
+        let close = () => ov.remove();
+        ok.onclick = () => { let newText = inp.value.trim(); if (newText.length>14) newText=newText.slice(0,14); contactExtraText[service]=newText; saveContactExtraText(); updateContactButtons(); close(); };
+        cancel.onclick = close;
+        inp.focus();
     }
     function initHomeButtons() {
         contactsGrid.innerHTML = '';
         services.forEach(service => {
-            const btn = document.createElement('button');
+            let btn = document.createElement('button');
             btn.className = 'big-btn';
             btn.setAttribute('data-service', service);
             btn.innerText = getContactButtonText(service);
-            btn.addEventListener('click', () => {
+            btn.onclick = () => {
                 if (service === 'clinica') {
                     homePage.classList.add('hidden');
                     imagePage.classList.remove('hidden');
                     requestImagePageWakeLock();
-                    renderReteLevel(reteLevelContainer, reteData, [reteData]);
+                    renderReteLevel(reteLevelContainer, reteData);
                     loadSavedImage();
                     updateHistoryState('image');
                 } else {
                     showEmergency(service);
                     updateHistoryState('emergency');
                 }
-            });
+            };
             if (service !== 'clinica') {
-                let pressTimerBtn = null;
-                const startTimer = () => { pressTimerBtn = setTimeout(() => showCustomPrompt(service, contactExtraText[service]), 5000); };
-                const cancelTimer = () => { if (pressTimerBtn) { clearTimeout(pressTimerBtn); pressTimerBtn = null; } };
-                btn.addEventListener('mousedown', startTimer);
-                btn.addEventListener('mouseup', cancelTimer);
-                btn.addEventListener('mouseleave', cancelTimer);
-                btn.addEventListener('touchstart', startTimer, { passive: true });
-                btn.addEventListener('touchend', cancelTimer);
-                btn.addEventListener('touchcancel', cancelTimer);
+                let t;
+                btn.onmousedown = () => { t = setTimeout(() => showCustomPrompt(service, contactExtraText[service]), 5000); };
+                btn.onmouseup = btn.onmouseleave = () => clearTimeout(t);
+                btn.ontouchstart = () => { t = setTimeout(() => showCustomPrompt(service, contactExtraText[service]), 5000); };
+                btn.ontouchend = btn.ontouchcancel = () => clearTimeout(t);
             } else {
-                let adminPressTimer = null;
-                const startAdminLongPress = () => {
-                    adminPressTimer = setTimeout(() => {
-                        if (!adminAuthenticated) {
-                            alert("Solo l'amministratore può modificare il titolo di MONASTIR.");
-                            return;
-                        }
-                        const newText = prompt("Inserisci il nuovo testo per il pulsante MONASTIR:", contactExtraText['clinica']);
-                        if (newText !== null && newText.trim() !== "") {
-                            contactExtraText['clinica'] = newText.trim();
-                            saveContactExtraText();
-                            updateContactButtons();
-                        } else if (newText !== null && newText.trim() === "") {
-                            alert("Il testo non può essere vuoto.");
-                        }
-                    }, 3000);
-                };
-                const cancelAdminLongPress = () => { if (adminPressTimer) clearTimeout(adminPressTimer); };
-                btn.addEventListener('mousedown', startAdminLongPress);
-                btn.addEventListener('mouseup', cancelAdminLongPress);
-                btn.addEventListener('mouseleave', cancelAdminLongPress);
-                btn.addEventListener('touchstart', startAdminLongPress, { passive: true });
-                btn.addEventListener('touchend', cancelAdminLongPress);
-                btn.addEventListener('touchcancel', cancelAdminLongPress);
+                let adminT;
+                btn.onmousedown = () => { adminT = setTimeout(() => { if (!adminAuthenticated) { alert("Solo admin."); return; } let nt = prompt("Nuovo testo:", contactExtraText.clinica); if (nt && nt.trim()) { contactExtraText.clinica = nt.trim(); saveContactExtraText(); updateContactButtons(); } }, 3000); };
+                btn.onmouseup = btn.onmouseleave = () => clearTimeout(adminT);
+                btn.ontouchstart = () => { adminT = setTimeout(() => { if (!adminAuthenticated) { alert("Solo admin."); return; } let nt = prompt("Nuovo testo:", contactExtraText.clinica); if (nt && nt.trim()) { contactExtraText.clinica = nt.trim(); saveContactExtraText(); updateContactButtons(); } }, 3000); };
+                btn.ontouchend = btn.ontouchcancel = () => clearTimeout(adminT);
             }
             contactsGrid.appendChild(btn);
         });
     }
-
-    // ==================== GEOLOCALIZZAZIONE, NOTE ====================
     function haversine(lat1,lng1,lat2,lng2) {
         const R = 6371e3;
         const φ1 = lat1 * Math.PI/180, φ2 = lat2 * Math.PI/180;
@@ -1414,8 +952,6 @@
         latLonDisplay.innerText = addressDisplay.innerText = refADisplay.innerText = refBDisplay.innerText = refCDisplay.innerText = "---";
         gpsStatus.innerHTML = "";
     }
-
-    // Funzioni note con supporto includeCoords per nota
     function getNormalNotesKey(s) { return `normalNotes_${s}_${CURRENT_VERSION}`; }
     function getSelectedNormalIdKey(s) { return `selectedNormalNote_${s}_${CURRENT_VERSION}`; }
     function saveNormalNotesForService(s) { localStorage.setItem(getNormalNotesKey(s), JSON.stringify(normalNotes[s])); }
@@ -1442,7 +978,6 @@
         selectedNormalNoteId = (savedNormalId && normalNotes[currentService].some(n => String(n.id) === savedNormalId)) ? savedNormalId : null;
         renderNormalNotes();
     }
-    
     function renderNormalNotes() {
         const notes = normalNotes[currentService] || [];
         if (!notes.length) { notesListArea.innerHTML = `<div style="font-size:0.7rem; color:#777;">Nessuna nota. Aggiungine una.</div>`; return; }
@@ -1547,7 +1082,6 @@
     }
     modalAudioIt.addEventListener('click', () => speakNoteFromModal('it'));
     modalAudioFr.addEventListener('click', () => speakNoteFromModal('fr'));
-    
     function saveNoteFromModal() {
         const title = editNoteTitle.value.trim();
         const description = editNoteDesc.value.trim();
@@ -1602,7 +1136,6 @@
     deleteNoteModalBtn.addEventListener('click', deleteNoteFromModal);
     noteEditModal.addEventListener('click', (e) => { if (e.target === noteEditModal) closeEditModal(); });
     addNoteBtn.addEventListener('click', openAddNoteModal);
-    
     function getSelectedNote() {
         if (selectedNormalNoteId) {
             return normalNotes[currentService].find(n => String(n.id) === selectedNormalNoteId);
@@ -1617,7 +1150,6 @@
         const note = getSelectedNote();
         return note ? (note.includeCoords === true) : false;
     }
-
     function getFormattedCoordinatesForSpeech(lang) {
         if (currentLat === null || currentLng === null) return null;
         const latDir = currentLat >= 0 ? (lang === 'it' ? "Nord" : "Nord") : (lang === 'it' ? "Sud" : "Sud");
@@ -1630,7 +1162,6 @@
             return `Coordonnées: ${latAbs} degrés ${latDir}, ${lngAbs} degrés ${lngDir}`;
         }
     }
-
     async function speakNoteWithOptionalCoords(lang) {
         if (!window.speechSynthesis) { alert(lang==='it'?"Sintesi non supportata":"Synthèse non supportée"); return; }
         speechSynthesis.cancel();
@@ -1669,7 +1200,6 @@
     }
     function speakItalianNote() { speakNoteWithOptionalCoords('it'); }
     function speakFrenchNote() { speakNoteWithOptionalCoords('fr'); }
-
     async function copyNoteWithOptionalCoords() {
         let note = getSelectedNoteDescription();
         if (!note) {
@@ -1700,8 +1230,6 @@
             showTemporaryMessage(copyInfoMsg, "📋 Nota copiata. Incolla su WhatsApp.", 15000);
         }
     }
-
-    // Funzioni di traduzione e ascolto operatore
     async function translateToFrench(italianText) {
         if (!italianText || italianText.trim() === "") return "";
         try {
@@ -1873,8 +1401,6 @@
     operatorResponseDisplay.addEventListener('click', openAdaptiveModal);
     closeAdaptiveBtn.addEventListener('click', closeAdaptiveModal);
     adaptiveModal.addEventListener('click', (e) => { if (e.target === adaptiveModal) closeAdaptiveModal(); });
-    // Campo bianco di PARLA OPERATORE ora apre adaptiveModal (come ascolta)
-    speakResultField.removeEventListener('click', openSpeakDetailModal);
     speakResultField.addEventListener('click', openAdaptiveModal);
     function openSpeakDetailModal() {
         if (!lastItalianText && !lastFrenchTranslation) { alert("Nessuna conversazione recente."); return; }
@@ -1884,7 +1410,6 @@
     function closeSpeakDetailModal() { speakDetailModal.style.display = 'none'; }
     closeSpeakModalBtn.addEventListener('click', closeSpeakDetailModal);
     speakDetailModal.addEventListener('click', (e) => { if (e.target === speakDetailModal) closeSpeakDetailModal(); });
-    
     function exportAllNotes() {
         let content = "";
         content += "[NUMERI TELEFONO]\n";
@@ -2022,31 +1547,15 @@
             }
         }
     }
-    
-    // Gestione info (pulsanti i) - nessun alert se testo vuoto
-    function getInfoTextKey(service, type) {
-        return `infoText_${type}_${service}_${CURRENT_VERSION}`;
-    }
-    function loadInfoText(service, type) {
-        const key = getInfoTextKey(service, type);
-        const saved = localStorage.getItem(key);
-        return saved ? saved : "";
-    }
-    function saveInfoText(service, type, text) {
-        const key = getInfoTextKey(service, type);
-        localStorage.setItem(key, text);
-    }
+    function getInfoTextKey(service, type) { return `infoText_${type}_${service}_${CURRENT_VERSION}`; }
+    function loadInfoText(service, type) { const key = getInfoTextKey(service, type); const saved = localStorage.getItem(key); return saved ? saved : ""; }
+    function saveInfoText(service, type, text) { const key = getInfoTextKey(service, type); localStorage.setItem(key, text); }
     function showInfoText(service, type) {
         const text = loadInfoText(service, type);
-        if (text && text.trim() !== "") {
-            alert(text);
-        }
+        if (text && text.trim() !== "") { alert(text); }
     }
     function editInfoText(service, type) {
-        if (!adminAuthenticated) {
-            alert("Solo l'amministratore può modificare questo testo.");
-            return;
-        }
+        if (!adminAuthenticated) { alert("Solo l'amministratore può modificare questo testo."); return; }
         const currentText = loadInfoText(service, type);
         const newText = prompt("Modifica il testo informativo:", currentText);
         if (newText !== null && newText.trim() !== "") {
@@ -2058,15 +1567,9 @@
     }
     function setupInfoButton(btn, type) {
         if (!btn) return;
-        btn.addEventListener('click', () => {
-            if (currentService) showInfoText(currentService, type);
-        });
+        btn.addEventListener('click', () => { if (currentService) showInfoText(currentService, type); });
         let pressTimer = null;
-        const startLongPress = () => {
-            pressTimer = setTimeout(() => {
-                editInfoText(currentService, type);
-            }, 3000);
-        };
+        const startLongPress = () => { pressTimer = setTimeout(() => { editInfoText(currentService, type); }, 3000); };
         const cancelLongPress = () => { if (pressTimer) clearTimeout(pressTimer); };
         btn.addEventListener('mousedown', startLongPress);
         btn.addEventListener('mouseup', cancelLongPress);
@@ -2075,7 +1578,6 @@
         btn.addEventListener('touchend', cancelLongPress);
         btn.addEventListener('touchcancel', cancelLongPress);
     }
-    
     function showEmergency(s) {
         if (!licenseCheckPassed) { alert('Licenza non attiva o scaduta. Attivala dalla home.'); return; }
         currentService = s;
@@ -2097,14 +1599,29 @@
         setupInfoButton(infoOperatorBtn, 'operator');
         setupInfoButton(infoSpeakBtn, 'speak');
     }
-    function onSaveNumber() { let n = phoneInput.value.trim(); if (n) { savePhone(currentService, n); phoneSaveMsg.innerText = "✅ Numero salvato nell'archivio"; setTimeout(()=>phoneSaveMsg.innerText="",2000); } else phoneSaveMsg.innerText = "⚠️ Inserisci un numero valido"; }
-    function onClearResponse() { clearOperatorTranslation(); transcribeStatus.innerText = "🧹 Traduzione cancellata"; setTimeout(() => transcribeStatus.innerText = "", 2000); }
-    function backHome() { 
-        emergencyPage.classList.add("hidden"); 
-        homePage.classList.remove("hidden"); 
-        currentService = null;
+    function onSaveNumber() { 
+        let n = phoneInput.value.trim(); 
+        if (n) { 
+            savePhone(currentService, n); 
+            phoneSaveMsg.innerText = "✅ Numero salvato nell'archivio"; 
+            setTimeout(()=>phoneSaveMsg.innerText="",2000); 
+        } else phoneSaveMsg.innerText = "⚠️ Inserisci un numero valido"; 
     }
-    
+    function onClearResponse() { 
+        clearOperatorTranslation(); 
+        transcribeStatus.innerText = "🧹 Traduzione cancellata"; 
+        setTimeout(() => transcribeStatus.innerText = "", 2000); 
+    }
+    closeActivityModalBtn.addEventListener('click', () => {
+        activityModal.style.display = 'none';
+        currentActivityNode = null;
+    });
+    activityModal.addEventListener('click', (e) => {
+        if (e.target === activityModal) {
+            activityModal.style.display = 'none';
+            currentActivityNode = null;
+        }
+    });
     function init() {
         loadAdminCode();
         loadAllNotes();
@@ -2112,31 +1629,29 @@
         migratePhoneNumbers();
         initHomeButtons();
         loadReteData();
-        setupSubHeaderEdit();
         saveNumberBtn.addEventListener('click', onSaveNumber);
         googleMapsBtn.addEventListener('click', () => window.open("https://maps.google.com", "_blank"));
         geolocationBtn.addEventListener('click', getLocationAndAddress);
         copyNoteBtn.addEventListener('click', copyNoteWithOptionalCoords);
-        backHomeBtn.addEventListener('click', () => goBackHome());
-        backHomeBtnDuplicate.addEventListener('click', () => goBackHome());
         listenResponseBtn.addEventListener('click', startListening30s);
         clearResponseBtn.addEventListener('click', onClearResponse);
         speakToOperatorBtn.addEventListener('click', startSpeakingItalian);
         clearSpeakBtn.addEventListener('click', clearSpeakTranslation);
         exportAllBtn.addEventListener('click', exportAllNotes);
         importAllBtn.addEventListener('click', () => globalImportFileInput.click());
-        globalImportFileInput.addEventListener('change', (e) => { if (e.target.files.length) importAllNotes(e.target.files[0]); globalImportFileInput.value = ''; });
+        globalImportFileInput.addEventListener('change', (e) => { 
+            if (e.target.files.length) importAllNotes(e.target.files[0]); 
+            globalImportFileInput.value = ''; 
+        });
         initRecognitionOperator();
         initRecognitionSpeak();
         initLicense();
         activateLicenseBtn.addEventListener('click', onActivateLicense);
-        copyRequestBtn.addEventListener('click', copyRequest);
         if (!reteData.children || reteData.children.length === 0) {
             reteData.children = [];
             saveReteData();
         }
         requestGlobalWakeLock();
-        // Stato iniziale per gestire il tasto indietro
         history.replaceState({ page: 'home' }, '');
     }
     init();
