@@ -86,7 +86,7 @@
         #activateLicenseBtn{flex-shrink:0}
         .admin-section{margin:16px 0;padding:12px;background:#ffe0b5;border-radius:24px;border-left:6px solid #e67e22;display:none}
         .admin-section .flex-row{margin-bottom:8px}
-        .days-line{text-align:center;font-size:0.9rem;color:#1e2a3a;margin-top:12px;font-weight:bold;display:flex;justify-content:center;align-items:center;gap:12px;flex-wrap:nowrap;background:#e9ecef;padding:8px 12px;border-radius:40px;white-space:nowrap}
+        .days-line{text-align:center;font-size:0.9rem;color:#1e2a3a;margin-top:12px;font-weight:bold;display:flex;justify-content:center;align-items:center;gap:12px;flex-wrap:nowrap;background:none;padding:0;border-radius:0;white-space:nowrap}
         .days-line button{background:#e67e22;color:white;border:none;padding:4px 12px;border-radius:40px;font-size:0.8rem;cursor:pointer;font-weight:bold;white-space:nowrap}
         .modal-info-text{font-size:0.85rem;line-height:1.4;margin-bottom:16px;white-space:pre-wrap;word-break:break-word}
         .image-top-box{background:#d2d6dc;border-radius:24px;margin-bottom:20px;padding:12px;text-align:center;border-left:6px solid #2c3e50}
@@ -396,7 +396,6 @@
             try {
                 globalWakeLock = await navigator.wakeLock.request('screen');
                 console.log('WakeLock attivo');
-                // Riapplica wake lock se la pagina diventa visibile
                 document.addEventListener('visibilitychange', async () => {
                     if (document.visibilityState === 'visible' && globalWakeLock === null) {
                         globalWakeLock = await navigator.wakeLock.request('screen');
@@ -405,7 +404,6 @@
             } catch(err) { console.warn('WakeLock fallito:', err); }
         }
     }
-    // Forza il wake lock anche dopo interazione utente (primo tocco)
     function ensureWakeLock() {
         if (globalWakeLock === null && 'wakeLock' in navigator) {
             navigator.wakeLock.request('screen').then(lock => {
@@ -414,7 +412,6 @@
             }).catch(e => console.warn(e));
         }
     }
-    // Aggiungi listener per riattivare wake lock al primo tocco
     document.body.addEventListener('touchstart', ensureWakeLock, { once: true });
     document.body.addEventListener('mousedown', ensureWakeLock, { once: true });
 
@@ -867,7 +864,7 @@
             return {lat,lng};
         } catch(e) { return {lat,lng}; }
     }
-    // Funzione migliorata con priorità di ricerca
+    // Funzione migliorata con priorità di ricerca (Alta: attività commerciali, Media: industrie/uffici, Bassa: strade/luoghi)
     async function fetchAllNamedPlaces(lat, lng) {
         const excludeTags = ["information","bench","waste_basket","toilets","telephone","recycling","fountain","drinking_water"];
         let query = `[out:json];(node(around:300,${lat},${lng})[name];way(around:300,${lat},${lng})[name];);out center;`;
@@ -889,8 +886,8 @@
                 let dist = haversine(lat, lng, latEl, lonEl);
                 let display = name;
                 let priority = 3; // priorità bassa (default)
-                // PRIORITÀ ALTA: attività commerciali/utili
-                let highPriority = ["bar","pub","cafe","restaurant","fast_food","pharmacy","supermarket","convenience","shop","car_repair","car_wash","tyres","car_parts","bank","hospital","clinic","doctor","dentist","school","kindergarten","university","college","gym","fitness","cinema","theatre","fuel","charging_station"];
+                // PRIORITÀ ALTA: attività commerciali/utili (bar, ristoranti, farmacie, supermercati, officine, ecc.)
+                let highPriority = ["bar","pub","cafe","restaurant","fast_food","pharmacy","supermarket","convenience","shop","car_repair","car_wash","tyres","car_parts","bank","hospital","clinic","doctor","dentist","school","kindergarten","university","college","gym","fitness","cinema","theatre","fuel","charging_station","police","fire_station","post_office","library","townhall"];
                 // PRIORITÀ MEDIA: industrie, uffici, attività generiche
                 let mediumPriority = ["industrial","commercial","office","workshop","warehouse","company","business"];
                 if (cat && highPriority.some(k => cat.includes(k))) {
@@ -920,12 +917,12 @@
                 }
                 items.push({ display, dist, priority });
             }
-            // Ordina prima per priorità (1=alta, 2=media, 3=bassa) poi per distanza
+            // Ordina per priorità (1=alta, 2=media, 3=bassa) e poi per distanza
             items.sort((a,b) => {
                 if (a.priority !== b.priority) return a.priority - b.priority;
                 return a.dist - b.dist;
             });
-            // Rimuovi duplicati per nome (primo occorrente)
+            // Rimuovi duplicati per nome (prima occorrenza)
             const unique = new Map();
             for (let item of items) {
                 let baseName = item.display.split(' (')[0];
