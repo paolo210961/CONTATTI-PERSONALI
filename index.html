@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
-    <title>Contatti Personali - v0228</title>
+    <title>Contatti Personali - v0229</title>
     <link rel="manifest" href="manifest.json">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -120,6 +120,8 @@
         .rete-select-dropdown{width:100%;padding:12px;border-radius:40px;background:#283593;color:white;border:none;font-weight:bold;font-size:1rem;margin:8px 0}
         .rete-parent-button{background:#283593;color:white;flex:1;padding:12px;border-radius:40px;text-align:center;font-weight:bold;cursor:pointer;transition:0.05s linear;margin-bottom:8px}
         .rete-parent-button:active{transform:scale(0.97)}
+        /* Nasconde eventuali pallini blu residui nella pagina foto */
+        .rete-container .note-btn-confirm { display: none !important; }
     </style>
 </head>
 <body>
@@ -137,7 +139,7 @@
             <div class="flex-row"><input type="text" id="generatedCode" readonly placeholder="Codice generato" style="flex:1; background:#f8f9fa;"><button id="copyGeneratedBtn" class="small-btn" style="background:#283593;">📋 COPIA</button></div>
             <div class="flex-row"><input type="text" id="newAdminCode" placeholder="Nuovo codice amministratore" style="flex:1;"><button id="changeAdminCodeBtn" class="small-btn" style="background:#8e44ad;">CAMBIA CODICE</button></div>
             <div class="admin-backup-buttons"><button id="saveInfoIconsBtn" class="small-btn" style="background:#283593;">💾 SALVA (i)</button><button id="restoreInfoIconsBtn" class="small-btn" style="background:#6b8e23;">📂 RIPRISTINA (i)</button></div>
-            <div id="backupHint" class="backup-hint">📄 info_icons_backup_v0228.txt</div>
+            <div id="backupHint" class="backup-hint">📄 info_icons_backup_v0229.txt</div>
             <button id="hideAdminBtn" class="small-btn" style="background:#757575; width:100%; margin-top:8px;">NASCONDI AREA ADMIN</button>
         </div>
         <div class="dark-card"><div class="grid-2" id="contactsGrid"></div></div>
@@ -145,7 +147,7 @@
         <div class="info-text">Ogni contatto ha il proprio archivio note.<br>📍 Ricerca entro 300m di TUTTI i luoghi con nome<br>🔊 Ascolto automatico 30 secondi dopo il messaggio</div>
         <div class="info-text">Non Utilizzare APP per Situazioni di Emergenza di Salute</div>
         <div class="days-line" id="daysLeftDisplayHome">Giorni rimanenti: --</div>
-        <div class="info-text">💾 Il file SALVA NOTE si chiama: contatti_personali_notes_backup_0228.txt</div>
+        <div class="info-text">💾 Il file SALVA NOTE si chiama: contatti_personali_notes_backup_0229.txt</div>
         <div class="export-import-row"><button id="exportAllBtn">💾 SALVA NOTE</button><button id="importAllBtn">📂 RIPRISTINA NOTE</button></div>
         <input type="file" id="globalImportFileInput" accept=".txt" style="display:none;">
     </div>
@@ -206,8 +208,8 @@
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
 <script>
-    // v0228 - Rimozione pallino blu nei tasti foto, tendina solo con licenza attiva, back migliorato
-    const CURRENT_VERSION = "0228";
+    // v0229 - Rimozione definitiva del pallino blu nella pagina foto (con CSS e codice pulito)
+    const CURRENT_VERSION = "0229";
     let currentService = "ambulanza";
     let currentLat = null, currentLng = null;
     let currentAddress = "";
@@ -225,7 +227,7 @@
     const SECRET_KEY = "ChiaveSegreta123";
     let adminCode = "admin2025", adminAuthenticated = false;
     
-    // DOM elements
+    // DOM elements (stessi della v0228)
     const homePage = document.getElementById('homePage');
     const emergencyPage = document.getElementById('emergencyPage');
     const imagePage = document.getElementById('imagePage');
@@ -366,7 +368,7 @@
     // ==================== GESTIONE TASTO INDIETRO (MIGLIORATA) ====================
     let currentPage = 'home';
     let isModalOpen = false;
-    let backStack = [];
+    let backStack = ['home'];
     function pushPage(page) { backStack.push(page); currentPage = page; history.pushState({ page: page, modal: isModalOpen }, ''); }
     function closeAllModals() {
         let closed = false;
@@ -410,9 +412,7 @@
                 keepScreenOn();
             }
         } else {
-            if (!homePage.classList.contains('hidden')) {
-                return;
-            }
+            if (!homePage.classList.contains('hidden')) return;
             homePage.classList.remove('hidden');
             emergencyPage.classList.add('hidden');
             imagePage.classList.add('hidden');
@@ -562,7 +562,7 @@
                 let div = document.createElement('div');
                 div.className = 'rete-item';
                 if (child.children && child.children.length > 0) {
-                    // Nodo con figli - nessun pallino blu a sinistra
+                    // Nodo con figli - nessun pallino blu
                     let parentBtn = document.createElement('div');
                     parentBtn.className = 'rete-parent-button';
                     parentBtn.innerText = (child.title && child.title.trim()) ? child.title : "[Tasto vuoto]";
@@ -1374,7 +1374,7 @@
     function savePhone(s,n) { localStorage.setItem(`phone_${s}_${CURRENT_VERSION}`, n); }
     function getPhone(s) { return localStorage.getItem(`phone_${s}_${CURRENT_VERSION}`); }
     const defaultPhone = { ambulanza:"118", polizia:"113", veterinario:"800123456", clinica:"800987654" };
-    function migratePhoneNumbers() { const oldVersions = ["0227","0226","0225"]; for (let s of services) { if (localStorage.getItem(`phone_${s}_${CURRENT_VERSION}`)) continue; for (let ver of oldVersions) { let old = localStorage.getItem(`phone_${s}_${ver}`); if (old) { localStorage.setItem(`phone_${s}_${CURRENT_VERSION}`, old); break; } } } }
+    function migratePhoneNumbers() { const oldVersions = ["0228","0227","0226"]; for (let s of services) { if (localStorage.getItem(`phone_${s}_${CURRENT_VERSION}`)) continue; for (let ver of oldVersions) { let old = localStorage.getItem(`phone_${s}_${ver}`); if (old) { localStorage.setItem(`phone_${s}_${CURRENT_VERSION}`, old); break; } } } }
     
     // ==================== PALLINI I ====================
     licenseInfoIcon.addEventListener('click', () => openGlobalInfoModal('licenseInfo', 'Informazioni Licenza', 'license_info_text'));
