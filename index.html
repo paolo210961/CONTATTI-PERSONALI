@@ -210,8 +210,7 @@
             <div id="speakResultField" class="speak-field">Traduzione Italiana e Francese</div>
             <button id="speakToOperatorBtn" class="small-btn double-height speak-btn">🎙️ PARLA CON OPERATORE</button>
             <div class="speak-extra-buttons">
-                <button id="speakReadItBtn" class="small-btn" style="background:#283593;">🔊 LEGGI IT</button>
-                <button id="speakReadFrBtn" class="small-btn" style="background:#6b8e23;">🔊 LEGGI FR</button>
+                <button id="speakReadFrBtn" class="small-btn double-height speak-btn" style="background:#6b8e23;">🔊 LEGGI FR</button>
             </div>
             <div id="speakStatus" class="status-msg"></div>
         </div>
@@ -249,6 +248,17 @@
                 <button id="deleteNoteModalBtn" class="delete-btn" style="display:none;">🗑️ CANCELLA NOTA</button>
                 <button id="saveNoteModalBtn" class="save-btn">SALVA</button>
                 <button id="cancelNoteModalBtn" class="cancel-btn">ANNULLA</button>
+            </div>
+        </div>
+    </div>
+    <div id="globalInfoModal" class="adaptive-modal" style="display:none;">
+        <div class="adaptive-modal-content">
+            <h3 id="globalInfoModalTitle">Informazioni</h3>
+            <textarea id="globalInfoTextarea" rows="8" readonly style="font-family:monospace; font-size:0.9rem;"></textarea>
+            <div class="modal-buttons">
+                <button id="globalInfoEditBtn" class="save-btn" style="background:#8e44ad;">✏️ MODIFICA</button>
+                <button id="globalInfoSaveBtn" class="save-btn" style="display:none;">💾 SALVA</button>
+                <button id="globalInfoCloseBtn" class="cancel-btn">CHIUDI</button>
             </div>
         </div>
     </div>
@@ -377,9 +387,15 @@
     const activityEditTextBtn = document.getElementById('activityEditTextBtn');
     const activityEditImageBtn = document.getElementById('activityEditImageBtn');
     const closeActivityModalBtn = document.getElementById('closeActivityModalBtn');
-    const licenseInfoIcon = document.getElementById('licenseInfoIcon');
-    const speakReadItBtn = document.getElementById('speakReadItBtn');
-    const speakReadFrBtn = document.getElementById('speakReadFrBtn');
+    // Nuovi elementi per modale informativa globale
+    const globalInfoModal = document.getElementById('globalInfoModal');
+    const globalInfoTextarea = document.getElementById('globalInfoTextarea');
+    const globalInfoEditBtn = document.getElementById('globalInfoEditBtn');
+    const globalInfoSaveBtn = document.getElementById('globalInfoSaveBtn');
+    const globalInfoCloseBtn = document.getElementById('globalInfoCloseBtn');
+    let currentGlobalInfoKey = null;
+    let currentGlobalInfoOriginal = "";
+
     let currentActivityNode = null;
     let currentEditId = null;
     let currentEditIncludeCoords = false;
@@ -389,13 +405,16 @@
     let lastItalianText = "";
     let lastFrenchTranslation = "";
 
-    // ==================== WAKE LOCK RINFORZATO (schermo sempre acceso) ====================
     async function requestGlobalWakeLock() {
         if ('wakeLock' in navigator) {
             try {
-                if (globalWakeLock) await globalWakeLock.release();
                 globalWakeLock = await navigator.wakeLock.request('screen');
                 console.log('WakeLock attivo');
+                document.addEventListener('visibilitychange', async () => {
+                    if (document.visibilityState === 'visible' && globalWakeLock === null) {
+                        globalWakeLock = await navigator.wakeLock.request('screen');
+                    }
+                });
             } catch(err) { console.warn('WakeLock fallito:', err); }
         }
     }
@@ -403,18 +422,12 @@
         if (globalWakeLock === null && 'wakeLock' in navigator) {
             navigator.wakeLock.request('screen').then(lock => {
                 globalWakeLock = lock;
-                console.log('WakeLock riattivato');
+                console.log('WakeLock riattivato dopo interazione');
             }).catch(e => console.warn(e));
         }
     }
-    // Attiva wake lock all'avvio e dopo ogni interazione
-    document.addEventListener('touchstart', ensureWakeLock);
-    document.addEventListener('mousedown', ensureWakeLock);
-    document.addEventListener('visibilitychange', () => {
-        if (document.visibilityState === 'visible') requestGlobalWakeLock();
-    });
-
-    // ==================== GESTIONE TASTO INDIETRO ====================
+    document.body.addEventListener('touchstart', ensureWakeLock, { once: true });
+    document.body.addEventListener('mousedown', ensureWakeLock, { once: true });
     let currentPage = 'home';
     function updateHistoryState(page) {
         if (currentPage !== page) {
@@ -429,6 +442,7 @@
         if (noteEditModal.style.display === 'flex') { noteEditModal.style.display = 'none'; closed = true; }
         if (infoModal.style.display === 'flex') { infoModal.style.display = 'none'; closed = true; }
         if (activityModal.style.display === 'flex') { activityModal.style.display = 'none'; closed = true; }
+        if (globalInfoModal.style.display === 'flex') { globalInfoModal.style.display = 'none'; closed = true; }
         return closed;
     }
     function goBackHome() {
@@ -459,8 +473,6 @@
         if (closeAllModals()) return;
         if (currentPage !== 'home') goBackFromSubPage();
     });
-
-    // ==================== GESTIONE RETE DINAMICA ====================
     let reteData = { title: "RETE", children: [] };
     function saveReteData() { localStorage.setItem('monastir_rete_data', JSON.stringify(reteData)); }
     function loadReteData() {
@@ -740,7 +752,7 @@
         if (daysHomeDisplay) {
             daysHomeDisplay.innerHTML = `v${CURRENT_VERSION} - Scade: ${daysRemaining} giorni <button id="copyRequestBtnMoved" class="small-btn" style="background:#e67e22;">📋 Richiedi attivazione</button>`;
             let moved = document.getElementById('copyRequestBtnMoved');
-            if (moved) moved.onclick = copyRequest;
+            if (moved) moved.onclick = () => openGlobalInfoModal('copyRequest', 'Inserisci le istruzioni per la richiesta di attivazione della licenza. Questo testo è modificabile solo dall\'amministratore.', 'copyRequest_text');
         }
     }
     function updateLicenseUI() {
@@ -762,13 +774,55 @@
             alert('Licenza attivata per 365 giorni.');
         } else alert('Codice non valido.');
     }
+    // Funzione per aprire la modale informativa globale
+    function openGlobalInfoModal(key, defaultText, storageKey) {
+        currentGlobalInfoKey = storageKey;
+        let savedText = localStorage.getItem(storageKey);
+        let displayText = savedText !== null ? savedText : defaultText;
+        currentGlobalInfoOriginal = displayText;
+        globalInfoTextarea.value = displayText;
+        globalInfoModalTitle.innerText = "Informazioni";
+        if (adminAuthenticated) {
+            globalInfoEditBtn.style.display = 'block';
+            globalInfoSaveBtn.style.display = 'none';
+            globalInfoTextarea.readOnly = true;
+        } else {
+            globalInfoEditBtn.style.display = 'none';
+            globalInfoSaveBtn.style.display = 'none';
+            globalInfoTextarea.readOnly = true;
+        }
+        globalInfoModal.style.display = 'flex';
+    }
+    // Gestione modale informativa
+    globalInfoEditBtn.addEventListener('click', () => {
+        if (!adminAuthenticated) { alert("Solo l'amministratore può modificare questo testo."); return; }
+        globalInfoTextarea.readOnly = false;
+        globalInfoEditBtn.style.display = 'none';
+        globalInfoSaveBtn.style.display = 'block';
+    });
+    globalInfoSaveBtn.addEventListener('click', () => {
+        if (!adminAuthenticated) return;
+        let newText = globalInfoTextarea.value;
+        if (newText !== currentGlobalInfoOriginal) {
+            localStorage.setItem(currentGlobalInfoKey, newText);
+            alert("Testo salvato.");
+        }
+        globalInfoTextarea.readOnly = true;
+        globalInfoEditBtn.style.display = 'block';
+        globalInfoSaveBtn.style.display = 'none';
+        globalInfoModal.style.display = 'none';
+    });
+    globalInfoCloseBtn.addEventListener('click', () => {
+        globalInfoModal.style.display = 'none';
+        globalInfoTextarea.readOnly = true;
+        globalInfoEditBtn.style.display = 'block';
+        globalInfoSaveBtn.style.display = 'none';
+    });
+    globalInfoModal.addEventListener('click', (e) => { if (e.target === globalInfoModal) globalInfoCloseBtn.click(); });
+    // Sostituzione copyRequest con la modale
     function copyRequest() {
-        let firstRun = localStorage.getItem('firstRun');
-        if (!firstRun) return;
-        let msg = `CODICE CLIENTE: ${clientCode}\n\nBonifico a Paolo Maiorana IBAN: IT31R0339512900052702573770 €48,00 causale: ${clientCode}\nInvia email a gli amicidipaolino@gmail.com con codice cliente.`;
-        navigator.clipboard.writeText(msg);
-        infoModalText.innerText = msg;
-        infoModal.style.display = 'flex';
+        // Ora usa la modale invece di copiare direttamente
+        openGlobalInfoModal('copyRequest', 'Inserisci le istruzioni per la richiesta di attivazione della licenza. Questo testo è modificabile solo dall\'amministratore.', 'copyRequest_text');
     }
     closeInfoModalBtn.onclick = () => infoModal.style.display = 'none';
     infoModal.onclick = (e) => { if (e.target === infoModal) infoModal.style.display = 'none'; };
@@ -1097,7 +1151,6 @@
         currentEditIncludeCoords = false;
         updateModalCoordButtons();
     });
-    // Funzione speak con pausa di 0.5 secondi tra i gruppi (per coordinate)
     async function speakWordsWithPause(msg, langCode, rate=1.0, wordPauseMs=200) {
         if (!window.speechSynthesis) return;
         speechSynthesis.cancel();
@@ -1108,7 +1161,6 @@
             u.rate = rate;
             speechSynthesis.speak(u);
             await new Promise(r => setTimeout(r, wordPauseMs));
-            // Pausa extra di 500ms per i numeri (coordinate)
             if (words[i].match(/[\d\.]+/)) {
                 await new Promise(r => setTimeout(r, 500));
             }
@@ -1411,15 +1463,6 @@
         };
         setTimeout(() => { if (recognitionSpeak && recognitionSpeak.stop) recognitionSpeak.stop(); }, 30000);
     }
-    // Nuovi pulsanti per leggere IT e FR dal box Parla Operatore
-    async function readLastItalian() {
-        if (lastItalianText && lastItalianText.trim() !== "") {
-            await speakWordsWithPause(lastItalianText, 'it-IT', 1.0, 200);
-            playBeep();
-        } else {
-            alert("Nessuna traduzione italiana disponibile. Parla con l'operatore prima.");
-        }
-    }
     async function readLastFrench() {
         if (lastFrenchTranslation && lastFrenchTranslation.trim() !== "") {
             await speakWordsWithPause(lastFrenchTranslation, 'fr-FR', 1.0, 200);
@@ -1428,8 +1471,8 @@
             alert("Nessuna traduzione francese disponibile. Parla con l'operatore prima.");
         }
     }
-    speakReadItBtn.addEventListener('click', readLastItalian);
-    speakReadFrBtn.addEventListener('click', readLastFrench);
+    const speakReadFrBtn = document.getElementById('speakReadFrBtn');
+    if (speakReadFrBtn) speakReadFrBtn.addEventListener('click', readLastFrench);
     function saveSpeakTranslation() {
         if (currentService) localStorage.setItem(`speakTranslation_${currentService}_${CURRENT_VERSION}`, JSON.stringify({ italian: lastItalianText, french: lastFrenchTranslation }));
     }
@@ -1659,6 +1702,14 @@
         btn.addEventListener('touchend', cancelLongPress);
         btn.addEventListener('touchcancel', cancelLongPress);
     }
+    // Gestione nuovo pallino "i" su licenza
+    licenseInfoIcon.addEventListener('click', () => {
+        openGlobalInfoModal('licenseInfo', 'Informazioni sul codice cliente. Questo testo è modificabile solo dall\'amministratore.', 'license_info_text');
+    });
+    // Aggiungi listener per gli altri pallini "i" nelle pagine (infoNoteBtn, infoOperatorBtn, infoSpeakBtn)
+    infoNoteBtn.addEventListener('click', () => openGlobalInfoModal('infoNote', 'Informazioni sulle note. Questo testo è modificabile solo dall\'amministratore.', 'info_note_text'));
+    infoOperatorBtn.addEventListener('click', () => openGlobalInfoModal('infoOperator', 'Informazioni sull\'ascolto operatore. Questo testo è modificabile solo dall\'amministratore.', 'info_operator_text'));
+    infoSpeakBtn.addEventListener('click', () => openGlobalInfoModal('infoSpeak', 'Informazioni sulla conversazione con operatore. Questo testo è modificabile solo dall\'amministratore.', 'info_speak_text'));
     function showEmergency(s) {
         if (!licenseCheckPassed) { alert('Licenza non attiva o scaduta. Attivala dalla home.'); return; }
         currentService = s;
@@ -1676,9 +1727,11 @@
         if (normalNoteInfo) normalNoteInfo.style.display = 'none';
         if (listenInfoMsg) listenInfoMsg.style.display = 'none';
         if (copyInfoMsg) copyInfoMsg.style.display = 'none';
-        setupInfoButton(infoNoteBtn, 'note');
-        setupInfoButton(infoOperatorBtn, 'operator');
-        setupInfoButton(infoSpeakBtn, 'speak');
+        // Non usiamo più i vecchi setupInfoButton perché ora usiamo la modale globale
+        // ma per mantenere la funzionalità, li sostituiamo con la modale informativa
+        infoNoteBtn.onclick = () => openGlobalInfoModal('infoNote', 'Informazioni sulle note. Questo testo è modificabile solo dall\'amministratore.', 'info_note_text');
+        infoOperatorBtn.onclick = () => openGlobalInfoModal('infoOperator', 'Informazioni sull\'ascolto operatore. Questo testo è modificabile solo dall\'amministratore.', 'info_operator_text');
+        infoSpeakBtn.onclick = () => openGlobalInfoModal('infoSpeak', 'Informazioni sulla conversazione con operatore. Questo testo è modificabile solo dall\'amministratore.', 'info_speak_text');
     }
     function onSaveNumber() { 
         let n = phoneInput.value.trim(); 
@@ -1702,9 +1755,6 @@
             activityModal.style.display = 'none';
             currentActivityNode = null;
         }
-    });
-    licenseInfoIcon.addEventListener('click', () => {
-        alert("Il codice cliente è univoco per questa installazione.\nPer attivare la licenza, invia un bonifico di €48,00 a Paolo Maiorana IBAN: IT31R0339512900052702573770 con causale il tuo codice cliente.\nPoi invia email a gli amicidipaolino@gmail.com con il codice cliente per ricevere il codice di sblocco.");
     });
     function init() {
         loadAdminCode();
