@@ -119,7 +119,6 @@
             <span>CONTATTI PERSONALI</span>
             <span>📇</span>
         </div>
-
         <div class="license-section">
             <div class="license-row">
                 <span class="license-label">LICENZA</span>
@@ -130,7 +129,6 @@
                 <button id="activateLicenseBtn" class="small-btn" style="background:#283593;">ATTIVA</button>
             </div>
         </div>
-
         <div id="adminSection" class="admin-section">
             <div style="font-weight: bold; margin-bottom: 8px;">🛠️ Area Amministratore</div>
             <div class="flex-row">
@@ -148,25 +146,20 @@
             </div>
             <button id="hideAdminBtn" class="small-btn" style="background:#757575; width:100%; margin-top:8px;">NASCONDI AREA ADMIN</button>
         </div>
-
         <div class="dark-card">
             <div class="grid-2" id="contactsGrid"></div>
         </div>
-
         <div class="rubrica-info">Rubrica Personale di Supporto e Consultazione</div>
         <div class="info-text">Ogni contatto ha il proprio archivio note.<br>📍 Ricerca entro 300m di TUTTI i luoghi con nome<br>🔊 Ascolto automatico 30 secondi dopo il messaggio</div>
         <div class="info-text">Non Utilizzare APP per Situazioni di Emergenza di Salute</div>
         <div class="days-line" id="daysLeftDisplayHome">Giorni rimanenti: --</div>
         <div class="info-text">💾 Il file SALVA NOTE si chiama: contatti_personali_notes_backup_0223.txt</div>
-
         <div class="export-import-row">
             <button id="exportAllBtn">💾 SALVA NOTE</button>
             <button id="importAllBtn">📂 RIPRISTINA NOTE</button>
         </div>
         <input type="file" id="globalImportFileInput" accept=".txt" style="display:none;">
     </div>
-
-    <!-- PAGINA EMERGENZA -->
     <div id="emergencyPage" class="page hidden">
         <div id="currentServiceDeco" class="current-service-deco">Contatto:</div>
         <div class="dark-card">
@@ -214,8 +207,6 @@
             <div id="speakStatus" class="status-msg"></div>
         </div>
     </div>
-
-    <!-- PAGINA FOTO (MONASTIR) -->
     <div id="imagePage" class="page hidden">
         <div class="image-top-box">
             <div class="image-top-title">MONASTIR: Facciamo Rete</div>
@@ -227,8 +218,6 @@
             <div id="reteLevelContainer"></div>
         </div>
     </div>
-
-    <!-- MODALI -->
     <div id="adaptiveModal" class="adaptive-modal" style="display:none;"><div class="adaptive-modal-content"><textarea id="modalTextarea" readonly></textarea><button id="closeAdaptiveBtn">CHIUDI</button></div></div>
     <div id="speakDetailModal" class="adaptive-modal" style="display:none;"><div class="adaptive-modal-content"><h3>📄 Dettaglio conversazione</h3><div class="detail-label">Italiano (originale)</div><div class="detail-text" id="speakOriginalText"></div><div class="detail-label">Francese (traduzione)</div><div class="detail-text" id="speakTranslatedText"></div><div class="modal-buttons"><button id="closeSpeakModalBtn" class="save-btn">CHIUDI</button></div></div></div>
     <div id="noteEditModal" class="adaptive-modal note-edit-modal" style="display:none;">
@@ -255,8 +244,6 @@
         </div>
     </div>
     <div id="infoModal" class="adaptive-modal" style="display:none;"><div class="adaptive-modal-content"><h3>📋 Richiesta attivazione</h3><div id="infoModalText" class="modal-info-text"></div><div class="modal-buttons"><button id="closeInfoModalBtn" class="cancel-btn">CHIUDI</button></div></div></div>
-
-    <!-- MODALE ATTIVITÀ -->
     <div id="activityModal" class="adaptive-modal" style="display:none;">
         <div class="adaptive-modal-content">
             <h3 id="activityModalTitle">Attività</h3>
@@ -278,7 +265,7 @@
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
 <script>
-<    const CURRENT_VERSION = "0223";
+    const CURRENT_VERSION = "0223";
     let currentService = "ambulanza";
     let currentLat = null, currentLng = null;
     let currentAddress = "";
@@ -390,7 +377,6 @@
     let lastItalianText = "";
     let lastFrenchTranslation = "";
 
-    // ==================== WAKE LOCK (schermo sempre acceso) ====================
     async function requestGlobalWakeLock() {
         if ('wakeLock' in navigator) {
             try {
@@ -414,8 +400,6 @@
     }
     document.body.addEventListener('touchstart', ensureWakeLock, { once: true });
     document.body.addEventListener('mousedown', ensureWakeLock, { once: true });
-
-    // ==================== GESTIONE TASTO INDIETRO ====================
     let currentPage = 'home';
     function updateHistoryState(page) {
         if (currentPage !== page) {
@@ -460,8 +444,6 @@
         if (closeAllModals()) return;
         if (currentPage !== 'home') goBackFromSubPage();
     });
-
-    // ==================== GESTIONE RETE DINAMICA ====================
     let reteData = { title: "RETE", children: [] };
     function saveReteData() { localStorage.setItem('monastir_rete_data', JSON.stringify(reteData)); }
     function loadReteData() {
@@ -864,7 +846,6 @@
             return {lat,lng};
         } catch(e) { return {lat,lng}; }
     }
-    // Funzione migliorata con priorità di ricerca e reverse geocoding potenziato
     async function fetchAllNamedPlaces(lat, lng) {
         const excludeTags = ["information","bench","waste_basket","toilets","telephone","recycling","fountain","drinking_water"];
         let query = `[out:json];(node(around:300,${lat},${lng})[name];way(around:300,${lat},${lng})[name];);out center;`;
@@ -885,18 +866,15 @@
                 if (cat && excludeTags.includes(cat)) continue;
                 let dist = haversine(lat, lng, latEl, lonEl);
                 let display = name;
-                let priority = 3; // priorità bassa (default: strade/luoghi generici)
-                // PRIORITÀ ALTA: solo attività NON stradali (escludiamo highway)
+                let priority = 3;
                 let highPriority = ["bar","pub","cafe","restaurant","fast_food","pharmacy","supermarket","convenience","shop","car_repair","car_wash","tyres","car_parts","bank","hospital","clinic","doctor","dentist","school","kindergarten","university","college","gym","fitness","cinema","theatre","fuel","charging_station","police","fire_station","post_office","library","townhall","industrial","commercial","office"];
-                // Verifica se NON è una strada (highway) e se è una categoria prioritaria
                 if (!tags.highway && cat && highPriority.some(k => cat.includes(k))) {
-                    priority = 1; // alta priorità
+                    priority = 1;
                 } else if (!tags.highway && cat) {
-                    priority = 2; // media priorità (altre attività non stradali)
+                    priority = 2;
                 } else if (tags.highway) {
-                    priority = 3; // bassa priorità (strade)
+                    priority = 3;
                 }
-                // Traduzione categoria in italiano per visualizzazione
                 if (cat && !tags.highway) {
                     let catMap = {
                         "pharmacy":"Farmacia","hospital":"Ospedale","police":"Commissariato","post_office":"Posta","bank":"Banca",
@@ -916,12 +894,10 @@
                 }
                 items.push({ display, dist, priority });
             }
-            // Ordina per priorità (1=alta, 2=media, 3=bassa) e poi per distanza
             items.sort((a,b) => {
                 if (a.priority !== b.priority) return a.priority - b.priority;
                 return a.dist - b.dist;
             });
-            // Rimuovi duplicati per nome (prima occorrenza)
             const unique = new Map();
             for (let item of items) {
                 let baseName = item.display.split(' (')[0];
@@ -941,7 +917,6 @@
             let url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1&accept-language=it`;
             let resp = await fetch(url, {headers:{'User-Agent':'SOSDrive/1.0'}});
             let data = await resp.json();
-            // Costruisci un indirizzo più preciso: prima la via, poi la località
             if (data.address) {
                 let road = data.address.road || "";
                 let suburb = data.address.suburb || "";
@@ -1007,7 +982,7 @@
         latLonDisplay.innerText = addressDisplay.innerText = refADisplay.innerText = refBDisplay.innerText = refCDisplay.innerText = "---";
         gpsStatus.innerHTML = "";
     }
-        function getNormalNotesKey(s) { return `normalNotes_${s}_${CURRENT_VERSION}`; }
+    function getNormalNotesKey(s) { return `normalNotes_${s}_${CURRENT_VERSION}`; }
     function getSelectedNormalIdKey(s) { return `selectedNormalNote_${s}_${CURRENT_VERSION}`; }
     function saveNormalNotesForService(s) { localStorage.setItem(getNormalNotesKey(s), JSON.stringify(normalNotes[s])); }
     function saveSelectedNormalId() {
