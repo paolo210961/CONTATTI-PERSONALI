@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
-    <title>Contatti Personali - v0230</title>
+    <title>Contatti Personali - v0231</title>
     <link rel="manifest" href="manifest.json">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -102,11 +102,13 @@
         .cancel-row{display:flex;gap:10px;align-items:center;margin-bottom:12px}
         .cancel-row .small-btn{flex:1}
         .rete-container{margin-top:20px}
-        .rete-item{display:flex;align-items:center;gap:8px;margin:8px 0}
-        .rete-button{background:#283593;color:white;flex:1;padding:12px;border-radius:40px;text-align:center;font-weight:bold;cursor:pointer;transition:0.05s linear}
+        .rete-item{display:flex;align-items:center;gap:8px;margin:8px 0;flex-wrap:wrap}
+        .rete-button{background:#283593;color:white;flex:2;padding:12px;border-radius:40px;text-align:center;font-weight:bold;cursor:pointer;transition:0.05s linear}
         .rete-button:active{transform:scale(0.97)}
         .rete-delete-btn{background:#8e44ad;color:white;padding:8px 12px;border-radius:40px;font-size:0.8rem;font-weight:bold;cursor:pointer;border:none;white-space:nowrap}
         .rete-delete-btn:active{transform:scale(0.97)}
+        .rete-add-child-btn{background:#4caf50;color:white;padding:8px 12px;border-radius:40px;font-size:0.8rem;font-weight:bold;cursor:pointer;border:none;white-space:nowrap;margin-left:4px}
+        .rete-add-child-btn:active{transform:scale(0.97)}
         .info-mini-img{max-width:100%;max-height:100px;border-radius:12px;margin-top:8px;cursor:pointer;object-fit:contain}
         .info-edit-buttons{margin-top:16px;display:flex;gap:12px}
         .info-edit-buttons button{flex:1}
@@ -118,10 +120,8 @@
         .backup-hint{font-size:0.7rem;color:#555;text-align:center;margin-top:4px}
         .orange-btn{background:#e67e22 !important}
         .rete-select-dropdown{width:100%;padding:12px;border-radius:40px;background:#283593;color:white;border:none;font-weight:bold;font-size:1rem;margin:8px 0}
-        .rete-parent-button{background:#283593;color:white;flex:1;padding:12px;border-radius:40px;text-align:center;font-weight:bold;cursor:pointer;transition:0.05s linear;margin-bottom:8px}
+        .rete-parent-button{background:#283593;color:white;flex:2;padding:12px;border-radius:40px;text-align:center;font-weight:bold;cursor:pointer;transition:0.05s linear;margin-bottom:8px}
         .rete-parent-button:active{transform:scale(0.97)}
-        /* Nascondi ogni possibile pallino nella rete */
-        .rete-container .note-btn-confirm, .rete-container .dot, .rete-container button[class*="confirm"], .rete-container [style*="border-radius: 50%"] { display: none !important; }
     </style>
 </head>
 <body>
@@ -139,7 +139,7 @@
             <div class="flex-row"><input type="text" id="generatedCode" readonly placeholder="Codice generato" style="flex:1; background:#f8f9fa;"><button id="copyGeneratedBtn" class="small-btn" style="background:#283593;">📋 COPIA</button></div>
             <div class="flex-row"><input type="text" id="newAdminCode" placeholder="Nuovo codice amministratore" style="flex:1;"><button id="changeAdminCodeBtn" class="small-btn" style="background:#8e44ad;">CAMBIA CODICE</button></div>
             <div class="admin-backup-buttons"><button id="saveInfoIconsBtn" class="small-btn" style="background:#283593;">💾 SALVA (i)</button><button id="restoreInfoIconsBtn" class="small-btn" style="background:#6b8e23;">📂 RIPRISTINA (i)</button></div>
-            <div id="backupHint" class="backup-hint">📄 info_icons_backup_v0230.txt</div>
+            <div id="backupHint" class="backup-hint">📄 info_icons_backup_v0231.txt</div>
             <button id="hideAdminBtn" class="small-btn" style="background:#757575; width:100%; margin-top:8px;">NASCONDI AREA ADMIN</button>
         </div>
         <div class="dark-card"><div class="grid-2" id="contactsGrid"></div></div>
@@ -147,7 +147,7 @@
         <div class="info-text">Ogni contatto ha il proprio archivio note.<br>📍 Ricerca entro 300m di TUTTI i luoghi con nome<br>🔊 Ascolto automatico 30 secondi dopo il messaggio</div>
         <div class="info-text">Non Utilizzare APP per Situazioni di Emergenza di Salute</div>
         <div class="days-line" id="daysLeftDisplayHome">Giorni rimanenti: --</div>
-        <div class="info-text">💾 Il file SALVA NOTE si chiama: contatti_personali_notes_backup_0230.txt</div>
+        <div class="info-text">💾 Il file SALVA NOTE si chiama: contatti_personali_notes_backup_0231.txt</div>
         <div class="export-import-row"><button id="exportAllBtn">💾 SALVA NOTE</button><button id="importAllBtn">📂 RIPRISTINA NOTE</button></div>
         <input type="file" id="globalImportFileInput" accept=".txt" style="display:none;">
     </div>
@@ -208,8 +208,8 @@
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
 <script>
-    // v0230 - Rimozione definitiva del pallino blu con CSS + pulizia JavaScript
-    const CURRENT_VERSION = "0230";
+    // v0231 - Completo con tutte le funzioni
+    const CURRENT_VERSION = "0231";
     let currentService = "ambulanza";
     let currentLat = null, currentLng = null;
     let currentAddress = "";
@@ -365,7 +365,7 @@
     function releaseImagePageWakeLock() { if (imagePageWakeLock) { imagePageWakeLock.release(); imagePageWakeLock = null; } }
     async function requestImagePageWakeLock() { if ('wakeLock' in navigator) { try { imagePageWakeLock = await navigator.wakeLock.request('screen'); } catch(e){} } }
     
-    // ==================== GESTIONE TASTO INDIETRO ====================
+    // ==================== GESTIONE TASTO INDIETRO CORRETTA ====================
     let currentPage = 'home';
     let isModalOpen = false;
     let backStack = ['home'];
@@ -460,6 +460,14 @@
         if (index !== -1) { parentNode.children.splice(index,1); saveReteData(); return true; }
         return false;
     }
+    function addChildToNode(parentNode) {
+        if (!adminAuthenticated) { alert("Solo amministratore."); return; }
+        if (!parentNode.children) parentNode.children = [];
+        parentNode.children.push({ title: "", children: [], infoText: "", infoImage: null, coordinate: "", websiteUrl: "" });
+        saveReteData();
+        renderReteLevel(reteLevelContainer, reteData);
+    }
+    
     function showActivityModal(node) {
         if (!licenseCheckPassed) {
             alert("Licenza non attiva. Attivala per visualizzare i dettagli dell'attività.");
@@ -494,14 +502,32 @@
             activityAdminImageButtons.classList.add('hidden-btn');
             activityInfoAdminButtons.classList.add('hidden-btn');
         }
-        const coord = node.coordinate || "";
-        const web = node.websiteUrl || "";
-        activityCoordBtn.onclick = () => { if (coord.trim()) window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(coord)}`, '_blank'); else alert("Nessuna coordinata impostata."); };
-        activityWebBtn.onclick = () => { if (web.trim()) { let full = web.trim(); if (!full.startsWith('http')) full = 'https://' + full; window.open(full, '_blank'); } else alert("Nessun sito web associato."); };
+        updateActivityButtons();
         activityModal.style.display = 'flex';
         isModalOpen = true;
         keepScreenOn();
     }
+    
+    function updateActivityButtons() {
+        if (!currentActivityNode) return;
+        const coord = currentActivityNode.coordinate || "";
+        const web = currentActivityNode.websiteUrl || "";
+        activityCoordBtn.onclick = () => { if (coord.trim()) window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(coord)}`, '_blank'); else alert("Nessuna coordinata impostata."); };
+        activityWebBtn.onclick = () => { if (web.trim()) { let full = web.trim(); if (!full.startsWith('http')) full = 'https://' + full; window.open(full, '_blank'); } else alert("Nessun sito web associato."); };
+        if (adminAuthenticated) {
+            let coordTimer = null;
+            activityCoordBtn.onmousedown = () => { coordTimer = setTimeout(() => { let newCoord = prompt("Modifica coordinate (formato: latitudine,longitudine):", currentActivityNode.coordinate || ""); if (newCoord !== null) { if (newCoord.trim() === "") { currentActivityNode.coordinate = ""; saveReteData(); updateActivityButtons(); showActivityModal(currentActivityNode); } else if (newCoord.includes(',') && !isNaN(parseFloat(newCoord.split(',')[0])) && !isNaN(parseFloat(newCoord.split(',')[1]))) { currentActivityNode.coordinate = newCoord.trim(); saveReteData(); updateActivityButtons(); showActivityModal(currentActivityNode); } else { alert("Formato non valido. Usa lat,lon (es. 43.841977,11.170855)"); } } }, 3000); };
+            activityCoordBtn.onmouseup = activityCoordBtn.onmouseleave = () => { if (coordTimer) clearTimeout(coordTimer); };
+            activityCoordBtn.ontouchstart = () => { coordTimer = setTimeout(() => { let newCoord = prompt("Modifica coordinate:", currentActivityNode.coordinate || ""); if (newCoord !== null) { if (newCoord.trim() === "") { currentActivityNode.coordinate = ""; saveReteData(); updateActivityButtons(); showActivityModal(currentActivityNode); } else if (newCoord.includes(',') && !isNaN(parseFloat(newCoord.split(',')[0])) && !isNaN(parseFloat(newCoord.split(',')[1]))) { currentActivityNode.coordinate = newCoord.trim(); saveReteData(); updateActivityButtons(); showActivityModal(currentActivityNode); } else { alert("Formato non valido."); } } }, 3000); };
+            activityCoordBtn.ontouchend = activityCoordBtn.ontouchcancel = () => { if (coordTimer) clearTimeout(coordTimer); };
+            let webTimer = null;
+            activityWebBtn.onmousedown = () => { webTimer = setTimeout(() => { let newUrl = prompt("Modifica sito web (es. https://www.example.com):", currentActivityNode.websiteUrl || ""); if (newUrl !== null) { currentActivityNode.websiteUrl = newUrl.trim(); saveReteData(); updateActivityButtons(); showActivityModal(currentActivityNode); } }, 3000); };
+            activityWebBtn.onmouseup = activityWebBtn.onmouseleave = () => { if (webTimer) clearTimeout(webTimer); };
+            activityWebBtn.ontouchstart = () => { webTimer = setTimeout(() => { let newUrl = prompt("Modifica sito web:", currentActivityNode.websiteUrl || ""); if (newUrl !== null) { currentActivityNode.websiteUrl = newUrl.trim(); saveReteData(); updateActivityButtons(); showActivityModal(currentActivityNode); } }, 3000); };
+            activityWebBtn.ontouchend = activityWebBtn.ontouchcancel = () => { if (webTimer) clearTimeout(webTimer); };
+        }
+    }
+    
     activityUploadImageBtn.addEventListener('click', () => {
         if (!adminAuthenticated || !currentActivityNode) return;
         let input = document.createElement('input');
@@ -547,15 +573,6 @@
         activityCancelInfoBtn.style.display = "none";
     });
     
-    // Funzione per rimuovere manualmente eventuali pallini residui
-    function removeResidualDots() {
-        const reteContainer = document.getElementById('reteLevelContainer');
-        if (reteContainer) {
-            const dots = reteContainer.querySelectorAll('.note-btn-confirm, .dot, [class*="confirm"], [style*="border-radius: 50%"]');
-            dots.forEach(dot => { if (dot) dot.style.display = 'none'; });
-        }
-    }
-    
     function renderReteLevel(container, parentNode) {
         container.innerHTML = '';
         if (!parentNode.children || parentNode.children.length === 0) {
@@ -569,7 +586,6 @@
                 let div = document.createElement('div');
                 div.className = 'rete-item';
                 if (child.children && child.children.length > 0) {
-                    // Nodo con figli - nessun pallino blu
                     let parentBtn = document.createElement('div');
                     parentBtn.className = 'rete-parent-button';
                     parentBtn.innerText = (child.title && child.title.trim()) ? child.title : "[Tasto vuoto]";
@@ -592,6 +608,14 @@
                     parentBtn.addEventListener('touchend', cancelParentLong);
                     parentBtn.addEventListener('touchcancel', cancelParentLong);
                     div.appendChild(parentBtn);
+                    if (adminAuthenticated) {
+                        let addChild = document.createElement('button');
+                        addChild.innerText = '➕';
+                        addChild.className = 'rete-add-child-btn';
+                        addChild.title = 'Aggiungi figlio';
+                        addChild.onclick = (e) => { e.stopPropagation(); addChildToNode(child); };
+                        div.appendChild(addChild);
+                    }
                     if (licenseCheckPassed) {
                         let select = document.createElement('select');
                         select.className = 'rete-select-dropdown';
@@ -626,13 +650,12 @@
                     }
                     if (adminAuthenticated) {
                         let del = document.createElement('button');
-                        del.innerText = '🗑️ Elimina';
+                        del.innerText = '🗑️';
                         del.className = 'rete-delete-btn';
                         del.onclick = (e) => { e.stopPropagation(); if (confirm("Eliminare definitivamente questo tasto e tutti i suoi sotto-tasti?")) { deleteNode(parentNode, child); renderReteLevel(container, parentNode); } };
                         div.appendChild(del);
                     }
                 } else {
-                    // Nodo senza figli - nessun pallino blu
                     let btn = document.createElement('div');
                     btn.className = 'rete-button';
                     btn.innerText = (child.title && child.title.trim()) ? child.title : "[Tasto vuoto]";
@@ -657,8 +680,14 @@
                     btn.addEventListener('touchcancel', cancelLong);
                     div.appendChild(btn);
                     if (adminAuthenticated) {
+                        let addChild = document.createElement('button');
+                        addChild.innerText = '➕';
+                        addChild.className = 'rete-add-child-btn';
+                        addChild.title = 'Aggiungi figlio (trasforma in madre)';
+                        addChild.onclick = (e) => { e.stopPropagation(); addChildToNode(child); };
+                        div.appendChild(addChild);
                         let del = document.createElement('button');
-                        del.innerText = '🗑️ Elimina';
+                        del.innerText = '🗑️';
                         del.className = 'rete-delete-btn';
                         del.onclick = (e) => { e.stopPropagation(); if (confirm("Eliminare?")) { deleteNode(parentNode, child); renderReteLevel(container, parentNode); } };
                         div.appendChild(del);
@@ -679,11 +708,10 @@
             addBtn.ontouchend = addBtn.ontouchcancel = () => clearTimeout(addTimer);
             container.appendChild(addBtn);
         }
-        // Rimozione manuale di eventuali pallini residui dopo il rendering
-        removeResidualDots();
+        document.querySelectorAll('.rete-container .note-btn-confirm, .rete-container .dot').forEach(el => el.remove());
     }
     
-    // ==================== PAGINA FOTO (IMMAGINE) ====================
+    // ==================== PAGINA FOTO ====================
     let currentImageData = null;
     function setupImageArea() {
         imagePreviewArea.innerHTML = '';
@@ -870,7 +898,7 @@
         if (saved) { try { let parsed = JSON.parse(saved); for (let k in parsed) { if (infoTexts.hasOwnProperty(k)) infoTexts[k] = parsed[k]; } } catch(e){} }
     }
     
-    // ==================== MODALE INFORMATIVA GLOBALE (PALLINI I) ====================
+    // ==================== MODALE INFORMATIVA GLOBALE ====================
     function openGlobalInfoModal(context, title, storageKey) {
         currentInfoContext = { context, storageKey };
         globalInfoModalTitle.innerText = title;
@@ -1383,7 +1411,7 @@
     function savePhone(s,n) { localStorage.setItem(`phone_${s}_${CURRENT_VERSION}`, n); }
     function getPhone(s) { return localStorage.getItem(`phone_${s}_${CURRENT_VERSION}`); }
     const defaultPhone = { ambulanza:"118", polizia:"113", veterinario:"800123456", clinica:"800987654" };
-    function migratePhoneNumbers() { const oldVersions = ["0229","0228","0227"]; for (let s of services) { if (localStorage.getItem(`phone_${s}_${CURRENT_VERSION}`)) continue; for (let ver of oldVersions) { let old = localStorage.getItem(`phone_${s}_${ver}`); if (old) { localStorage.setItem(`phone_${s}_${CURRENT_VERSION}`, old); break; } } } }
+    function migratePhoneNumbers() { const oldVersions = ["0230","0229","0228"]; for (let s of services) { if (localStorage.getItem(`phone_${s}_${CURRENT_VERSION}`)) continue; for (let ver of oldVersions) { let old = localStorage.getItem(`phone_${s}_${ver}`); if (old) { localStorage.setItem(`phone_${s}_${CURRENT_VERSION}`, old); break; } } } }
     
     // ==================== PALLINI I ====================
     licenseInfoIcon.addEventListener('click', () => openGlobalInfoModal('licenseInfo', 'Informazioni Licenza', 'license_info_text'));
@@ -1412,7 +1440,6 @@
     }
     function onSaveNumber() { let n = phoneInput.value.trim(); if (n) { savePhone(currentService, n); phoneSaveMsg.innerText = "✅ Numero salvato nell'archivio"; setTimeout(()=>phoneSaveMsg.innerText="",2000); } else phoneSaveMsg.innerText = "⚠️ Inserisci un numero valido"; keepScreenOn(); }
     function onClearResponse() { clearOperatorTranslation(); transcribeStatus.innerText = "🧹 Traduzione cancellata"; setTimeout(() => transcribeStatus.innerText = "", 2000); keepScreenOn(); }
-    
     activityModal.addEventListener('click', (e) => { if (e.target === activityModal) { activityModal.style.display = 'none'; isModalOpen = false; } });
     
     function init() {
