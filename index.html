@@ -86,8 +86,8 @@
         #activateLicenseBtn{flex-shrink:0}
         .admin-section{margin:16px 0;padding:12px;background:#ffe0b5;border-radius:24px;border-left:6px solid #e67e22;display:none}
         .admin-section .flex-row{margin-bottom:8px}
-        .days-line{text-align:center;font-size:0.9rem;color:#1e2a3a;margin-top:12px;font-weight:bold;display:flex;justify-content:center;align-items:center;gap:12px;flex-wrap:wrap;background:#e9ecef;padding:8px 12px;border-radius:40px}
-        .days-line button{background:#e67e22;color:white;border:none;padding:4px 12px;border-radius:40px;font-size:0.8rem;cursor:pointer;font-weight:bold}
+        .days-line{text-align:center;font-size:0.9rem;color:#1e2a3a;margin-top:12px;font-weight:bold;display:flex;justify-content:center;align-items:center;gap:12px;flex-wrap:nowrap;background:#e9ecef;padding:8px 12px;border-radius:40px;white-space:nowrap}
+        .days-line button{background:#e67e22;color:white;border:none;padding:4px 12px;border-radius:40px;font-size:0.8rem;cursor:pointer;font-weight:bold;white-space:nowrap}
         .modal-info-text{font-size:0.85rem;line-height:1.4;margin-bottom:16px;white-space:pre-wrap;word-break:break-word}
         .image-top-box{background:#d2d6dc;border-radius:24px;margin-bottom:20px;padding:12px;text-align:center;border-left:6px solid #2c3e50}
         .image-top-title{font-size:1.3rem;font-weight:bold;color:#1e2a3a;margin-bottom:12px}
@@ -178,9 +178,9 @@
         <div id="coordsContainer" class="dark-card">
             <div><strong>📌 COORDINATE:</strong> <span id="latLonDisplay">---</span></div>
             <div><strong>🏠 INDIRIZZO:</strong> <span id="addressDisplay">---</span></div>
-            <div><strong>📍 SONO VICINO A (1):</strong> <span id="refADisplay">---</span></div>
-            <div><strong>📍 SONO VICINO A (2):</strong> <span id="refBDisplay">---</span></div>
-            <div><strong>📍 SONO VICINO A (3):</strong> <span id="refCDisplay">---</span></div>
+            <div><strong>📍 NELLE VICINANZE (1):</strong> <span id="refADisplay">---</span></div>
+            <div><strong>📍 NELLE VICINANZE (2):</strong> <span id="refBDisplay">---</span></div>
+            <div><strong>📍 NELLE VICINANZE (3):</strong> <span id="refCDisplay">---</span></div>
             <button id="geolocationBtn" class="small-btn" style="width:100%; margin:8px 0 0 0;">📍 CARICA COORDINATE</button>
             <div id="gpsStatus" class="status-msg"></div>
         </div>
@@ -390,18 +390,35 @@
     let lastItalianText = "";
     let lastFrenchTranslation = "";
 
+    // ==================== WAKE LOCK (schermo sempre acceso) ====================
     async function requestGlobalWakeLock() {
         if ('wakeLock' in navigator) {
             try {
                 globalWakeLock = await navigator.wakeLock.request('screen');
+                console.log('WakeLock attivo');
+                // Riapplica wake lock se la pagina diventa visibile
                 document.addEventListener('visibilitychange', async () => {
                     if (document.visibilityState === 'visible' && globalWakeLock === null) {
                         globalWakeLock = await navigator.wakeLock.request('screen');
                     }
                 });
-            } catch(err) { console.warn(err); }
+            } catch(err) { console.warn('WakeLock fallito:', err); }
         }
     }
+    // Forza il wake lock anche dopo interazione utente (primo tocco)
+    function ensureWakeLock() {
+        if (globalWakeLock === null && 'wakeLock' in navigator) {
+            navigator.wakeLock.request('screen').then(lock => {
+                globalWakeLock = lock;
+                console.log('WakeLock riattivato dopo interazione');
+            }).catch(e => console.warn(e));
+        }
+    }
+    // Aggiungi listener per riattivare wake lock al primo tocco
+    document.body.addEventListener('touchstart', ensureWakeLock, { once: true });
+    document.body.addEventListener('mousedown', ensureWakeLock, { once: true });
+
+    // ==================== GESTIONE TASTO INDIETRO ====================
     let currentPage = 'home';
     function updateHistoryState(page) {
         if (currentPage !== page) {
@@ -446,6 +463,8 @@
         if (closeAllModals()) return;
         if (currentPage !== 'home') goBackFromSubPage();
     });
+
+    // ==================== GESTIONE RETE DINAMICA ====================
     let reteData = { title: "RETE", children: [] };
     function saveReteData() { localStorage.setItem('monastir_rete_data', JSON.stringify(reteData)); }
     function loadReteData() {
@@ -848,6 +867,7 @@
             return {lat,lng};
         } catch(e) { return {lat,lng}; }
     }
+    // Funzione migliorata con priorità di ricerca
     async function fetchAllNamedPlaces(lat, lng) {
         const excludeTags = ["information","bench","waste_basket","toilets","telephone","recycling","fountain","drinking_water"];
         let query = `[out:json];(node(around:300,${lat},${lng})[name];way(around:300,${lat},${lng})[name];);out center;`;
@@ -864,10 +884,23 @@
                 let tags = el.tags || {};
                 let name = tags.name;
                 if (!name || name.trim() === "") continue;
-                let cat = tags.amenity || tags.shop || tags.tourism || tags.office || tags.leisure || tags.historic || tags.place || tags.aeroway || tags.railway;
+                let cat = tags.amenity || tags.shop || tags.tourism || tags.office || tags.leisure || tags.historic || tags.place || tags.aeroway || tags.railway || tags.highway || tags.industrial;
                 if (cat && excludeTags.includes(cat)) continue;
                 let dist = haversine(lat, lng, latEl, lonEl);
                 let display = name;
+                let priority = 3; // priorità bassa (default)
+                // PRIORITÀ ALTA: attività commerciali/utili
+                let highPriority = ["bar","pub","cafe","restaurant","fast_food","pharmacy","supermarket","convenience","shop","car_repair","car_wash","tyres","car_parts","bank","hospital","clinic","doctor","dentist","school","kindergarten","university","college","gym","fitness","cinema","theatre","fuel","charging_station"];
+                // PRIORITÀ MEDIA: industrie, uffici, attività generiche
+                let mediumPriority = ["industrial","commercial","office","workshop","warehouse","company","business"];
+                if (cat && highPriority.some(k => cat.includes(k))) {
+                    priority = 1; // alta
+                } else if (cat && mediumPriority.some(k => cat.includes(k))) {
+                    priority = 2; // media
+                } else if (cat && (cat === "highway" || cat === "place" || cat === "aeroway" || cat === "railway" || cat === "historic" || cat === "monument" || cat === "attraction")) {
+                    priority = 3; // bassa
+                }
+                // Traduzione categoria in italiano per visualizzazione
                 if (cat) {
                     let catMap = {
                         "pharmacy":"Farmacia","hospital":"Ospedale","police":"Commissariato","post_office":"Posta","bank":"Banca",
@@ -875,19 +908,30 @@
                         "cafe":"Bar","restaurant":"Ristorante","pub":"Pub","fast_food":"Fast food","museum":"Museo","monument":"Monumento",
                         "attraction":"Attrazione","square":"Piazza","garden":"Giardino","park":"Parco","bus_station":"Stazione bus","train_station":"Stazione",
                         "church":"Chiesa","services":"Area di servizio","motorway_junction":"Uscita autostradale","aeroway":"Aeroporto","railway":"Stazione",
-                        "shop":"Negozio","office":"Ufficio","leisure":"Tempo libero","historic":"Sito storico","place":"Luogo","industrial":"Azienda"
+                        "shop":"Negozio","office":"Ufficio","leisure":"Tempo libero","historic":"Sito storico","place":"Luogo","industrial":"Azienda",
+                        "car_repair":"Officina","car_wash":"Autolavaggio","tyres":"Gommista","car_parts":"Ricambi auto","fuel":"Distributore","charging_station":"Colonnina elettrica",
+                        "school":"Scuola","kindergarten":"Asilo","university":"Università","college":"College","gym":"Palestra","fitness":"Centro fitness",
+                        "cinema":"Cinema","theatre":"Teatro","doctor":"Medico","dentist":"Dentista","clinic":"Ambulatorio"
                     };
                     let readable = catMap[cat] || (cat.charAt(0).toUpperCase() + cat.slice(1));
                     display = `${name} (${readable})`;
+                } else if (tags.highway) {
+                    display = `${name} (via/ strada)`;
                 }
-                items.push({ display, dist });
+                items.push({ display, dist, priority });
             }
+            // Ordina prima per priorità (1=alta, 2=media, 3=bassa) poi per distanza
+            items.sort((a,b) => {
+                if (a.priority !== b.priority) return a.priority - b.priority;
+                return a.dist - b.dist;
+            });
+            // Rimuovi duplicati per nome (primo occorrente)
             const unique = new Map();
             for (let item of items) {
-                if (!unique.has(item.display.split(' (')[0])) unique.set(item.display.split(' (')[0], item);
+                let baseName = item.display.split(' (')[0];
+                if (!unique.has(baseName)) unique.set(baseName, item);
             }
             let uniqueItems = Array.from(unique.values());
-            uniqueItems.sort((a,b) => a.dist - b.dist);
             let refs = uniqueItems.slice(0,3).map(i => `${i.display} a ${Math.round(i.dist)} metri`);
             while(refs.length < 3) refs.push("Nessun riferimento");
             return refs;
