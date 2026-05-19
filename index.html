@@ -116,6 +116,7 @@
         .admin-backup-buttons{display:flex;gap:12px;margin-top:8px;margin-bottom:8px}
         .admin-backup-buttons button{flex:1}
         .backup-hint{font-size:0.7rem;color:#555;text-align:center;margin-top:4px}
+        .orange-btn{background:#e67e22 !important}
     </style>
 </head>
 <body>
@@ -156,7 +157,7 @@
                 <button id="saveInfoIconsBtn" class="small-btn" style="background:#283593;">💾 SALVA (i)</button>
                 <button id="restoreInfoIconsBtn" class="small-btn" style="background:#6b8e23;">📂 RIPRISTINA (i)</button>
             </div>
-            <div id="backupHint" class="backup-hint"></div>
+            <div id="backupHint" class="backup-hint">📄 info_icons_backup_v0225.txt</div>
             <button id="hideAdminBtn" class="small-btn" style="background:#757575; width:100%; margin-top:8px;">NASCONDI AREA ADMIN</button>
         </div>
         <div class="dark-card">
@@ -218,7 +219,7 @@
             <div id="speakResultField" class="speak-field">Traduzione Italiana e Francese</div>
             <button id="speakToOperatorBtn" class="small-btn double-height speak-btn">🎙️ PARLA CON OPERATORE</button>
             <div class="speak-extra-buttons">
-                <button id="speakReadFrBtn" class="small-btn double-height speak-btn" style="background:#6b8e23;">🔊 LEGGI FRANCESE NOTA E COORDINATE</button>
+                <button id="speakReadFrBtn" class="small-btn double-height speak-btn orange-btn">🔊 LEGGI FRANCESE NOTA E COORDINATE</button>
             </div>
             <div id="speakStatus" class="status-msg"></div>
         </div>
@@ -273,19 +274,21 @@
     <div id="infoModal" class="adaptive-modal" style="display:none;"><div class="adaptive-modal-content"><h3>📋 Richiesta attivazione</h3><div id="infoModalText" class="modal-info-text"></div><div class="modal-buttons"><button id="closeInfoModalBtn" class="cancel-btn">CHIUDI</button></div></div></div>
     <div id="activityModal" class="adaptive-modal" style="display:none;">
         <div class="adaptive-modal-content">
-            <h3 id="activityModalTitle">Attività</h3>
-            <div id="activityInfoText" class="modal-info-text" style="white-space: pre-wrap; word-break: break-word;"></div>
+            <div style="text-align:center; font-size:1.3rem; font-weight:bold; margin-bottom:15px;" id="activityModalTitle">Attività</div>
             <div id="activityImageContainer" style="text-align:center; margin:10px 0;"></div>
+            <div id="activityAdminImageButtons" class="info-edit-buttons hidden-btn" style="margin-bottom:12px;">
+                <button id="activityUploadImageBtn" class="small-btn" style="background:#6b8e23;">📸 CARICA/MODIFICA FOTO</button>
+            </div>
+            <label style="font-weight:bold;">📝 INFORMAZIONI</label>
+            <textarea id="activityInfoText" rows="5" readonly style="width:100%; padding:12px; border-radius:16px; border:1px solid #ced4da; font-family:monospace; resize:vertical; margin:10px 0;"></textarea>
+            <div id="activityInfoAdminButtons" class="info-edit-buttons hidden-btn" style="margin-bottom:12px;">
+                <button id="activityEditInfoBtn" class="small-btn" style="background:#283593;">✏️ MODIFICA</button>
+                <button id="activitySaveInfoBtn" class="small-btn" style="background:#4caf50; display:none;">💾 SALVA</button>
+                <button id="activityCancelInfoBtn" class="small-btn" style="background:#e67e22; display:none;">❌ ANNULLA</button>
+            </div>
             <div class="modal-buttons" style="justify-content:center; gap:12px;">
-                <button id="activityCoordBtn" class="small-btn" style="background:#283593;">📍 APRI MAPPA</button>
+                <button id="activityCoordBtn" class="small-btn" style="background:#283593;">📍 TROVAMI</button>
                 <button id="activityWebBtn" class="small-btn" style="background:#2c3e50;">🌐 APRI SITO</button>
-            </div>
-            <div id="activityAdminButtons" class="info-edit-buttons hidden-btn" style="margin-top:20px;">
-                <button id="activityEditTextBtn" class="small-btn" style="background:#283593;">✏️ MODIFICA TESTO</button>
-                <button id="activityEditImageBtn" class="small-btn" style="background:#6b8e23;">📸 CARICA FOTO</button>
-            </div>
-            <div class="modal-buttons">
-                <button id="closeActivityModalBtn" class="cancel-btn">CHIUDI</button>
             </div>
         </div>
     </div>
@@ -389,13 +392,16 @@
     const infoSpeakBtn = document.getElementById('infoSpeakBtn');
     const activityModal = document.getElementById('activityModal');
     const activityModalTitle = document.getElementById('activityModalTitle');
-    const activityInfoText = document.getElementById('activityInfoText');
+    const activityInfoTextarea = document.getElementById('activityInfoText');
     const activityImageContainer = document.getElementById('activityImageContainer');
     const activityCoordBtn = document.getElementById('activityCoordBtn');
     const activityWebBtn = document.getElementById('activityWebBtn');
-    const activityAdminButtons = document.getElementById('activityAdminButtons');
-    const activityEditTextBtn = document.getElementById('activityEditTextBtn');
-    const activityEditImageBtn = document.getElementById('activityEditImageBtn');
+    const activityAdminImageButtons = document.getElementById('activityAdminImageButtons');
+    const activityInfoAdminButtons = document.getElementById('activityInfoAdminButtons');
+    const activityEditInfoBtn = document.getElementById('activityEditInfoBtn');
+    const activitySaveInfoBtn = document.getElementById('activitySaveInfoBtn');
+    const activityCancelInfoBtn = document.getElementById('activityCancelInfoBtn');
+    const activityUploadImageBtn = document.getElementById('activityUploadImageBtn');
     const closeActivityModalBtn = document.getElementById('closeActivityModalBtn');
     const licenseInfoIcon = document.getElementById('licenseInfoIcon');
     const globalInfoModalDiv = document.getElementById('globalInfoModal');
@@ -552,101 +558,6 @@
         const index = parentNode.children.findIndex(c => c === nodeToDelete);
         if (index !== -1) { parentNode.children.splice(index,1); saveReteData(); return true; }
         return false;
-    }
-    function linkifyText(text) {
-        if (!text) return "Nessuna informazione aggiuntiva.";
-        const urlRegex = /(https?:\/\/[^\s]+)/g;
-        return text.replace(urlRegex, url => `<a href="${url}" target="_blank">${url}</a>`).replace(/\n/g,'<br>');
-    }
-    function showActivityModal(node) {
-        currentActivityNode = node;
-        activityModalTitle.innerText = (node.title && node.title.trim()) ? node.title : "Attività senza titolo";
-        const infoText = node.infoText || "Nessuna informazione aggiuntiva.";
-        activityInfoText.innerHTML = linkifyText(infoText);
-        activityImageContainer.innerHTML = '';
-        if (node.infoImage) {
-            let img = document.createElement('img');
-            img.src = node.infoImage;
-            img.className = 'info-mini-img';
-            img.style.maxWidth = '100%';
-            img.style.maxHeight = '120px';
-            img.style.objectFit = 'contain';
-            activityImageContainer.appendChild(img);
-            if (adminAuthenticated) {
-                let timer;
-                img.onmousedown = () => { timer = setTimeout(() => openActivityImageGallery(node), 3000); };
-                img.onmouseup = img.onmouseleave = () => clearTimeout(timer);
-                img.ontouchstart = () => { timer = setTimeout(() => openActivityImageGallery(node), 3000); };
-                img.ontouchend = img.ontouchcancel = () => clearTimeout(timer);
-            }
-        } else {
-            let placeholder = document.createElement('div');
-            placeholder.className = 'info-mini-placeholder';
-            placeholder.innerText = adminAuthenticated ? "📸 Premi a lungo (3 sec) per aggiungere una foto" : "Nessuna foto disponibile";
-            activityImageContainer.appendChild(placeholder);
-            if (adminAuthenticated) {
-                let timer;
-                placeholder.onmousedown = () => { timer = setTimeout(() => openActivityImageGallery(node), 3000); };
-                placeholder.onmouseup = placeholder.onmouseleave = () => clearTimeout(timer);
-                placeholder.ontouchstart = () => { timer = setTimeout(() => openActivityImageGallery(node), 3000); };
-                placeholder.ontouchend = placeholder.ontouchcancel = () => clearTimeout(timer);
-            }
-        }
-        const coord = node.coordinate || "";
-        const web = node.websiteUrl || "";
-        activityCoordBtn.onclick = () => {
-            if (coord.trim()) window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(coord)}`, '_blank');
-            else alert("Nessuna coordinata.");
-        };
-        activityWebBtn.onclick = () => {
-            if (web.trim()) {
-                let full = web.trim();
-                if (!full.startsWith('http')) full = 'https://' + full;
-                window.open(full, '_blank');
-            } else alert("Nessun sito web.");
-        };
-        if (adminAuthenticated) {
-            activityAdminButtons.classList.remove('hidden-btn');
-            activityEditTextBtn.onclick = () => openActivityTextModal(node);
-            activityEditImageBtn.onclick = () => openActivityImageGallery(node);
-        } else {
-            activityAdminButtons.classList.add('hidden-btn');
-        }
-        activityModal.style.display = 'flex';
-        keepScreenOn();
-    }
-    function openActivityImageGallery(node) {
-        let input = document.createElement('input');
-        input.type = 'file';
-        input.accept = 'image/*';
-        input.onchange = (e) => {
-            let file = e.target.files[0];
-            if (file) {
-                let reader = new FileReader();
-                reader.onload = (ev) => {
-                    node.infoImage = ev.target.result;
-                    saveReteData();
-                    if (currentActivityNode === node) showActivityModal(node);
-                };
-                reader.readAsDataURL(file);
-            }
-        };
-        input.click();
-    }
-    function openActivityTextModal(node) {
-        let overlay = document.createElement('div');
-        overlay.className = 'adaptive-modal';
-        overlay.style.display = 'flex';
-        overlay.innerHTML = `<div class="adaptive-modal-content"><h3>✏️ Modifica informazioni</h3><textarea id="tempActivityText" rows="6">${escapeHtml(node.infoText || "")}</textarea><div class="modal-buttons"><button id="tempSaveBtn" class="save-btn">SALVA</button><button id="tempCancelBtn" class="cancel-btn">ANNULLA</button></div></div>`;
-        document.body.appendChild(overlay);
-        let textarea = overlay.querySelector('#tempActivityText');
-        let saveBtn = overlay.querySelector('#tempSaveBtn');
-        let cancelBtn = overlay.querySelector('#tempCancelBtn');
-        let close = () => overlay.remove();
-        saveBtn.onclick = () => { node.infoText = textarea.value; saveReteData(); if (currentActivityNode === node) showActivityModal(node); close(); };
-        cancelBtn.onclick = close;
-        overlay.onclick = (e) => { if (e.target === overlay) close(); };
-        keepScreenOn();
     }
     function renderReteLevel(container, parentNode) {
         container.innerHTML = '';
@@ -1818,11 +1729,117 @@
         }
     }
     
-    // ==================== PALLINI I (già gestiti con modale globale) ====================
+    // ==================== PALLINI I ====================
     licenseInfoIcon.addEventListener('click', () => openGlobalInfoModal('licenseInfo', 'Informazioni Licenza', 'license_info_text'));
     infoNoteBtn.addEventListener('click', () => openGlobalInfoModal('infoNote', 'Informazioni Note', 'info_note_text'));
     infoOperatorBtn.addEventListener('click', () => openGlobalInfoModal('infoOperator', 'Informazioni Ascolto Operatore', 'info_operator_text'));
     infoSpeakBtn.addEventListener('click', () => openGlobalInfoModal('infoSpeak', 'Informazioni Conversazione', 'info_speak_text'));
+    
+    // ==================== GESTIONE MODALE ATTIVITÀ (NUOVA VERSIONE) ====================
+    const activityInfoTextarea = document.getElementById('activityInfoText');
+    const activityUploadImageBtn = document.getElementById('activityUploadImageBtn');
+    const activityEditInfoBtn = document.getElementById('activityEditInfoBtn');
+    const activitySaveInfoBtn = document.getElementById('activitySaveInfoBtn');
+    const activityCancelInfoBtn = document.getElementById('activityCancelInfoBtn');
+    
+    function showActivityModal(node) {
+        currentActivityNode = node;
+        const title = (node.title && node.title.trim()) ? node.title : "Attività senza titolo";
+        activityModalTitle.innerText = title;
+        const infoText = node.infoText || "Nessuna informazione aggiuntiva.";
+        activityInfoTextarea.value = infoText;
+        activityInfoTextarea.readOnly = true;
+        activityImageContainer.innerHTML = '';
+        if (node.infoImage) {
+            let img = document.createElement('img');
+            img.src = node.infoImage;
+            img.className = 'info-mini-img';
+            img.style.maxWidth = '100%';
+            img.style.maxHeight = '120px';
+            img.style.objectFit = 'contain';
+            activityImageContainer.appendChild(img);
+        } else {
+            let placeholder = document.createElement('div');
+            placeholder.className = 'info-mini-placeholder';
+            placeholder.innerText = "Nessuna foto disponibile";
+            activityImageContainer.appendChild(placeholder);
+        }
+        // Pulsante upload foto (solo admin)
+        if (adminAuthenticated) {
+            activityAdminImageButtons.classList.remove('hidden-btn');
+        } else {
+            activityAdminImageButtons.classList.add('hidden-btn');
+        }
+        // Pulsanti modifica testo (solo admin)
+        if (adminAuthenticated) {
+            activityInfoAdminButtons.classList.remove('hidden-btn');
+            activityEditInfoBtn.style.display = "block";
+            activitySaveInfoBtn.style.display = "none";
+            activityCancelInfoBtn.style.display = "none";
+        } else {
+            activityInfoAdminButtons.classList.add('hidden-btn');
+        }
+        // Pulsanti mappa e sito
+        const coord = node.coordinate || "";
+        const web = node.websiteUrl || "";
+        activityCoordBtn.onclick = () => {
+            if (coord.trim()) window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(coord)}`, '_blank');
+            else alert("Nessuna coordinata impostata.");
+        };
+        activityWebBtn.onclick = () => {
+            if (web.trim()) {
+                let full = web.trim();
+                if (!full.startsWith('http')) full = 'https://' + full;
+                window.open(full, '_blank');
+            } else alert("Nessun sito web associato.");
+        };
+        activityModal.style.display = 'flex';
+        keepScreenOn();
+    }
+    activityUploadImageBtn.addEventListener('click', () => {
+        if (!adminAuthenticated || !currentActivityNode) return;
+        let input = document.createElement('input');
+        input.type = 'file';
+        input.accept = 'image/*';
+        input.onchange = (e) => {
+            let file = e.target.files[0];
+            if (file) {
+                let reader = new FileReader();
+                reader.onload = (ev) => {
+                    currentActivityNode.infoImage = ev.target.result;
+                    saveReteData();
+                    showActivityModal(currentActivityNode);
+                };
+                reader.readAsDataURL(file);
+            }
+        };
+        input.click();
+    });
+    activityEditInfoBtn.addEventListener('click', () => {
+        if (!adminAuthenticated || !currentActivityNode) return;
+        activityInfoTextarea.readOnly = false;
+        activityEditInfoBtn.style.display = "none";
+        activitySaveInfoBtn.style.display = "block";
+        activityCancelInfoBtn.style.display = "block";
+    });
+    activitySaveInfoBtn.addEventListener('click', () => {
+        if (!adminAuthenticated || !currentActivityNode) return;
+        currentActivityNode.infoText = activityInfoTextarea.value;
+        saveReteData();
+        activityInfoTextarea.readOnly = true;
+        activityEditInfoBtn.style.display = "block";
+        activitySaveInfoBtn.style.display = "none";
+        activityCancelInfoBtn.style.display = "none";
+        alert("Informazioni salvate.");
+    });
+    activityCancelInfoBtn.addEventListener('click', () => {
+        if (!currentActivityNode) return;
+        activityInfoTextarea.value = currentActivityNode.infoText || "Nessuna informazione aggiuntiva.";
+        activityInfoTextarea.readOnly = true;
+        activityEditInfoBtn.style.display = "block";
+        activitySaveInfoBtn.style.display = "none";
+        activityCancelInfoBtn.style.display = "none";
+    });
     
     function showEmergency(s) {
         if (!licenseCheckPassed) { alert('Licenza non attiva o scaduta. Attivala dalla home.'); return; }
@@ -1858,18 +1875,6 @@
         setTimeout(() => transcribeStatus.innerText = "", 2000); 
         keepScreenOn();
     }
-    closeActivityModalBtn.addEventListener('click', () => {
-        activityModal.style.display = 'none';
-        currentActivityNode = null;
-        keepScreenOn();
-    });
-    activityModal.addEventListener('click', (e) => {
-        if (e.target === activityModal) {
-            activityModal.style.display = 'none';
-            currentActivityNode = null;
-            keepScreenOn();
-        }
-    });
     
     function init() {
         loadAdminCode();
