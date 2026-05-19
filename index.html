@@ -111,8 +111,9 @@
         .info-edit-buttons{margin-top:16px;display:flex;gap:12px}
         .info-edit-buttons button{flex:1}
         .hidden-btn{display:none !important}
-        .speak-extra-buttons{display:flex;gap:10px;margin-top:12px}
-        .speak-extra-buttons button{flex:1}
+        .backup-buttons{display:flex;gap:12px;margin-top:12px}
+        .backup-buttons button{flex:1}
+        .backup-hint{font-size:0.7rem;color:#555;text-align:center;margin-top:6px}
     </style>
 </head>
 <body>
@@ -149,6 +150,11 @@
                 <input type="text" id="newAdminCode" placeholder="Nuovo codice amministratore" style="flex:1;">
                 <button id="changeAdminCodeBtn" class="small-btn" style="background:#8e44ad;">CAMBIA CODICE</button>
             </div>
+            <div class="backup-buttons">
+                <button id="saveInfoIconsBtn" class="small-btn" style="background:#283593;">💾 SALVA (i)</button>
+                <button id="restoreInfoIconsBtn" class="small-btn" style="background:#558b2f;">📂 RIPRISTINA (i)</button>
+            </div>
+            <div id="backupHint" class="backup-hint"></div>
             <button id="hideAdminBtn" class="small-btn" style="background:#757575; width:100%; margin-top:8px;">NASCONDI AREA ADMIN</button>
         </div>
         <div class="dark-card">
@@ -210,7 +216,7 @@
             <div id="speakResultField" class="speak-field">Traduzione Italiana e Francese</div>
             <button id="speakToOperatorBtn" class="small-btn double-height speak-btn">🎙️ PARLA CON OPERATORE</button>
             <div class="speak-extra-buttons">
-                <button id="speakReadFrBtn" class="small-btn double-height speak-btn" style="background:#6b8e23;">🔊 LEGGI FR</button>
+                <button id="speakReadFrBtn" class="small-btn double-height speak-btn" style="background:#6b8e23;">🔊 Leggi Francese Nota e Coordinate</button>
             </div>
             <div id="speakStatus" class="status-msg"></div>
         </div>
@@ -254,7 +260,7 @@
     <div id="globalInfoModal" class="adaptive-modal" style="display:none;">
         <div class="adaptive-modal-content">
             <h3 id="globalInfoModalTitle">Informazioni</h3>
-            <textarea id="globalInfoTextarea" rows="8" readonly style="font-family:monospace; font-size:0.9rem;"></textarea>
+            <textarea id="globalInfoTextarea" rows="8" style="font-family:monospace; font-size:0.9rem;"></textarea>
             <div class="modal-buttons">
                 <button id="globalInfoEditBtn" class="save-btn" style="background:#8e44ad;">✏️ MODIFICA</button>
                 <button id="globalInfoSaveBtn" class="save-btn" style="display:none;">💾 SALVA</button>
@@ -284,775 +290,7 @@
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
 <script>
-    const CURRENT_VERSION = "0224";
-    let currentService = "ambulanza";
-    let currentLat = null, currentLng = null;
-    let currentAddress = "";
-    let currentRefA = "", currentRefB = "", currentRefC = "";
-    let normalNotes = {};
-    let selectedNormalNoteId = null;
-    let globalWakeLock = null;
-    let imagePageWakeLock = null;
-    let contactExtraText = {
-        ambulanza: "",
-        polizia: "",
-        veterinario: "",
-        clinica: "MONASTIR: Facciamo Rete"
-    };
-    const services = ["ambulanza", "polizia", "veterinario", "clinica"];
-    for (let s of services) normalNotes[s] = [];
-    let licenseActive = false, daysRemaining = 0, licenseCheckPassed = false, clientCode = "";
-    const SECRET_KEY = "ChiaveSegreta123";
-    let adminCode = "admin2025", adminAuthenticated = false;
-    const homePage = document.getElementById('homePage');
-    const emergencyPage = document.getElementById('emergencyPage');
-    const imagePage = document.getElementById('imagePage');
-    const reteLevelContainer = document.getElementById('reteLevelContainer');
-    const currentServiceDeco = document.getElementById('currentServiceDeco');
-    const phoneInput = document.getElementById('phoneNumber');
-    const saveNumberBtn = document.getElementById('saveNumberBtn');
-    const googleMapsBtn = document.getElementById('googleMapsBtn');
-    const geolocationBtn = document.getElementById('geolocationBtn');
-    const latLonDisplay = document.getElementById('latLonDisplay');
-    const addressDisplay = document.getElementById('addressDisplay');
-    const refADisplay = document.getElementById('refADisplay');
-    const refBDisplay = document.getElementById('refBDisplay');
-    const refCDisplay = document.getElementById('refCDisplay');
-    const gpsStatus = document.getElementById('gpsStatus');
-    const addNoteBtn = document.getElementById('addNoteBtn');
-    const notesListArea = document.getElementById('notesListArea');
-    const copyNoteBtn = document.getElementById('copyNoteBtn');
-    const phoneSaveMsg = document.getElementById('phoneSaveMsg');
-    const listenResponseBtn = document.getElementById('listenResponseBtn');
-    const clearResponseBtn = document.getElementById('clearResponseBtn');
-    const transcribeStatus = document.getElementById('transcribeStatus');
-    const listenInfoMsg = document.getElementById('listenInfoMsg');
-    const copyInfoMsg = document.getElementById('copyInfoMsg');
-    const normalNoteInfo = document.getElementById('normalNoteInfo');
-    const speakToOperatorBtn = document.getElementById('speakToOperatorBtn');
-    const speakResultField = document.getElementById('speakResultField');
-    const operatorResponseDisplay = document.getElementById('operatorResponseDisplay');
-    const speakStatus = document.getElementById('speakStatus');
-    const clearSpeakBtn = document.getElementById('clearSpeakBtn');
-    const speakDetailModal = document.getElementById('speakDetailModal');
-    const speakOriginalText = document.getElementById('speakOriginalText');
-    const speakTranslatedText = document.getElementById('speakTranslatedText');
-    const closeSpeakModalBtn = document.getElementById('closeSpeakModalBtn');
-    const adaptiveModal = document.getElementById('adaptiveModal');
-    const modalTextarea = document.getElementById('modalTextarea');
-    const closeAdaptiveBtn = document.getElementById('closeAdaptiveBtn');
-    const noteEditModal = document.getElementById('noteEditModal');
-    const editNoteTitle = document.getElementById('editNoteTitle');
-    const editNoteDesc = document.getElementById('editNoteDesc');
-    const saveNoteModalBtn = document.getElementById('saveNoteModalBtn');
-    const cancelNoteModalBtn = document.getElementById('cancelNoteModalBtn');
-    const deleteNoteModalBtn = document.getElementById('deleteNoteModalBtn');
-    const noteModalTitle = document.getElementById('noteModalTitle');
-    const modalCoordS = document.getElementById('modalCoordS');
-    const modalCoordN = document.getElementById('modalCoordN');
-    const modalAudioIt = document.getElementById('modalAudioIt');
-    const modalAudioFr = document.getElementById('modalAudioFr');
-    const exportAllBtn = document.getElementById('exportAllBtn');
-    const importAllBtn = document.getElementById('importAllBtn');
-    const globalImportFileInput = document.getElementById('globalImportFileInput');
-    const contactsGrid = document.getElementById('contactsGrid');
-    const clientCodeInput = document.getElementById('clientCodeInput');
-    const unlockCodeInput = document.getElementById('unlockCodeInput');
-    const activateLicenseBtn = document.getElementById('activateLicenseBtn');
-    const adminSection = document.getElementById('adminSection');
-    const adminClientCode = document.getElementById('adminClientCode');
-    const adminFirstRun = document.getElementById('adminFirstRun');
-    const generateUnlockBtn = document.getElementById('generateUnlockBtn');
-    const generatedCode = document.getElementById('generatedCode');
-    const copyGeneratedBtn = document.getElementById('copyGeneratedBtn');
-    const hideAdminBtn = document.getElementById('hideAdminBtn');
-    const adminLongPressBtn = document.getElementById('adminLongPressBtn');
-    const newAdminCode = document.getElementById('newAdminCode');
-    const changeAdminCodeBtn = document.getElementById('changeAdminCodeBtn');
-    const daysHomeDisplay = document.getElementById('daysLeftDisplayHome');
-    const infoModal = document.getElementById('infoModal');
-    const infoModalText = document.getElementById('infoModalText');
-    const closeInfoModalBtn = document.getElementById('closeInfoModalBtn');
-    const imagePreviewArea = document.getElementById('imagePreviewArea');
-    const infoNoteBtn = document.getElementById('infoNoteBtn');
-    const infoOperatorBtn = document.getElementById('infoOperatorBtn');
-    const infoSpeakBtn = document.getElementById('infoSpeakBtn');
-    const activityModal = document.getElementById('activityModal');
-    const activityModalTitle = document.getElementById('activityModalTitle');
-    const activityInfoText = document.getElementById('activityInfoText');
-    const activityImageContainer = document.getElementById('activityImageContainer');
-    const activityCoordBtn = document.getElementById('activityCoordBtn');
-    const activityWebBtn = document.getElementById('activityWebBtn');
-    const activityAdminButtons = document.getElementById('activityAdminButtons');
-    const activityEditTextBtn = document.getElementById('activityEditTextBtn');
-    const activityEditImageBtn = document.getElementById('activityEditImageBtn');
-    const closeActivityModalBtn = document.getElementById('closeActivityModalBtn');
-    // Nuovi elementi per modale informativa globale
-    const globalInfoModal = document.getElementById('globalInfoModal');
-    const globalInfoTextarea = document.getElementById('globalInfoTextarea');
-    const globalInfoEditBtn = document.getElementById('globalInfoEditBtn');
-    const globalInfoSaveBtn = document.getElementById('globalInfoSaveBtn');
-    const globalInfoCloseBtn = document.getElementById('globalInfoCloseBtn');
-    let currentGlobalInfoKey = null;
-    let currentGlobalInfoOriginal = "";
-
-    let currentActivityNode = null;
-    let currentEditId = null;
-    let currentEditIncludeCoords = false;
-    let recognitionOperator = null;
-    let recognitionSpeak = null;
-    let recognitionTimeout = null;
-    let lastItalianText = "";
-    let lastFrenchTranslation = "";
-
-    async function requestGlobalWakeLock() {
-        if ('wakeLock' in navigator) {
-            try {
-                globalWakeLock = await navigator.wakeLock.request('screen');
-                console.log('WakeLock attivo');
-                document.addEventListener('visibilitychange', async () => {
-                    if (document.visibilityState === 'visible' && globalWakeLock === null) {
-                        globalWakeLock = await navigator.wakeLock.request('screen');
-                    }
-                });
-            } catch(err) { console.warn('WakeLock fallito:', err); }
-        }
-    }
-    function ensureWakeLock() {
-        if (globalWakeLock === null && 'wakeLock' in navigator) {
-            navigator.wakeLock.request('screen').then(lock => {
-                globalWakeLock = lock;
-                console.log('WakeLock riattivato dopo interazione');
-            }).catch(e => console.warn(e));
-        }
-    }
-    document.body.addEventListener('touchstart', ensureWakeLock, { once: true });
-    document.body.addEventListener('mousedown', ensureWakeLock, { once: true });
-    let currentPage = 'home';
-    function updateHistoryState(page) {
-        if (currentPage !== page) {
-            history.pushState({ page: page }, '');
-            currentPage = page;
-        }
-    }
-    function closeAllModals() {
-        let closed = false;
-        if (adaptiveModal.style.display === 'flex') { adaptiveModal.style.display = 'none'; closed = true; }
-        if (speakDetailModal.style.display === 'flex') { speakDetailModal.style.display = 'none'; closed = true; }
-        if (noteEditModal.style.display === 'flex') { noteEditModal.style.display = 'none'; closed = true; }
-        if (infoModal.style.display === 'flex') { infoModal.style.display = 'none'; closed = true; }
-        if (activityModal.style.display === 'flex') { activityModal.style.display = 'none'; closed = true; }
-        if (globalInfoModal.style.display === 'flex') { globalInfoModal.style.display = 'none'; closed = true; }
-        return closed;
-    }
-    function goBackHome() {
-        if (!homePage.classList.contains('hidden')) return;
-        homePage.classList.remove('hidden');
-        emergencyPage.classList.add('hidden');
-        imagePage.classList.add('hidden');
-        currentPage = 'home';
-        releaseImagePageWakeLock();
-        requestGlobalWakeLock();
-    }
-    function goBackFromSubPage() {
-        if (!imagePage.classList.contains('hidden')) {
-            imagePage.classList.add('hidden');
-            homePage.classList.remove('hidden');
-            releaseImagePageWakeLock();
-            currentPage = 'home';
-        } else if (!emergencyPage.classList.contains('hidden')) {
-            emergencyPage.classList.add('hidden');
-            homePage.classList.remove('hidden');
-            currentService = null;
-            currentPage = 'home';
-        } else {
-            goBackHome();
-        }
-    }
-    window.addEventListener('popstate', (event) => {
-        if (closeAllModals()) return;
-        if (currentPage !== 'home') goBackFromSubPage();
-    });
-    let reteData = { title: "RETE", children: [] };
-    function saveReteData() { localStorage.setItem('monastir_rete_data', JSON.stringify(reteData)); }
-    function loadReteData() {
-        const saved = localStorage.getItem('monastir_rete_data');
-        if (saved) {
-            try {
-                reteData = JSON.parse(saved);
-                function ensureFields(node) {
-                    if (!node.infoText) node.infoText = "";
-                    if (!node.infoImage) node.infoImage = null;
-                    if (!node.coordinate) node.coordinate = "";
-                    if (!node.websiteUrl) node.websiteUrl = "";
-                    if (node.children) node.children.forEach(ensureFields);
-                }
-                ensureFields(reteData);
-            } catch(e) {}
-        }
-        if (!reteData.title) reteData = { title: "RETE", children: [] };
-        if (!reteData.children) reteData.children = [];
-    }
-    function addEmptyChildToNode(parentNode) {
-        if (!adminAuthenticated) { alert("Solo amministratore."); return null; }
-        if (!parentNode.children) parentNode.children = [];
-        parentNode.children.push({ title: "", children: [], infoText: "", infoImage: null, coordinate: "", websiteUrl: "" });
-        saveReteData();
-        return parentNode.children[parentNode.children.length - 1];
-    }
-    function editNodeTitle(node, newTitle) {
-        if (!adminAuthenticated) { alert("Solo amministratore."); return false; }
-        node.title = newTitle;
-        saveReteData();
-        return true;
-    }
-    function deleteNode(parentNode, nodeToDelete) {
-        if (!adminAuthenticated) { alert("Solo amministratore."); return false; }
-        const index = parentNode.children.findIndex(c => c === nodeToDelete);
-        if (index !== -1) { parentNode.children.splice(index,1); saveReteData(); return true; }
-        return false;
-    }
-    function linkifyText(text) {
-        if (!text) return "Nessuna informazione aggiuntiva.";
-        const urlRegex = /(https?:\/\/[^\s]+)/g;
-        return text.replace(urlRegex, url => `<a href="${url}" target="_blank">${url}</a>`).replace(/\n/g,'<br>');
-    }
-    function showActivityModal(node) {
-        currentActivityNode = node;
-        activityModalTitle.innerText = (node.title && node.title.trim()) ? node.title : "Attività senza titolo";
-        const infoText = node.infoText || "Nessuna informazione aggiuntiva.";
-        activityInfoText.innerHTML = linkifyText(infoText);
-        activityImageContainer.innerHTML = '';
-        if (node.infoImage) {
-            let img = document.createElement('img');
-            img.src = node.infoImage;
-            img.className = 'info-mini-img';
-            img.style.maxWidth = '100%';
-            img.style.maxHeight = '120px';
-            img.style.objectFit = 'contain';
-            activityImageContainer.appendChild(img);
-            if (adminAuthenticated) {
-                let timer;
-                img.onmousedown = () => { timer = setTimeout(() => openActivityImageGallery(node), 3000); };
-                img.onmouseup = img.onmouseleave = () => clearTimeout(timer);
-                img.ontouchstart = () => { timer = setTimeout(() => openActivityImageGallery(node), 3000); };
-                img.ontouchend = img.ontouchcancel = () => clearTimeout(timer);
-            }
-        } else {
-            let placeholder = document.createElement('div');
-            placeholder.className = 'info-mini-placeholder';
-            placeholder.innerText = adminAuthenticated ? "📸 Premi a lungo (3 sec) per aggiungere una foto" : "Nessuna foto disponibile";
-            activityImageContainer.appendChild(placeholder);
-            if (adminAuthenticated) {
-                let timer;
-                placeholder.onmousedown = () => { timer = setTimeout(() => openActivityImageGallery(node), 3000); };
-                placeholder.onmouseup = placeholder.onmouseleave = () => clearTimeout(timer);
-                placeholder.ontouchstart = () => { timer = setTimeout(() => openActivityImageGallery(node), 3000); };
-                placeholder.ontouchend = placeholder.ontouchcancel = () => clearTimeout(timer);
-            }
-        }
-        const coord = node.coordinate || "";
-        const web = node.websiteUrl || "";
-        activityCoordBtn.onclick = () => {
-            if (coord.trim()) window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(coord)}`, '_blank');
-            else alert("Nessuna coordinata.");
-        };
-        activityWebBtn.onclick = () => {
-            if (web.trim()) {
-                let full = web.trim();
-                if (!full.startsWith('http')) full = 'https://' + full;
-                window.open(full, '_blank');
-            } else alert("Nessun sito web.");
-        };
-        if (adminAuthenticated) {
-            activityAdminButtons.classList.remove('hidden-btn');
-            activityEditTextBtn.onclick = () => openActivityTextModal(node);
-            activityEditImageBtn.onclick = () => openActivityImageGallery(node);
-        } else {
-            activityAdminButtons.classList.add('hidden-btn');
-        }
-        activityModal.style.display = 'flex';
-    }
-    function openActivityImageGallery(node) {
-        let input = document.createElement('input');
-        input.type = 'file';
-        input.accept = 'image/*';
-        input.onchange = (e) => {
-            let file = e.target.files[0];
-            if (file) {
-                let reader = new FileReader();
-                reader.onload = (ev) => {
-                    node.infoImage = ev.target.result;
-                    saveReteData();
-                    if (currentActivityNode === node) showActivityModal(node);
-                };
-                reader.readAsDataURL(file);
-            }
-        };
-        input.click();
-    }
-    function openActivityTextModal(node) {
-        let overlay = document.createElement('div');
-        overlay.className = 'adaptive-modal';
-        overlay.style.display = 'flex';
-        overlay.innerHTML = `<div class="adaptive-modal-content"><h3>✏️ Modifica informazioni</h3><textarea id="tempActivityText" rows="6">${escapeHtml(node.infoText || "")}</textarea><div class="modal-buttons"><button id="tempSaveBtn" class="save-btn">SALVA</button><button id="tempCancelBtn" class="cancel-btn">ANNULLA</button></div></div>`;
-        document.body.appendChild(overlay);
-        let textarea = overlay.querySelector('#tempActivityText');
-        let saveBtn = overlay.querySelector('#tempSaveBtn');
-        let cancelBtn = overlay.querySelector('#tempCancelBtn');
-        let close = () => overlay.remove();
-        saveBtn.onclick = () => { node.infoText = textarea.value; saveReteData(); if (currentActivityNode === node) showActivityModal(node); close(); };
-        cancelBtn.onclick = close;
-        overlay.onclick = (e) => { if (e.target === overlay) close(); };
-    }
-    function renderReteLevel(container, parentNode) {
-        container.innerHTML = '';
-        if (!parentNode.children || parentNode.children.length === 0) {
-            let empty = document.createElement('div');
-            empty.style.textAlign = 'center';
-            empty.style.padding = '20px';
-            empty.innerText = adminAuthenticated ? 'Nessun tasto. Premi a lungo su "+ AGGIUNGI TASTO" per aggiungere.' : 'Nessun tasto disponibile.';
-            container.appendChild(empty);
-        } else {
-            parentNode.children.forEach(child => {
-                let div = document.createElement('div');
-                div.className = 'rete-item';
-                let btn = document.createElement('div');
-                btn.className = 'rete-button';
-                btn.innerText = (child.title && child.title.trim()) ? child.title : "[Tasto vuoto]";
-                btn.onclick = (e) => { e.stopPropagation(); if (btn._pt) clearTimeout(btn._pt); showActivityModal(child); };
-                let pressTimer = null;
-                let startLong = () => {
-                    pressTimer = setTimeout(() => {
-                        if (!adminAuthenticated) { alert("Solo amministratore."); return; }
-                        let newTitle = prompt("Nuovo titolo:", child.title);
-                        if (newTitle !== null && newTitle.trim() !== "") {
-                            editNodeTitle(child, newTitle.trim());
-                            renderReteLevel(container, parentNode);
-                        } else if (newTitle !== null && newTitle.trim() === "") alert("Titolo vuoto non permesso.");
-                    }, 3000);
-                };
-                let cancelLong = () => { if (pressTimer) clearTimeout(pressTimer); };
-                btn.addEventListener('mousedown', startLong);
-                btn.addEventListener('mouseup', cancelLong);
-                btn.addEventListener('mouseleave', cancelLong);
-                btn.addEventListener('touchstart', startLong, { passive: true });
-                btn.addEventListener('touchend', cancelLong);
-                btn.addEventListener('touchcancel', cancelLong);
-                div.appendChild(btn);
-                if (adminAuthenticated) {
-                    let del = document.createElement('button');
-                    del.innerText = '🗑️ Elimina';
-                    del.className = 'rete-delete-btn';
-                    del.onclick = (e) => { e.stopPropagation(); if (confirm("Eliminare?")) { deleteNode(parentNode, child); renderReteLevel(container, parentNode); } };
-                    div.appendChild(del);
-                }
-                container.appendChild(div);
-            });
-        }
-        if (adminAuthenticated) {
-            let addBtn = document.createElement('div');
-            addBtn.className = 'rete-button';
-            addBtn.style.background = '#558b2f';
-            addBtn.innerText = '+ AGGIUNGI TASTO (premi 3 sec)';
-            let addTimer = null;
-            addBtn.onmousedown = () => { addTimer = setTimeout(() => { let newEmpty = addEmptyChildToNode(parentNode); if (newEmpty) renderReteLevel(container, parentNode); }, 3000); };
-            addBtn.onmouseup = addBtn.onmouseleave = () => clearTimeout(addTimer);
-            addBtn.ontouchstart = () => { addTimer = setTimeout(() => { let newEmpty = addEmptyChildToNode(parentNode); if (newEmpty) renderReteLevel(container, parentNode); }, 3000); };
-            addBtn.ontouchend = addBtn.ontouchcancel = () => clearTimeout(addTimer);
-            container.appendChild(addBtn);
-        }
-    }
-    let currentImageData = null;
-    function setupImageArea() {
-        imagePreviewArea.innerHTML = '';
-        if (currentImageData) {
-            let img = document.createElement('img');
-            img.src = currentImageData;
-            img.className = 'uploaded-image';
-            img.style.maxWidth = '100%';
-            img.style.maxHeight = '180px';
-            imagePreviewArea.appendChild(img);
-            attachMainImageLongPress(img);
-        } else {
-            let ph = document.createElement('div');
-            ph.className = 'image-placeholder';
-            ph.innerText = adminAuthenticated ? '📸 Premi a lungo (3 sec) per caricare un\'immagine' : '🔐 Solo amministratore';
-            imagePreviewArea.appendChild(ph);
-            attachMainPlaceholderLongPress(ph);
-        }
-    }
-    function attachMainPlaceholderLongPress(el) {
-        let timer;
-        el.onmousedown = () => { timer = setTimeout(() => { if (adminAuthenticated) openMainImageGallery(); }, 3000); };
-        el.onmouseup = el.onmouseleave = () => clearTimeout(timer);
-        el.ontouchstart = () => { timer = setTimeout(() => { if (adminAuthenticated) openMainImageGallery(); }, 3000); };
-        el.ontouchend = el.ontouchcancel = () => clearTimeout(timer);
-    }
-    function attachMainImageLongPress(img) {
-        let timer;
-        img.onmousedown = () => { timer = setTimeout(() => { if (adminAuthenticated) openMainImageGallery(true); }, 3000); };
-        img.onmouseup = img.onmouseleave = () => clearTimeout(timer);
-        img.ontouchstart = () => { timer = setTimeout(() => { if (adminAuthenticated) openMainImageGallery(true); }, 3000); };
-        img.ontouchend = img.ontouchcancel = () => clearTimeout(timer);
-    }
-    function openMainImageGallery() {
-        let input = document.createElement('input');
-        input.type = 'file';
-        input.accept = 'image/*';
-        input.onchange = (e) => {
-            let file = e.target.files[0];
-            if (file) {
-                let reader = new FileReader();
-                reader.onload = (ev) => {
-                    currentImageData = ev.target.result;
-                    setupImageArea();
-                    localStorage.setItem('monastir_image', currentImageData);
-                };
-                reader.readAsDataURL(file);
-            }
-        };
-        input.click();
-    }
-    function loadSavedImage() {
-        let saved = localStorage.getItem('monastir_image');
-        if (saved) { currentImageData = saved; setupImageArea(); }
-        else setupImageArea();
-    }
-    async function requestImagePageWakeLock() { if ('wakeLock' in navigator) { try { imagePageWakeLock = await navigator.wakeLock.request('screen'); } catch(e) {} } }
-    function releaseImagePageWakeLock() { if (imagePageWakeLock) { imagePageWakeLock.release(); imagePageWakeLock = null; } }
-    function generateRandomClientCode() { return Math.floor(1000000000 + Math.random() * 9000000000).toString(); }
-    function hashTo20Digits(hash) { let hex = hash.toString(CryptoJS.enc.Hex); let decimal = BigInt('0x' + hex).toString(); return decimal.slice(0,20).padStart(20,'0'); }
-    function verifyUnlockCode(clientCode, firstRun, unlockCode) { const message = `${clientCode}|${firstRun}`; const hash = CryptoJS.HmacSHA256(message, SECRET_KEY); const expected = hashTo20Digits(hash); return expected === unlockCode; }
-    async function getCurrentUTCTime() { try { let res = await fetch('https://worldtimeapi.org/api/timezone/Etc/UTC'); if (!res.ok) throw new Error(); let data = await res.json(); return new Date(data.utc_datetime); } catch(e) { return new Date(); } }
-    async function initLicense() {
-        const now = await getCurrentUTCTime();
-        let firstRun = localStorage.getItem('firstRun');
-        if (!firstRun) {
-            firstRun = now.getTime();
-            localStorage.setItem('firstRun', firstRun);
-            let newClientCode = generateRandomClientCode();
-            localStorage.setItem('clientCode', newClientCode);
-            localStorage.setItem('activated', 'false');
-            localStorage.setItem('expiryDate', firstRun + 90 * 86400000);
-        }
-        firstRun = parseInt(firstRun);
-        clientCode = localStorage.getItem('clientCode') || generateRandomClientCode();
-        if (!localStorage.getItem('clientCode')) localStorage.setItem('clientCode', clientCode);
-        const activated = localStorage.getItem('activated') === 'true';
-        let expiry = parseInt(localStorage.getItem('expiryDate'));
-        if (activated && expiry < firstRun + 365 * 86400000) { expiry = firstRun + 365 * 86400000; localStorage.setItem('expiryDate', expiry); }
-        const nowTime = now.getTime();
-        if (nowTime > expiry) { licenseActive = false; licenseCheckPassed = false; }
-        else { licenseActive = activated; licenseCheckPassed = true; }
-        daysRemaining = Math.ceil((expiry - nowTime) / 86400000);
-        updateLicenseUI();
-        toggleAppAccess(!licenseCheckPassed);
-        if (clientCodeInput) clientCodeInput.value = clientCode;
-        if (daysHomeDisplay) {
-            daysHomeDisplay.innerHTML = `v${CURRENT_VERSION} - Scade: ${daysRemaining} giorni <button id="copyRequestBtnMoved" class="small-btn" style="background:#e67e22;">📋 Richiedi attivazione</button>`;
-            let moved = document.getElementById('copyRequestBtnMoved');
-            if (moved) moved.onclick = () => openGlobalInfoModal('copyRequest', 'Inserisci le istruzioni per la richiesta di attivazione della licenza. Questo testo è modificabile solo dall\'amministratore.', 'copyRequest_text');
-        }
-    }
-    function updateLicenseUI() {
-        let activated = localStorage.getItem('activated') === 'true';
-        if (activated) { unlockCodeInput.disabled = true; activateLicenseBtn.disabled = true; }
-        else { unlockCodeInput.disabled = false; activateLicenseBtn.disabled = false; }
-    }
-    function toggleAppAccess(block) { document.querySelectorAll('.big-btn').forEach(btn => { btn.style.pointerEvents = block ? 'none' : 'auto'; btn.style.opacity = block ? '0.5' : '1'; }); }
-    async function onActivateLicense() {
-        let unlockCode = unlockCodeInput.value.trim();
-        if (!/^\d{20}$/.test(unlockCode)) { alert('20 cifre.'); return; }
-        let firstRun = localStorage.getItem('firstRun');
-        if (!firstRun) { alert('Errore primo avvio.'); return; }
-        if (verifyUnlockCode(clientCode, parseInt(firstRun), unlockCode)) {
-            let newExpiry = parseInt(firstRun) + 365 * 86400000;
-            localStorage.setItem('activated', 'true');
-            localStorage.setItem('expiryDate', newExpiry);
-            await initLicense();
-            alert('Licenza attivata per 365 giorni.');
-        } else alert('Codice non valido.');
-    }
-    // Funzione per aprire la modale informativa globale
-    function openGlobalInfoModal(key, defaultText, storageKey) {
-        currentGlobalInfoKey = storageKey;
-        let savedText = localStorage.getItem(storageKey);
-        let displayText = savedText !== null ? savedText : defaultText;
-        currentGlobalInfoOriginal = displayText;
-        globalInfoTextarea.value = displayText;
-        globalInfoModalTitle.innerText = "Informazioni";
-        if (adminAuthenticated) {
-            globalInfoEditBtn.style.display = 'block';
-            globalInfoSaveBtn.style.display = 'none';
-            globalInfoTextarea.readOnly = true;
-        } else {
-            globalInfoEditBtn.style.display = 'none';
-            globalInfoSaveBtn.style.display = 'none';
-            globalInfoTextarea.readOnly = true;
-        }
-        globalInfoModal.style.display = 'flex';
-    }
-    // Gestione modale informativa
-    globalInfoEditBtn.addEventListener('click', () => {
-        if (!adminAuthenticated) { alert("Solo l'amministratore può modificare questo testo."); return; }
-        globalInfoTextarea.readOnly = false;
-        globalInfoEditBtn.style.display = 'none';
-        globalInfoSaveBtn.style.display = 'block';
-    });
-    globalInfoSaveBtn.addEventListener('click', () => {
-        if (!adminAuthenticated) return;
-        let newText = globalInfoTextarea.value;
-        if (newText !== currentGlobalInfoOriginal) {
-            localStorage.setItem(currentGlobalInfoKey, newText);
-            alert("Testo salvato.");
-        }
-        globalInfoTextarea.readOnly = true;
-        globalInfoEditBtn.style.display = 'block';
-        globalInfoSaveBtn.style.display = 'none';
-        globalInfoModal.style.display = 'none';
-    });
-    globalInfoCloseBtn.addEventListener('click', () => {
-        globalInfoModal.style.display = 'none';
-        globalInfoTextarea.readOnly = true;
-        globalInfoEditBtn.style.display = 'block';
-        globalInfoSaveBtn.style.display = 'none';
-    });
-    globalInfoModal.addEventListener('click', (e) => { if (e.target === globalInfoModal) globalInfoCloseBtn.click(); });
-    // Sostituzione copyRequest con la modale
-    function copyRequest() {
-        // Ora usa la modale invece di copiare direttamente
-        openGlobalInfoModal('copyRequest', 'Inserisci le istruzioni per la richiesta di attivazione della licenza. Questo testo è modificabile solo dall\'amministratore.', 'copyRequest_text');
-    }
-    closeInfoModalBtn.onclick = () => infoModal.style.display = 'none';
-    infoModal.onclick = (e) => { if (e.target === infoModal) infoModal.style.display = 'none'; };
-    function loadAdminCode() { let saved = localStorage.getItem('adminCode'); if (saved && saved.trim()) adminCode = saved; else { adminCode = "admin2025"; localStorage.setItem('adminCode', adminCode); } }
-    function saveAdminCode(newCode) { if (newCode && newCode.trim()) { adminCode = newCode; localStorage.setItem('adminCode', adminCode); alert("Codice admin cambiato."); } else alert("Codice non valido."); }
-    function generateUnlockCodeAdmin(clientCode, firstRun) { const message = `${clientCode}|${firstRun}`; const hash = CryptoJS.HmacSHA256(message, SECRET_KEY); return hashTo20Digits(hash); }
-    function onGenerateUnlock() { let cc = adminClientCode.value.trim(); let fr = adminFirstRun.value.trim(); if (!/^\d{6,10}$/.test(cc)) { alert("Codice cliente 6-10 cifre."); return; } if (!/^\d+$/.test(fr) || fr.length<10) { alert("First Run non valido."); return; } generatedCode.value = generateUnlockCodeAdmin(cc, fr); }
-    function copyGenerated() { if (generatedCode.value) { navigator.clipboard.writeText(generatedCode.value); alert("Copiato."); } else alert("Nessun codice."); }
-    function showAdminSection() { adminSection.style.display = 'block'; }
-    function hideAdminSection() { adminSection.style.display = 'none'; }
-    let adminTimer = null;
-    function startAdminTimer() { adminTimer = setTimeout(() => { let code = prompt("Codice amministratore:"); if (code === adminCode) { adminAuthenticated = true; showAdminSection(); alert("Accesso admin."); if (imagePage && !imagePage.classList.contains('hidden')) { renderReteLevel(reteLevelContainer, reteData); loadSavedImage(); } } else if (code !== null) alert("Codice errato."); }, 3000); }
-    function cancelAdminTimer() { if (adminTimer) clearTimeout(adminTimer); }
-    adminLongPressBtn.addEventListener('mousedown', startAdminTimer);
-    adminLongPressBtn.addEventListener('mouseup', cancelAdminTimer);
-    adminLongPressBtn.addEventListener('mouseleave', cancelAdminTimer);
-    adminLongPressBtn.addEventListener('touchstart', startAdminTimer, { passive: true });
-    adminLongPressBtn.addEventListener('touchend', cancelAdminTimer);
-    adminLongPressBtn.addEventListener('touchcancel', cancelAdminTimer);
-    generateUnlockBtn.onclick = onGenerateUnlock;
-    copyGeneratedBtn.onclick = copyGenerated;
-    hideAdminBtn.onclick = hideAdminSection;
-    changeAdminCodeBtn.onclick = () => { let nc = newAdminCode.value.trim(); if (nc) saveAdminCode(nc); else alert("Inserisci nuovo codice."); };
-    function saveContactExtraText() { services.forEach(s => localStorage.setItem(`contactExtra_${s}_${CURRENT_VERSION}`, contactExtraText[s])); }
-    function loadContactExtraText() { services.forEach(s => { let saved = localStorage.getItem(`contactExtra_${s}_${CURRENT_VERSION}`); if (saved !== null) contactExtraText[s] = saved; else contactExtraText[s] = (s === 'clinica') ? "MONASTIR: Facciamo Rete" : ""; }); }
-    function getContactButtonText(s) { let extra = contactExtraText[s]; if (extra && extra.trim()) return extra; if (s === 'clinica') return "MONASTIR: Facciamo Rete"; return `Contatto: premi 5 sc. per modifica`; }
-    function updateContactButtons() { document.querySelectorAll('.big-btn').forEach(btn => { let s = btn.getAttribute('data-service'); if (s) btn.innerText = getContactButtonText(s); }); }
-    function showCustomPrompt(service, currentExtra) {
-        if (service === 'clinica') return;
-        let ov = document.createElement('div'); ov.className = 'custom-prompt';
-        ov.innerHTML = `<div class="custom-prompt-content"><h3>Modifica testo</h3><input id="custInp" maxlength="14" value="${currentExtra}"><div><button id="okBtn">OK</button><button id="cancelBtn">ANNULLA</button></div></div>`;
-        document.body.appendChild(ov);
-        let inp = ov.querySelector('#custInp'); let ok = ov.querySelector('#okBtn'); let cancel = ov.querySelector('#cancelBtn');
-        let close = () => ov.remove();
-        ok.onclick = () => { let newText = inp.value.trim(); if (newText.length>14) newText=newText.slice(0,14); contactExtraText[service]=newText; saveContactExtraText(); updateContactButtons(); close(); };
-        cancel.onclick = close;
-        inp.focus();
-    }
-    function initHomeButtons() {
-        contactsGrid.innerHTML = '';
-        services.forEach(service => {
-            let btn = document.createElement('button');
-            btn.className = 'big-btn';
-            btn.setAttribute('data-service', service);
-            btn.innerText = getContactButtonText(service);
-            btn.onclick = () => {
-                if (service === 'clinica') {
-                    homePage.classList.add('hidden');
-                    imagePage.classList.remove('hidden');
-                    requestImagePageWakeLock();
-                    renderReteLevel(reteLevelContainer, reteData);
-                    loadSavedImage();
-                    updateHistoryState('image');
-                } else {
-                    showEmergency(service);
-                    updateHistoryState('emergency');
-                }
-            };
-            if (service !== 'clinica') {
-                let t;
-                btn.onmousedown = () => { t = setTimeout(() => showCustomPrompt(service, contactExtraText[service]), 5000); };
-                btn.onmouseup = btn.onmouseleave = () => clearTimeout(t);
-                btn.ontouchstart = () => { t = setTimeout(() => showCustomPrompt(service, contactExtraText[service]), 5000); };
-                btn.ontouchend = btn.ontouchcancel = () => clearTimeout(t);
-            } else {
-                let adminT;
-                btn.onmousedown = () => { adminT = setTimeout(() => { if (!adminAuthenticated) { alert("Solo admin."); return; } let nt = prompt("Nuovo testo:", contactExtraText.clinica); if (nt && nt.trim()) { contactExtraText.clinica = nt.trim(); saveContactExtraText(); updateContactButtons(); } }, 3000); };
-                btn.onmouseup = btn.onmouseleave = () => clearTimeout(adminT);
-                btn.ontouchstart = () => { adminT = setTimeout(() => { if (!adminAuthenticated) { alert("Solo admin."); return; } let nt = prompt("Nuovo testo:", contactExtraText.clinica); if (nt && nt.trim()) { contactExtraText.clinica = nt.trim(); saveContactExtraText(); updateContactButtons(); } }, 3000); };
-                btn.ontouchend = btn.ontouchcancel = () => clearTimeout(adminT);
-            }
-            contactsGrid.appendChild(btn);
-        });
-    }
-    function haversine(lat1,lng1,lat2,lng2) {
-        const R = 6371e3;
-        const φ1 = lat1 * Math.PI/180, φ2 = lat2 * Math.PI/180;
-        const Δφ = (lat2-lat1) * Math.PI/180, Δλ = (lng2-lng1) * Math.PI/180;
-        const a = Math.sin(Δφ/2)**2 + Math.cos(φ1)*Math.cos(φ2)*Math.sin(Δλ/2)**2;
-        return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-    }
-    async function snapToRoad(lat,lng) {
-        let url = `https://overpass-api.de/api/interpreter?data=[out:json];way(around:50,${lat},${lng})["highway"];out center;`;
-        try {
-            let resp = await fetch(url);
-            let data = await resp.json();
-            if (!data.elements?.length) return {lat,lng};
-            let way = data.elements[0];
-            let clat = way.center?.lat || way.lat;
-            let clng = way.center?.lon || way.lon;
-            if (clat && clng && haversine(lat,lng,clat,clng) < 50) return {lat:clat, lng:clng};
-            return {lat,lng};
-        } catch(e) { return {lat,lng}; }
-    }
-    async function fetchAllNamedPlaces(lat, lng) {
-        const excludeTags = ["information","bench","waste_basket","toilets","telephone","recycling","fountain","drinking_water"];
-        let query = `[out:json];(node(around:300,${lat},${lng})[name];way(around:300,${lat},${lng})[name];);out center;`;
-        let url = `https://overpass-api.de/api/interpreter?data=${encodeURIComponent(query)}`;
-        try {
-            let resp = await fetch(url);
-            let data = await resp.json();
-            if (!data.elements?.length) return [];
-            let items = [];
-            for (let el of data.elements) {
-                let latEl = el.lat || el.center?.lat;
-                let lonEl = el.lon || el.center?.lon;
-                if (!latEl) continue;
-                let tags = el.tags || {};
-                let name = tags.name;
-                if (!name || name.trim() === "") continue;
-                let cat = tags.amenity || tags.shop || tags.tourism || tags.office || tags.leisure || tags.historic || tags.place || tags.aeroway || tags.railway || tags.highway || tags.industrial;
-                if (cat && excludeTags.includes(cat)) continue;
-                let dist = haversine(lat, lng, latEl, lonEl);
-                let display = name;
-                let priority = 3;
-                let highPriority = ["bar","pub","cafe","restaurant","fast_food","pharmacy","supermarket","convenience","shop","car_repair","car_wash","tyres","car_parts","bank","hospital","clinic","doctor","dentist","school","kindergarten","university","college","gym","fitness","cinema","theatre","fuel","charging_station","police","fire_station","post_office","library","townhall","industrial","commercial","office"];
-                if (!tags.highway && cat && highPriority.some(k => cat.includes(k))) {
-                    priority = 1;
-                } else if (!tags.highway && cat) {
-                    priority = 2;
-                } else if (tags.highway) {
-                    priority = 3;
-                }
-                if (cat && !tags.highway) {
-                    let catMap = {
-                        "pharmacy":"Farmacia","hospital":"Ospedale","police":"Commissariato","post_office":"Posta","bank":"Banca",
-                        "library":"Biblioteca","fire_station":"Caserma","townhall":"Municipio","supermarket":"Supermercato","convenience":"Alimentari",
-                        "cafe":"Bar","restaurant":"Ristorante","pub":"Pub","fast_food":"Fast food","museum":"Museo","monument":"Monumento",
-                        "attraction":"Attrazione","square":"Piazza","garden":"Giardino","park":"Parco","bus_station":"Stazione bus","train_station":"Stazione",
-                        "church":"Chiesa","services":"Area di servizio","motorway_junction":"Uscita autostradale","aeroway":"Aeroporto","railway":"Stazione",
-                        "shop":"Negozio","office":"Ufficio","leisure":"Tempo libero","historic":"Sito storico","place":"Luogo","industrial":"Azienda",
-                        "car_repair":"Officina","car_wash":"Autolavaggio","tyres":"Gommista","car_parts":"Ricambi auto","fuel":"Distributore","charging_station":"Colonnina elettrica",
-                        "school":"Scuola","kindergarten":"Asilo","university":"Università","college":"College","gym":"Palestra","fitness":"Centro fitness",
-                        "cinema":"Cinema","theatre":"Teatro","doctor":"Medico","dentist":"Dentista","clinic":"Ambulatorio","commercial":"Attività commerciale"
-                    };
-                    let readable = catMap[cat] || (cat.charAt(0).toUpperCase() + cat.slice(1));
-                    display = `${name} (${readable})`;
-                } else if (tags.highway) {
-                    display = `${name} (via/strada)`;
-                }
-                items.push({ display, dist, priority });
-            }
-            items.sort((a,b) => {
-                if (a.priority !== b.priority) return a.priority - b.priority;
-                return a.dist - b.dist;
-            });
-            const unique = new Map();
-            for (let item of items) {
-                let baseName = item.display.split(' (')[0];
-                if (!unique.has(baseName)) unique.set(baseName, item);
-            }
-            let uniqueItems = Array.from(unique.values());
-            let refs = uniqueItems.slice(0,3).map(i => `${i.display} a ${Math.round(i.dist)} metri`);
-            while(refs.length < 3) refs.push("Nessun riferimento");
-            return refs;
-        } catch(e) {
-            console.warn("Errore ricerca nomi", e);
-            return ["Nessun riferimento","Nessun riferimento","Nessun riferimento"];
-        }
-    }
-    async function reverseGeocode(lat,lng) {
-        try {
-            let url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1&accept-language=it`;
-            let resp = await fetch(url, {headers:{'User-Agent':'SOSDrive/1.0'}});
-            let data = await resp.json();
-            if (data.address) {
-                let road = data.address.road || "";
-                let suburb = data.address.suburb || "";
-                let village = data.address.village || "";
-                let town = data.address.town || "";
-                let city = data.address.city || "";
-                let result = "";
-                if (road) result += road;
-                if (suburb && suburb !== road) result += result ? ", " + suburb : suburb;
-                if (village && village !== road && village !== suburb) result += result ? ", " + village : village;
-                if (town && town !== road && town !== suburb && town !== village) result += result ? ", " + town : town;
-                if (city && city !== town && city !== village) result += result ? ", " + city : city;
-                if (result) return result;
-            }
-            return data.display_name || "Indirizzo non trovato";
-        } catch(e) { return "Indirizzo non disponibile"; }
-    }
-    async function getAveragePosition() {
-        return new Promise((resolve,reject) => {
-            let attempts=0, positions=[];
-            let success = (pos) => {
-                positions.push({lat:pos.coords.latitude, lng:pos.coords.longitude});
-                attempts++;
-                if (attempts>=5) {
-                    let sumLat=0, sumLng=0;
-                    positions.forEach(p=>{sumLat+=p.lat; sumLng+=p.lng;});
-                    resolve({lat:sumLat/positions.length, lng:sumLng/positions.length});
-                } else navigator.geolocation.getCurrentPosition(success, error, {enableHighAccuracy:true, timeout:5000});
-            };
-            let error = (err) => {
-                if (positions.length) {
-                    let sumLat=0, sumLng=0;
-                    positions.forEach(p=>{sumLat+=p.lat; sumLng+=p.lng;});
-                    resolve({lat:sumLat/positions.length, lng:sumLng/positions.length});
-                } else reject(err);
-            };
-            navigator.geolocation.getCurrentPosition(success, error, {enableHighAccuracy:true, timeout:5000});
-        });
-    }
-    async function getLocationAndAddress() {
-        if (!navigator.geolocation) { gpsStatus.innerHTML = "❌ GPS non supportato"; return; }
-        gpsStatus.innerHTML = "⏳ Acquisizione 5 letture GPS...";
-        try {
-            let avg = await getAveragePosition();
-            gpsStatus.innerHTML = "📍 Elaborazione map matching...";
-            let snapped = await snapToRoad(avg.lat, avg.lng);
-            let finalLat = snapped.lat, finalLng = snapped.lng;
-            let address = await reverseGeocode(finalLat, finalLng);
-            gpsStatus.innerHTML = "🔍 Ricerca luoghi con nome entro 300m...";
-            let [ref1, ref2, ref3] = await fetchAllNamedPlaces(finalLat, finalLng);
-            currentLat = finalLat; currentLng = finalLng; currentAddress = address; currentRefA = ref1; currentRefB = ref2; currentRefC = ref3;
-            latLonDisplay.innerText = `${finalLat.toFixed(6)}, ${finalLng.toFixed(6)}`;
-            addressDisplay.innerText = address;
-            refADisplay.innerText = ref1;
-            refBDisplay.innerText = ref2;
-            refCDisplay.innerText = ref3;
-            gpsStatus.innerHTML = "✅ Posizione e riferimenti aggiornati!";
-            setTimeout(()=> gpsStatus.innerHTML = "✅ Pronto.", 3000);
-        } catch(e) { gpsStatus.innerHTML = `❌ Errore GPS: ${e.message}`; }
-    }
-    function resetCoords() {
-        currentLat=currentLng=null; currentAddress=""; currentRefA=""; currentRefB=""; currentRefC="";
-        latLonDisplay.innerText = addressDisplay.innerText = refADisplay.innerText = refBDisplay.innerText = refCDisplay.innerText = "---";
-        gpsStatus.innerHTML = "";
-    }
+    // ==================== GESTIONE NOTE ====================
     function getNormalNotesKey(s) { return `normalNotes_${s}_${CURRENT_VERSION}`; }
     function getSelectedNormalIdKey(s) { return `selectedNormalNote_${s}_${CURRENT_VERSION}`; }
     function saveNormalNotesForService(s) { localStorage.setItem(getNormalNotesKey(s), JSON.stringify(normalNotes[s])); }
@@ -1121,6 +359,7 @@
         updateModalCoordButtons();
         deleteNoteModalBtn.style.display = 'none';
         noteEditModal.style.display = 'flex';
+        keepScreenOn();
     }
     function openEditNoteModal(noteId) {
         const note = normalNotes[currentService].find(n => String(n.id) === noteId);
@@ -1133,6 +372,7 @@
         updateModalCoordButtons();
         deleteNoteModalBtn.style.display = 'block';
         noteEditModal.style.display = 'flex';
+        keepScreenOn();
     }
     function updateModalCoordButtons() {
         if (currentEditIncludeCoords) {
@@ -1195,6 +435,7 @@
             await speakWordsWithPause(fullText, 'it-IT', 1.0, 200);
         }
         playBeep();
+        keepScreenOn();
     }
     modalAudioIt.addEventListener('click', () => speakNoteFromModal('it'));
     modalAudioFr.addEventListener('click', () => speakNoteFromModal('fr'));
@@ -1227,6 +468,7 @@
         }
         setTimeout(()=> gpsStatus.innerHTML = "✅ Pronto.", 2000);
         closeEditModal();
+        keepScreenOn();
     }
     function deleteNoteFromModal() {
         if (!currentEditId) return;
@@ -1313,6 +555,7 @@
         playBeep();
         gpsStatus.innerHTML = "✅ Messaggio completato. Avvio ascolto operatore (30 secondi)...";
         setTimeout(() => startListening30s(), 500);
+        keepScreenOn();
     }
     function speakItalianNote() { speakNoteWithOptionalCoords('it'); }
     function speakFrenchNote() { speakNoteWithOptionalCoords('fr'); }
@@ -1345,7 +588,10 @@
             gpsStatus.innerHTML = "📋 Nota copiata manualmente";
             showTemporaryMessage(copyInfoMsg, "📋 Nota copiata. Incolla su WhatsApp.", 15000);
         }
+        keepScreenOn();
     }
+    
+    // ==================== TRADUZIONI E ASCOLTO ====================
     async function translateToFrench(italianText) {
         if (!italianText || italianText.trim() === "") return "";
         try {
@@ -1406,6 +652,7 @@
             setTimeout(() => { if (transcribeStatus.innerText.includes("Tradotto") || transcribeStatus.innerText.includes("Nessun parlato")) transcribeStatus.innerText = ""; }, 4000);
         };
         recognitionTimeout = setTimeout(() => { if (recognitionOperator && recognitionOperator.stop) recognitionOperator.stop(); }, 30000);
+        keepScreenOn();
     }
     function initRecognitionSpeak() {
         if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
@@ -1462,17 +709,36 @@
             }
         };
         setTimeout(() => { if (recognitionSpeak && recognitionSpeak.stop) recognitionSpeak.stop(); }, 30000);
+        keepScreenOn();
     }
-    async function readLastFrench() {
-        if (lastFrenchTranslation && lastFrenchTranslation.trim() !== "") {
-            await speakWordsWithPause(lastFrenchTranslation, 'fr-FR', 1.0, 200);
-            playBeep();
-        } else {
-            alert("Nessuna traduzione francese disponibile. Parla con l'operatore prima.");
+    // Pulsante "Leggi Francese Nota e Coordinate" -> legge nota selezionata + coordinate (se attivo)
+    async function readFrenchNoteAndCoords() {
+        if (!window.speechSynthesis) { alert("Sintesi non supportata"); return; }
+        speechSynthesis.cancel();
+        let note = getSelectedNoteDescription();
+        if (!note) {
+            alert("Nessuna nota selezionata. Seleziona una nota premendo il pallino blu.");
+            return;
         }
+        let fullText = note;
+        const includeCoords = getSelectedNoteIncludeCoords();
+        if (includeCoords && currentLat !== null && currentLng !== null) {
+            const coordText = getFormattedCoordinatesForSpeech('fr');
+            if (coordText) {
+                const translatedCoord = await translateToFrench(coordText);
+                fullText = note + ". " + translatedCoord;
+            } else {
+                fullText = note + ". Coordonnées non disponibles.";
+            }
+        } else if (includeCoords && (currentLat === null || currentLng === null)) {
+            fullText = note + ". Coordonnées non disponibles.";
+        }
+        await speakWordsWithPause(fullText, 'fr-FR', 1.0, 200);
+        playBeep();
+        keepScreenOn();
     }
-    const speakReadFrBtn = document.getElementById('speakReadFrBtn');
-    if (speakReadFrBtn) speakReadFrBtn.addEventListener('click', readLastFrench);
+    if (speakReadFrBtn) speakReadFrBtn.addEventListener('click', readFrenchNoteAndCoords);
+    
     function saveSpeakTranslation() {
         if (currentService) localStorage.setItem(`speakTranslation_${currentService}_${CURRENT_VERSION}`, JSON.stringify({ italian: lastItalianText, french: lastFrenchTranslation }));
     }
@@ -1568,6 +834,7 @@
         URL.revokeObjectURL(a.href);
         gpsStatus.innerHTML = "📁 Backup completo salvato (note + contatti).";
         setTimeout(() => gpsStatus.innerHTML = "✅ Pronto.", 2000);
+        keepScreenOn();
     }
     function importAllNotes(file) {
         const reader = new FileReader();
@@ -1657,6 +924,7 @@
             setTimeout(() => gpsStatus.innerHTML = "✅ Pronto.", 2000);
         };
         reader.readAsText(file, "UTF-8");
+        keepScreenOn();
     }
     function savePhone(s,n) { localStorage.setItem(`phone_${s}_${CURRENT_VERSION}`, n); }
     function getPhone(s) { return localStorage.getItem(`phone_${s}_${CURRENT_VERSION}`); }
@@ -1671,45 +939,13 @@
             }
         }
     }
-    function getInfoTextKey(service, type) { return `infoText_${type}_${service}_${CURRENT_VERSION}`; }
-    function loadInfoText(service, type) { const key = getInfoTextKey(service, type); const saved = localStorage.getItem(key); return saved ? saved : ""; }
-    function saveInfoText(service, type, text) { const key = getInfoTextKey(service, type); localStorage.setItem(key, text); }
-    function showInfoText(service, type) {
-        const text = loadInfoText(service, type);
-        if (text && text.trim() !== "") { alert(text); }
-    }
-    function editInfoText(service, type) {
-        if (!adminAuthenticated) { alert("Solo l'amministratore può modificare questo testo."); return; }
-        const currentText = loadInfoText(service, type);
-        const newText = prompt("Modifica il testo informativo:", currentText);
-        if (newText !== null && newText.trim() !== "") {
-            saveInfoText(service, type, newText.trim());
-            alert("Testo informativo aggiornato.");
-        } else if (newText !== null && newText.trim() === "") {
-            alert("Il testo non può essere vuoto.");
-        }
-    }
-    function setupInfoButton(btn, type) {
-        if (!btn) return;
-        btn.addEventListener('click', () => { if (currentService) showInfoText(currentService, type); });
-        let pressTimer = null;
-        const startLongPress = () => { pressTimer = setTimeout(() => { editInfoText(currentService, type); }, 3000); };
-        const cancelLongPress = () => { if (pressTimer) clearTimeout(pressTimer); };
-        btn.addEventListener('mousedown', startLongPress);
-        btn.addEventListener('mouseup', cancelLongPress);
-        btn.addEventListener('mouseleave', cancelLongPress);
-        btn.addEventListener('touchstart', startLongPress, { passive: true });
-        btn.addEventListener('touchend', cancelLongPress);
-        btn.addEventListener('touchcancel', cancelLongPress);
-    }
-    // Gestione nuovo pallino "i" su licenza
-    licenseInfoIcon.addEventListener('click', () => {
-        openGlobalInfoModal('licenseInfo', 'Informazioni sul codice cliente. Questo testo è modificabile solo dall\'amministratore.', 'license_info_text');
-    });
-    // Aggiungi listener per gli altri pallini "i" nelle pagine (infoNoteBtn, infoOperatorBtn, infoSpeakBtn)
-    infoNoteBtn.addEventListener('click', () => openGlobalInfoModal('infoNote', 'Informazioni sulle note. Questo testo è modificabile solo dall\'amministratore.', 'info_note_text'));
-    infoOperatorBtn.addEventListener('click', () => openGlobalInfoModal('infoOperator', 'Informazioni sull\'ascolto operatore. Questo testo è modificabile solo dall\'amministratore.', 'info_operator_text'));
-    infoSpeakBtn.addEventListener('click', () => openGlobalInfoModal('infoSpeak', 'Informazioni sulla conversazione con operatore. Questo testo è modificabile solo dall\'amministratore.', 'info_speak_text'));
+    
+    // ==================== PALLINI I (già gestiti con modale globale) ====================
+    licenseInfoIcon.addEventListener('click', () => openGlobalInfoModal('licenseInfo', 'Informazioni Licenza', 'license_info_text'));
+    infoNoteBtn.addEventListener('click', () => openGlobalInfoModal('infoNote', 'Informazioni Note', 'info_note_text'));
+    infoOperatorBtn.addEventListener('click', () => openGlobalInfoModal('infoOperator', 'Informazioni Ascolto Operatore', 'info_operator_text'));
+    infoSpeakBtn.addEventListener('click', () => openGlobalInfoModal('infoSpeak', 'Informazioni Conversazione', 'info_speak_text'));
+    
     function showEmergency(s) {
         if (!licenseCheckPassed) { alert('Licenza non attiva o scaduta. Attivala dalla home.'); return; }
         currentService = s;
@@ -1727,11 +963,7 @@
         if (normalNoteInfo) normalNoteInfo.style.display = 'none';
         if (listenInfoMsg) listenInfoMsg.style.display = 'none';
         if (copyInfoMsg) copyInfoMsg.style.display = 'none';
-        // Non usiamo più i vecchi setupInfoButton perché ora usiamo la modale globale
-        // ma per mantenere la funzionalità, li sostituiamo con la modale informativa
-        infoNoteBtn.onclick = () => openGlobalInfoModal('infoNote', 'Informazioni sulle note. Questo testo è modificabile solo dall\'amministratore.', 'info_note_text');
-        infoOperatorBtn.onclick = () => openGlobalInfoModal('infoOperator', 'Informazioni sull\'ascolto operatore. Questo testo è modificabile solo dall\'amministratore.', 'info_operator_text');
-        infoSpeakBtn.onclick = () => openGlobalInfoModal('infoSpeak', 'Informazioni sulla conversazione con operatore. Questo testo è modificabile solo dall\'amministratore.', 'info_speak_text');
+        keepScreenOn();
     }
     function onSaveNumber() { 
         let n = phoneInput.value.trim(); 
@@ -1740,27 +972,33 @@
             phoneSaveMsg.innerText = "✅ Numero salvato nell'archivio"; 
             setTimeout(()=>phoneSaveMsg.innerText="",2000); 
         } else phoneSaveMsg.innerText = "⚠️ Inserisci un numero valido"; 
+        keepScreenOn();
     }
     function onClearResponse() { 
         clearOperatorTranslation(); 
         transcribeStatus.innerText = "🧹 Traduzione cancellata"; 
         setTimeout(() => transcribeStatus.innerText = "", 2000); 
+        keepScreenOn();
     }
     closeActivityModalBtn.addEventListener('click', () => {
         activityModal.style.display = 'none';
         currentActivityNode = null;
+        keepScreenOn();
     });
     activityModal.addEventListener('click', (e) => {
         if (e.target === activityModal) {
             activityModal.style.display = 'none';
             currentActivityNode = null;
+            keepScreenOn();
         }
     });
+    
     function init() {
         loadAdminCode();
         loadAllNotes();
         loadContactExtraText();
         migratePhoneNumbers();
+        loadInfoTextsFromLocal();
         initHomeButtons();
         loadReteData();
         saveNumberBtn.addEventListener('click', onSaveNumber);
@@ -1785,7 +1023,8 @@
             reteData.children = [];
             saveReteData();
         }
-        requestGlobalWakeLock();
+        keepScreenOn();
+        bindWakeLockToInteraction();
         history.replaceState({ page: 'home' }, '');
     }
     init();
