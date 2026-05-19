@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
-    <title>Contatti Personali - v0232</title>
+    <title>Contatti Personali - v0233</title>
     <link rel="manifest" href="manifest.json">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -102,26 +102,16 @@
         .cancel-row{display:flex;gap:10px;align-items:center;margin-bottom:12px}
         .cancel-row .small-btn{flex:1}
         .rete-container{margin-top:20px}
-        .rete-item{display:flex;align-items:center;gap:8px;margin:8px 0;flex-wrap:wrap}
-        .rete-button{background:#283593;color:white;flex:2;padding:12px;border-radius:40px;text-align:center;font-weight:bold;cursor:pointer;transition:0.05s linear}
-        .rete-button:active{transform:scale(0.97)}
-        .rete-delete-btn{background:#8e44ad;color:white;padding:8px 12px;border-radius:40px;font-size:0.8rem;font-weight:bold;cursor:pointer;border:none;white-space:nowrap}
-        .rete-delete-btn:active{transform:scale(0.97)}
-        .rete-add-child-btn{background:#4caf50;color:white;padding:8px 12px;border-radius:40px;font-size:0.8rem;font-weight:bold;cursor:pointer;border:none;white-space:nowrap;margin-left:4px}
-        .rete-add-child-btn:active{transform:scale(0.97)}
-        .info-mini-img{max-width:100%;max-height:100px;border-radius:12px;margin-top:8px;cursor:pointer;object-fit:contain}
-        .info-edit-buttons{margin-top:16px;display:flex;gap:12px}
-        .info-edit-buttons button{flex:1}
-        .hidden-btn{display:none !important}
-        .speak-extra-buttons{display:flex;gap:10px;margin-top:12px}
-        .speak-extra-buttons button{flex:1}
-        .admin-backup-buttons{display:flex;gap:12px;margin-top:8px;margin-bottom:8px}
-        .admin-backup-buttons button{flex:1}
-        .backup-hint{font-size:0.7rem;color:#555;text-align:center;margin-top:4px}
-        .orange-btn{background:#e67e22 !important}
-        .rete-select-dropdown{width:100%;padding:12px;border-radius:40px;background:#283593;color:white;border:none;font-weight:bold;font-size:1rem;margin:8px 0}
-        .rete-parent-button{background:#283593;color:white;flex:2;padding:12px;border-radius:40px;text-align:center;font-weight:bold;cursor:pointer;transition:0.05s linear;margin-bottom:8px}
-        .rete-parent-button:active{transform:scale(0.97)}
+        .rete-category{background:#283593;color:white;padding:12px;border-radius:40px;margin:8px 0;display:flex;align-items:center;gap:8px}
+        .rete-category .category-name{flex:2;font-weight:bold;text-align:center;cursor:pointer}
+        .rete-category .small-icon{background:#4caf50;color:white;border:none;border-radius:40px;padding:6px 12px;font-weight:bold;cursor:pointer}
+        .rete-category .delete-icon{background:#8e44ad;color:white;border:none;border-radius:40px;padding:6px 12px;cursor:pointer}
+        .rete-child{background:#283593;color:white;padding:8px 12px;border-radius:40px;margin:4px 0 4px 20px;display:flex;align-items:center;gap:8px}
+        .rete-child .child-name{flex:2;font-weight:bold;cursor:pointer}
+        .rete-child .delete-icon{background:#8e44ad;color:white;border:none;border-radius:40px;padding:4px 8px;cursor:pointer}
+        .rete-child .child-icon{font-size:1.2rem;margin-right:4px}
+        .add-category-btn{background:#4caf50;color:white;border:none;border-radius:40px;padding:12px;margin-top:16px;font-weight:bold;cursor:pointer}
+        .add-category-btn:active{transform:scale(0.97)}
     </style>
 </head>
 <body>
@@ -139,7 +129,7 @@
             <div class="flex-row"><input type="text" id="generatedCode" readonly placeholder="Codice generato" style="flex:1; background:#f8f9fa;"><button id="copyGeneratedBtn" class="small-btn" style="background:#283593;">📋 COPIA</button></div>
             <div class="flex-row"><input type="text" id="newAdminCode" placeholder="Nuovo codice amministratore" style="flex:1;"><button id="changeAdminCodeBtn" class="small-btn" style="background:#8e44ad;">CAMBIA CODICE</button></div>
             <div class="admin-backup-buttons"><button id="saveInfoIconsBtn" class="small-btn" style="background:#283593;">💾 SALVA (i)</button><button id="restoreInfoIconsBtn" class="small-btn" style="background:#6b8e23;">📂 RIPRISTINA (i)</button></div>
-            <div id="backupHint" class="backup-hint">📄 info_icons_backup_v0232.txt</div>
+            <div id="backupHint" class="backup-hint">📄 info_icons_backup_v0233.txt</div>
             <button id="hideAdminBtn" class="small-btn" style="background:#757575; width:100%; margin-top:8px;">NASCONDI AREA ADMIN</button>
         </div>
         <div class="dark-card"><div class="grid-2" id="contactsGrid"></div></div>
@@ -147,7 +137,7 @@
         <div class="info-text">Ogni contatto ha il proprio archivio note.<br>📍 Ricerca entro 300m di TUTTI i luoghi con nome<br>🔊 Ascolto automatico 30 secondi dopo il messaggio</div>
         <div class="info-text">Non Utilizzare APP per Situazioni di Emergenza di Salute</div>
         <div class="days-line" id="daysLeftDisplayHome">Giorni rimanenti: --</div>
-        <div class="info-text">💾 Il file SALVA NOTE si chiama: contatti_personali_notes_backup_0232.txt</div>
+        <div class="info-text">💾 Il file SALVA NOTE si chiama: contatti_personali_notes_backup_0233.txt</div>
         <div class="export-import-row"><button id="exportAllBtn">💾 SALVA NOTE</button><button id="importAllBtn">📂 RIPRISTINA NOTE</button></div>
         <input type="file" id="globalImportFileInput" accept=".txt" style="display:none;">
     </div>
@@ -208,8 +198,8 @@
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
 <script>
-    // v0232 - Correzione aggiunta figli: il pulsante "+" aggiunge figlio senza duplicazioni
-    const CURRENT_VERSION = "0232";
+    // v0233 - Nuova gestione: categorie (madri) e figli con modale per rinominare figli
+    const CURRENT_VERSION = "0233";
     let currentService = "ambulanza";
     let currentLat = null, currentLng = null;
     let currentAddress = "";
@@ -365,7 +355,7 @@
     function releaseImagePageWakeLock() { if (imagePageWakeLock) { imagePageWakeLock.release(); imagePageWakeLock = null; } }
     async function requestImagePageWakeLock() { if ('wakeLock' in navigator) { try { imagePageWakeLock = await navigator.wakeLock.request('screen'); } catch(e){} } }
     
-    // ==================== GESTIONE TASTO INDIETRO CORRETTA ====================
+    // ==================== GESTIONE TASTO INDIETRO ====================
     let currentPage = 'home';
     let isModalOpen = false;
     let backStack = ['home'];
@@ -399,7 +389,7 @@
                 emergencyPage.classList.add('hidden');
                 currentPage = 'image';
                 requestImagePageWakeLock();
-                renderReteLevel(reteLevelContainer, reteData);
+                renderReteCategories(reteLevelContainer, reteData);
                 loadSavedImage();
                 keepScreenOn();
             } else if (prev === 'emergency') {
@@ -420,67 +410,85 @@
         }
     });
     
-    // ==================== GESTIONE RETE DINAMICA ====================
-    let reteData = { title: "RETE", children: [] };
+    // ==================== GESTIONE RETE (NUOVA VERSIONE CATEGORIE + FIGLI) ====================
+    let reteData = { categories: [] };
     function saveReteData() { localStorage.setItem('monastir_rete_data', JSON.stringify(reteData)); }
     function loadReteData() {
         const saved = localStorage.getItem('monastir_rete_data');
         if (saved) {
             try {
                 reteData = JSON.parse(saved);
-                function ensureFields(node) {
-                    if (!node.infoText) node.infoText = "";
-                    if (!node.infoImage) node.infoImage = null;
-                    if (!node.coordinate) node.coordinate = "";
-                    if (!node.websiteUrl) node.websiteUrl = "";
-                    if (node.children) node.children.forEach(ensureFields);
-                }
-                ensureFields(reteData);
-            } catch(e) {}
+                if (!reteData.categories) reteData.categories = [];
+                reteData.categories.forEach(cat => {
+                    if (!cat.children) cat.children = [];
+                    cat.children.forEach(child => {
+                        if (!child.title) child.title = "";
+                        if (!child.infoText) child.infoText = "";
+                        if (!child.infoImage) child.infoImage = null;
+                        if (!child.coordinate) child.coordinate = "";
+                        if (!child.websiteUrl) child.websiteUrl = "";
+                    });
+                });
+            } catch(e) { console.warn(e); }
         }
-        if (!reteData.title) reteData = { title: "RETE", children: [] };
-        if (!reteData.children) reteData.children = [];
+        if (!reteData.categories) reteData.categories = [];
     }
-    function addEmptyChildToNode(parentNode) {
-        if (!adminAuthenticated) { alert("Solo amministratore."); return null; }
-        if (!parentNode.children) parentNode.children = [];
-        parentNode.children.push({ title: "", children: [], infoText: "", infoImage: null, coordinate: "", websiteUrl: "" });
+    function addCategory() {
+        if (!adminAuthenticated) { alert("Solo amministratore."); return; }
+        reteData.categories.push({ title: "Tasto vuoto", children: [] });
         saveReteData();
-        return parentNode.children[parentNode.children.length - 1];
+        renderReteCategories(reteLevelContainer, reteData);
     }
-    function editNodeTitle(node, newTitle) {
+    function addChildToCategory(category) {
+        if (!adminAuthenticated) { alert("Solo amministratore."); return; }
+        if (!category.children) category.children = [];
+        category.children.push({ id: Date.now() + '_' + Math.random(), title: "Selezione attività", infoText: "", infoImage: null, coordinate: "", websiteUrl: "" });
+        saveReteData();
+        renderReteCategories(reteLevelContainer, reteData);
+    }
+    function editCategoryTitle(category, newTitle) {
         if (!adminAuthenticated) { alert("Solo amministratore."); return false; }
-        node.title = newTitle;
+        category.title = newTitle;
         saveReteData();
+        renderReteCategories(reteLevelContainer, reteData);
         return true;
     }
-    function deleteNode(parentNode, nodeToDelete) {
-        if (!adminAuthenticated) { alert("Solo amministratore."); return false; }
-        const index = parentNode.children.findIndex(c => c === nodeToDelete);
-        if (index !== -1) { parentNode.children.splice(index,1); saveReteData(); return true; }
-        return false;
-    }
-    function addChildToNode(parentNode) {
+    function deleteCategory(category, index) {
         if (!adminAuthenticated) { alert("Solo amministratore."); return; }
-        if (!parentNode.children) parentNode.children = [];
-        parentNode.children.push({ title: "", children: [], infoText: "", infoImage: null, coordinate: "", websiteUrl: "" });
-        saveReteData();
-        renderReteLevel(reteLevelContainer, reteData);
+        if (confirm("Vuoi eliminare la categoria '" + category.title + "' e tutti i suoi figli? (S/N)")) {
+            reteData.categories.splice(index, 1);
+            saveReteData();
+            renderReteCategories(reteLevelContainer, reteData);
+        }
     }
-    
-    function showActivityModal(node) {
+    function deleteChild(category, childIndex) {
+        if (!adminAuthenticated) { alert("Solo amministratore."); return; }
+        if (confirm("Vuoi eliminare questo figlio?")) {
+            category.children.splice(childIndex, 1);
+            saveReteData();
+            renderReteCategories(reteLevelContainer, reteData);
+        }
+    }
+    function editChildTitle(child, newTitle) {
+        if (!adminAuthenticated) { alert("Solo amministratore."); return false; }
+        child.title = newTitle;
+        saveReteData();
+        renderReteCategories(reteLevelContainer, reteData);
+        return true;
+    }
+    function showActivityModalForChild(child) {
         if (!licenseCheckPassed) {
             alert("Licenza non attiva. Attivala per visualizzare i dettagli dell'attività.");
             return;
         }
-        currentActivityNode = node;
-        activityModalTitle.innerText = (node.title && node.title.trim()) ? node.title : "Attività senza titolo";
-        activityInfoText.value = node.infoText || "Nessuna informazione aggiuntiva.";
+        currentActivityNode = child;
+        activityModalTitle.innerText = (child.title && child.title.trim()) ? child.title : "Descrittivo attività senza titolo";
+        activityInfoText.value = child.infoText || "Nessuna informazione aggiuntiva.";
         activityInfoText.readOnly = true;
         activityImageContainer.innerHTML = '';
-        if (node.infoImage) {
+        if (child.infoImage) {
             let img = document.createElement('img');
-            img.src = node.infoImage;
+            img.src = child.infoImage;
             img.className = 'info-mini-img';
             img.style.maxWidth = '100%';
             img.style.maxHeight = '120px';
@@ -502,32 +510,29 @@
             activityAdminImageButtons.classList.add('hidden-btn');
             activityInfoAdminButtons.classList.add('hidden-btn');
         }
-        updateActivityButtons();
+        updateActivityButtonsForChild(child);
         activityModal.style.display = 'flex';
         isModalOpen = true;
         keepScreenOn();
     }
-    
-    function updateActivityButtons() {
-        if (!currentActivityNode) return;
-        const coord = currentActivityNode.coordinate || "";
-        const web = currentActivityNode.websiteUrl || "";
+    function updateActivityButtonsForChild(child) {
+        const coord = child.coordinate || "";
+        const web = child.websiteUrl || "";
         activityCoordBtn.onclick = () => { if (coord.trim()) window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(coord)}`, '_blank'); else alert("Nessuna coordinata impostata."); };
         activityWebBtn.onclick = () => { if (web.trim()) { let full = web.trim(); if (!full.startsWith('http')) full = 'https://' + full; window.open(full, '_blank'); } else alert("Nessun sito web associato."); };
         if (adminAuthenticated) {
             let coordTimer = null;
-            activityCoordBtn.onmousedown = () => { coordTimer = setTimeout(() => { let newCoord = prompt("Modifica coordinate (formato: latitudine,longitudine):", currentActivityNode.coordinate || ""); if (newCoord !== null) { if (newCoord.trim() === "") { currentActivityNode.coordinate = ""; saveReteData(); updateActivityButtons(); showActivityModal(currentActivityNode); } else if (newCoord.includes(',') && !isNaN(parseFloat(newCoord.split(',')[0])) && !isNaN(parseFloat(newCoord.split(',')[1]))) { currentActivityNode.coordinate = newCoord.trim(); saveReteData(); updateActivityButtons(); showActivityModal(currentActivityNode); } else { alert("Formato non valido. Usa lat,lon (es. 43.841977,11.170855)"); } } }, 3000); };
+            activityCoordBtn.onmousedown = () => { coordTimer = setTimeout(() => { let newCoord = prompt("Modifica coordinate (formato: latitudine,longitudine):", child.coordinate || ""); if (newCoord !== null) { if (newCoord.trim() === "") { child.coordinate = ""; saveReteData(); updateActivityButtonsForChild(child); showActivityModalForChild(child); } else if (newCoord.includes(',') && !isNaN(parseFloat(newCoord.split(',')[0])) && !isNaN(parseFloat(newCoord.split(',')[1]))) { child.coordinate = newCoord.trim(); saveReteData(); updateActivityButtonsForChild(child); showActivityModalForChild(child); } else { alert("Formato non valido. Usa lat,lon (es. 43.841977,11.170855)"); } } }, 3000); };
             activityCoordBtn.onmouseup = activityCoordBtn.onmouseleave = () => { if (coordTimer) clearTimeout(coordTimer); };
-            activityCoordBtn.ontouchstart = () => { coordTimer = setTimeout(() => { let newCoord = prompt("Modifica coordinate:", currentActivityNode.coordinate || ""); if (newCoord !== null) { if (newCoord.trim() === "") { currentActivityNode.coordinate = ""; saveReteData(); updateActivityButtons(); showActivityModal(currentActivityNode); } else if (newCoord.includes(',') && !isNaN(parseFloat(newCoord.split(',')[0])) && !isNaN(parseFloat(newCoord.split(',')[1]))) { currentActivityNode.coordinate = newCoord.trim(); saveReteData(); updateActivityButtons(); showActivityModal(currentActivityNode); } else { alert("Formato non valido."); } } }, 3000); };
+            activityCoordBtn.ontouchstart = () => { coordTimer = setTimeout(() => { let newCoord = prompt("Modifica coordinate:", child.coordinate || ""); if (newCoord !== null) { if (newCoord.trim() === "") { child.coordinate = ""; saveReteData(); updateActivityButtonsForChild(child); showActivityModalForChild(child); } else if (newCoord.includes(',') && !isNaN(parseFloat(newCoord.split(',')[0])) && !isNaN(parseFloat(newCoord.split(',')[1]))) { child.coordinate = newCoord.trim(); saveReteData(); updateActivityButtonsForChild(child); showActivityModalForChild(child); } else { alert("Formato non valido."); } } }, 3000); };
             activityCoordBtn.ontouchend = activityCoordBtn.ontouchcancel = () => { if (coordTimer) clearTimeout(coordTimer); };
             let webTimer = null;
-            activityWebBtn.onmousedown = () => { webTimer = setTimeout(() => { let newUrl = prompt("Modifica sito web (es. https://www.example.com):", currentActivityNode.websiteUrl || ""); if (newUrl !== null) { currentActivityNode.websiteUrl = newUrl.trim(); saveReteData(); updateActivityButtons(); showActivityModal(currentActivityNode); } }, 3000); };
+            activityWebBtn.onmousedown = () => { webTimer = setTimeout(() => { let newUrl = prompt("Modifica sito web (es. https://www.example.com):", child.websiteUrl || ""); if (newUrl !== null) { child.websiteUrl = newUrl.trim(); saveReteData(); updateActivityButtonsForChild(child); showActivityModalForChild(child); } }, 3000); };
             activityWebBtn.onmouseup = activityWebBtn.onmouseleave = () => { if (webTimer) clearTimeout(webTimer); };
-            activityWebBtn.ontouchstart = () => { webTimer = setTimeout(() => { let newUrl = prompt("Modifica sito web:", currentActivityNode.websiteUrl || ""); if (newUrl !== null) { currentActivityNode.websiteUrl = newUrl.trim(); saveReteData(); updateActivityButtons(); showActivityModal(currentActivityNode); } }, 3000); };
+            activityWebBtn.ontouchstart = () => { webTimer = setTimeout(() => { let newUrl = prompt("Modifica sito web:", child.websiteUrl || ""); if (newUrl !== null) { child.websiteUrl = newUrl.trim(); saveReteData(); updateActivityButtonsForChild(child); showActivityModalForChild(child); } }, 3000); };
             activityWebBtn.ontouchend = activityWebBtn.ontouchcancel = () => { if (webTimer) clearTimeout(webTimer); };
         }
     }
-    
     activityUploadImageBtn.addEventListener('click', () => {
         if (!adminAuthenticated || !currentActivityNode) return;
         let input = document.createElement('input');
@@ -540,7 +545,7 @@
                 reader.onload = (ev) => {
                     currentActivityNode.infoImage = ev.target.result;
                     saveReteData();
-                    showActivityModal(currentActivityNode);
+                    showActivityModalForChild(currentActivityNode);
                 };
                 reader.readAsDataURL(file);
             }
@@ -573,145 +578,85 @@
         activityCancelInfoBtn.style.display = "none";
     });
     
-    function renderReteLevel(container, parentNode) {
+    function renderReteCategories(container, data) {
         container.innerHTML = '';
-        if (!parentNode.children || parentNode.children.length === 0) {
+        if (!data.categories || data.categories.length === 0) {
             let empty = document.createElement('div');
             empty.style.textAlign = 'center';
             empty.style.padding = '20px';
-            empty.innerText = adminAuthenticated ? 'Nessun tasto. Premi a lungo su "+ AGGIUNGI TASTO" per aggiungere.' : 'Nessun tasto disponibile.';
+            empty.innerText = adminAuthenticated ? 'Nessuna categoria. Premi "+ AGGIUNGI TASTO" per aggiungere.' : 'Nessuna categoria disponibile.';
             container.appendChild(empty);
         } else {
-            parentNode.children.forEach(child => {
-                let div = document.createElement('div');
-                div.className = 'rete-item';
-                if (child.children && child.children.length > 0) {
-                    // Nodo con figli (madre)
-                    let parentBtn = document.createElement('div');
-                    parentBtn.className = 'rete-parent-button';
-                    parentBtn.innerText = (child.title && child.title.trim()) ? child.title : "[Tasto vuoto]";
-                    let parentPressTimer = null;
-                    let startParentLong = () => {
-                        parentPressTimer = setTimeout(() => {
-                            if (!adminAuthenticated) { alert("Solo amministratore."); return; }
-                            let newTitle = prompt("Nuovo titolo per il menù:", child.title);
-                            if (newTitle !== null && newTitle.trim() !== "") {
-                                editNodeTitle(child, newTitle.trim());
-                                renderReteLevel(container, parentNode);
-                            } else if (newTitle !== null && newTitle.trim() === "") alert("Titolo vuoto non permesso.");
-                        }, 3000);
-                    };
-                    let cancelParentLong = () => { if (parentPressTimer) clearTimeout(parentPressTimer); };
-                    parentBtn.addEventListener('mousedown', startParentLong);
-                    parentBtn.addEventListener('mouseup', cancelParentLong);
-                    parentBtn.addEventListener('mouseleave', cancelParentLong);
-                    parentBtn.addEventListener('touchstart', startParentLong, { passive: true });
-                    parentBtn.addEventListener('touchend', cancelParentLong);
-                    parentBtn.addEventListener('touchcancel', cancelParentLong);
-                    div.appendChild(parentBtn);
-                    if (adminAuthenticated) {
-                        let addChild = document.createElement('button');
-                        addChild.innerText = '➕';
-                        addChild.className = 'rete-add-child-btn';
-                        addChild.title = 'Aggiungi figlio';
-                        addChild.onclick = (e) => { e.stopPropagation(); addChildToNode(child); };
-                        div.appendChild(addChild);
-                    }
-                    if (licenseCheckPassed) {
-                        let select = document.createElement('select');
-                        select.className = 'rete-select-dropdown';
-                        let defaultOption = document.createElement('option');
-                        defaultOption.text = "📋 Seleziona attività...";
-                        defaultOption.value = "";
-                        select.appendChild(defaultOption);
-                        child.children.forEach(subchild => {
-                            let opt = document.createElement('option');
-                            opt.text = subchild.title && subchild.title.trim() ? subchild.title : "[Senza titolo]";
-                            if (!subchild.id) subchild.id = 'tmp_' + Date.now() + '_' + Math.random();
-                            opt.value = subchild.id;
-                            select.appendChild(opt);
-                        });
-                        select.onchange = (e) => {
-                            if (e.target.value) {
-                                let selectedId = e.target.value;
-                                let found = child.children.find(c => c.id === selectedId);
-                                if (found) showActivityModal(found);
-                            }
-                            select.selectedIndex = 0;
-                        };
-                        div.appendChild(select);
-                    } else {
-                        let infoMsg = document.createElement('div');
-                        infoMsg.style.fontSize = '0.7rem';
-                        infoMsg.style.color = '#aaa';
-                        infoMsg.style.padding = '4px';
-                        infoMsg.style.textAlign = 'center';
-                        infoMsg.innerText = '🔒 Attiva la licenza per visualizzare i sotto-tasti';
-                        div.appendChild(infoMsg);
-                    }
-                    if (adminAuthenticated) {
-                        let del = document.createElement('button');
-                        del.innerText = '🗑️';
-                        del.className = 'rete-delete-btn';
-                        del.onclick = (e) => { e.stopPropagation(); if (confirm("Eliminare definitivamente questo tasto e tutti i suoi sotto-tasti?")) { deleteNode(parentNode, child); renderReteLevel(container, parentNode); } };
-                        div.appendChild(del);
-                    }
-                } else {
-                    // Nodo senza figli (foglia)
-                    let btn = document.createElement('div');
-                    btn.className = 'rete-button';
-                    btn.innerText = (child.title && child.title.trim()) ? child.title : "[Tasto vuoto]";
-                    btn.onclick = (e) => { e.stopPropagation(); if (btn._pt) clearTimeout(btn._pt); showActivityModal(child); };
+            data.categories.forEach((cat, idx) => {
+                let catDiv = document.createElement('div');
+                catDiv.className = 'rete-category';
+                let catNameSpan = document.createElement('span');
+                catNameSpan.className = 'category-name';
+                catNameSpan.innerText = (cat.title && cat.title.trim()) ? cat.title : "Tasto vuoto";
+                if (adminAuthenticated) {
                     let pressTimer = null;
-                    let startLong = () => {
-                        pressTimer = setTimeout(() => {
-                            if (!adminAuthenticated) { alert("Solo amministratore."); return; }
-                            let newTitle = prompt("Nuovo titolo:", child.title);
-                            if (newTitle !== null && newTitle.trim() !== "") {
-                                editNodeTitle(child, newTitle.trim());
-                                renderReteLevel(container, parentNode);
-                            } else if (newTitle !== null && newTitle.trim() === "") alert("Titolo vuoto non permesso.");
-                        }, 3000);
-                    };
-                    let cancelLong = () => { if (pressTimer) clearTimeout(pressTimer); };
-                    btn.addEventListener('mousedown', startLong);
-                    btn.addEventListener('mouseup', cancelLong);
-                    btn.addEventListener('mouseleave', cancelLong);
-                    btn.addEventListener('touchstart', startLong, { passive: true });
-                    btn.addEventListener('touchend', cancelLong);
-                    btn.addEventListener('touchcancel', cancelLong);
-                    div.appendChild(btn);
-                    if (adminAuthenticated) {
-                        let addChild = document.createElement('button');
-                        addChild.innerText = '➕';
-                        addChild.className = 'rete-add-child-btn';
-                        addChild.title = 'Aggiungi figlio (trasforma in madre)';
-                        addChild.onclick = (e) => { e.stopPropagation(); addChildToNode(child); };
-                        div.appendChild(addChild);
-                        let del = document.createElement('button');
-                        del.innerText = '🗑️';
-                        del.className = 'rete-delete-btn';
-                        del.onclick = (e) => { e.stopPropagation(); if (confirm("Eliminare?")) { deleteNode(parentNode, child); renderReteLevel(container, parentNode); } };
-                        div.appendChild(del);
-                    }
+                    catNameSpan.addEventListener('mousedown', () => { pressTimer = setTimeout(() => { let newTitle = prompt("Modifica nome categoria:", cat.title); if (newTitle !== null && newTitle.trim() !== "") { editCategoryTitle(cat, newTitle.trim()); } else if (newTitle !== null && newTitle.trim() === "") alert("Titolo non può essere vuoto."); }, 3000); });
+                    catNameSpan.addEventListener('mouseup', () => { if (pressTimer) clearTimeout(pressTimer); });
+                    catNameSpan.addEventListener('mouseleave', () => { if (pressTimer) clearTimeout(pressTimer); });
+                    catNameSpan.addEventListener('touchstart', () => { pressTimer = setTimeout(() => { let newTitle = prompt("Modifica nome categoria:", cat.title); if (newTitle !== null && newTitle.trim() !== "") { editCategoryTitle(cat, newTitle.trim()); } else if (newTitle !== null && newTitle.trim() === "") alert("Titolo non può essere vuoto."); }, 3000); });
+                    catNameSpan.addEventListener('touchend', () => { if (pressTimer) clearTimeout(pressTimer); });
+                    catNameSpan.addEventListener('touchcancel', () => { if (pressTimer) clearTimeout(pressTimer); });
                 }
-                container.appendChild(div);
+                catDiv.appendChild(catNameSpan);
+                let addBtn = document.createElement('button');
+                addBtn.innerText = '+';
+                addBtn.className = 'small-icon';
+                addBtn.onclick = (e) => { e.stopPropagation(); addChildToCategory(cat); };
+                if (adminAuthenticated) catDiv.appendChild(addBtn);
+                let delBtn = document.createElement('button');
+                delBtn.innerText = '🗑️';
+                delBtn.className = 'delete-icon';
+                delBtn.onclick = (e) => { e.stopPropagation(); deleteCategory(cat, idx); };
+                if (adminAuthenticated) catDiv.appendChild(delBtn);
+                container.appendChild(catDiv);
+                if (cat.children && cat.children.length > 0) {
+                    cat.children.forEach((child, childIdx) => {
+                        let childDiv = document.createElement('div');
+                        childDiv.className = 'rete-child';
+                        let iconSpan = document.createElement('span');
+                        iconSpan.className = 'child-icon';
+                        iconSpan.innerText = '🏷️';
+                        childDiv.appendChild(iconSpan);
+                        let childNameSpan = document.createElement('span');
+                        childNameSpan.className = 'child-name';
+                        childNameSpan.innerText = (child.title && child.title.trim()) ? child.title : "Selezione attività";
+                        childNameSpan.onclick = (e) => { e.stopPropagation(); showActivityModalForChild(child); };
+                        if (adminAuthenticated) {
+                            let pressTimer = null;
+                            childNameSpan.addEventListener('mousedown', () => { pressTimer = setTimeout(() => { let newTitle = prompt("Modifica nome attività:", child.title); if (newTitle !== null && newTitle.trim() !== "") { editChildTitle(child, newTitle.trim()); } else if (newTitle !== null && newTitle.trim() === "") alert("Titolo non può essere vuoto."); }, 3000); });
+                            childNameSpan.addEventListener('mouseup', () => { if (pressTimer) clearTimeout(pressTimer); });
+                            childNameSpan.addEventListener('mouseleave', () => { if (pressTimer) clearTimeout(pressTimer); });
+                            childNameSpan.addEventListener('touchstart', () => { pressTimer = setTimeout(() => { let newTitle = prompt("Modifica nome attività:", child.title); if (newTitle !== null && newTitle.trim() !== "") { editChildTitle(child, newTitle.trim()); } else if (newTitle !== null && newTitle.trim() === "") alert("Titolo non può essere vuoto."); }, 3000); });
+                            childNameSpan.addEventListener('touchend', () => { if (pressTimer) clearTimeout(pressTimer); });
+                            childNameSpan.addEventListener('touchcancel', () => { if (pressTimer) clearTimeout(pressTimer); });
+                        }
+                        childDiv.appendChild(childNameSpan);
+                        let delChildBtn = document.createElement('button');
+                        delChildBtn.innerText = '🗑️';
+                        delChildBtn.className = 'delete-icon';
+                        delChildBtn.onclick = (e) => { e.stopPropagation(); deleteChild(cat, childIdx); };
+                        if (adminAuthenticated) childDiv.appendChild(delChildBtn);
+                        container.appendChild(childDiv);
+                    });
+                }
             });
         }
         if (adminAuthenticated) {
-            let addBtn = document.createElement('div');
-            addBtn.className = 'rete-button';
-            addBtn.style.background = '#558b2f';
-            addBtn.innerText = '+ AGGIUNGI TASTO (premi 3 sec)';
+            let addCatBtn = document.createElement('button');
+            addCatBtn.innerText = '+ AGGIUNGI TASTO (premi 3 sec)';
+            addCatBtn.className = 'add-category-btn';
             let addTimer = null;
-            addBtn.onmousedown = () => { addTimer = setTimeout(() => { let newEmpty = addEmptyChildToNode(parentNode); if (newEmpty) renderReteLevel(container, parentNode); }, 3000); };
-            addBtn.onmouseup = addBtn.onmouseleave = () => clearTimeout(addTimer);
-            addBtn.ontouchstart = () => { addTimer = setTimeout(() => { let newEmpty = addEmptyChildToNode(parentNode); if (newEmpty) renderReteLevel(container, parentNode); }, 3000); };
-            addBtn.ontouchend = addBtn.ontouchcancel = () => clearTimeout(addTimer);
-            container.appendChild(addBtn);
+            addCatBtn.onmousedown = () => { addTimer = setTimeout(() => { addCategory(); }, 3000); };
+            addCatBtn.onmouseup = addCatBtn.onmouseleave = () => { if (addTimer) clearTimeout(addTimer); };
+            addCatBtn.ontouchstart = () => { addTimer = setTimeout(() => { addCategory(); }, 3000); };
+            addCatBtn.ontouchend = addCatBtn.ontouchcancel = () => { if (addTimer) clearTimeout(addTimer); };
+            container.appendChild(addCatBtn);
         }
-        // Pulizia di eventuali elementi indesiderati
-        document.querySelectorAll('.rete-container .note-btn-confirm, .rete-container .dot').forEach(el => el.remove());
     }
     
     // ==================== PAGINA FOTO ====================
@@ -838,7 +783,7 @@
     function showAdminSection() { adminSection.style.display = 'block'; }
     function hideAdminSection() { adminSection.style.display = 'none'; }
     let adminTimer = null;
-    function startAdminTimer() { adminTimer = setTimeout(() => { let code = prompt("Codice amministratore:"); if (code === adminCode) { adminAuthenticated = true; showAdminSection(); alert("Accesso admin."); if (imagePage && !imagePage.classList.contains('hidden')) { renderReteLevel(reteLevelContainer, reteData); loadSavedImage(); } } else if (code !== null) alert("Codice errato."); }, 3000); }
+    function startAdminTimer() { adminTimer = setTimeout(() => { let code = prompt("Codice amministratore:"); if (code === adminCode) { adminAuthenticated = true; showAdminSection(); alert("Accesso admin."); if (imagePage && !imagePage.classList.contains('hidden')) { renderReteCategories(reteLevelContainer, reteData); loadSavedImage(); } } else if (code !== null) alert("Codice errato."); }, 3000); }
     function cancelAdminTimer() { if (adminTimer) clearTimeout(adminTimer); }
     adminLongPressBtn.addEventListener('mousedown', startAdminTimer);
     adminLongPressBtn.addEventListener('mouseup', cancelAdminTimer);
@@ -960,7 +905,7 @@
                     homePage.classList.add('hidden');
                     imagePage.classList.remove('hidden');
                     requestImagePageWakeLock();
-                    renderReteLevel(reteLevelContainer, reteData);
+                    renderReteCategories(reteLevelContainer, reteData);
                     loadSavedImage();
                     pushPage('image');
                     keepScreenOn();
@@ -1414,7 +1359,7 @@
     function savePhone(s,n) { localStorage.setItem(`phone_${s}_${CURRENT_VERSION}`, n); }
     function getPhone(s) { return localStorage.getItem(`phone_${s}_${CURRENT_VERSION}`); }
     const defaultPhone = { ambulanza:"118", polizia:"113", veterinario:"800123456", clinica:"800987654" };
-    function migratePhoneNumbers() { const oldVersions = ["0231","0230","0229"]; for (let s of services) { if (localStorage.getItem(`phone_${s}_${CURRENT_VERSION}`)) continue; for (let ver of oldVersions) { let old = localStorage.getItem(`phone_${s}_${ver}`); if (old) { localStorage.setItem(`phone_${s}_${CURRENT_VERSION}`, old); break; } } } }
+    function migratePhoneNumbers() { const oldVersions = ["0232","0231","0230"]; for (let s of services) { if (localStorage.getItem(`phone_${s}_${CURRENT_VERSION}`)) continue; for (let ver of oldVersions) { let old = localStorage.getItem(`phone_${s}_${ver}`); if (old) { localStorage.setItem(`phone_${s}_${CURRENT_VERSION}`, old); break; } } } }
     
     // ==================== PALLINI I ====================
     licenseInfoIcon.addEventListener('click', () => openGlobalInfoModal('licenseInfo', 'Informazioni Licenza', 'license_info_text'));
@@ -1468,7 +1413,7 @@
         initRecognitionSpeak();
         initLicense();
         activateLicenseBtn.addEventListener('click', onActivateLicense);
-        if (!reteData.children || reteData.children.length === 0) { reteData.children = []; saveReteData(); }
+        if (!reteData.categories || reteData.categories.length === 0) { reteData.categories = []; saveReteData(); }
         keepScreenOn();
         bindWakeLockToInteraction();
         backStack = ['home'];
