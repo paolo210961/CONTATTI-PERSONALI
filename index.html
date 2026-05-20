@@ -127,7 +127,6 @@
         <div class="license-section">
             <div class="license-row"><span class="license-label">LICENZA</span><input type="text" id="clientCodeInput" placeholder="Codice Cliente" inputmode="numeric" readonly><div id="licenseInfoIcon" class="info-icon">𝒊</div></div>
             <div class="license-row"><input type="text" id="unlockCodeInput" placeholder="Codice Attivazione (20 cifre)" maxlength="20" inputmode="numeric"><button id="activateLicenseBtn" class="small-btn" style="background:#283593;">ATTIVA</button></div>
-            <div class="license-row"><button id="requestActivationBtn" class="small-btn" style="background:#e67e22; width:100%;">📧 Richiedi attivazione</button></div>
         </div>
         <div id="adminSection" class="admin-section">
             <div style="font-weight: bold; margin-bottom: 8px;">🛠️ Area Amministratore</div>
@@ -207,7 +206,7 @@
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
 <script>
-    // v0235 - FINALE: pulsanti esporta/importa rete visibili per admin in imagePage
+    // v0235 - FINALE: immagine principale inclusa nell'esportazione della rete
     const CURRENT_VERSION = "0235";
     let currentService = "ambulanza";
     let currentLat = null, currentLng = null;
@@ -332,7 +331,6 @@
     const restoreInfoIconsBtn = document.getElementById('restoreInfoIconsBtn');
     const backupHint = document.getElementById('backupHint');
     const speakReadFrBtn = document.getElementById('speakReadFrBtn');
-    const requestActivationBtn = document.getElementById('requestActivationBtn');
     const exportReteBtn = document.getElementById('exportReteBtn');
     const importReteBtn = document.getElementById('importReteBtn');
     const adminReteButtons = document.getElementById('adminReteButtons');
@@ -436,6 +434,8 @@
     
     // ==================== GESTIONE RETE CATEGORIE + FIGLI ====================
     let reteData = { categories: [] };
+    let currentImageData = null;
+    
     function saveReteData() { localStorage.setItem('monastir_rete_data', JSON.stringify(reteData)); }
     function loadReteData() {
         const saved = localStorage.getItem('monastir_rete_data');
@@ -458,7 +458,7 @@
         if (!reteData.categories) reteData.categories = [];
     }
     
-    // Sincronizzazione automatica da file JSON remoto
+    // Sincronizzazione automatica da file JSON remoto (include anche l'immagine principale)
     async function syncReteDataFromRemote() {
         try {
             const url = window.location.href.substring(0, window.location.href.lastIndexOf('/') + 1) + 'rete_data.json?t=' + Date.now();
@@ -466,9 +466,15 @@
             if (response.ok) {
                 const remoteData = await response.json();
                 if (remoteData.categories && Array.isArray(remoteData.categories)) {
-                    reteData = remoteData;
+                    reteData = { categories: remoteData.categories };
                     saveReteData();
                     console.log('Rete sincronizzata da remoto');
+                }
+                if (remoteData.mainImage && typeof remoteData.mainImage === 'string' && remoteData.mainImage.startsWith('data:image')) {
+                    currentImageData = remoteData.mainImage;
+                    localStorage.setItem('monastir_image', currentImageData);
+                    setupImageArea();
+                    console.log('Immagine principale sincronizzata');
                 }
             } else {
                 console.log('File rete_data.json non trovato, uso dati locali');
@@ -479,7 +485,11 @@
     }
     
     function exportReteToFile() {
-        const dataStr = JSON.stringify(reteData, null, 2);
+        const exportData = {
+            categories: reteData.categories,
+            mainImage: currentImageData || null
+        };
+        const dataStr = JSON.stringify(exportData, null, 2);
         const blob = new Blob([dataStr], {type: 'application/json'});
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
@@ -489,7 +499,7 @@
         a.click();
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
-        alert('File rete_data.json esportato con successo.');
+        alert('File rete_data.json esportato con successo (inclusa immagine principale).');
     }
     
     function importReteFromFile(file) {
@@ -498,12 +508,17 @@
             try {
                 const imported = JSON.parse(e.target.result);
                 if (imported.categories && Array.isArray(imported.categories)) {
-                    reteData = imported;
+                    reteData = { categories: imported.categories };
                     saveReteData();
+                    if (imported.mainImage && typeof imported.mainImage === 'string' && imported.mainImage.startsWith('data:image')) {
+                        currentImageData = imported.mainImage;
+                        localStorage.setItem('monastir_image', currentImageData);
+                        setupImageArea();
+                    }
                     renderReteCategories(reteLevelContainer, reteData);
-                    alert('Rete importata correttamente.');
+                    alert('Rete importata correttamente (inclusa immagine principale).');
                 } else {
-                    alert('Formato file non valido.');
+                    alert('Formato file non valido: manca "categories".');
                 }
             } catch(err) {
                 alert('Errore durante l\'importazione: ' + err.message);
@@ -557,7 +572,6 @@
     }
     
     function showActivityModalForChild(child) {
-        // Admin bypassa il controllo di licenza
         if (!adminAuthenticated) {
             const activated = localStorage.getItem('activated') === 'true';
             if (!activated) {
@@ -750,7 +764,6 @@
     }
     
     // ==================== PAGINA FOTO ====================
-    let currentImageData = null;
     function setupImageArea() {
         imagePreviewArea.innerHTML = '';
         if (currentImageData) {
@@ -837,7 +850,7 @@
         }
         else { 
             licenseActive = activated; 
-            licenseCheckPassed = true;   // periodo di prova attivo
+            licenseCheckPassed = true;
         }
         
         daysRemaining = Math.ceil((expiry - nowTime) / 86400000);
@@ -870,7 +883,6 @@
         } else alert('Codice non valido.');
     }
     
-    // Modale richiesta attivazione con pulsante email
     function openActivationRequestModal() {
         const modalContent = `
             Per attivare la licenza, invia un bonifico di €48,00 a Paolo Maiorana
@@ -904,7 +916,6 @@
     function closeInfoModalFunc() { infoModal.style.display = 'none'; isModalOpen = false; }
     closeInfoModalBtn.onclick = closeInfoModalFunc;
     infoModal.onclick = (e) => { if (e.target === infoModal) closeInfoModalFunc(); };
-    requestActivationBtn.addEventListener('click', openActivationRequestModal);
     
     function loadAdminCode() { let saved = localStorage.getItem('adminCode'); if (saved && saved.trim()) adminCode = saved; else { adminCode = "admin2025"; localStorage.setItem('adminCode', adminCode); } }
     function saveAdminCode(newCode) { if (newCode && newCode.trim()) { adminCode = newCode; localStorage.setItem('adminCode', adminCode); alert("Codice admin cambiato."); } else alert("Codice non valido."); }
