@@ -15,7 +15,7 @@
         .container{max-width:600px;width:100%;margin:0 auto;overflow-x:hidden}
         .page{background:white;border-radius:32px;padding:24px 20px 32px;box-shadow:0 8px 24px rgba(0,0,0,0.05);overflow-x:hidden}
         .hidden{display:none !important}
-        button,.big-btn,.small-btn,.title-btn,.speak-field,.note-item,.confirm-note-btn,.add-note-btn,.export-import-row button,.uploaded-image,.image-container img,.image-top-title,.info-circle-btn{user-select:none;-webkit-touch-callout:none;-webkit-user-select:none}
+        button,.big-btn,.small-btn,.title-btn,.speak-field,.note-item,.confirm-note-btn,.add-note-btn,.export-import-row button,.uploaded-image,.image-container img,.image-top-title,.info-circle-btn,.rete-button{user-select:none;-webkit-touch-callout:none;-webkit-user-select:none}
         .title-btn{background:#FFC107;border:none;border-radius:60px;padding:14px 12px;font-size:1.5rem;font-weight:bold;color:#1e2a3a;width:100%;text-align:center;margin-bottom:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:12px;box-shadow:0 6px 12px rgba(0,0,0,0.2);transition:0.05s linear}
         .title-btn:active{transform:scale(0.97)}
         .current-service-deco{background:#6c757d;border:none;border-radius:60px;padding:14px 12px;font-size:1.3rem;font-weight:bold;color:white;width:100%;text-align:center;margin-bottom:20px;box-shadow:0 4px 8px rgba(0,0,0,0.2)}
@@ -102,22 +102,16 @@
         .cancel-row{display:flex;gap:10px;align-items:center;margin-bottom:12px}
         .cancel-row .small-btn{flex:1}
         .rete-container{margin-top:20px}
-        .rete-category{background:#283593;color:white;border-radius:60px;padding:12px;margin:12px 0;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
-        .rete-category .category-name{flex:2;font-weight:bold;font-size:1.1rem;text-align:center;cursor:pointer}
-        .rete-category .small-icon{background:#4caf50;color:white;border:none;border-radius:40px;padding:6px 16px;font-weight:bold;cursor:pointer}
-        .rete-category .delete-icon{background:#8e44ad;color:white;border:none;border-radius:40px;padding:6px 16px;cursor:pointer}
-        .rete-children-container{margin-left:20px;margin-bottom:12px}
-        .rete-child-item{background:#283593;color:white;border-radius:40px;padding:10px 12px;margin:6px 0;display:flex;align-items:center;gap:8px}
-        .rete-child-item .child-name{flex:2;font-weight:bold;cursor:pointer}
-        .rete-child-item .delete-child-btn{background:#dc3545;color:white;border:none;border-radius:40px;padding:4px 12px;cursor:pointer}
-        .add-category-btn{background:#4caf50;color:white;border:none;border-radius:60px;padding:14px;margin-top:16px;font-weight:bold;cursor:pointer;width:100%}
+        .rete-category{background:#283593;color:white;padding:12px;border-radius:40px;margin:8px 0;display:flex;align-items:center;gap:8px}
+        .rete-category .category-name{flex:2;font-weight:bold;text-align:center;user-select:none;-webkit-touch-callout:none}
+        .rete-category .small-icon{background:#4caf50;color:white;border:none;border-radius:40px;padding:6px 12px;font-weight:bold;cursor:pointer}
+        .rete-category .delete-icon{background:#8e44ad;color:white;border:none;border-radius:40px;padding:6px 12px;cursor:pointer}
+        .rete-children{margin-left:20px;margin-bottom:8px}
+        .rete-child{background:#9e9e9e;color:white;padding:8px 12px;border-radius:40px;margin:6px 0;display:flex;align-items:center;gap:8px}
+        .rete-child .child-name{flex:2;font-weight:bold;cursor:pointer;user-select:none}
+        .rete-child .delete-child-icon{background:#dc3545;color:white;border:none;border-radius:40px;padding:4px 10px;font-weight:bold;cursor:pointer}
+        .add-category-btn{background:#4caf50;color:white;border:none;border-radius:40px;padding:12px;margin-top:16px;font-weight:bold;cursor:pointer}
         .add-category-btn:active{transform:scale(0.97)}
-        .speak-extra-buttons{display:flex;gap:10px;margin-top:12px}
-        .admin-backup-buttons{display:flex;gap:12px;margin-top:8px;margin-bottom:8px}
-        .backup-hint{font-size:0.7rem;color:#555;text-align:center;margin-top:4px}
-        .orange-btn{background:#e67e22 !important}
-        .info-edit-buttons{margin-top:16px;display:flex;gap:12px}
-        .hidden-btn{display:none !important}
     </style>
 </head>
 <body>
@@ -192,8 +186,7 @@
     <div id="infoModal" class="adaptive-modal" style="display:none;"><div class="adaptive-modal-content"><h3>📋 Richiesta attivazione</h3><div id="infoModalText" class="modal-info-text"></div><div class="modal-buttons"><button id="closeInfoModalBtn" class="cancel-btn">CHIUDI</button></div></div></div>
     <div id="activityModal" class="adaptive-modal" style="display:none;">
         <div class="adaptive-modal-content">
-            <div style="text-align:center; font-size:1.4rem; font-weight:bold; margin-bottom:15px;" id="activityModalTitle">Attività</div>
-            <div style="margin-bottom:10px;"><input type="text" id="activityTitleInput" placeholder="Descrittivo attività" style="width:100%; text-align:center; font-weight:bold; font-size:1.2rem;"></div>
+            <div style="text-align:center; font-size:1.3rem; font-weight:bold; margin-bottom:15px;" id="activityModalTitle">Attività</div>
             <div id="activityImageContainer" style="text-align:center; margin:10px 0;"></div>
             <div id="activityAdminImageButtons" class="info-edit-buttons hidden-btn" style="margin-bottom:12px;"><button id="activityUploadImageBtn" class="small-btn" style="background:#6b8e23;">📸 CARICA/MODIFICA FOTO</button></div>
             <label style="font-weight:bold;">📝 INFORMAZIONI</label>
@@ -205,7 +198,7 @@
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
 <script>
-    // v0234 - Categorie (madri) con figli come pulsanti, modale con titolo modificabile
+    // v0234 - Struttura: categorie (madri) non cliccabili, figli con colore grigio
     const CURRENT_VERSION = "0234";
     let currentService = "ambulanza";
     let currentLat = null, currentLng = null;
@@ -300,7 +293,6 @@
     const infoSpeakBtn = document.getElementById('infoSpeakBtn');
     const activityModal = document.getElementById('activityModal');
     const activityModalTitle = document.getElementById('activityModalTitle');
-    const activityTitleInput = document.getElementById('activityTitleInput');
     const activityInfoText = document.getElementById('activityInfoText');
     const activityImageContainer = document.getElementById('activityImageContainer');
     const activityCoordBtn = document.getElementById('activityCoordBtn');
@@ -323,7 +315,7 @@
     const backupHint = document.getElementById('backupHint');
     const speakReadFrBtn = document.getElementById('speakReadFrBtn');
     
-    let currentChildNode = null;
+    let currentActivityNode = null;
     let currentEditId = null;
     let currentEditIncludeCoords = false;
     let recognitionOperator = null;
@@ -418,7 +410,7 @@
         }
     });
     
-    // ==================== GESTIONE RETE (CATEGORIE + FIGLI) ====================
+    // ==================== GESTIONE RETE CATEGORIE + FIGLI ====================
     let reteData = { categories: [] };
     function saveReteData() { localStorage.setItem('monastir_rete_data', JSON.stringify(reteData)); }
     function loadReteData() {
@@ -447,6 +439,13 @@
         saveReteData();
         renderReteCategories(reteLevelContainer, reteData);
     }
+    function addChildToCategory(category) {
+        if (!adminAuthenticated) { alert("Solo amministratore."); return; }
+        if (!category.children) category.children = [];
+        category.children.push({ id: Date.now() + '_' + Math.random(), title: "Selezione attività", infoText: "", infoImage: null, coordinate: "", websiteUrl: "" });
+        saveReteData();
+        renderReteCategories(reteLevelContainer, reteData);
+    }
     function editCategoryTitle(category, newTitle) {
         if (!adminAuthenticated) { alert("Solo amministratore."); return false; }
         category.title = newTitle;
@@ -456,18 +455,11 @@
     }
     function deleteCategory(category, index) {
         if (!adminAuthenticated) { alert("Solo amministratore."); return; }
-        if (confirm("Vuoi eliminare la categoria '" + category.title + "' e tutti i suoi figli? (S/N)")) {
+        if (confirm("Vuoi eliminare la categoria '" + category.title + "' e tutti i suoi figli?")) {
             reteData.categories.splice(index, 1);
             saveReteData();
             renderReteCategories(reteLevelContainer, reteData);
         }
-    }
-    function addChildToCategory(category) {
-        if (!adminAuthenticated) { alert("Solo amministratore."); return; }
-        if (!category.children) category.children = [];
-        category.children.push({ id: Date.now() + '_' + Math.random(), title: "Selezione attività", infoText: "", infoImage: null, coordinate: "", websiteUrl: "" });
-        saveReteData();
-        renderReteCategories(reteLevelContainer, reteData);
     }
     function deleteChild(category, childIndex) {
         if (!adminAuthenticated) { alert("Solo amministratore."); return; }
@@ -477,11 +469,12 @@
             renderReteCategories(reteLevelContainer, reteData);
         }
     }
-    function updateChildTitle(child, newTitle) {
-        if (!adminAuthenticated) return;
+    function editChildTitle(child, newTitle) {
+        if (!adminAuthenticated) { alert("Solo amministratore."); return false; }
         child.title = newTitle;
         saveReteData();
         renderReteCategories(reteLevelContainer, reteData);
+        return true;
     }
     
     function showActivityModalForChild(child) {
@@ -489,10 +482,8 @@
             alert("Licenza non attiva. Attivala per visualizzare i dettagli dell'attività.");
             return;
         }
-        currentChildNode = child;
-        activityModalTitle.innerText = "Modifica Attività";
-        activityTitleInput.value = child.title || "";
-        activityTitleInput.readOnly = !adminAuthenticated;
+        currentActivityNode = child;
+        activityModalTitle.innerText = (child.title && child.title.trim()) ? child.title : "Descrittivo attività senza titolo";
         activityInfoText.value = child.infoText || "Nessuna informazione aggiuntiva.";
         activityInfoText.readOnly = true;
         activityImageContainer.innerHTML = '';
@@ -516,11 +507,9 @@
             activityEditInfoBtn.style.display = "block";
             activitySaveInfoBtn.style.display = "none";
             activityCancelInfoBtn.style.display = "none";
-            activityTitleInput.readOnly = false;
         } else {
             activityAdminImageButtons.classList.add('hidden-btn');
             activityInfoAdminButtons.classList.add('hidden-btn');
-            activityTitleInput.readOnly = true;
         }
         updateActivityButtonsForChild(child);
         activityModal.style.display = 'flex';
@@ -548,7 +537,7 @@
     }
     
     activityUploadImageBtn.addEventListener('click', () => {
-        if (!adminAuthenticated || !currentChildNode) return;
+        if (!adminAuthenticated || !currentActivityNode) return;
         let input = document.createElement('input');
         input.type = 'file';
         input.accept = 'image/*';
@@ -557,9 +546,9 @@
             if (file) {
                 let reader = new FileReader();
                 reader.onload = (ev) => {
-                    currentChildNode.infoImage = ev.target.result;
+                    currentActivityNode.infoImage = ev.target.result;
                     saveReteData();
-                    showActivityModalForChild(currentChildNode);
+                    showActivityModalForChild(currentActivityNode);
                 };
                 reader.readAsDataURL(file);
             }
@@ -567,15 +556,15 @@
         input.click();
     });
     activityEditInfoBtn.addEventListener('click', () => {
-        if (!adminAuthenticated || !currentChildNode) return;
+        if (!adminAuthenticated || !currentActivityNode) return;
         activityInfoText.readOnly = false;
         activityEditInfoBtn.style.display = "none";
         activitySaveInfoBtn.style.display = "block";
         activityCancelInfoBtn.style.display = "block";
     });
     activitySaveInfoBtn.addEventListener('click', () => {
-        if (!adminAuthenticated || !currentChildNode) return;
-        currentChildNode.infoText = activityInfoText.value;
+        if (!adminAuthenticated || !currentActivityNode) return;
+        currentActivityNode.infoText = activityInfoText.value;
         saveReteData();
         activityInfoText.readOnly = true;
         activityEditInfoBtn.style.display = "block";
@@ -584,24 +573,12 @@
         alert("Informazioni salvate.");
     });
     activityCancelInfoBtn.addEventListener('click', () => {
-        if (!currentChildNode) return;
-        activityInfoText.value = currentChildNode.infoText || "Nessuna informazione aggiuntiva.";
+        if (!currentActivityNode) return;
+        activityInfoText.value = currentActivityNode.infoText || "Nessuna informazione aggiuntiva.";
         activityInfoText.readOnly = true;
         activityEditInfoBtn.style.display = "block";
         activitySaveInfoBtn.style.display = "none";
         activityCancelInfoBtn.style.display = "none";
-    });
-    activityTitleInput.addEventListener('change', () => {
-        if (!adminAuthenticated || !currentChildNode) return;
-        let newTitle = activityTitleInput.value.trim();
-        if (newTitle !== "") {
-            currentChildNode.title = newTitle;
-            saveReteData();
-            renderReteCategories(reteLevelContainer, reteData);
-        } else {
-            activityTitleInput.value = currentChildNode.title;
-            alert("Il titolo non può essere vuoto.");
-        }
     });
     
     function renderReteCategories(container, data) {
@@ -619,6 +596,10 @@
                 let catNameSpan = document.createElement('span');
                 catNameSpan.className = 'category-name';
                 catNameSpan.innerText = (cat.title && cat.title.trim()) ? cat.title : "Tasto vuoto";
+                catNameSpan.style.userSelect = 'none';
+                catNameSpan.style.webkitUserSelect = 'none';
+                // Tasto madre non cliccabile
+                catNameSpan.onclick = null;
                 if (adminAuthenticated) {
                     let pressTimer = null;
                     catNameSpan.addEventListener('mousedown', () => { pressTimer = setTimeout(() => { let newTitle = prompt("Modifica nome categoria:", cat.title); if (newTitle !== null && newTitle.trim() !== "") { editCategoryTitle(cat, newTitle.trim()); } else if (newTitle !== null && newTitle.trim() === "") alert("Titolo non può essere vuoto."); }, 3000); });
@@ -642,22 +623,29 @@
                 container.appendChild(catDiv);
                 if (cat.children && cat.children.length > 0) {
                     let childrenDiv = document.createElement('div');
-                    childrenDiv.className = 'rete-children-container';
+                    childrenDiv.className = 'rete-children';
                     cat.children.forEach((child, childIdx) => {
                         let childDiv = document.createElement('div');
-                        childDiv.className = 'rete-child-item';
+                        childDiv.className = 'rete-child';
                         let childNameSpan = document.createElement('span');
                         childNameSpan.className = 'child-name';
                         childNameSpan.innerText = (child.title && child.title.trim()) ? child.title : "Selezione attività";
                         childNameSpan.onclick = (e) => { e.stopPropagation(); showActivityModalForChild(child); };
-                        childDiv.appendChild(childNameSpan);
                         if (adminAuthenticated) {
-                            let delChildBtn = document.createElement('button');
-                            delChildBtn.innerText = '-';
-                            delChildBtn.className = 'delete-child-btn';
-                            delChildBtn.onclick = (e) => { e.stopPropagation(); deleteChild(cat, childIdx); };
-                            childDiv.appendChild(delChildBtn);
+                            let pressTimer = null;
+                            childNameSpan.addEventListener('mousedown', () => { pressTimer = setTimeout(() => { let newTitle = prompt("Modifica nome attività:", child.title); if (newTitle !== null && newTitle.trim() !== "") { editChildTitle(child, newTitle.trim()); } else if (newTitle !== null && newTitle.trim() === "") alert("Titolo non può essere vuoto."); }, 3000); });
+                            childNameSpan.addEventListener('mouseup', () => { if (pressTimer) clearTimeout(pressTimer); });
+                            childNameSpan.addEventListener('mouseleave', () => { if (pressTimer) clearTimeout(pressTimer); });
+                            childNameSpan.addEventListener('touchstart', () => { pressTimer = setTimeout(() => { let newTitle = prompt("Modifica nome attività:", child.title); if (newTitle !== null && newTitle.trim() !== "") { editChildTitle(child, newTitle.trim()); } else if (newTitle !== null && newTitle.trim() === "") alert("Titolo non può essere vuoto."); }, 3000); });
+                            childNameSpan.addEventListener('touchend', () => { if (pressTimer) clearTimeout(pressTimer); });
+                            childNameSpan.addEventListener('touchcancel', () => { if (pressTimer) clearTimeout(pressTimer); });
                         }
+                        childDiv.appendChild(childNameSpan);
+                        let delChildBtn = document.createElement('button');
+                        delChildBtn.innerText = '-';
+                        delChildBtn.className = 'delete-child-icon';
+                        delChildBtn.onclick = (e) => { e.stopPropagation(); deleteChild(cat, childIdx); };
+                        if (adminAuthenticated) childDiv.appendChild(delChildBtn);
                         childrenDiv.appendChild(childDiv);
                     });
                     container.appendChild(childrenDiv);
