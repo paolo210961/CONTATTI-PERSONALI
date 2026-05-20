@@ -200,6 +200,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
 <script>
     // v0235 - CORREZIONE BUG LICENZA: licenseCheckPassed ora = activated
+    //          RIMOSSA toggleAppAccess per mantenere i 4 bottoni sempre cliccabili
     const CURRENT_VERSION = "0235";
     let currentService = "ambulanza";
     let currentLat = null, currentLng = null;
@@ -763,7 +764,8 @@
         
         daysRemaining = Math.ceil((expiry - nowTime) / 86400000);
         updateLicenseUI();
-        toggleAppAccess(!licenseCheckPassed);
+        // toggleAppAccess RIMOSSO - i bottoni sono sempre cliccabili
+        
         if (clientCodeInput) clientCodeInput.value = clientCode;
         if (daysHomeDisplay) {
             daysHomeDisplay.innerHTML = `v${CURRENT_VERSION} - Scade: ${daysRemaining} giorni <button id="copyRequestBtnMoved" class="small-btn" style="background:#e67e22;">📋 Richiedi attivazione</button>`;
@@ -776,7 +778,8 @@
         if (activated) { unlockCodeInput.disabled = true; activateLicenseBtn.disabled = true; }
         else { unlockCodeInput.disabled = false; activateLicenseBtn.disabled = false; }
     }
-    function toggleAppAccess(block) { document.querySelectorAll('.big-btn').forEach(btn => { btn.style.pointerEvents = block ? 'none' : 'auto'; btn.style.opacity = block ? '0.5' : '1'; }); }
+    // Funzione toggleAppAccess RIMOSSA - non più utilizzata
+    
     async function onActivateLicense() {
         let unlockCode = unlockCodeInput.value.trim();
         if (!/^\d{20}$/.test(unlockCode)) { alert('20 cifre.'); return; }
