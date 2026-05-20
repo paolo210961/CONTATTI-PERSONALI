@@ -112,6 +112,7 @@
         .rete-child .delete-child-icon{background:#dc3545;color:white;border:none;border-radius:40px;padding:4px 10px;font-weight:bold;cursor:pointer}
         .add-category-btn{background:#4caf50;color:white;border:none;border-radius:40px;padding:12px;margin-top:16px;font-weight:bold;cursor:pointer}
         .add-category-btn:active{transform:scale(0.97)}
+        .hidden-btn{display:none !important}
     </style>
 </head>
 <body>
@@ -198,7 +199,7 @@
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
 <script>
-    // v0234 - Struttura: categorie (madri) non cliccabili, figli con colore grigio
+    // v0234 - Corretta gestione foto e visibilità clienti
     const CURRENT_VERSION = "0234";
     let currentService = "ambulanza";
     let currentLat = null, currentLng = null;
@@ -548,6 +549,7 @@
                 reader.onload = (ev) => {
                     currentActivityNode.infoImage = ev.target.result;
                     saveReteData();
+                    // Ricarica la modale con la nuova foto
                     showActivityModalForChild(currentActivityNode);
                 };
                 reader.readAsDataURL(file);
@@ -555,6 +557,7 @@
         };
         input.click();
     });
+    
     activityEditInfoBtn.addEventListener('click', () => {
         if (!adminAuthenticated || !currentActivityNode) return;
         activityInfoText.readOnly = false;
@@ -571,6 +574,8 @@
         activitySaveInfoBtn.style.display = "none";
         activityCancelInfoBtn.style.display = "none";
         alert("Informazioni salvate.");
+        // Ricarica la modale per mostrare i dati aggiornati (utile per il titolo)
+        showActivityModalForChild(currentActivityNode);
     });
     activityCancelInfoBtn.addEventListener('click', () => {
         if (!currentActivityNode) return;
@@ -581,6 +586,7 @@
         activityCancelInfoBtn.style.display = "none";
     });
     
+    // Render principale
     function renderReteCategories(container, data) {
         container.innerHTML = '';
         if (!data.categories || data.categories.length === 0) {
