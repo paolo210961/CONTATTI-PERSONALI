@@ -199,8 +199,7 @@
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
 <script>
-    // v0235 - CORREZIONE BUG LICENZA: licenseCheckPassed ora = activated
-    //          RIMOSSA toggleAppAccess per mantenere i 4 bottoni sempre cliccabili
+    // v0235 - CORREZIONE: licenseCheckPassed = activated, aggiunto licenseInitComplete per evitare lampeggio
     const CURRENT_VERSION = "0235";
     let currentService = "ambulanza";
     let currentLat = null, currentLng = null;
@@ -215,7 +214,7 @@
     };
     const services = ["ambulanza", "polizia", "veterinario", "clinica"];
     for (let s of services) normalNotes[s] = [];
-    let licenseActive = false, daysRemaining = 0, licenseCheckPassed = false, clientCode = "";
+    let licenseActive = false, daysRemaining = 0, licenseCheckPassed = false, licenseInitComplete = false, clientCode = "";
     const SECRET_KEY = "ChiaveSegreta123";
     let adminCode = "admin2025", adminAuthenticated = false;
     
@@ -480,7 +479,10 @@
     }
     
     function showActivityModalForChild(child) {
-        // Controllo accesso: solo se licenza attivata
+        if (!licenseInitComplete) {
+            alert("App in caricamento, attendi qualche secondo...");
+            return;
+        }
         if (!licenseCheckPassed) {
             alert("NEGATO ACCESSO – RICHIEDI ATTIVAZIONE – VAI NELLA SCHERMATA HOME");
             return;
@@ -634,7 +636,6 @@
                         let childNameSpan = document.createElement('span');
                         childNameSpan.className = 'child-name';
                         childNameSpan.innerText = (child.title && child.title.trim()) ? child.title : "Selezione attività";
-                        // Click sul figlio - ora protetto da licenseCheckPassed all'interno di showActivityModalForChild
                         childNameSpan.onclick = (e) => { e.stopPropagation(); showActivityModalForChild(child); };
                         if (adminAuthenticated) {
                             let pressTimer = null;
@@ -752,19 +753,17 @@
         if (activated && expiry < firstRun + 365 * 86400000) { expiry = firstRun + 365 * 86400000; localStorage.setItem('expiryDate', expiry); }
         const nowTime = now.getTime();
         
-        // CORREZIONE BUG: licenseCheckPassed ora dipende DA activated
         if (nowTime > expiry) { 
             licenseActive = false; 
             licenseCheckPassed = false; 
         }
         else { 
             licenseActive = activated; 
-            licenseCheckPassed = activated;   // <--- CORREZIONE APPLICATA
+            licenseCheckPassed = activated;
         }
         
         daysRemaining = Math.ceil((expiry - nowTime) / 86400000);
         updateLicenseUI();
-        // toggleAppAccess RIMOSSO - i bottoni sono sempre cliccabili
         
         if (clientCodeInput) clientCodeInput.value = clientCode;
         if (daysHomeDisplay) {
@@ -772,13 +771,14 @@
             let moved = document.getElementById('copyRequestBtnMoved');
             if (moved) moved.onclick = () => openGlobalInfoModal('licenseRequest', 'Richiedi attivazione', 'license_request_text');
         }
+        
+        licenseInitComplete = true;
     }
     function updateLicenseUI() {
         let activated = localStorage.getItem('activated') === 'true';
         if (activated) { unlockCodeInput.disabled = true; activateLicenseBtn.disabled = true; }
         else { unlockCodeInput.disabled = false; activateLicenseBtn.disabled = false; }
     }
-    // Funzione toggleAppAccess RIMOSSA - non più utilizzata
     
     async function onActivateLicense() {
         let unlockCode = unlockCodeInput.value.trim();
@@ -1390,7 +1390,14 @@
     infoSpeakBtn.addEventListener('click', () => openGlobalInfoModal('infoSpeak', 'Informazioni Conversazione', 'info_speak_text'));
     
     function showEmergency(s) {
-        if (!licenseCheckPassed) { alert('Licenza non attiva o scaduta. Attivala dalla home.'); return; }
+        if (!licenseInitComplete) {
+            alert("App in caricamento, attendi qualche secondo...");
+            return;
+        }
+        if (!licenseCheckPassed) { 
+            alert('Licenza non attiva o scaduta. Attivala dalla home.'); 
+            return; 
+        }
         currentService = s;
         let extra = contactExtraText[s];
         let label = extra && extra.trim() !== "" ? `Contatto: ${extra}` : "Contatto:";
