@@ -199,7 +199,7 @@
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
 <script>
-    // v0235 - CORREZIONE: licenseCheckPassed = activated, aggiunto licenseInitComplete per evitare lampeggio
+    // v0235 - CORREZIONI: periodo prova 90 giorni + tasto indietro MONASTIR diretto
     const CURRENT_VERSION = "0235";
     let currentService = "ambulanza";
     let currentLat = null, currentLng = null;
@@ -360,7 +360,16 @@
     let currentPage = 'home';
     let isModalOpen = false;
     let backStack = ['home'];
-    function pushPage(page) { backStack.push(page); currentPage = page; history.pushState({ page: page, modal: isModalOpen }, ''); }
+    function pushPage(page) { 
+        backStack.push(page); 
+        currentPage = page; 
+        history.pushState({ page: page, modal: isModalOpen }, ''); 
+    }
+    function replaceBackStackForImage() {
+        backStack = ['home', 'image'];
+        currentPage = 'image';
+        history.replaceState({ page: 'image', modal: false }, '');
+    }
     function closeAllModals() {
         let closed = false;
         if (adaptiveModal.style.display === 'flex') { adaptiveModal.style.display = 'none'; closed = true; }
@@ -750,16 +759,25 @@
         if (!localStorage.getItem('clientCode')) localStorage.setItem('clientCode', clientCode);
         const activated = localStorage.getItem('activated') === 'true';
         let expiry = parseInt(localStorage.getItem('expiryDate'));
-        if (activated && expiry < firstRun + 365 * 86400000) { expiry = firstRun + 365 * 86400000; localStorage.setItem('expiryDate', expiry); }
         const nowTime = now.getTime();
+        
+        // PERIODO DI PROVA 90 GIORNI
+        // Se siamo entro 90 giorni dalla data firstRun, l'app funziona anche senza attivazione
+        const trialPeriodEnd = firstRun + 90 * 86400000;
+        const isInTrialPeriod = nowTime < trialPeriodEnd;
         
         if (nowTime > expiry) { 
             licenseActive = false; 
             licenseCheckPassed = false; 
         }
         else { 
-            licenseActive = activated; 
-            licenseCheckPassed = activated;
+            licenseActive = activated || isInTrialPeriod;
+            // Se siamo nel periodo di prova (90 giorni) OPPURE la licenza è attivata, allora passa il controllo
+            if (isInTrialPeriod) {
+                licenseCheckPassed = true;   // periodo di prova attivo
+            } else {
+                licenseCheckPassed = activated;   // fuori periodo di prova, serve attivazione
+            }
         }
         
         daysRemaining = Math.ceil((expiry - nowTime) / 86400000);
@@ -929,7 +947,7 @@
                     requestImagePageWakeLock();
                     renderReteCategories(reteLevelContainer, reteData);
                     loadSavedImage();
-                    pushPage('image');
+                    replaceBackStackForImage();  // CORREZIONE: stack diretto per tornare alla home
                     keepScreenOn();
                 } else {
                     showEmergency(service);
