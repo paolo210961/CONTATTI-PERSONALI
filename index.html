@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
-    <title>Contatti Personali - v0235</title>
+    <title>Contatti Personali - v0234</title>
     <link rel="manifest" href="manifest.json">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -130,7 +130,7 @@
             <div class="flex-row"><input type="text" id="generatedCode" readonly placeholder="Codice generato" style="flex:1; background:#f8f9fa;"><button id="copyGeneratedBtn" class="small-btn" style="background:#283593;">📋 COPIA</button></div>
             <div class="flex-row"><input type="text" id="newAdminCode" placeholder="Nuovo codice amministratore" style="flex:1;"><button id="changeAdminCodeBtn" class="small-btn" style="background:#8e44ad;">CAMBIA CODICE</button></div>
             <div class="admin-backup-buttons"><button id="saveInfoIconsBtn" class="small-btn" style="background:#283593;">💾 SALVA (i)</button><button id="restoreInfoIconsBtn" class="small-btn" style="background:#6b8e23;">📂 RIPRISTINA (i)</button></div>
-            <div id="backupHint" class="backup-hint">📄 info_icons_backup_v0235.txt</div>
+            <div id="backupHint" class="backup-hint">📄 info_icons_backup_v0234.txt</div>
             <button id="hideAdminBtn" class="small-btn" style="background:#757575; width:100%; margin-top:8px;">NASCONDI AREA ADMIN</button>
         </div>
         <div class="dark-card"><div class="grid-2" id="contactsGrid"></div></div>
@@ -138,7 +138,7 @@
         <div class="info-text">Ogni contatto ha il proprio archivio note.<br>📍 Ricerca entro 300m di TUTTI i luoghi con nome<br>🔊 Ascolto automatico 30 secondi dopo il messaggio</div>
         <div class="info-text">Non Utilizzare APP per Situazioni di Emergenza di Salute</div>
         <div class="days-line" id="daysLeftDisplayHome">Giorni rimanenti: --</div>
-        <div class="info-text">💾 Il file SALVA NOTE si chiama: contatti_personali_notes_backup_0235.txt</div>
+        <div class="info-text">💾 Il file SALVA NOTE si chiama: contatti_personali_notes_backup_0234.txt</div>
         <div class="export-import-row"><button id="exportAllBtn">💾 SALVA NOTE</button><button id="importAllBtn">📂 RIPRISTINA NOTE</button></div>
         <input type="file" id="globalImportFileInput" accept=".txt" style="display:none;">
     </div>
@@ -199,8 +199,8 @@
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
 <script>
-    // v0235 - CORREZIONI: periodo prova 90 giorni + tasto indietro MONASTIR diretto
-    const CURRENT_VERSION = "0235";
+    // v0234 - Corretta gestione foto e visibilità clienti
+    const CURRENT_VERSION = "0234";
     let currentService = "ambulanza";
     let currentLat = null, currentLng = null;
     let currentAddress = "";
@@ -214,7 +214,7 @@
     };
     const services = ["ambulanza", "polizia", "veterinario", "clinica"];
     for (let s of services) normalNotes[s] = [];
-    let licenseActive = false, daysRemaining = 0, licenseCheckPassed = false, licenseInitComplete = false, clientCode = "";
+    let licenseActive = false, daysRemaining = 0, licenseCheckPassed = false, clientCode = "";
     const SECRET_KEY = "ChiaveSegreta123";
     let adminCode = "admin2025", adminAuthenticated = false;
     
@@ -360,16 +360,7 @@
     let currentPage = 'home';
     let isModalOpen = false;
     let backStack = ['home'];
-    function pushPage(page) { 
-        backStack.push(page); 
-        currentPage = page; 
-        history.pushState({ page: page, modal: isModalOpen }, ''); 
-    }
-    function replaceBackStackForImage() {
-        backStack = ['home', 'image'];
-        currentPage = 'image';
-        history.replaceState({ page: 'image', modal: false }, '');
-    }
+    function pushPage(page) { backStack.push(page); currentPage = page; history.pushState({ page: page, modal: isModalOpen }, ''); }
     function closeAllModals() {
         let closed = false;
         if (adaptiveModal.style.display === 'flex') { adaptiveModal.style.display = 'none'; closed = true; }
@@ -488,12 +479,8 @@
     }
     
     function showActivityModalForChild(child) {
-        if (!licenseInitComplete) {
-            alert("App in caricamento, attendi qualche secondo...");
-            return;
-        }
         if (!licenseCheckPassed) {
-            alert("NEGATO ACCESSO – RICHIEDI ATTIVAZIONE – VAI NELLA SCHERMATA HOME");
+            alert("Licenza non attiva. Attivala per visualizzare i dettagli dell'attività.");
             return;
         }
         currentActivityNode = child;
@@ -562,6 +549,7 @@
                 reader.onload = (ev) => {
                     currentActivityNode.infoImage = ev.target.result;
                     saveReteData();
+                    // Ricarica la modale con la nuova foto
                     showActivityModalForChild(currentActivityNode);
                 };
                 reader.readAsDataURL(file);
@@ -586,6 +574,7 @@
         activitySaveInfoBtn.style.display = "none";
         activityCancelInfoBtn.style.display = "none";
         alert("Informazioni salvate.");
+        // Ricarica la modale per mostrare i dati aggiornati (utile per il titolo)
         showActivityModalForChild(currentActivityNode);
     });
     activityCancelInfoBtn.addEventListener('click', () => {
@@ -597,6 +586,7 @@
         activityCancelInfoBtn.style.display = "none";
     });
     
+    // Render principale
     function renderReteCategories(container, data) {
         container.innerHTML = '';
         if (!data.categories || data.categories.length === 0) {
@@ -614,6 +604,7 @@
                 catNameSpan.innerText = (cat.title && cat.title.trim()) ? cat.title : "Tasto vuoto";
                 catNameSpan.style.userSelect = 'none';
                 catNameSpan.style.webkitUserSelect = 'none';
+                // Tasto madre non cliccabile
                 catNameSpan.onclick = null;
                 if (adminAuthenticated) {
                     let pressTimer = null;
@@ -759,45 +750,26 @@
         if (!localStorage.getItem('clientCode')) localStorage.setItem('clientCode', clientCode);
         const activated = localStorage.getItem('activated') === 'true';
         let expiry = parseInt(localStorage.getItem('expiryDate'));
+        if (activated && expiry < firstRun + 365 * 86400000) { expiry = firstRun + 365 * 86400000; localStorage.setItem('expiryDate', expiry); }
         const nowTime = now.getTime();
-        
-        // PERIODO DI PROVA 90 GIORNI
-        // Se siamo entro 90 giorni dalla data firstRun, l'app funziona anche senza attivazione
-        const trialPeriodEnd = firstRun + 90 * 86400000;
-        const isInTrialPeriod = nowTime < trialPeriodEnd;
-        
-        if (nowTime > expiry) { 
-            licenseActive = false; 
-            licenseCheckPassed = false; 
-        }
-        else { 
-            licenseActive = activated || isInTrialPeriod;
-            // Se siamo nel periodo di prova (90 giorni) OPPURE la licenza è attivata, allora passa il controllo
-            if (isInTrialPeriod) {
-                licenseCheckPassed = true;   // periodo di prova attivo
-            } else {
-                licenseCheckPassed = activated;   // fuori periodo di prova, serve attivazione
-            }
-        }
-        
+        if (nowTime > expiry) { licenseActive = false; licenseCheckPassed = false; }
+        else { licenseActive = activated; licenseCheckPassed = true; }
         daysRemaining = Math.ceil((expiry - nowTime) / 86400000);
         updateLicenseUI();
-        
+        toggleAppAccess(!licenseCheckPassed);
         if (clientCodeInput) clientCodeInput.value = clientCode;
         if (daysHomeDisplay) {
             daysHomeDisplay.innerHTML = `v${CURRENT_VERSION} - Scade: ${daysRemaining} giorni <button id="copyRequestBtnMoved" class="small-btn" style="background:#e67e22;">📋 Richiedi attivazione</button>`;
             let moved = document.getElementById('copyRequestBtnMoved');
             if (moved) moved.onclick = () => openGlobalInfoModal('licenseRequest', 'Richiedi attivazione', 'license_request_text');
         }
-        
-        licenseInitComplete = true;
     }
     function updateLicenseUI() {
         let activated = localStorage.getItem('activated') === 'true';
         if (activated) { unlockCodeInput.disabled = true; activateLicenseBtn.disabled = true; }
         else { unlockCodeInput.disabled = false; activateLicenseBtn.disabled = false; }
     }
-    
+    function toggleAppAccess(block) { document.querySelectorAll('.big-btn').forEach(btn => { btn.style.pointerEvents = block ? 'none' : 'auto'; btn.style.opacity = block ? '0.5' : '1'; }); }
     async function onActivateLicense() {
         let unlockCode = unlockCodeInput.value.trim();
         if (!/^\d{20}$/.test(unlockCode)) { alert('20 cifre.'); return; }
@@ -947,7 +919,7 @@
                     requestImagePageWakeLock();
                     renderReteCategories(reteLevelContainer, reteData);
                     loadSavedImage();
-                    replaceBackStackForImage();  // CORREZIONE: stack diretto per tornare alla home
+                    pushPage('image');
                     keepScreenOn();
                 } else {
                     showEmergency(service);
@@ -1399,7 +1371,7 @@
     function savePhone(s,n) { localStorage.setItem(`phone_${s}_${CURRENT_VERSION}`, n); }
     function getPhone(s) { return localStorage.getItem(`phone_${s}_${CURRENT_VERSION}`); }
     const defaultPhone = { ambulanza:"118", polizia:"113", veterinario:"800123456", clinica:"800987654" };
-    function migratePhoneNumbers() { const oldVersions = ["0234","0233","0232"]; for (let s of services) { if (localStorage.getItem(`phone_${s}_${CURRENT_VERSION}`)) continue; for (let ver of oldVersions) { let old = localStorage.getItem(`phone_${s}_${ver}`); if (old) { localStorage.setItem(`phone_${s}_${CURRENT_VERSION}`, old); break; } } } }
+    function migratePhoneNumbers() { const oldVersions = ["0233","0232","0231"]; for (let s of services) { if (localStorage.getItem(`phone_${s}_${CURRENT_VERSION}`)) continue; for (let ver of oldVersions) { let old = localStorage.getItem(`phone_${s}_${ver}`); if (old) { localStorage.setItem(`phone_${s}_${CURRENT_VERSION}`, old); break; } } } }
     
     // ==================== PALLINI I ====================
     licenseInfoIcon.addEventListener('click', () => openGlobalInfoModal('licenseInfo', 'Informazioni Licenza', 'license_info_text'));
@@ -1408,14 +1380,7 @@
     infoSpeakBtn.addEventListener('click', () => openGlobalInfoModal('infoSpeak', 'Informazioni Conversazione', 'info_speak_text'));
     
     function showEmergency(s) {
-        if (!licenseInitComplete) {
-            alert("App in caricamento, attendi qualche secondo...");
-            return;
-        }
-        if (!licenseCheckPassed) { 
-            alert('Licenza non attiva o scaduta. Attivala dalla home.'); 
-            return; 
-        }
+        if (!licenseCheckPassed) { alert('Licenza non attiva o scaduta. Attivala dalla home.'); return; }
         currentService = s;
         let extra = contactExtraText[s];
         let label = extra && extra.trim() !== "" ? `Contatto: ${extra}` : "Contatto:";
