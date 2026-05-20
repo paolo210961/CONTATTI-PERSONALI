@@ -116,6 +116,8 @@
         .speak-extra-buttons { margin-top: 12px; }
         .orange-btn { background: #FF6600 !important; color: white !important; }
         .info-message-small { font-size: 0.7rem; color: #555; text-align: center; margin-top: 8px; margin-bottom: 8px; }
+        .admin-rete-buttons { display: flex; gap: 10px; margin-top: 12px; }
+        .admin-rete-buttons button { flex: 1; background: #283593; }
     </style>
 </head>
 <body>
@@ -125,6 +127,7 @@
         <div class="license-section">
             <div class="license-row"><span class="license-label">LICENZA</span><input type="text" id="clientCodeInput" placeholder="Codice Cliente" inputmode="numeric" readonly><div id="licenseInfoIcon" class="info-icon">𝒊</div></div>
             <div class="license-row"><input type="text" id="unlockCodeInput" placeholder="Codice Attivazione (20 cifre)" maxlength="20" inputmode="numeric"><button id="activateLicenseBtn" class="small-btn" style="background:#283593;">ATTIVA</button></div>
+            <div class="license-row"><button id="requestActivationBtn" class="small-btn" style="background:#e67e22; width:100%;">📧 Richiedi attivazione</button></div>
         </div>
         <div id="adminSection" class="admin-section">
             <div style="font-weight: bold; margin-bottom: 8px;">🛠️ Area Amministratore</div>
@@ -182,13 +185,14 @@
         <div class="image-top-box"><div class="image-top-title">MONASTIR: Facciamo Rete</div><div id="imagePreviewArea" class="image-container"><div class="image-placeholder" id="imagePlaceholder">📸 Solo amministratore: premi a lungo (3 sec) per caricare un'immagine</div></div></div>
         <div class="info-message-small">Per la consultazione, Richiedi Codice Attivazione nella Home.</div>
         <div id="reteRootContainer" class="rete-container"><div id="reteLevelContainer"></div></div>
+        <div id="adminReteButtons" class="admin-rete-buttons hidden-btn"><button id="exportReteBtn">📤 ESPORTA RETE</button><button id="importReteBtn">📥 IMPORTA RETE DA FILE</button></div>
     </div>
     <!-- MODALI -->
     <div id="adaptiveModal" class="adaptive-modal" style="display:none;"><div class="adaptive-modal-content"><textarea id="modalTextarea" readonly></textarea><button id="closeAdaptiveBtn">CHIUDI</button></div></div>
     <div id="speakDetailModal" class="adaptive-modal" style="display:none;"><div class="adaptive-modal-content"><h3>📄 Dettaglio conversazione</h3><div class="detail-label">Italiano (originale)</div><div class="detail-text" id="speakOriginalText"></div><div class="detail-label">Francese (traduzione)</div><div class="detail-text" id="speakTranslatedText"></div><div class="modal-buttons"><button id="closeSpeakModalBtn" class="save-btn">CHIUDI</button></div></div></div>
     <div id="noteEditModal" class="adaptive-modal note-edit-modal" style="display:none;"><div class="adaptive-modal-content"><h3 id="noteModalTitle">➕ Aggiungi Nota</h3><label class="detail-label">Titolo</label><input type="text" id="editNoteTitle" placeholder="Inserisci il titolo"><label class="detail-label">Descrizione</label><textarea id="editNoteDesc" rows="4" placeholder="Inserisci la descrizione"></textarea><label class="detail-label">Includi coordinate nella copia/lettura</label><div class="coord-toggle-group"><button id="modalCoordS" class="coord-toggle-modal-btn">S</button><button id="modalCoordN" class="coord-toggle-modal-btn">N</button></div><div class="modal-audio-row"><button id="modalAudioIt" class="modal-audio-btn">🇮🇹 LEGGI in IT</button><button id="modalAudioFr" class="modal-audio-btn">🇹🇳 LEGGI in FR</button></div><div class="modal-buttons"><button id="deleteNoteModalBtn" class="delete-btn" style="display:none;">🗑️ CANCELLA NOTA</button><button id="saveNoteModalBtn" class="save-btn">SALVA</button><button id="cancelNoteModalBtn" class="cancel-btn">ANNULLA</button></div></div></div>
     <div id="globalInfoModal" class="adaptive-modal" style="display:none;"><div class="adaptive-modal-content"><h3 id="globalInfoModalTitle">Informazioni</h3><textarea id="globalInfoTextarea" rows="8" readonly style="font-family:monospace; font-size:0.9rem;"></textarea><div class="modal-buttons"><button id="globalInfoEditBtn" class="save-btn" style="background:#8e44ad;">✏️ MODIFICA</button><button id="globalInfoSaveBtn" class="save-btn" style="display:none;">💾 SALVA</button><button id="globalInfoDownloadBtn" class="save-btn" style="background:#4caf50;">📲 INSTALLA APP</button><button id="globalInfoCloseBtn" class="cancel-btn">CHIUDI</button></div></div></div>
-    <div id="infoModal" class="adaptive-modal" style="display:none;"><div class="adaptive-modal-content"><h3>📋 Richiesta attivazione</h3><div id="infoModalText" class="modal-info-text"></div><div class="modal-buttons"><button id="infoModalSendEmailBtn" class="save-btn" style="background:#4caf50; display:none;">📧 Invia dati per attivazione</button><button id="closeInfoModalBtn" class="cancel-btn">CHIUDI</button></div></div></div>
+    <div id="infoModal" class="adaptive-modal" style="display:none;"><div class="adaptive-modal-content"><h3>📋 Richiesta attivazione</h3><div id="infoModalText" class="modal-info-text"></div><div class="modal-buttons"><button id="closeInfoModalBtn" class="cancel-btn">CHIUDI</button></div></div></div>
     <div id="activityModal" class="adaptive-modal" style="display:none;">
         <div class="adaptive-modal-content">
             <div style="text-align:center; font-size:1.3rem; font-weight:bold; margin-bottom:15px;" id="activityModalTitle">Attività</div>
@@ -203,7 +207,7 @@
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
 <script>
-    // v0235 - MODIFICHE FINALI: admin bypassa figli, pulsante email in modale richiesta attivazione
+    // v0235 - FINALE: tutte le modifiche richieste
     const CURRENT_VERSION = "0235";
     let currentService = "ambulanza";
     let currentLat = null, currentLng = null;
@@ -299,7 +303,6 @@
     const daysHomeDisplay = document.getElementById('daysLeftDisplayHome');
     const infoModal = document.getElementById('infoModal');
     const infoModalText = document.getElementById('infoModalText');
-    const infoModalSendEmailBtn = document.getElementById('infoModalSendEmailBtn');
     const closeInfoModalBtn = document.getElementById('closeInfoModalBtn');
     const imagePreviewArea = document.getElementById('imagePreviewArea');
     const infoNoteBtn = document.getElementById('infoNoteBtn');
@@ -329,6 +332,10 @@
     const restoreInfoIconsBtn = document.getElementById('restoreInfoIconsBtn');
     const backupHint = document.getElementById('backupHint');
     const speakReadFrBtn = document.getElementById('speakReadFrBtn');
+    const requestActivationBtn = document.getElementById('requestActivationBtn');
+    const exportReteBtn = document.getElementById('exportReteBtn');
+    const importReteBtn = document.getElementById('importReteBtn');
+    const adminReteButtons = document.getElementById('adminReteButtons');
     
     let currentActivityNode = null;
     let currentEditId = null;
@@ -353,7 +360,6 @@
             try {
                 if (globalWakeLock) { try { globalWakeLock.release(); } catch(e){} globalWakeLock = null; }
                 globalWakeLock = await navigator.wakeLock.request('screen');
-                console.log('WakeLock attivato');
             } catch(err) { console.warn('WakeLock fallito:', err); }
         }
     }
@@ -404,8 +410,10 @@
                 emergencyPage.classList.add('hidden');
                 currentPage = 'image';
                 requestImagePageWakeLock();
-                renderReteCategories(reteLevelContainer, reteData);
-                loadSavedImage();
+                syncReteDataFromRemote().then(() => {
+                    renderReteCategories(reteLevelContainer, reteData);
+                    loadSavedImage();
+                });
                 keepScreenOn();
             } else if (prev === 'emergency') {
                 homePage.classList.add('hidden');
@@ -448,6 +456,61 @@
         }
         if (!reteData.categories) reteData.categories = [];
     }
+    
+    // Sincronizzazione automatica da file JSON remoto
+    async function syncReteDataFromRemote() {
+        try {
+            const url = window.location.href.substring(0, window.location.href.lastIndexOf('/') + 1) + 'rete_data.json?t=' + Date.now();
+            const response = await fetch(url);
+            if (response.ok) {
+                const remoteData = await response.json();
+                if (remoteData.categories && Array.isArray(remoteData.categories)) {
+                    reteData = remoteData;
+                    saveReteData();
+                    console.log('Rete sincronizzata da remoto');
+                }
+            } else {
+                console.log('File rete_data.json non trovato, uso dati locali');
+            }
+        } catch(e) {
+            console.warn('Errore sincronizzazione rete:', e);
+        }
+    }
+    
+    function exportReteToFile() {
+        const dataStr = JSON.stringify(reteData, null, 2);
+        const blob = new Blob([dataStr], {type: 'application/json'});
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'rete_data.json';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        alert('File rete_data.json esportato con successo.');
+    }
+    
+    function importReteFromFile(file) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            try {
+                const imported = JSON.parse(e.target.result);
+                if (imported.categories && Array.isArray(imported.categories)) {
+                    reteData = imported;
+                    saveReteData();
+                    renderReteCategories(reteLevelContainer, reteData);
+                    alert('Rete importata correttamente.');
+                } else {
+                    alert('Formato file non valido.');
+                }
+            } catch(err) {
+                alert('Errore durante l\'importazione: ' + err.message);
+            }
+        };
+        reader.readAsText(file);
+    }
+    
     function addCategory() {
         if (!adminAuthenticated) { alert("Solo amministratore."); return; }
         reteData.categories.push({ title: "Tasto vuoto", children: [] });
@@ -494,9 +557,7 @@
     
     function showActivityModalForChild(child) {
         // Admin bypassa il controllo di licenza
-        if (adminAuthenticated) {
-            // Accesso consentito senza verificare licenza
-        } else {
+        if (!adminAuthenticated) {
             const activated = localStorage.getItem('activated') === 'true';
             if (!activated) {
                 alert("NEGATO ACCESSO – RICHIEDI ATTIVAZIONE – VAI NELLA SCHERMATA HOME");
@@ -785,32 +846,13 @@
         if (daysHomeDisplay) {
             daysHomeDisplay.innerHTML = `v${CURRENT_VERSION} - Scade: ${daysRemaining} giorni <button id="copyRequestBtnMoved" class="small-btn" style="background:#e67e22;">📋 Richiedi attivazione</button>`;
             let moved = document.getElementById('copyRequestBtnMoved');
-            if (moved) moved.onclick = () => openInfoModalWithEmailButton();
+            if (moved) moved.onclick = () => openActivationRequestModal();
         }
     }
     function updateLicenseUI() {
         let activated = localStorage.getItem('activated') === 'true';
         if (activated) { unlockCodeInput.disabled = true; activateLicenseBtn.disabled = true; }
         else { unlockCodeInput.disabled = false; activateLicenseBtn.disabled = false; }
-    }
-    
-    // Funzione per aprire il modale info con il pulsante email
-    function openInfoModalWithEmailButton() {
-        const msg = infoTexts.licenseRequest || "Per attivare la licenza, invia un bonifico di €48,00 a Paolo Maiorana IBAN: IT31R0339512900052702573770 con causale il tuo codice cliente.\nPoi invia email a gli amicidipaolino@gmail.com con il codice cliente.\nRiceverai il codice di sblocco a 20 cifre.";
-        infoModalText.innerText = msg;
-        infoModalSendEmailBtn.style.display = "block";
-        infoModal.style.display = 'flex';
-        isModalOpen = true;
-        keepScreenOn();
-    }
-    
-    // Funzione per inviare email con codice cliente e first run
-    function sendActivationRequestEmail() {
-        const firstRun = localStorage.getItem('firstRun') || "";
-        const clientCodeValue = clientCodeInput.value || "";
-        const subject = encodeURIComponent("Richiesta attivazione licenza Contatti Personali");
-        const body = encodeURIComponent(`Richiesta attivazione licenza\n\nCodice Cliente: ${clientCodeValue}\nFirst Run: ${firstRun}\n\nGrazie.`);
-        window.location.href = `mailto:gliamicidipaolino@gmail.com?subject=${subject}&body=${body}`;
     }
     
     async function onActivateLicense() {
@@ -826,18 +868,52 @@
             alert('Licenza attivata per 365 giorni.');
         } else alert('Codice non valido.');
     }
-    function closeInfoModalFunc() { infoModal.style.display = 'none'; infoModalSendEmailBtn.style.display = "none"; }
+    
+    // Modale richiesta attivazione con pulsante email
+    function openActivationRequestModal() {
+        const firstRun = localStorage.getItem('firstRun');
+        const modalContent = `
+            Per attivare la licenza, invia un bonifico di €48,00 a Paolo Maiorana
+            IBAN: IT31R0339512900052702573770 con causale il tuo codice cliente.
+            Dopo il pagamento, premi il pulsante qui sotto per inviare automaticamente
+            i tuoi dati di attivazione all'amministratore.
+        `;
+        infoModalText.innerText = modalContent;
+        // Aggiungo un pulsante nel footer del modale
+        const buttonsDiv = document.querySelector('#infoModal .modal-buttons');
+        let existingEmailBtn = document.getElementById('sendActivationEmailBtn');
+        if (!existingEmailBtn) {
+            const emailBtn = document.createElement('button');
+            emailBtn.id = 'sendActivationEmailBtn';
+            emailBtn.className = 'save-btn';
+            emailBtn.style.background = '#4caf50';
+            emailBtn.innerText = '📧 Invia dati per attivazione';
+            emailBtn.onclick = () => {
+                const clientCodeVal = clientCodeInput.value;
+                const firstRunVal = localStorage.getItem('firstRun');
+                const subject = encodeURIComponent('Richiesta attivazione licenza Contatti Personali');
+                const body = encodeURIComponent(`Codice Cliente: ${clientCodeVal}\nFirst Run: ${firstRunVal}`);
+                window.location.href = `mailto:gliamicidipaolino@gmail.com?subject=${subject}&body=${body}`;
+            };
+            buttonsDiv.appendChild(emailBtn);
+        }
+        infoModal.style.display = 'flex';
+        isModalOpen = true;
+        keepScreenOn();
+    }
+    
+    function closeInfoModalFunc() { infoModal.style.display = 'none'; isModalOpen = false; }
     closeInfoModalBtn.onclick = closeInfoModalFunc;
     infoModal.onclick = (e) => { if (e.target === infoModal) closeInfoModalFunc(); };
-    infoModalSendEmailBtn.onclick = sendActivationRequestEmail;
+    requestActivationBtn.addEventListener('click', openActivationRequestModal);
     
     function loadAdminCode() { let saved = localStorage.getItem('adminCode'); if (saved && saved.trim()) adminCode = saved; else { adminCode = "admin2025"; localStorage.setItem('adminCode', adminCode); } }
     function saveAdminCode(newCode) { if (newCode && newCode.trim()) { adminCode = newCode; localStorage.setItem('adminCode', adminCode); alert("Codice admin cambiato."); } else alert("Codice non valido."); }
     function generateUnlockCodeAdmin(clientCode, firstRun) { const message = `${clientCode}|${firstRun}`; const hash = CryptoJS.HmacSHA256(message, SECRET_KEY); return hashTo20Digits(hash); }
     function onGenerateUnlock() { let cc = adminClientCode.value.trim(); let fr = adminFirstRun.value.trim(); if (!/^\d{6,10}$/.test(cc)) { alert("Codice cliente 6-10 cifre."); return; } if (!/^\d+$/.test(fr) || fr.length<10) { alert("First Run non valido."); return; } generatedCode.value = generateUnlockCodeAdmin(cc, fr); }
     function copyGenerated() { if (generatedCode.value) { navigator.clipboard.writeText(generatedCode.value); alert("Copiato."); } else alert("Nessun codice."); }
-    function showAdminSection() { adminSection.style.display = 'block'; }
-    function hideAdminSection() { adminSection.style.display = 'none'; }
+    function showAdminSection() { adminSection.style.display = 'block'; if (imagePage && !imagePage.classList.contains('hidden')) adminReteButtons.classList.remove('hidden-btn'); }
+    function hideAdminSection() { adminSection.style.display = 'none'; adminReteButtons.classList.add('hidden-btn'); }
     let adminTimer = null;
     function startAdminTimer() { adminTimer = setTimeout(() => { let code = prompt("Codice amministratore:"); if (code === adminCode) { adminAuthenticated = true; showAdminSection(); alert("Accesso admin."); if (imagePage && !imagePage.classList.contains('hidden')) { renderReteCategories(reteLevelContainer, reteData); loadSavedImage(); } } else if (code !== null) alert("Codice errato."); }, 3000); }
     function cancelAdminTimer() { if (adminTimer) clearTimeout(adminTimer); }
@@ -902,7 +978,7 @@
         if (saved) { try { let parsed = JSON.parse(saved); for (let k in parsed) { if (infoTexts.hasOwnProperty(k)) infoTexts[k] = parsed[k]; } } catch(e){} }
     }
     
-    // ==================== MODALE INFORMATIVA GLOBALE ====================
+    // ==================== MODALE INFORMATIVA GLOBALE (ℹ️) ====================
     function openGlobalInfoModal(context, title, storageKey) {
         currentInfoContext = { context, storageKey };
         globalInfoModalTitle.innerText = title;
@@ -984,8 +1060,10 @@
                     homePage.classList.add('hidden');
                     imagePage.classList.remove('hidden');
                     requestImagePageWakeLock();
-                    renderReteCategories(reteLevelContainer, reteData);
-                    loadSavedImage();
+                    syncReteDataFromRemote().then(() => {
+                        renderReteCategories(reteLevelContainer, reteData);
+                        loadSavedImage();
+                    });
                     pushPage('image');
                     keepScreenOn();
                 } else {
@@ -1471,6 +1549,16 @@
     function onSaveNumber() { let n = phoneInput.value.trim(); if (n) { savePhone(currentService, n); phoneSaveMsg.innerText = "✅ Numero salvato nell'archivio"; setTimeout(()=>phoneSaveMsg.innerText="",2000); } else phoneSaveMsg.innerText = "⚠️ Inserisci un numero valido"; keepScreenOn(); }
     function onClearResponse() { clearOperatorTranslation(); transcribeStatus.innerText = "🧹 Traduzione cancellata"; setTimeout(() => transcribeStatus.innerText = "", 2000); keepScreenOn(); }
     activityModal.addEventListener('click', (e) => { if (e.target === activityModal) { activityModal.style.display = 'none'; isModalOpen = false; } });
+    
+    // Esportazione/importazione rete per admin
+    if (exportReteBtn) exportReteBtn.addEventListener('click', exportReteToFile);
+    if (importReteBtn) importReteBtn.addEventListener('click', () => {
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = 'application/json';
+        input.onchange = (e) => { if (e.target.files.length) importReteFromFile(e.target.files[0]); };
+        input.click();
+    });
     
     function init() {
         loadAdminCode();
