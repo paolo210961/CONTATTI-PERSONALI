@@ -116,7 +116,7 @@
         .speak-extra-buttons { margin-top: 12px; }
         .orange-btn { background: #FF6600 !important; color: white !important; }
         .info-message-small { font-size: 0.7rem; color: #555; text-align: center; margin-top: 8px; margin-bottom: 8px; }
-        .admin-rete-buttons { display: flex; gap: 10px; margin-top: 12px; }
+        .admin-rete-buttons { display: flex; gap: 10px; margin-top: 20px; }
         .admin-rete-buttons button { flex: 1; background: #283593; }
     </style>
 </head>
@@ -207,7 +207,7 @@
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
 <script>
-    // v0235 - FINALE: tutte le modifiche richieste
+    // v0235 - FINALE: pulsanti esporta/importa rete visibili per admin in imagePage
     const CURRENT_VERSION = "0235";
     let currentService = "ambulanza";
     let currentLat = null, currentLng = null;
@@ -410,6 +410,7 @@
                 emergencyPage.classList.add('hidden');
                 currentPage = 'image';
                 requestImagePageWakeLock();
+                updateAdminReteButtonsVisibility();
                 syncReteDataFromRemote().then(() => {
                     renderReteCategories(reteLevelContainer, reteData);
                     loadSavedImage();
@@ -871,7 +872,6 @@
     
     // Modale richiesta attivazione con pulsante email
     function openActivationRequestModal() {
-        const firstRun = localStorage.getItem('firstRun');
         const modalContent = `
             Per attivare la licenza, invia un bonifico di €48,00 a Paolo Maiorana
             IBAN: IT31R0339512900052702573770 con causale il tuo codice cliente.
@@ -879,7 +879,6 @@
             i tuoi dati di attivazione all'amministratore.
         `;
         infoModalText.innerText = modalContent;
-        // Aggiungo un pulsante nel footer del modale
         const buttonsDiv = document.querySelector('#infoModal .modal-buttons');
         let existingEmailBtn = document.getElementById('sendActivationEmailBtn');
         if (!existingEmailBtn) {
@@ -912,10 +911,21 @@
     function generateUnlockCodeAdmin(clientCode, firstRun) { const message = `${clientCode}|${firstRun}`; const hash = CryptoJS.HmacSHA256(message, SECRET_KEY); return hashTo20Digits(hash); }
     function onGenerateUnlock() { let cc = adminClientCode.value.trim(); let fr = adminFirstRun.value.trim(); if (!/^\d{6,10}$/.test(cc)) { alert("Codice cliente 6-10 cifre."); return; } if (!/^\d+$/.test(fr) || fr.length<10) { alert("First Run non valido."); return; } generatedCode.value = generateUnlockCodeAdmin(cc, fr); }
     function copyGenerated() { if (generatedCode.value) { navigator.clipboard.writeText(generatedCode.value); alert("Copiato."); } else alert("Nessun codice."); }
-    function showAdminSection() { adminSection.style.display = 'block'; if (imagePage && !imagePage.classList.contains('hidden')) adminReteButtons.classList.remove('hidden-btn'); }
-    function hideAdminSection() { adminSection.style.display = 'none'; adminReteButtons.classList.add('hidden-btn'); }
+    function showAdminSection() { adminSection.style.display = 'block'; updateAdminReteButtonsVisibility(); }
+    function hideAdminSection() { adminSection.style.display = 'none'; updateAdminReteButtonsVisibility(); }
+    
+    function updateAdminReteButtonsVisibility() {
+        if (adminReteButtons) {
+            if (adminAuthenticated && imagePage && !imagePage.classList.contains('hidden')) {
+                adminReteButtons.classList.remove('hidden-btn');
+            } else {
+                adminReteButtons.classList.add('hidden-btn');
+            }
+        }
+    }
+    
     let adminTimer = null;
-    function startAdminTimer() { adminTimer = setTimeout(() => { let code = prompt("Codice amministratore:"); if (code === adminCode) { adminAuthenticated = true; showAdminSection(); alert("Accesso admin."); if (imagePage && !imagePage.classList.contains('hidden')) { renderReteCategories(reteLevelContainer, reteData); loadSavedImage(); } } else if (code !== null) alert("Codice errato."); }, 3000); }
+    function startAdminTimer() { adminTimer = setTimeout(() => { let code = prompt("Codice amministratore:"); if (code === adminCode) { adminAuthenticated = true; showAdminSection(); alert("Accesso admin."); updateAdminReteButtonsVisibility(); if (imagePage && !imagePage.classList.contains('hidden')) { renderReteCategories(reteLevelContainer, reteData); loadSavedImage(); } } else if (code !== null) alert("Codice errato."); }, 3000); }
     function cancelAdminTimer() { if (adminTimer) clearTimeout(adminTimer); }
     adminLongPressBtn.addEventListener('mousedown', startAdminTimer);
     adminLongPressBtn.addEventListener('mouseup', cancelAdminTimer);
@@ -1060,6 +1070,7 @@
                     homePage.classList.add('hidden');
                     imagePage.classList.remove('hidden');
                     requestImagePageWakeLock();
+                    updateAdminReteButtonsVisibility();
                     syncReteDataFromRemote().then(() => {
                         renderReteCategories(reteLevelContainer, reteData);
                         loadSavedImage();
