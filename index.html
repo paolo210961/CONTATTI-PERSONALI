@@ -118,6 +118,10 @@
         .info-message-small { font-size: 0.7rem; color: #555; text-align: center; margin-top: 8px; margin-bottom: 8px; }
         .admin-rete-buttons { display: flex; gap: 10px; margin-top: 20px; }
         .admin-rete-buttons button { flex: 1; background: #283593; }
+        .sync-status { font-size: 0.75rem; text-align: center; margin: 10px 0; padding: 6px; border-radius: 20px; background: #e9ecef; color: #1e2a3a; display: none; }
+        .sync-status.error { background: #f8d7da; color: #721c24; }
+        .sync-status.success { background: #d4edda; color: #155724; }
+        .force-sync-btn { background: #17a2b8 !important; margin-top: 10px; }
     </style>
 </head>
 <body>
@@ -183,8 +187,10 @@
     <div id="imagePage" class="page hidden">
         <div class="image-top-box"><div class="image-top-title">MONASTIR: Facciamo Rete</div><div id="imagePreviewArea" class="image-container"><div class="image-placeholder" id="imagePlaceholder">📸 Solo amministratore: premi a lungo (3 sec) per caricare un'immagine</div></div></div>
         <div class="info-message-small">Per la consultazione, Richiedi Codice Attivazione nella Home.</div>
+        <div id="syncStatus" class="sync-status"></div>
         <div id="reteRootContainer" class="rete-container"><div id="reteLevelContainer"></div></div>
         <div id="adminReteButtons" class="admin-rete-buttons hidden-btn"><button id="exportReteBtn">📤 ESPORTA RETE</button><button id="importReteBtn">📥 IMPORTA RETE DA FILE</button></div>
+        <button id="forceSyncBtn" class="small-btn force-sync-btn">🔄 FORZA SINCRONIZZAZIONE</button>
     </div>
     <!-- MODALI -->
     <div id="adaptiveModal" class="adaptive-modal" style="display:none;"><div class="adaptive-modal-content"><textarea id="modalTextarea" readonly></textarea><button id="closeAdaptiveBtn">CHIUDI</button></div></div>
@@ -206,7 +212,7 @@
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
 <script>
-    // v0235 - FINALE: immagine principale inclusa nell'esportazione della rete
+    // v0235 - Aggiunta pulsante forza sincronizzazione e messaggi di stato
     const CURRENT_VERSION = "0235";
     let currentService = "ambulanza";
     let currentLat = null, currentLng = null;
@@ -334,6 +340,8 @@
     const exportReteBtn = document.getElementById('exportReteBtn');
     const importReteBtn = document.getElementById('importReteBtn');
     const adminReteButtons = document.getElementById('adminReteButtons');
+    const forceSyncBtn = document.getElementById('forceSyncBtn');
+    const syncStatusDiv = document.getElementById('syncStatus');
     
     let currentActivityNode = null;
     let currentEditId = null;
@@ -409,10 +417,7 @@
                 currentPage = 'image';
                 requestImagePageWakeLock();
                 updateAdminReteButtonsVisibility();
-                syncReteDataFromRemote().then(() => {
-                    renderReteCategories(reteLevelContainer, reteData);
-                    loadSavedImage();
-                });
+                performSync(true);
                 keepScreenOn();
             } else if (prev === 'emergency') {
                 homePage.classList.add('hidden');
@@ -458,29 +463,49 @@
         if (!reteData.categories) reteData.categories = [];
     }
     
-    // Sincronizzazione automatica da file JSON remoto (include anche l'immagine principale)
-    async function syncReteDataFromRemote() {
+    function showSyncStatus(message, isError = false) {
+        if (syncStatusDiv) {
+            syncStatusDiv.textContent = message;
+            syncStatusDiv.style.display = 'block';
+            syncStatusDiv.className = 'sync-status' + (isError ? ' error' : ' success');
+            setTimeout(() => {
+                if (syncStatusDiv.style.display === 'block') syncStatusDiv.style.display = 'none';
+            }, 5000);
+        }
+    }
+    
+    async function performSync(showMessages = true) {
+        if (showMessages) showSyncStatus('🔄 Sincronizzazione in corso...', false);
         try {
             const url = window.location.href.substring(0, window.location.href.lastIndexOf('/') + 1) + 'rete_data.json?t=' + Date.now();
             const response = await fetch(url);
             if (response.ok) {
                 const remoteData = await response.json();
+                let updated = false;
                 if (remoteData.categories && Array.isArray(remoteData.categories)) {
                     reteData = { categories: remoteData.categories };
                     saveReteData();
-                    console.log('Rete sincronizzata da remoto');
+                    updated = true;
                 }
                 if (remoteData.mainImage && typeof remoteData.mainImage === 'string' && remoteData.mainImage.startsWith('data:image')) {
                     currentImageData = remoteData.mainImage;
                     localStorage.setItem('monastir_image', currentImageData);
                     setupImageArea();
-                    console.log('Immagine principale sincronizzata');
+                    updated = true;
+                }
+                if (updated) {
+                    renderReteCategories(reteLevelContainer, reteData);
+                    if (showMessages) showSyncStatus('✅ Sincronizzazione completata!', false);
+                } else {
+                    if (showMessages) showSyncStatus('⚠️ Nessun dato nuovo da sincronizzare.', false);
                 }
             } else {
-                console.log('File rete_data.json non trovato, uso dati locali');
+                if (showMessages) showSyncStatus('❌ File rete_data.json non trovato sul server.', true);
+                console.log('File rete_data.json non trovato');
             }
         } catch(e) {
             console.warn('Errore sincronizzazione rete:', e);
+            if (showMessages) showSyncStatus('❌ Errore di rete: ' + e.message, true);
         }
     }
     
@@ -791,9 +816,9 @@
     }
     function attachMainImageLongPress(img) {
         let timer;
-        img.onmousedown = () => { timer = setTimeout(() => { if (adminAuthenticated) openMainImageGallery(true); }, 3000); };
+        img.onmousedown = () => { timer = setTimeout(() => { if (adminAuthenticated) openMainImageGallery(); }, 3000); };
         img.onmouseup = img.onmouseleave = () => clearTimeout(timer);
-        img.ontouchstart = () => { timer = setTimeout(() => { if (adminAuthenticated) openMainImageGallery(true); }, 3000); };
+        img.ontouchstart = () => { timer = setTimeout(() => { if (adminAuthenticated) openMainImageGallery(); }, 3000); };
         img.ontouchend = img.ontouchcancel = () => clearTimeout(timer);
     }
     function openMainImageGallery() {
@@ -1082,7 +1107,7 @@
                     imagePage.classList.remove('hidden');
                     requestImagePageWakeLock();
                     updateAdminReteButtonsVisibility();
-                    syncReteDataFromRemote().then(() => {
+                    performSync(true).then(() => {
                         renderReteCategories(reteLevelContainer, reteData);
                         loadSavedImage();
                     });
@@ -1580,6 +1605,12 @@
         input.accept = 'application/json';
         input.onchange = (e) => { if (e.target.files.length) importReteFromFile(e.target.files[0]); };
         input.click();
+    });
+    if (forceSyncBtn) forceSyncBtn.addEventListener('click', () => {
+        performSync(true).then(() => {
+            renderReteCategories(reteLevelContainer, reteData);
+            loadSavedImage();
+        });
     });
     
     function init() {
