@@ -113,7 +113,6 @@
         .add-category-btn{background:#4caf50;color:white;border:none;border-radius:40px;padding:12px;margin-top:16px;font-weight:bold;cursor:pointer}
         .add-category-btn:active{transform:scale(0.97)}
         .hidden-btn{display:none !important}
-        /* MODIFICHE RICHESTE */
         .speak-extra-buttons { margin-top: 12px; }
         .orange-btn { background: #FF6600 !important; color: white !important; }
         .info-message-small { font-size: 0.7rem; color: #555; text-align: center; margin-top: 8px; margin-bottom: 8px; }
@@ -181,7 +180,6 @@
     </div>
     <div id="imagePage" class="page hidden">
         <div class="image-top-box"><div class="image-top-title">MONASTIR: Facciamo Rete</div><div id="imagePreviewArea" class="image-container"><div class="image-placeholder" id="imagePlaceholder">📸 Solo amministratore: premi a lungo (3 sec) per caricare un'immagine</div></div></div>
-        <!-- Messaggio informativo aggiunto sotto l'area immagine -->
         <div class="info-message-small">Per la consultazione, Richiedi Codice Attivazione nella Home.</div>
         <div id="reteRootContainer" class="rete-container"><div id="reteLevelContainer"></div></div>
     </div>
@@ -189,7 +187,7 @@
     <div id="adaptiveModal" class="adaptive-modal" style="display:none;"><div class="adaptive-modal-content"><textarea id="modalTextarea" readonly></textarea><button id="closeAdaptiveBtn">CHIUDI</button></div></div>
     <div id="speakDetailModal" class="adaptive-modal" style="display:none;"><div class="adaptive-modal-content"><h3>📄 Dettaglio conversazione</h3><div class="detail-label">Italiano (originale)</div><div class="detail-text" id="speakOriginalText"></div><div class="detail-label">Francese (traduzione)</div><div class="detail-text" id="speakTranslatedText"></div><div class="modal-buttons"><button id="closeSpeakModalBtn" class="save-btn">CHIUDI</button></div></div></div>
     <div id="noteEditModal" class="adaptive-modal note-edit-modal" style="display:none;"><div class="adaptive-modal-content"><h3 id="noteModalTitle">➕ Aggiungi Nota</h3><label class="detail-label">Titolo</label><input type="text" id="editNoteTitle" placeholder="Inserisci il titolo"><label class="detail-label">Descrizione</label><textarea id="editNoteDesc" rows="4" placeholder="Inserisci la descrizione"></textarea><label class="detail-label">Includi coordinate nella copia/lettura</label><div class="coord-toggle-group"><button id="modalCoordS" class="coord-toggle-modal-btn">S</button><button id="modalCoordN" class="coord-toggle-modal-btn">N</button></div><div class="modal-audio-row"><button id="modalAudioIt" class="modal-audio-btn">🇮🇹 LEGGI in IT</button><button id="modalAudioFr" class="modal-audio-btn">🇹🇳 LEGGI in FR</button></div><div class="modal-buttons"><button id="deleteNoteModalBtn" class="delete-btn" style="display:none;">🗑️ CANCELLA NOTA</button><button id="saveNoteModalBtn" class="save-btn">SALVA</button><button id="cancelNoteModalBtn" class="cancel-btn">ANNULLA</button></div></div></div>
-    <div id="globalInfoModal" class="adaptive-modal" style="display:none;"><div class="adaptive-modal-content"><h3 id="globalInfoModalTitle">Informazioni</h3><textarea id="globalInfoTextarea" rows="8" readonly style="font-family:monospace; font-size:0.9rem;"></textarea><div class="modal-buttons"><button id="globalInfoEditBtn" class="save-btn" style="background:#8e44ad;">✏️ MODIFICA</button><button id="globalInfoSaveBtn" class="save-btn" style="display:none;">💾 SALVA</button><button id="globalInfoDownloadBtn" class="save-btn" style="background:#4caf50; display:none;">📲 SCARICA APP</button><button id="globalInfoCloseBtn" class="cancel-btn">CHIUDI</button></div></div></div>
+    <div id="globalInfoModal" class="adaptive-modal" style="display:none;"><div class="adaptive-modal-content"><h3 id="globalInfoModalTitle">Informazioni</h3><textarea id="globalInfoTextarea" rows="8" readonly style="font-family:monospace; font-size:0.9rem;"></textarea><div class="modal-buttons"><button id="globalInfoEditBtn" class="save-btn" style="background:#8e44ad;">✏️ MODIFICA</button><button id="globalInfoSaveBtn" class="save-btn" style="display:none;">💾 SALVA</button><button id="globalInfoDownloadBtn" class="save-btn" style="background:#4caf50;">📲 INSTALLA APP</button><button id="globalInfoCloseBtn" class="cancel-btn">CHIUDI</button></div></div></div>
     <div id="infoModal" class="adaptive-modal" style="display:none;"><div class="adaptive-modal-content"><h3>📋 Richiesta attivazione</h3><div id="infoModalText" class="modal-info-text"></div><div class="modal-buttons"><button id="closeInfoModalBtn" class="cancel-btn">CHIUDI</button></div></div></div>
     <div id="activityModal" class="adaptive-modal" style="display:none;">
         <div class="adaptive-modal-content">
@@ -205,7 +203,7 @@
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
 <script>
-    // v0235 - MODIFICHE RICHIESTE: messaggio info in imagePage, bottone arancione con spazio, download app nel modale licenza
+    // v0235 - MODIFICA: installazione PWA tramite bottone "Installa App" nel modale licenza
     const CURRENT_VERSION = "0235";
     let currentService = "ambulanza";
     let currentLat = null, currentLng = null;
@@ -223,6 +221,14 @@
     let licenseActive = false, daysRemaining = 0, licenseCheckPassed = false, clientCode = "";
     const SECRET_KEY = "ChiaveSegreta123";
     let adminCode = "admin2025", adminAuthenticated = false;
+    
+    // PWA install prompt
+    let deferredPrompt = null;
+    window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredPrompt = e;
+        console.log('beforeinstallprompt captured');
+    });
     
     // DOM elements
     const homePage = document.getElementById('homePage');
@@ -486,7 +492,6 @@
     }
     
     function showActivityModalForChild(child) {
-        // i figli si aprono SOLO con licenza attivata (NESSUN periodo di prova)
         const activated = localStorage.getItem('activated') === 'true';
         if (!activated) {
             alert("NEGATO ACCESSO – RICHIEDI ATTIVAZIONE – VAI NELLA SCHERMATA HOME");
@@ -764,7 +769,7 @@
         }
         else { 
             licenseActive = activated; 
-            licenseCheckPassed = true;   // periodo di prova attivo: i contatti principali funzionano
+            licenseCheckPassed = true;   // periodo di prova attivo
         }
         
         daysRemaining = Math.ceil((expiry - nowTime) / 86400000);
@@ -879,7 +884,7 @@
         globalInfoTextarea.readOnly = !adminAuthenticated;
         globalInfoEditBtn.style.display = adminAuthenticated ? "block" : "none";
         globalInfoSaveBtn.style.display = "none";
-        // Mostra il bottone di download SOLO per il contesto licenseInfo
+        // Mostra il bottone di installazione SOLO per il contesto licenseInfo
         if (context === 'licenseInfo') {
             globalInfoDownloadBtn.style.display = "block";
         } else {
@@ -889,21 +894,24 @@
         isModalOpen = true;
         keepScreenOn();
     }
-    // Funzione per scaricare l'app (file HTML corrente)
-    function downloadApp() {
-        // Ottieni il contenuto HTML corrente
-        const htmlContent = document.documentElement.outerHTML;
-        const blob = new Blob([htmlContent], { type: 'text/html' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = 'contatti_personali.html';
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
+    
+    // Funzione per installare l'app come PWA
+    function installPWA() {
+        if (deferredPrompt) {
+            deferredPrompt.prompt();
+            deferredPrompt.userChoice.then((choiceResult) => {
+                if (choiceResult.outcome === 'accepted') {
+                    console.log('Utente ha accettato l\'installazione');
+                } else {
+                    console.log('Utente ha rifiutato l\'installazione');
+                }
+                deferredPrompt = null;
+            });
+        } else {
+            alert("Installazione non disponibile in questo momento.\n\nPuoi aggiungere manualmente questa app alla schermata Home:\n- Su Android: menu Chrome → 'Aggiungi a schermata Home'\n- Su iOS: condividi → 'Aggiungi a Home'");
+        }
     }
-    globalInfoDownloadBtn.addEventListener('click', downloadApp);
+    globalInfoDownloadBtn.addEventListener('click', installPWA);
     
     globalInfoEditBtn.addEventListener('click', () => {
         if (!adminAuthenticated) return;
