@@ -199,7 +199,7 @@
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
 <script>
-    // v0235 - Solo modifica: apertura modale figlio solo se licenza attivata (licenseCheckPassed === true)
+    // v0235 - CORREZIONE BUG LICENZA: licenseCheckPassed ora = activated
     const CURRENT_VERSION = "0235";
     let currentService = "ambulanza";
     let currentLat = null, currentLng = null;
@@ -479,7 +479,7 @@
     }
     
     function showActivityModalForChild(child) {
-        // *** MODIFICA PRINCIPALE: controllo accesso solo se licenza attivata ***
+        // Controllo accesso: solo se licenza attivata
         if (!licenseCheckPassed) {
             alert("NEGATO ACCESSO – RICHIEDI ATTIVAZIONE – VAI NELLA SCHERMATA HOME");
             return;
@@ -633,7 +633,7 @@
                         let childNameSpan = document.createElement('span');
                         childNameSpan.className = 'child-name';
                         childNameSpan.innerText = (child.title && child.title.trim()) ? child.title : "Selezione attività";
-                        // Il click sul figlio ora viene gestito con controllo licenza
+                        // Click sul figlio - ora protetto da licenseCheckPassed all'interno di showActivityModalForChild
                         childNameSpan.onclick = (e) => { e.stopPropagation(); showActivityModalForChild(child); };
                         if (adminAuthenticated) {
                             let pressTimer = null;
@@ -750,8 +750,17 @@
         let expiry = parseInt(localStorage.getItem('expiryDate'));
         if (activated && expiry < firstRun + 365 * 86400000) { expiry = firstRun + 365 * 86400000; localStorage.setItem('expiryDate', expiry); }
         const nowTime = now.getTime();
-        if (nowTime > expiry) { licenseActive = false; licenseCheckPassed = false; }
-        else { licenseActive = activated; licenseCheckPassed = true; }
+        
+        // CORREZIONE BUG: licenseCheckPassed ora dipende DA activated
+        if (nowTime > expiry) { 
+            licenseActive = false; 
+            licenseCheckPassed = false; 
+        }
+        else { 
+            licenseActive = activated; 
+            licenseCheckPassed = activated;   // <--- CORREZIONE APPLICATA
+        }
+        
         daysRemaining = Math.ceil((expiry - nowTime) / 86400000);
         updateLicenseUI();
         toggleAppAccess(!licenseCheckPassed);
