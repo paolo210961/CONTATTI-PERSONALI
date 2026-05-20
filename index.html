@@ -188,7 +188,7 @@
     <div id="speakDetailModal" class="adaptive-modal" style="display:none;"><div class="adaptive-modal-content"><h3>📄 Dettaglio conversazione</h3><div class="detail-label">Italiano (originale)</div><div class="detail-text" id="speakOriginalText"></div><div class="detail-label">Francese (traduzione)</div><div class="detail-text" id="speakTranslatedText"></div><div class="modal-buttons"><button id="closeSpeakModalBtn" class="save-btn">CHIUDI</button></div></div></div>
     <div id="noteEditModal" class="adaptive-modal note-edit-modal" style="display:none;"><div class="adaptive-modal-content"><h3 id="noteModalTitle">➕ Aggiungi Nota</h3><label class="detail-label">Titolo</label><input type="text" id="editNoteTitle" placeholder="Inserisci il titolo"><label class="detail-label">Descrizione</label><textarea id="editNoteDesc" rows="4" placeholder="Inserisci la descrizione"></textarea><label class="detail-label">Includi coordinate nella copia/lettura</label><div class="coord-toggle-group"><button id="modalCoordS" class="coord-toggle-modal-btn">S</button><button id="modalCoordN" class="coord-toggle-modal-btn">N</button></div><div class="modal-audio-row"><button id="modalAudioIt" class="modal-audio-btn">🇮🇹 LEGGI in IT</button><button id="modalAudioFr" class="modal-audio-btn">🇹🇳 LEGGI in FR</button></div><div class="modal-buttons"><button id="deleteNoteModalBtn" class="delete-btn" style="display:none;">🗑️ CANCELLA NOTA</button><button id="saveNoteModalBtn" class="save-btn">SALVA</button><button id="cancelNoteModalBtn" class="cancel-btn">ANNULLA</button></div></div></div>
     <div id="globalInfoModal" class="adaptive-modal" style="display:none;"><div class="adaptive-modal-content"><h3 id="globalInfoModalTitle">Informazioni</h3><textarea id="globalInfoTextarea" rows="8" readonly style="font-family:monospace; font-size:0.9rem;"></textarea><div class="modal-buttons"><button id="globalInfoEditBtn" class="save-btn" style="background:#8e44ad;">✏️ MODIFICA</button><button id="globalInfoSaveBtn" class="save-btn" style="display:none;">💾 SALVA</button><button id="globalInfoDownloadBtn" class="save-btn" style="background:#4caf50;">📲 INSTALLA APP</button><button id="globalInfoCloseBtn" class="cancel-btn">CHIUDI</button></div></div></div>
-    <div id="infoModal" class="adaptive-modal" style="display:none;"><div class="adaptive-modal-content"><h3>📋 Richiesta attivazione</h3><div id="infoModalText" class="modal-info-text"></div><div class="modal-buttons"><button id="closeInfoModalBtn" class="cancel-btn">CHIUDI</button></div></div></div>
+    <div id="infoModal" class="adaptive-modal" style="display:none;"><div class="adaptive-modal-content"><h3>📋 Richiesta attivazione</h3><div id="infoModalText" class="modal-info-text"></div><div class="modal-buttons"><button id="infoModalSendEmailBtn" class="save-btn" style="background:#4caf50; display:none;">📧 Invia dati per attivazione</button><button id="closeInfoModalBtn" class="cancel-btn">CHIUDI</button></div></div></div>
     <div id="activityModal" class="adaptive-modal" style="display:none;">
         <div class="adaptive-modal-content">
             <div style="text-align:center; font-size:1.3rem; font-weight:bold; margin-bottom:15px;" id="activityModalTitle">Attività</div>
@@ -203,7 +203,7 @@
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
 <script>
-    // v0235 - MODIFICA: installazione PWA tramite bottone "Installa App" nel modale licenza
+    // v0235 - MODIFICHE FINALI: admin bypassa figli, pulsante email in modale richiesta attivazione
     const CURRENT_VERSION = "0235";
     let currentService = "ambulanza";
     let currentLat = null, currentLng = null;
@@ -299,6 +299,7 @@
     const daysHomeDisplay = document.getElementById('daysLeftDisplayHome');
     const infoModal = document.getElementById('infoModal');
     const infoModalText = document.getElementById('infoModalText');
+    const infoModalSendEmailBtn = document.getElementById('infoModalSendEmailBtn');
     const closeInfoModalBtn = document.getElementById('closeInfoModalBtn');
     const imagePreviewArea = document.getElementById('imagePreviewArea');
     const infoNoteBtn = document.getElementById('infoNoteBtn');
@@ -492,10 +493,15 @@
     }
     
     function showActivityModalForChild(child) {
-        const activated = localStorage.getItem('activated') === 'true';
-        if (!activated) {
-            alert("NEGATO ACCESSO – RICHIEDI ATTIVAZIONE – VAI NELLA SCHERMATA HOME");
-            return;
+        // Admin bypassa il controllo di licenza
+        if (adminAuthenticated) {
+            // Accesso consentito senza verificare licenza
+        } else {
+            const activated = localStorage.getItem('activated') === 'true';
+            if (!activated) {
+                alert("NEGATO ACCESSO – RICHIEDI ATTIVAZIONE – VAI NELLA SCHERMATA HOME");
+                return;
+            }
         }
         currentActivityNode = child;
         activityModalTitle.innerText = (child.title && child.title.trim()) ? child.title : "Descrittivo attività senza titolo";
@@ -779,13 +785,32 @@
         if (daysHomeDisplay) {
             daysHomeDisplay.innerHTML = `v${CURRENT_VERSION} - Scade: ${daysRemaining} giorni <button id="copyRequestBtnMoved" class="small-btn" style="background:#e67e22;">📋 Richiedi attivazione</button>`;
             let moved = document.getElementById('copyRequestBtnMoved');
-            if (moved) moved.onclick = () => openGlobalInfoModal('licenseRequest', 'Richiedi attivazione', 'license_request_text');
+            if (moved) moved.onclick = () => openInfoModalWithEmailButton();
         }
     }
     function updateLicenseUI() {
         let activated = localStorage.getItem('activated') === 'true';
         if (activated) { unlockCodeInput.disabled = true; activateLicenseBtn.disabled = true; }
         else { unlockCodeInput.disabled = false; activateLicenseBtn.disabled = false; }
+    }
+    
+    // Funzione per aprire il modale info con il pulsante email
+    function openInfoModalWithEmailButton() {
+        const msg = infoTexts.licenseRequest || "Per attivare la licenza, invia un bonifico di €48,00 a Paolo Maiorana IBAN: IT31R0339512900052702573770 con causale il tuo codice cliente.\nPoi invia email a gli amicidipaolino@gmail.com con il codice cliente.\nRiceverai il codice di sblocco a 20 cifre.";
+        infoModalText.innerText = msg;
+        infoModalSendEmailBtn.style.display = "block";
+        infoModal.style.display = 'flex';
+        isModalOpen = true;
+        keepScreenOn();
+    }
+    
+    // Funzione per inviare email con codice cliente e first run
+    function sendActivationRequestEmail() {
+        const firstRun = localStorage.getItem('firstRun') || "";
+        const clientCodeValue = clientCodeInput.value || "";
+        const subject = encodeURIComponent("Richiesta attivazione licenza Contatti Personali");
+        const body = encodeURIComponent(`Richiesta attivazione licenza\n\nCodice Cliente: ${clientCodeValue}\nFirst Run: ${firstRun}\n\nGrazie.`);
+        window.location.href = `mailto:gliamicidipaolino@gmail.com?subject=${subject}&body=${body}`;
     }
     
     async function onActivateLicense() {
@@ -801,9 +826,10 @@
             alert('Licenza attivata per 365 giorni.');
         } else alert('Codice non valido.');
     }
-    function closeInfoModalFunc() { infoModal.style.display = 'none'; }
+    function closeInfoModalFunc() { infoModal.style.display = 'none'; infoModalSendEmailBtn.style.display = "none"; }
     closeInfoModalBtn.onclick = closeInfoModalFunc;
     infoModal.onclick = (e) => { if (e.target === infoModal) closeInfoModalFunc(); };
+    infoModalSendEmailBtn.onclick = sendActivationRequestEmail;
     
     function loadAdminCode() { let saved = localStorage.getItem('adminCode'); if (saved && saved.trim()) adminCode = saved; else { adminCode = "admin2025"; localStorage.setItem('adminCode', adminCode); } }
     function saveAdminCode(newCode) { if (newCode && newCode.trim()) { adminCode = newCode; localStorage.setItem('adminCode', adminCode); alert("Codice admin cambiato."); } else alert("Codice non valido."); }
@@ -884,7 +910,6 @@
         globalInfoTextarea.readOnly = !adminAuthenticated;
         globalInfoEditBtn.style.display = adminAuthenticated ? "block" : "none";
         globalInfoSaveBtn.style.display = "none";
-        // Mostra il bottone di installazione SOLO per il contesto licenseInfo
         if (context === 'licenseInfo') {
             globalInfoDownloadBtn.style.display = "block";
         } else {
@@ -895,7 +920,6 @@
         keepScreenOn();
     }
     
-    // Funzione per installare l'app come PWA
     function installPWA() {
         if (deferredPrompt) {
             deferredPrompt.prompt();
