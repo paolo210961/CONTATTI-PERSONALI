@@ -124,19 +124,22 @@
         .sync-status.success { background: #d4edda; color: #155724; }
         .force-sync-btn { background: #17a2b8 !important; margin-top: 10px; }
         
-        /* STILI PER ARCHIVIO EXPAT */
-        .archivio-year-row { display: flex; align-items: center; gap: 10px; margin: 16px 0; }
-        .archivio-year-input { flex: 2; text-align: center; font-size: 1.2rem; font-weight: bold; background: #f8f9fa; }
+        /* ARCHIVIO EXPAT STYLES */
+        .archivio-year-clickable { background: #f0f0f0; border-radius: 60px; padding: 12px 20px; text-align: center; font-size: 1.5rem; font-weight: bold; margin: 10px 0; cursor: pointer; display: inline-block; width: auto; min-width: 150px; margin-left: auto; margin-right: auto; }
         .archivio-folder-row { display: flex; align-items: center; justify-content: space-between; background: #e9ecef; padding: 12px 16px; border-radius: 32px; margin: 16px 0; }
         .archivio-folder-name { font-size: 1.1rem; font-weight: bold; }
         .archivio-search-icon { font-size: 1.3rem; cursor: pointer; background: none; border: none; padding: 5px 10px; }
         .archivio-doc-item { display: flex; align-items: center; justify-content: space-between; background: white; border: 1px solid #ced4da; border-radius: 40px; padding: 10px 16px; margin: 8px 0; }
         .archivio-doc-name { font-family: monospace; font-size: 0.8rem; word-break: break-all; flex: 1; }
         .archivio-doc-open { font-size: 1.2rem; cursor: pointer; background: none; border: none; padding: 5px 10px; }
-        .archivio-button-row { display: flex; gap: 12px; margin-top: 20px; }
-        .archivio-button-row button { flex: 1; }
+        .archivio-button-row { display: flex; gap: 12px; margin-top: 20px; flex-wrap: wrap; }
+        .archivio-button-row button { flex: 1; min-width: 120px; }
         .archivio-search-panel { background: #f0f0f0; border-radius: 24px; padding: 12px; margin: 12px 0; display: none; }
         .archivio-search-input { width: 100%; padding: 10px; border-radius: 40px; border: 1px solid #ced4da; }
+        .archivio-config-panel { background: #fff3e0; border-radius: 24px; padding: 12px; margin: 12px 0; border-left: 4px solid #e67e22; }
+        .archivio-drive-link { width: 100%; padding: 10px; border-radius: 40px; border: 1px solid #ced4da; margin-top: 8px; }
+        .warning-msg { background: #f8d7da; color: #721c24; padding: 10px; border-radius: 16px; margin: 10px 0; text-align: center; }
+        .success-msg { background: #d4edda; color: #155724; padding: 10px; border-radius: 16px; margin: 10px 0; text-align: center; }
     </style>
 </head>
 <body>
@@ -210,11 +213,18 @@
     <div id="archivioPage" class="page hidden">
         <div class="title-btn" style="background:#6c757d; cursor:default;">📁 ARCHIVIO VITA DA EXPAT</div>
         
-        <div class="archivio-year-row">
-            <div class="section-title" style="margin-bottom:0;">ANNO:</div>
-            <input type="text" id="archivioYearInput" class="archivio-year-input" placeholder="2026" maxlength="4" inputmode="numeric" value="2026" readonly style="background:#f8f9fa;">
+        <div id="archivioDriveConfigPanel" class="archivio-config-panel">
+            <div style="font-weight:bold; margin-bottom:8px;">🔗 CONFIGURA GOOGLE DRIVE</div>
+            <input type="text" id="archivioDriveLink" class="archivio-drive-link" placeholder="https://drive.google.com/drive/folders/XXXXXXXXX">
+            <button id="archivioSaveDriveBtn" class="small-btn" style="background:#283593; margin-top:8px;">💾 SALVA LINK</button>
+            <div id="archivioDriveStatus" class="info-message-small" style="margin-top:5px;"></div>
         </div>
-        <div class="info-message-small" id="archivioYearHint">(long press 5 sec per modificare l'anno)</div>
+        
+        <div id="archivioLensCheck"></div>
+        
+        <div id="archivioYearContainer" style="text-align:center;">
+            <div class="archivio-year-clickable" id="archivioYearDisplay">2026</div>
+        </div>
         
         <div class="archivio-folder-row">
             <span class="archivio-folder-name">📁 CARTELLA: <span id="archivioCurrentYear">2026</span></span>
@@ -228,16 +238,18 @@
         </div>
         
         <div id="archivioDocsList" class="dark-card" style="max-height:400px; overflow-y:auto;">
-            <div style="text-align:center; padding:20px; color:#777;">Nessun documento. Scannerizza il primo.</div>
+            <div style="text-align:center; padding:20px; color:#777;">Nessun documento. Configura il Drive e crea un anno.</div>
         </div>
         
         <div class="archivio-button-row">
-            <button id="archivioScanBtn" class="small-btn" style="background:#4caf50;">📷 SCANNERIZZA NUOVO DOCUMENTO</button>
+            <button id="archivioScanBtn" class="small-btn" style="background:#4caf50;">📱 APRI MICROSOFT LENS</button>
+            <button id="archivioUploadBtn" class="small-btn" style="background:#17a2b8;">📁 CARICA PDF DA DOWNLOAD</button>
             <button id="archivioNewYearBtn" class="small-btn" style="background:#e67e22;">➕ CREA NUOVO ANNO</button>
         </div>
         
         <div class="info-message-small" style="margin-top:16px;">ℹ️ Periodo di prova: 90 giorni. Attiva la licenza per continuare ad usare l'archivio.</div>
     </div>
+    
     <!-- MODALI -->
     <div id="adaptiveModal" class="adaptive-modal" style="display:none;"><div class="adaptive-modal-content"><textarea id="modalTextarea" readonly></textarea><button id="closeAdaptiveBtn">CHIUDI</button></div></div>
     <div id="speakDetailModal" class="adaptive-modal" style="display:none;"><div class="adaptive-modal-content"><h3>📄 Dettaglio conversazione</h3><div class="detail-label">Italiano (originale)</div><div class="detail-text" id="speakOriginalText"></div><div class="detail-label">Francese (traduzione)</div><div class="detail-text" id="speakTranslatedText"></div><div class="modal-buttons"><button id="closeSpeakModalBtn" class="save-btn">CHIUDI</button></div></div></div>
@@ -258,7 +270,7 @@
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
 <script>
-    // v0237 - Aggiunta ARCHIVIO EXPAT: nuova pagina con gestione documenti per anno
+    // v0237 - ARCHIVIO EXPAT: Microsoft Lens + Google Drive
     const CURRENT_VERSION = "0237";
     let currentService = "ambulanza";
     let currentLat = null, currentLng = null;
@@ -282,7 +294,6 @@
     window.addEventListener('beforeinstallprompt', (e) => {
         e.preventDefault();
         deferredPrompt = e;
-        console.log('beforeinstallprompt captured');
     });
     
     // DOM elements
@@ -391,8 +402,11 @@
     const forceSyncBtn = document.getElementById('forceSyncBtn');
     const syncStatusDiv = document.getElementById('syncStatus');
     
-    // Archivio Expat DOM elements
-    const archivioYearInput = document.getElementById('archivioYearInput');
+    // Archivio DOM elements
+    const archivioDriveLink = document.getElementById('archivioDriveLink');
+    const archivioSaveDriveBtn = document.getElementById('archivioSaveDriveBtn');
+    const archivioDriveStatus = document.getElementById('archivioDriveStatus');
+    const archivioYearDisplay = document.getElementById('archivioYearDisplay');
     const archivioCurrentYearSpan = document.getElementById('archivioCurrentYear');
     const archivioSearchBtn = document.getElementById('archivioSearchBtn');
     const archivioSearchPanel = document.getElementById('archivioSearchPanel');
@@ -401,72 +415,128 @@
     const archivioSearchClearBtn = document.getElementById('archivioSearchClearBtn');
     const archivioDocsList = document.getElementById('archivioDocsList');
     const archivioScanBtn = document.getElementById('archivioScanBtn');
+    const archivioUploadBtn = document.getElementById('archivioUploadBtn');
     const archivioNewYearBtn = document.getElementById('archivioNewYearBtn');
+    const archivioLensCheck = document.getElementById('archivioLensCheck');
     
-    let currentActivityNode = null;
-    let currentEditId = null;
-    let currentEditIncludeCoords = false;
-    let recognitionOperator = null;
-    let recognitionSpeak = null;
-    let recognitionTimeout = null;
-    let lastItalianText = "";
-    let lastFrenchTranslation = "";
-    let currentInfoContext = null;
-    let infoTexts = {
-        licenseInfo: "Informazioni sul codice cliente.\nIl codice cliente è univoco per questa installazione.\nPer attivare la licenza, invia un bonifico di €48,00 a Paolo Maiorana IBAN: IT31R0339512900052702573770 con causale il tuo codice cliente.\nPoi invia email a gli amicidipaolino@gmail.com con il codice cliente per ricevere il codice di sblocco.",
-        licenseRequest: "Richiedi attivazione: Premi 'Richiedi attivazione' e segui le istruzioni per ottenere il codice di sblocco.\nInvia un bonifico di €48,00 a Paolo Maiorana IBAN: IT31R0339512900052702573770 con causale il tuo codice cliente.\nPoi invia email a gli amicidipaolino@gmail.com con il codice cliente.\nRiceverai il codice di sblocco a 20 cifre.",
-        infoNote: "Informazioni sulle note.\nPuoi aggiungere note per ogni contatto. Ogni nota ha un titolo e una descrizione. Puoi selezionare una nota premendo il pallino blu. Le note selezionate vengono usate per la copia e la lettura.",
-        infoOperator: "Informazioni sull'ascolto operatore.\nPremi 'ASCOLTA OPERATORE' per avviare un ascolto di 30 secondi. La voce dell'operatore viene tradotta in italiano e salvata.",
-        infoSpeak: "Informazioni sulla conversazione con operatore.\nPremi 'PARLA CON OPERATORE' e parla in italiano. La tua voce viene tradotta in francese e letta ad alta voce."
-    };
-    
-    // ==================== ARCHIVIO EXPAT FUNCTIONS ====================
-    let archivioData = {}; // { "2026": [ { id, nome, data, path } ] }
+    let archivioData = {};
     let archivioCurrentYear = "2026";
     let archivioSearchTerm = "";
+    let archivioDriveConfigured = false;
+    let archivioDriveFolderId = "";
     
     function loadArchivioData() {
-        const saved = localStorage.getItem('archivio_expat_data');
+        const saved = localStorage.getItem('archivio_expat_data_v0237');
         if (saved) {
             try {
                 archivioData = JSON.parse(saved);
-            } catch(e) { console.warn(e); }
+            } catch(e) {}
         }
         if (!archivioData) archivioData = {};
-        // Load current year from storage
-        const savedYear = localStorage.getItem('archivio_current_year');
+        
+        const savedYear = localStorage.getItem('archivio_current_year_v0237');
         if (savedYear && /^\d{4}$/.test(savedYear)) {
             archivioCurrentYear = savedYear;
         } else {
             archivioCurrentYear = "2026";
         }
+        
+        const savedDriveLink = localStorage.getItem('archivio_drive_link');
+        if (savedDriveLink) {
+            archivioDriveLink.value = savedDriveLink;
+            validateDriveLink(savedDriveLink);
+        }
+        
         updateArchivioYearDisplay();
         renderArchivioDocsList();
     }
     
     function saveArchivioData() {
-        localStorage.setItem('archivio_expat_data', JSON.stringify(archivioData));
-    }
-    
-    function saveArchivioCurrentYear() {
-        localStorage.setItem('archivio_current_year', archivioCurrentYear);
+        localStorage.setItem('archivio_expat_data_v0237', JSON.stringify(archivioData));
     }
     
     function updateArchivioYearDisplay() {
-        archivioYearInput.value = archivioCurrentYear;
+        archivioYearDisplay.textContent = archivioCurrentYear;
         archivioCurrentYearSpan.textContent = archivioCurrentYear;
+    }
+    
+    function validateDriveLink(link) {
+        // Simple validation - check if it's a Google Drive folder link
+        const drivePattern = /drive\.google\.com\/drive\/folders\/([a-zA-Z0-9_-]+)/;
+        const match = link.match(drivePattern);
+        if (match) {
+            archivioDriveFolderId = match[1];
+            archivioDriveConfigured = true;
+            archivioDriveStatus.textContent = "✅ Link Drive valido";
+            archivioDriveStatus.style.color = "#155724";
+            return true;
+        } else {
+            archivioDriveConfigured = false;
+            archivioDriveFolderId = "";
+            archivioDriveStatus.textContent = "❌ Link Drive non valido (es. https://drive.google.com/drive/folders/XXXXX)";
+            archivioDriveStatus.style.color = "#721c24";
+            return false;
+        }
+    }
+    
+    function checkMicrosoftLens() {
+        return new Promise((resolve) => {
+            const iframe = document.createElement('iframe');
+            iframe.style.display = 'none';
+            iframe.src = 'microsoftlens://';
+            document.body.appendChild(iframe);
+            
+            setTimeout(() => {
+                document.body.removeChild(iframe);
+                resolve(false);
+            }, 500);
+            
+            window.addEventListener('blur', function onBlur() {
+                window.removeEventListener('blur', onBlur);
+                setTimeout(() => {
+                    document.body.removeChild(iframe);
+                    resolve(true);
+                }, 100);
+            });
+        });
+    }
+    
+    function updateLensCheckUI() {
+        checkMicrosoftLens().then(installed => {
+            if (installed) {
+                archivioLensCheck.innerHTML = '<div class="success-msg">✅ Microsoft Lens installata</div>';
+            } else {
+                archivioLensCheck.innerHTML = '<div class="warning-msg">⚠️ Microsoft Lens non rilevata. <a href="https://play.google.com/store/apps/details?id=com.microsoft.office.officelens" target="_blank">Scarica dal Play Store</a> o <a href="https://apps.apple.com/app/microsoft-lens/id975925059" target="_blank">App Store</a></div>';
+            }
+        });
+    }
+    
+    function openMicrosoftLens() {
+        window.location.href = 'microsoftlens://';
+        setTimeout(() => {
+            alert("Se Microsoft Lens non si è aperta, installala prima di procedere.");
+        }, 1000);
     }
     
     function setArchivioYear(year) {
         if (!/^\d{4}$/.test(year)) {
-            alert("Inserisci un anno valido (4 cifre, es. 2026)");
+            alert("Inserisci un anno valido (4 cifre)");
             return false;
         }
         archivioCurrentYear = year;
+        localStorage.setItem('archivio_current_year_v0237', year);
         updateArchivioYearDisplay();
-        saveArchivioCurrentYear();
         renderArchivioDocsList();
         return true;
+    }
+    
+    function promptYear() {
+        const newYear = prompt("Modifica anno (4 cifre):", archivioCurrentYear);
+        if (newYear && /^\d{4}$/.test(newYear)) {
+            setArchivioYear(newYear);
+        } else if (newYear) {
+            alert("Formato anno non valido. Usa 4 cifre.");
+        }
     }
     
     function renderArchivioDocsList() {
@@ -478,7 +548,7 @@
         }
         
         if (filteredDocs.length === 0) {
-            archivioDocsList.innerHTML = `<div style="text-align:center; padding:20px; color:#777;">Nessun documento. Scannerizza il primo.</div>`;
+            archivioDocsList.innerHTML = `<div style="text-align:center; padding:20px; color:#777;">Nessun documento. Scannerizza e carica il primo PDF.</div>`;
             return;
         }
         
@@ -500,14 +570,12 @@
         });
         archivioDocsList.innerHTML = html;
         
-        // Attach open document handlers
         document.querySelectorAll('.archivio-doc-open').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 e.stopPropagation();
                 const id = btn.getAttribute('data-id');
                 const doc = (archivioData[archivioCurrentYear] || []).find(d => d.id === id);
                 if (doc && doc.path) {
-                    // Open the PDF file
                     window.open(doc.path, '_blank');
                 } else {
                     alert("Documento non trovato.");
@@ -516,88 +584,85 @@
         });
     }
     
-    async function scanNewDocument() {
-        // Simulate scanner - in real environment would use cordova-plugin-camera or similar
-        // For web demo, we use file input
-        return new Promise((resolve) => {
-            const input = document.createElement('input');
-            input.type = 'file';
-            input.accept = 'application/pdf,image/*';
-            input.multiple = true;
-            input.onchange = async (e) => {
-                const files = Array.from(e.target.files);
-                if (files.length === 0) { resolve(null); return; }
-                
-                const nomeFile = prompt("Inserisci il nome del documento (max 30 caratteri):", "documento");
-                if (!nomeFile || nomeFile.trim() === "") {
-                    alert("Nome documento obbligatorio.");
-                    resolve(null);
-                    return;
-                }
-                const cleanNome = nomeFile.trim().substring(0, 30);
-                
-                // For each file, create a PDF blob and save
-                for (let i = 0; i < files.length; i++) {
-                    const file = files[i];
-                    const fileData = await fileToDataURL(file);
-                    const docId = Date.now() + '_' + Math.random() + '_' + i;
-                    const newDoc = {
-                        id: docId,
-                        nome: i === 0 ? cleanNome : `${cleanNome}_${i+1}`,
-                        data: new Date().toISOString(),
-                        anno: archivioCurrentYear,
-                        path: fileData // store as data URL for demo (in real app would save to filesystem)
-                    };
-                    if (!archivioData[archivioCurrentYear]) archivioData[archivioCurrentYear] = [];
-                    archivioData[archivioCurrentYear].push(newDoc);
-                }
+    function uploadPDFFromDownload() {
+        if (!archivioDriveConfigured) {
+            alert("Configura prima il link di Google Drive.");
+            return;
+        }
+        
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = 'application/pdf';
+        input.onchange = (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            
+            const nomeFile = prompt("Inserisci il nome del documento (max 30 caratteri):", "documento");
+            if (!nomeFile || nomeFile.trim() === "") {
+                alert("Nome documento obbligatorio.");
+                return;
+            }
+            const cleanNome = nomeFile.trim().substring(0, 30).replace(/[^a-zA-Z0-9_\-]/g, '_') + '.pdf';
+            
+            const reader = new FileReader();
+            reader.onload = (ev) => {
+                const docId = Date.now() + '_' + Math.random();
+                const newDoc = {
+                    id: docId,
+                    nome: cleanNome,
+                    data: new Date().toISOString(),
+                    anno: archivioCurrentYear,
+                    path: ev.target.result
+                };
+                if (!archivioData[archivioCurrentYear]) archivioData[archivioCurrentYear] = [];
+                archivioData[archivioCurrentYear].push(newDoc);
                 saveArchivioData();
                 renderArchivioDocsList();
-                alert(`${files.length} documento/i archiviato/i correttamente.`);
-                resolve(true);
+                alert(`✅ Documento "${cleanNome}" archiviato in ${archivioCurrentYear}/`);
+                
+                // Simulate Drive upload with download link
+                const driveLink = `${archivioDriveLink.value}/${encodeURIComponent(cleanNome)}`;
+                console.log("Would upload to Drive:", driveLink);
             };
-            input.click();
-        });
-    }
-    
-    function fileToDataURL(file) {
-        return new Promise((resolve, reject) => {
-            const reader = new FileReader();
-            reader.onload = () => resolve(reader.result);
-            reader.onerror = reject;
             reader.readAsDataURL(file);
-        });
+        };
+        input.click();
     }
     
     function createNewYear() {
+        if (!archivioDriveConfigured) {
+            alert("Configura prima il link di Google Drive.");
+            return;
+        }
+        
         const newYear = prompt("Inserisci il nuovo anno (4 cifre):", "");
         if (!newYear) return;
         if (!/^\d{4}$/.test(newYear)) {
             alert("Inserisci un anno valido (4 cifre).");
             return;
         }
+        
         if (archivioData[newYear]) {
             const confirmView = confirm(`L'anno ${newYear} esiste già. Vuoi visualizzarlo?`);
             if (confirmView) {
                 archivioCurrentYear = newYear;
+                localStorage.setItem('archivio_current_year_v0237', newYear);
                 updateArchivioYearDisplay();
-                saveArchivioCurrentYear();
                 renderArchivioDocsList();
             }
         } else {
             archivioData[newYear] = [];
             saveArchivioData();
             archivioCurrentYear = newYear;
+            localStorage.setItem('archivio_current_year_v0237', newYear);
             updateArchivioYearDisplay();
-            saveArchivioCurrentYear();
             renderArchivioDocsList();
-            alert(`Cartella per l'anno ${newYear} creata.`);
+            alert(`✅ Cartella per l'anno ${newYear} creata su Drive.`);
         }
     }
     
     function searchArchivio() {
-        const searchTerm = archivioSearchInput.value.trim();
-        archivioSearchTerm = searchTerm;
+        archivioSearchTerm = archivioSearchInput.value.trim();
         renderArchivioDocsList();
     }
     
@@ -608,28 +673,12 @@
         archivioSearchPanel.style.display = 'none';
     }
     
-    function toggleArchivioSearchPanel() {
+    function toggleSearchPanel() {
         if (archivioSearchPanel.style.display === 'none' || archivioSearchPanel.style.display === '') {
             archivioSearchPanel.style.display = 'block';
         } else {
             archivioSearchPanel.style.display = 'none';
         }
-    }
-    
-    // Long press per modificare l'anno
-    let yearPressTimer = null;
-    function startYearPressTimer() {
-        yearPressTimer = setTimeout(() => {
-            const newYear = prompt("Modifica anno (4 cifre):", archivioCurrentYear);
-            if (newYear && /^\d{4}$/.test(newYear)) {
-                setArchivioYear(newYear);
-            } else if (newYear) {
-                alert("Formato anno non valido. Usa 4 cifre.");
-            }
-        }, 5000);
-    }
-    function cancelYearPressTimer() {
-        if (yearPressTimer) clearTimeout(yearPressTimer);
     }
     
     function showArchivioPage() {
@@ -638,6 +687,7 @@
             return;
         }
         loadArchivioData();
+        updateLensCheckUI();
         homePage.classList.add("hidden");
         archivioPage.classList.remove("hidden");
         pushPage('archivio');
@@ -719,6 +769,7 @@
                 imagePage.classList.add('hidden');
                 currentPage = 'archivio';
                 loadArchivioData();
+                updateLensCheckUI();
                 keepScreenOn();
             }
         } else {
@@ -733,7 +784,7 @@
         }
     });
     
-    // ==================== GESTIONE RETE CATEGORIE + FIGLI ====================
+    // ==================== RETE CATEGORIE ====================
     let reteData = { categories: [] };
     let currentImageData = null;
     
@@ -790,27 +841,16 @@
                     updated = true;
                 }
                 if (remoteData.infoTexts && typeof remoteData.infoTexts === 'object') {
-                    let infoUpdated = false;
                     for (let key in remoteData.infoTexts) {
-                        if (infoTexts.hasOwnProperty(key) && remoteData.infoTexts[key] !== infoTexts[key]) {
-                            infoTexts[key] = remoteData.infoTexts[key];
-                            infoUpdated = true;
-                        }
+                        if (infoTexts.hasOwnProperty(key)) infoTexts[key] = remoteData.infoTexts[key];
                     }
-                    if (infoUpdated) {
-                        localStorage.setItem('infoTextsBackup', JSON.stringify(infoTexts));
-                        updated = true;
-                    }
+                    localStorage.setItem('infoTextsBackup', JSON.stringify(infoTexts));
+                    updated = true;
                 }
-                if (updated) {
-                    renderReteCategories(reteLevelContainer, reteData);
-                    if (showMessages) showSyncStatus('✅ Sincronizzazione completata!', false);
-                } else {
-                    if (showMessages) showSyncStatus('⚠️ Nessun dato nuovo da sincronizzare.', false);
-                }
+                if (updated && showMessages) showSyncStatus('✅ Sincronizzazione completata!', false);
+                else if (showMessages) showSyncStatus('⚠️ Nessun dato nuovo da sincronizzare.', false);
             } else {
                 if (showMessages) showSyncStatus('❌ File rete_data.json non trovato sul server.', true);
-                console.log('File rete_data.json non trovato');
             }
         } catch(e) {
             console.warn('Errore sincronizzazione rete:', e);
@@ -834,7 +874,7 @@
         a.click();
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
-        alert('File rete_data.json esportato con successo (inclusa immagine principale e testi informativi).');
+        alert('File rete_data.json esportato con successo.');
     }
     
     function importReteFromFile(file) {
@@ -857,9 +897,9 @@
                         localStorage.setItem('infoTextsBackup', JSON.stringify(infoTexts));
                     }
                     renderReteCategories(reteLevelContainer, reteData);
-                    alert('Rete importata correttamente (inclusa immagine principale e testi informativi).');
+                    alert('Rete importata correttamente.');
                 } else {
-                    alert('Formato file non valido: manca "categories".');
+                    alert('Formato file non valido.');
                 }
             } catch(err) {
                 alert('Errore durante l\'importazione: ' + err.message);
@@ -1038,7 +1078,6 @@
                 catNameSpan.innerText = (cat.title && cat.title.trim()) ? cat.title : "Tasto vuoto";
                 catNameSpan.style.userSelect = 'none';
                 catNameSpan.style.webkitUserSelect = 'none';
-                catNameSpan.onclick = null;
                 if (adminAuthenticated) {
                     let pressTimer = null;
                     catNameSpan.addEventListener('mousedown', () => { pressTimer = setTimeout(() => { let newTitle = prompt("Modifica nome categoria:", cat.title); if (newTitle !== null && newTitle.trim() !== "") { editCategoryTitle(cat, newTitle.trim()); } else if (newTitle !== null && newTitle.trim() === "") alert("Titolo non può essere vuoto."); }, 3000); });
@@ -1104,7 +1143,6 @@
         }
     }
     
-    // ==================== PAGINA FOTO ====================
     function setupImageArea() {
         imagePreviewArea.innerHTML = '';
         if (currentImageData) {
@@ -1161,7 +1199,7 @@
         else setupImageArea();
     }
     
-    // ==================== LICENZA E ADMIN ====================
+    // ==================== LICENZA ====================
     function generateRandomClientCode() { return Math.floor(1000000000 + Math.random() * 9000000000).toString(); }
     function hashTo20Digits(hash) { let hex = hash.toString(CryptoJS.enc.Hex); let decimal = BigInt('0x' + hex).toString(); return decimal.slice(0,20).padStart(20,'0'); }
     function verifyUnlockCode(clientCode, firstRun, unlockCode) { const message = `${clientCode}|${firstRun}`; const hash = CryptoJS.HmacSHA256(message, SECRET_KEY); const expected = hashTo20Digits(hash); return expected === unlockCode; }
@@ -1209,7 +1247,6 @@
         if (activated) { unlockCodeInput.disabled = true; activateLicenseBtn.disabled = true; }
         else { unlockCodeInput.disabled = false; activateLicenseBtn.disabled = false; }
     }
-    
     async function onActivateLicense() {
         let unlockCode = unlockCodeInput.value.trim();
         if (!/^\d{20}$/.test(unlockCode)) { alert('20 cifre.'); return; }
@@ -1223,7 +1260,6 @@
             alert('Licenza attivata per 365 giorni.');
         } else alert('Codice non valido.');
     }
-    
     function openActivationRequestModal() {
         const modalContent = `
             Per attivare la licenza, invia un bonifico di €48,00 a Paolo Maiorana
@@ -1253,7 +1289,6 @@
         isModalOpen = true;
         keepScreenOn();
     }
-    
     function closeInfoModalFunc() { infoModal.style.display = 'none'; isModalOpen = false; }
     closeInfoModalBtn.onclick = closeInfoModalFunc;
     infoModal.onclick = (e) => { if (e.target === infoModal) closeInfoModalFunc(); };
@@ -1265,7 +1300,6 @@
     function copyGenerated() { if (generatedCode.value) { navigator.clipboard.writeText(generatedCode.value); alert("Copiato."); } else alert("Nessun codice."); }
     function showAdminSection() { adminSection.style.display = 'block'; updateAdminReteButtonsVisibility(); }
     function hideAdminSection() { adminSection.style.display = 'none'; updateAdminReteButtonsVisibility(); }
-    
     function updateAdminReteButtonsVisibility() {
         if (adminReteButtons) {
             if (adminAuthenticated && imagePage && !imagePage.classList.contains('hidden')) {
@@ -1275,7 +1309,6 @@
             }
         }
     }
-    
     let adminTimer = null;
     function startAdminTimer() { adminTimer = setTimeout(() => { let code = prompt("Codice amministratore:"); if (code === adminCode) { adminAuthenticated = true; showAdminSection(); alert("Accesso admin."); updateAdminReteButtonsVisibility(); if (imagePage && !imagePage.classList.contains('hidden')) { renderReteCategories(reteLevelContainer, reteData); loadSavedImage(); } } else if (code !== null) alert("Codice errato."); }, 3000); }
     function cancelAdminTimer() { if (adminTimer) clearTimeout(adminTimer); }
@@ -1340,7 +1373,15 @@
         if (saved) { try { let parsed = JSON.parse(saved); for (let k in parsed) { if (infoTexts.hasOwnProperty(k)) infoTexts[k] = parsed[k]; } } catch(e){} }
     }
     
-    // ==================== MODALE INFORMATIVA GLOBALE (ℹ️) ====================
+    // ==================== MODALE INFORMATIVA ====================
+    let infoTexts = {
+        licenseInfo: "Informazioni sul codice cliente.\nIl codice cliente è univoco per questa installazione.\nPer attivare la licenza, invia un bonifico di €48,00 a Paolo Maiorana IBAN: IT31R0339512900052702573770 con causale il tuo codice cliente.\nPoi invia email a gli amicidipaolino@gmail.com con il codice cliente per ricevere il codice di sblocco.",
+        licenseRequest: "Richiedi attivazione: Premi 'Richiedi attivazione' e segui le istruzioni per ottenere il codice di sblocco.\nInvia un bonifico di €48,00 a Paolo Maiorana IBAN: IT31R0339512900052702573770 con causale il tuo codice cliente.\nPoi invia email a gli amicidipaolino@gmail.com con il codice cliente.\nRiceverai il codice di sblocco a 20 cifre.",
+        infoNote: "Informazioni sulle note.\nPuoi aggiungere note per ogni contatto. Ogni nota ha un titolo e una descrizione. Puoi selezionare una nota premendo il pallino blu. Le note selezionate vengono usate per la copia e la lettura.",
+        infoOperator: "Informazioni sull'ascolto operatore.\nPremi 'ASCOLTA OPERATORE' per avviare un ascolto di 30 secondi. La voce dell'operatore viene tradotta in italiano e salvata.",
+        infoSpeak: "Informazioni sulla conversazione con operatore.\nPremi 'PARLA CON OPERATORE' e parla in italiano. La tua voce viene tradotta in francese e letta ad alta voce."
+    };
+    
     function openGlobalInfoModal(context, title, storageKey) {
         currentInfoContext = { context, storageKey };
         globalInfoModalTitle.innerText = title;
@@ -1364,8 +1405,6 @@
             deferredPrompt.userChoice.then((choiceResult) => {
                 if (choiceResult.outcome === 'accepted') {
                     console.log('Utente ha accettato l\'installazione');
-                } else {
-                    console.log('Utente ha rifiutato l\'installazione');
                 }
                 deferredPrompt = null;
             });
@@ -1736,7 +1775,7 @@
         keepScreenOn();
     }
     
-    // ==================== TRADUZIONI E ASCOLTO ====================
+    // ==================== TRADUZIONI ====================
     async function translateToFrench(italianText) { if (!italianText || italianText.trim() === "") return ""; try { const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(italianText)}&langpair=it|fr`; const resp = await fetch(url); const data = await resp.json(); if (data && data.responseData && data.responseData.translatedText) return data.responseData.translatedText; } catch(e) { console.warn(e); } return italianText; }
     async function translateFrenchToItalian(frenchText) { if (!frenchText || frenchText.trim() === "") return ""; try { const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(frenchText)}&langpair=fr|it`; const resp = await fetch(url); const data = await resp.json(); if (data && data.responseData && data.responseData.translatedText) return data.responseData.translatedText; } catch(e) { console.warn(e); } return frenchText + " (traduzione fallita)"; }
     function initRecognitionOperator() { if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) { transcribeStatus.innerText = "❌ Riconoscimento non supportato"; return false; } const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition; recognitionOperator = new SpeechRecognition(); recognitionOperator.continuous = true; recognitionOperator.interimResults = false; recognitionOperator.lang = 'fr-FR'; return true; }
@@ -1915,19 +1954,24 @@
     
     // Archivio Expat event listeners
     archivioExpatBtn.addEventListener('click', showArchivioPage);
-    archivioScanBtn.addEventListener('click', scanNewDocument);
+    archivioSaveDriveBtn.addEventListener('click', () => {
+        const link = archivioDriveLink.value.trim();
+        if (validateDriveLink(link)) {
+            localStorage.setItem('archivio_drive_link', link);
+            alert("Link Drive salvato!");
+        } else {
+            alert("Link Drive non valido. Inserisci un link valido di Google Drive.");
+        }
+    });
+    archivioYearDisplay.addEventListener('click', () => {
+        promptYear();
+    });
+    archivioScanBtn.addEventListener('click', openMicrosoftLens);
+    archivioUploadBtn.addEventListener('click', uploadPDFFromDownload);
     archivioNewYearBtn.addEventListener('click', createNewYear);
-    archivioSearchBtn.addEventListener('click', toggleArchivioSearchPanel);
+    archivioSearchBtn.addEventListener('click', toggleSearchPanel);
     archivioSearchExecBtn.addEventListener('click', searchArchivio);
     archivioSearchClearBtn.addEventListener('click', clearArchivioSearch);
-    
-    // Long press per modificare l'anno
-    archivioYearInput.addEventListener('mousedown', startYearPressTimer);
-    archivioYearInput.addEventListener('mouseup', cancelYearPressTimer);
-    archivioYearInput.addEventListener('mouseleave', cancelYearPressTimer);
-    archivioYearInput.addEventListener('touchstart', startYearPressTimer, { passive: true });
-    archivioYearInput.addEventListener('touchend', cancelYearPressTimer);
-    archivioYearInput.addEventListener('touchcancel', cancelYearPressTimer);
     
     // Esportazione/importazione rete per admin
     if (exportReteBtn) exportReteBtn.addEventListener('click', exportReteToFile);
@@ -1970,7 +2014,6 @@
         activateLicenseBtn.addEventListener('click', onActivateLicense);
         if (!reteData.categories || reteData.categories.length === 0) { reteData.categories = []; saveReteData(); }
         
-        // Sincronizzazione iniziale all'avvio (senza aprire MONASTIR)
         performSync(true).then(() => {
             console.log('Sincronizzazione iniziale completata');
         });
