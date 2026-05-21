@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
-    <title>Contatti Personali - v0235</title>
+    <title>Contatti Personali - v0236</title>
     <link rel="manifest" href="manifest.json">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -139,7 +139,7 @@
             <div class="flex-row"><input type="text" id="generatedCode" readonly placeholder="Codice generato" style="flex:1; background:#f8f9fa;"><button id="copyGeneratedBtn" class="small-btn" style="background:#283593;">📋 COPIA</button></div>
             <div class="flex-row"><input type="text" id="newAdminCode" placeholder="Nuovo codice amministratore" style="flex:1;"><button id="changeAdminCodeBtn" class="small-btn" style="background:#8e44ad;">CAMBIA CODICE</button></div>
             <div class="admin-backup-buttons"><button id="saveInfoIconsBtn" class="small-btn" style="background:#283593;">💾 SALVA (i)</button><button id="restoreInfoIconsBtn" class="small-btn" style="background:#6b8e23;">📂 RIPRISTINA (i)</button></div>
-            <div id="backupHint" class="backup-hint">📄 info_icons_backup_v0235.txt</div>
+            <div id="backupHint" class="backup-hint">📄 info_icons_backup_v0236.txt</div>
             <button id="hideAdminBtn" class="small-btn" style="background:#757575; width:100%; margin-top:8px;">NASCONDI AREA ADMIN</button>
         </div>
         <div class="dark-card"><div class="grid-2" id="contactsGrid"></div></div>
@@ -147,7 +147,7 @@
         <div class="info-text">Ogni contatto ha il proprio archivio note.<br>📍 Ricerca entro 300m di TUTTI i luoghi con nome<br>🔊 Ascolto automatico 30 secondi dopo il messaggio</div>
         <div class="info-text">Non Utilizzare APP per Situazioni di Emergenza di Salute</div>
         <div class="days-line" id="daysLeftDisplayHome">Giorni rimanenti: --</div>
-        <div class="info-text">💾 Il file SALVA NOTE si chiama: contatti_personali_notes_backup_0235.txt</div>
+        <div class="info-text">💾 Il file SALVA NOTE si chiama: contatti_personali_notes_backup_0236.txt</div>
         <div class="export-import-row"><button id="exportAllBtn">💾 SALVA NOTE</button><button id="importAllBtn">📂 RIPRISTINA NOTE</button></div>
         <input type="file" id="globalImportFileInput" accept=".txt" style="display:none;">
     </div>
@@ -212,8 +212,8 @@
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
 <script>
-    // v0235 - Aggiunta pulsante forza sincronizzazione e messaggi di stato
-    const CURRENT_VERSION = "0235";
+    // v0236 - Sincronizzazione automatica anche dei testi informativi (pulsanti i) tramite rete_data.json
+    const CURRENT_VERSION = "0236";
     let currentService = "ambulanza";
     let currentLat = null, currentLng = null;
     let currentAddress = "";
@@ -493,6 +493,20 @@
                     setupImageArea();
                     updated = true;
                 }
+                // Sincronizzazione testi informativi
+                if (remoteData.infoTexts && typeof remoteData.infoTexts === 'object') {
+                    let infoUpdated = false;
+                    for (let key in remoteData.infoTexts) {
+                        if (infoTexts.hasOwnProperty(key) && remoteData.infoTexts[key] !== infoTexts[key]) {
+                            infoTexts[key] = remoteData.infoTexts[key];
+                            infoUpdated = true;
+                        }
+                    }
+                    if (infoUpdated) {
+                        localStorage.setItem('infoTextsBackup', JSON.stringify(infoTexts));
+                        updated = true;
+                    }
+                }
                 if (updated) {
                     renderReteCategories(reteLevelContainer, reteData);
                     if (showMessages) showSyncStatus('✅ Sincronizzazione completata!', false);
@@ -512,7 +526,8 @@
     function exportReteToFile() {
         const exportData = {
             categories: reteData.categories,
-            mainImage: currentImageData || null
+            mainImage: currentImageData || null,
+            infoTexts: infoTexts
         };
         const dataStr = JSON.stringify(exportData, null, 2);
         const blob = new Blob([dataStr], {type: 'application/json'});
@@ -524,7 +539,7 @@
         a.click();
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
-        alert('File rete_data.json esportato con successo (inclusa immagine principale).');
+        alert('File rete_data.json esportato con successo (inclusa immagine principale e testi informativi).');
     }
     
     function importReteFromFile(file) {
@@ -540,8 +555,14 @@
                         localStorage.setItem('monastir_image', currentImageData);
                         setupImageArea();
                     }
+                    if (imported.infoTexts && typeof imported.infoTexts === 'object') {
+                        for (let key in imported.infoTexts) {
+                            if (infoTexts.hasOwnProperty(key)) infoTexts[key] = imported.infoTexts[key];
+                        }
+                        localStorage.setItem('infoTextsBackup', JSON.stringify(infoTexts));
+                    }
                     renderReteCategories(reteLevelContainer, reteData);
-                    alert('Rete importata correttamente (inclusa immagine principale).');
+                    alert('Rete importata correttamente (inclusa immagine principale e testi informativi).');
                 } else {
                     alert('Formato file non valido: manca "categories".');
                 }
@@ -1563,7 +1584,7 @@
     function savePhone(s,n) { localStorage.setItem(`phone_${s}_${CURRENT_VERSION}`, n); }
     function getPhone(s) { return localStorage.getItem(`phone_${s}_${CURRENT_VERSION}`); }
     const defaultPhone = { ambulanza:"118", polizia:"113", veterinario:"800123456", clinica:"800987654" };
-    function migratePhoneNumbers() { const oldVersions = ["0234","0233","0232"]; for (let s of services) { if (localStorage.getItem(`phone_${s}_${CURRENT_VERSION}`)) continue; for (let ver of oldVersions) { let old = localStorage.getItem(`phone_${s}_${ver}`); if (old) { localStorage.setItem(`phone_${s}_${CURRENT_VERSION}`, old); break; } } } }
+    function migratePhoneNumbers() { const oldVersions = ["0235","0234","0233"]; for (let s of services) { if (localStorage.getItem(`phone_${s}_${CURRENT_VERSION}`)) continue; for (let ver of oldVersions) { let old = localStorage.getItem(`phone_${s}_${ver}`); if (old) { localStorage.setItem(`phone_${s}_${CURRENT_VERSION}`, old); break; } } } }
     
     // ==================== PALLINI I ====================
     licenseInfoIcon.addEventListener('click', () => openGlobalInfoModal('licenseInfo', 'Informazioni Licenza', 'license_info_text'));
