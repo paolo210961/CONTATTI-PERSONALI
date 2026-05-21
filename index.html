@@ -137,11 +137,19 @@
         .archivio-search-panel { background: #f0f0f0; border-radius: 24px; padding: 12px; margin: 12px 0; display: none; }
         .archivio-search-input { width: 100%; padding: 10px; border-radius: 40px; border: 1px solid #ced4da; }
         .archivio-config-panel { background: #fff3e0; border-radius: 24px; padding: 12px; margin: 12px 0; border-left: 4px solid #e67e22; }
-        .archivio-config-field { width: 100%; padding: 10px; border-radius: 40px; border: 1px solid #ced4da; margin-top: 8px; }
-        .archivio-provider-select { width: 100%; padding: 10px; border-radius: 40px; border: 1px solid #ced4da; margin-bottom: 12px; background: white; }
+        .archivio-config-field { width: 100%; padding: 10px; border-radius: 40px; border: 1px solid #ced4da; margin-top: 8px; background: #f8f9fa; }
+        .archivio-select { width: 100%; padding: 10px; border-radius: 40px; border: 1px solid #ced4da; margin-bottom: 12px; background: white; }
         .warning-msg { background: #f8d7da; color: #721c24; padding: 10px; border-radius: 16px; margin: 10px 0; text-align: center; }
         .success-msg { background: #d4edda; color: #155724; padding: 10px; border-radius: 16px; margin: 10px 0; text-align: center; }
-        .archivio-config-note { font-size: 0.7rem; color: #666; margin-top: 8px; text-align: center; }
+        .info-msg { background: #d1ecf1; color: #0c5460; padding: 10px; border-radius: 16px; margin: 10px 0; text-align: center; }
+        .folder-browser-modal .adaptive-modal-content { max-width: 500px; max-height: 80vh; }
+        .folder-tree { max-height: 300px; overflow-y: auto; margin: 10px 0; }
+        .folder-item { padding: 10px; margin: 2px 0; display: flex; align-items: center; cursor: pointer; border-radius: 40px; }
+        .folder-item:hover { background: #f0f0f0; }
+        .folder-item.selected { background: #e3f2fd; }
+        .folder-icon { margin-right: 10px; font-size: 1.2rem; }
+        .folder-name { flex: 1; }
+        .current-path { font-size: 0.8rem; color: #666; margin-bottom: 10px; word-break: break-all; }
     </style>
 </head>
 <body>
@@ -216,22 +224,36 @@
         <div class="title-btn" style="background:#6c757d; cursor:default;">📁 ARCHIVIO VITA DA EXPAT</div>
         
         <div id="archivioConfigPanel" class="archivio-config-panel">
-            <div style="font-weight:bold; margin-bottom:8px;">⚙️ CONFIGURAZIONE CLOUD</div>
-            <select id="archivioProviderSelect" class="archivio-provider-select">
-                <option value="googledrive">Google Drive</option>
-                <option value="webdav">WebDAV (Infomaniak / Nextcloud / ownCloud)</option>
-            </select>
-            <div id="archivioGoogleConfig" style="display:block;">
-                <button id="archivioGoogleLoginBtn" class="small-btn" style="background:#4285f4; width:100%;">🔑 LOGIN CON GOOGLE</button>
-                <div id="archivioGoogleStatus" class="info-message-small" style="margin-top:5px;"></div>
+            <div style="font-weight:bold; margin-bottom:8px;">⚙️ CONFIGURAZIONE GOOGLE DRIVE</div>
+            
+            <div id="archivioPreLogin" style="display:block;">
+                <label style="font-weight:bold;">Account Google:</label>
+                <select id="archivioAccountSelect" class="archivio-select">
+                    <option value="">-- Seleziona account --</option>
+                </select>
+                <button id="archivioAddAccountBtn" class="small-btn" style="background:#4caf50; margin-top:5px;">➕ AGGIUNGI ACCOUNT</button>
+                <button id="archivioLoginBtn" class="small-btn" style="background:#4285f4; margin-top:8px; width:100%;">🔑 LOGIN CON GOOGLE</button>
+                <div class="info-message-small" style="margin-top:8px;">
+                    ℹ️ Se non hai un account Google, 
+                    <a href="https://accounts.google.com/signup" target="_blank" style="color:#e67e22;">📧 CREANE UNO QUI</a> (gratuito)
+                </div>
             </div>
-            <div id="archivioWebdavConfig" style="display:none;">
-                <input type="text" id="archivioWebdavUrl" class="archivio-config-field" placeholder="URL WebDAV (es. https://xxxx.webdav.infomaniak.com)">
-                <input type="text" id="archivioWebdavUser" class="archivio-config-field" placeholder="Username">
-                <input type="password" id="archivioWebdavPass" class="archivio-config-field" placeholder="Password">
+            
+            <div id="archivioPostLogin" style="display:none;">
+                <div class="success-msg" id="archivioUserInfo">✅ Connesso come: --</div>
+                <div class="flex-row" style="margin-top:8px;">
+                    <button id="archivioChangeAccountBtn" class="small-btn" style="background:#e67e22; flex:1;">🔄 CAMBIA ACCOUNT</button>
+                    <button id="archivioBrowseFolderBtn" class="small-btn" style="background:#283593; flex:1;">📂 SFOGLIA CARTELLE</button>
+                </div>
+                <div style="margin-top:10px;">
+                    <label style="font-weight:bold;">📁 Cartella padre per archivi:</label>
+                    <div class="archivio-config-field" id="archivioParentPath" style="background:#f8f9fa;">Nessuna cartella selezionata</div>
+                    <input type="hidden" id="archivioParentId" value="">
+                </div>
+                <div class="info-message-small" style="margin-top:8px;">
+                    ℹ️ Le cartelle per anno (2026, 2027, ...) verranno create automaticamente qui dentro.
+                </div>
             </div>
-            <button id="archivioSaveConfigBtn" class="small-btn" style="background:#283593; margin-top:12px;">💾 SALVA CONFIGURAZIONE</button>
-            <div class="archivio-config-note">🔹 Supporto: Google Drive e WebDAV (Infomaniak, Nextcloud, ownCloud)</div>
         </div>
         
         <div id="archivioLensCheck"></div>
@@ -252,16 +274,32 @@
         </div>
         
         <div id="archivioDocsList" class="dark-card" style="max-height:400px; overflow-y:auto;">
-            <div style="text-align:center; padding:20px; color:#777;">Nessun documento. Configura il cloud e crea un anno.</div>
+            <div style="text-align:center; padding:20px; color:#777;">Nessun documento. Configura il Drive e crea un anno.</div>
         </div>
         
         <div class="archivio-button-row">
-            <button id="archivioScanBtn" class="small-btn" style="background:#4caf50;">📱 APRI MICROSOFT LENS</button>
-            <button id="archivioUploadBtn" class="small-btn" style="background:#17a2b8;">📁 CARICA PDF DA DOWNLOAD</button>
+            <button id="archivioAdobeScanBtn" class="small-btn" style="background:#ff3366;">📱 APRI ADOBE SCAN</button>
+            <button id="archivioUploadBtn" class="small-btn" style="background:#17a2b8;">📁 CARICA PDF DA DRIVE</button>
             <button id="archivioNewYearBtn" class="small-btn" style="background:#e67e22;">➕ CREA NUOVO ANNO</button>
         </div>
         
         <div class="info-message-small" style="margin-top:16px;">ℹ️ Periodo di prova: 90 giorni. Attiva la licenza per continuare ad usare l'archivio.</div>
+    </div>
+    
+    <!-- MODALE SFOGLIA CARTELLE -->
+    <div id="folderBrowserModal" class="adaptive-modal" style="display:none;">
+        <div class="adaptive-modal-content" style="max-width:500px;">
+            <h3>📂 Seleziona cartella padre</h3>
+            <div id="folderBrowserPath" class="current-path">Mio Drive</div>
+            <div id="folderTree" class="folder-tree">
+                <div style="text-align:center; padding:20px;">Caricamento...</div>
+            </div>
+            <div class="flex-row" style="margin-top:10px;">
+                <button id="folderBrowserNewFolderBtn" class="small-btn" style="background:#4caf50;">➕ NUOVA CARTELLA</button>
+                <button id="folderBrowserSelectBtn" class="small-btn" style="background:#283593;">✅ SELEZIONA</button>
+                <button id="folderBrowserCancelBtn" class="small-btn" style="background:#8e44ad;">❌ ANNULLA</button>
+            </div>
+        </div>
     </div>
     
     <!-- MODALI -->
@@ -284,7 +322,7 @@
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
 <script>
-    // v0237 - ARCHIVIO EXPAT: supporto Google Drive + WebDAV (Infomaniak/Nextcloud)
+    // v0237 - ARCHIVIO EXPAT: Google Drive + Adobe Scan + Sfoglia cartelle
     const CURRENT_VERSION = "0237";
     let currentService = "ambulanza";
     let currentLat = null, currentLng = null;
@@ -417,15 +455,16 @@
     const syncStatusDiv = document.getElementById('syncStatus');
     
     // Archivio DOM elements
-    const archivioProviderSelect = document.getElementById('archivioProviderSelect');
-    const archivioGoogleConfig = document.getElementById('archivioGoogleConfig');
-    const archivioWebdavConfig = document.getElementById('archivioWebdavConfig');
-    const archivioGoogleLoginBtn = document.getElementById('archivioGoogleLoginBtn');
-    const archivioGoogleStatus = document.getElementById('archivioGoogleStatus');
-    const archivioWebdavUrl = document.getElementById('archivioWebdavUrl');
-    const archivioWebdavUser = document.getElementById('archivioWebdavUser');
-    const archivioWebdavPass = document.getElementById('archivioWebdavPass');
-    const archivioSaveConfigBtn = document.getElementById('archivioSaveConfigBtn');
+    const archivioPreLogin = document.getElementById('archivioPreLogin');
+    const archivioPostLogin = document.getElementById('archivioPostLogin');
+    const archivioAccountSelect = document.getElementById('archivioAccountSelect');
+    const archivioAddAccountBtn = document.getElementById('archivioAddAccountBtn');
+    const archivioLoginBtn = document.getElementById('archivioLoginBtn');
+    const archivioChangeAccountBtn = document.getElementById('archivioChangeAccountBtn');
+    const archivioBrowseFolderBtn = document.getElementById('archivioBrowseFolderBtn');
+    const archivioUserInfo = document.getElementById('archivioUserInfo');
+    const archivioParentPath = document.getElementById('archivioParentPath');
+    const archivioParentId = document.getElementById('archivioParentId');
     const archivioYearDisplay = document.getElementById('archivioYearDisplay');
     const archivioCurrentYearSpan = document.getElementById('archivioCurrentYear');
     const archivioSearchBtn = document.getElementById('archivioSearchBtn');
@@ -434,17 +473,32 @@
     const archivioSearchExecBtn = document.getElementById('archivioSearchExecBtn');
     const archivioSearchClearBtn = document.getElementById('archivioSearchClearBtn');
     const archivioDocsList = document.getElementById('archivioDocsList');
-    const archivioScanBtn = document.getElementById('archivioScanBtn');
+    const archivioAdobeScanBtn = document.getElementById('archivioAdobeScanBtn');
     const archivioUploadBtn = document.getElementById('archivioUploadBtn');
     const archivioNewYearBtn = document.getElementById('archivioNewYearBtn');
     const archivioLensCheck = document.getElementById('archivioLensCheck');
     
+    // Folder browser modal
+    const folderBrowserModal = document.getElementById('folderBrowserModal');
+    const folderBrowserPath = document.getElementById('folderBrowserPath');
+    const folderTree = document.getElementById('folderTree');
+    const folderBrowserNewFolderBtn = document.getElementById('folderBrowserNewFolderBtn');
+    const folderBrowserSelectBtn = document.getElementById('folderBrowserSelectBtn');
+    const folderBrowserCancelBtn = document.getElementById('folderBrowserCancelBtn');
+    
     let archivioData = {};
     let archivioCurrentYear = "2026";
     let archivioSearchTerm = "";
-    let archivioCloudConfig = { provider: "googledrive", googleToken: null, webdav: { url: "", user: "", pass: "" } };
-    let archivioConfigured = false;
+    let googleAccessToken = null;
+    let googleUserEmail = null;
+    let selectedParentId = "root";
+    let selectedParentPath = "Mio Drive";
+    let currentFolderId = "root";
+    let currentFolderPath = "Mio Drive";
+    let selectedFolderId = "root";
+    let selectedFolderPath = "Mio Drive";
     
+    // Carica account salvati
     function loadArchivioData() {
         const saved = localStorage.getItem('archivio_expat_data_v0237');
         if (saved) {
@@ -461,52 +515,33 @@
             archivioCurrentYear = "2026";
         }
         
-        // Load cloud config
-        const savedConfig = localStorage.getItem('archivio_cloud_config');
-        if (savedConfig) {
-            try {
-                archivioCloudConfig = JSON.parse(savedConfig);
-                if (archivioCloudConfig.provider === 'googledrive' && archivioCloudConfig.googleToken) {
-                    archivioConfigured = true;
-                } else if (archivioCloudConfig.provider === 'webdav' && archivioCloudConfig.webdav.url && archivioCloudConfig.webdav.user) {
-                    archivioConfigured = true;
-                }
-                updateConfigUI();
-            } catch(e) {}
+        // Carica configurazione Google
+        const savedToken = localStorage.getItem('google_access_token');
+        const savedEmail = localStorage.getItem('google_user_email');
+        const savedParentId = localStorage.getItem('archivio_parent_id');
+        const savedParentPath = localStorage.getItem('archivio_parent_path');
+        
+        if (savedToken && savedEmail) {
+            googleAccessToken = savedToken;
+            googleUserEmail = savedEmail;
+            if (savedParentId) selectedParentId = savedParentId;
+            if (savedParentPath) selectedParentPath = savedParentPath;
+            updateUIAfterLogin();
         }
         
         updateArchivioYearDisplay();
         renderArchivioDocsList();
     }
     
+    function saveGoogleConfig() {
+        if (googleAccessToken) localStorage.setItem('google_access_token', googleAccessToken);
+        if (googleUserEmail) localStorage.setItem('google_user_email', googleUserEmail);
+        localStorage.setItem('archivio_parent_id', selectedParentId);
+        localStorage.setItem('archivio_parent_path', selectedParentPath);
+    }
+    
     function saveArchivioData() {
         localStorage.setItem('archivio_expat_data_v0237', JSON.stringify(archivioData));
-    }
-    
-    function saveCloudConfig() {
-        localStorage.setItem('archivio_cloud_config', JSON.stringify(archivioCloudConfig));
-    }
-    
-    function updateConfigUI() {
-        if (archivioCloudConfig.provider === 'googledrive') {
-            archivioProviderSelect.value = 'googledrive';
-            archivioGoogleConfig.style.display = 'block';
-            archivioWebdavConfig.style.display = 'none';
-            if (archivioCloudConfig.googleToken) {
-                archivioGoogleStatus.innerHTML = '✅ Google Drive connesso';
-                archivioGoogleStatus.style.color = '#155724';
-            } else {
-                archivioGoogleStatus.innerHTML = '⚠️ Non connesso. Clicca su LOGIN.';
-                archivioGoogleStatus.style.color = '#856404';
-            }
-        } else {
-            archivioProviderSelect.value = 'webdav';
-            archivioGoogleConfig.style.display = 'none';
-            archivioWebdavConfig.style.display = 'block';
-            archivioWebdavUrl.value = archivioCloudConfig.webdav.url || '';
-            archivioWebdavUser.value = archivioCloudConfig.webdav.user || '';
-            archivioWebdavPass.value = archivioCloudConfig.webdav.pass || '';
-        }
     }
     
     function updateArchivioYearDisplay() {
@@ -580,87 +615,117 @@
         });
     }
     
-    function checkMicrosoftLens() {
-        return new Promise((resolve) => {
-            const iframe = document.createElement('iframe');
-            iframe.style.display = 'none';
-            iframe.src = 'microsoftlens://';
-            document.body.appendChild(iframe);
-            setTimeout(() => {
-                document.body.removeChild(iframe);
-                resolve(false);
-            }, 500);
-            window.addEventListener('blur', function onBlur() {
-                window.removeEventListener('blur', onBlur);
-                setTimeout(() => {
-                    document.body.removeChild(iframe);
-                    resolve(true);
-                }, 100);
-            });
-        });
-    }
-    
-    function updateLensCheckUI() {
-        checkMicrosoftLens().then(installed => {
-            if (installed) {
-                archivioLensCheck.innerHTML = '<div class="success-msg">✅ Microsoft Lens installata</div>';
-            } else {
-                archivioLensCheck.innerHTML = '<div class="warning-msg">⚠️ Microsoft Lens non rilevata. <a href="https://play.google.com/store/apps/details?id=com.microsoft.office.officelens" target="_blank">Scarica dal Play Store</a> o <a href="https://apps.apple.com/app/microsoft-lens/id975925059" target="_blank">App Store</a></div>';
-            }
-        });
-    }
-    
-    function openMicrosoftLens() {
-        window.location.href = 'microsoftlens://';
+    function openAdobeScan() {
+        window.open('https://play.google.com/store/apps/details?id=com.adobe.scan.android', '_blank');
         setTimeout(() => {
-            alert("Se Microsoft Lens non si è aperta, installala prima di procedere.");
-        }, 1000);
+            alert("Se Adobe Scan non è installata, scaricala dal Play Store / App Store (gratuita).\n\nScannerizza il documento e salvalo su Google Drive nella cartella dell'anno corrente, poi torna qui e premi 'CARICA PDF DA DRIVE'.");
+        }, 500);
     }
     
-    function uploadPDFFromDownload() {
-        if (!archivioConfigured) {
-            alert("Configura prima il cloud (Google Drive o WebDAV).");
+    function uploadPDFFromDrive() {
+        if (!googleAccessToken) {
+            alert("Configura prima Google Drive.");
+            return;
+        }
+        if (!selectedParentId || selectedParentId === "root") {
+            alert("Seleziona prima una cartella padre valida.");
             return;
         }
         
-        const input = document.createElement('input');
-        input.type = 'file';
-        input.accept = 'application/pdf';
-        input.onchange = (e) => {
+        // Apri il file picker di Google Drive
+        const picker = document.createElement('input');
+        picker.type = 'file';
+        picker.accept = 'application/pdf';
+        picker.onchange = async (e) => {
             const file = e.target.files[0];
             if (!file) return;
             
-            const nomeFile = prompt("Inserisci il nome del documento (max 30 caratteri):", "documento");
+            const nomeFile = prompt("Inserisci il nome del documento (max 30 caratteri):", file.name.replace('.pdf', '').substring(0, 30));
             if (!nomeFile || nomeFile.trim() === "") {
                 alert("Nome documento obbligatorio.");
                 return;
             }
             const cleanNome = nomeFile.trim().substring(0, 30).replace(/[^a-zA-Z0-9_\-]/g, '_') + '.pdf';
             
-            const reader = new FileReader();
-            reader.onload = (ev) => {
+            // Carica il file su Google Drive nella cartella dell'anno
+            const yearFolderId = await ensureYearFolder(archivioCurrentYear);
+            if (!yearFolderId) {
+                alert("Errore: impossibile creare/ottenere la cartella dell'anno.");
+                return;
+            }
+            
+            const formData = new FormData();
+            formData.append('metadata', new Blob([JSON.stringify({
+                name: cleanNome,
+                parents: [yearFolderId]
+            })], {type: 'application/json'}));
+            formData.append('file', file);
+            
+            const response = await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart', {
+                method: 'POST',
+                headers: { 'Authorization': 'Bearer ' + googleAccessToken },
+                body: formData
+            });
+            
+            if (response.ok) {
+                const fileData = await response.json();
                 const docId = Date.now() + '_' + Math.random();
                 const newDoc = {
                     id: docId,
                     nome: cleanNome,
                     data: new Date().toISOString(),
                     anno: archivioCurrentYear,
-                    path: ev.target.result
+                    path: `https://drive.google.com/file/d/${fileData.id}/view`,
+                    driveFileId: fileData.id
                 };
                 if (!archivioData[archivioCurrentYear]) archivioData[archivioCurrentYear] = [];
                 archivioData[archivioCurrentYear].push(newDoc);
                 saveArchivioData();
                 renderArchivioDocsList();
-                alert(`✅ Documento "${cleanNome}" archiviato in ${archivioCurrentYear}/`);
-            };
-            reader.readAsDataURL(file);
+                alert(`✅ Documento "${cleanNome}" caricato su Google Drive nella cartella ${archivioCurrentYear}/`);
+            } else {
+                alert("Errore durante il caricamento su Drive.");
+            }
         };
-        input.click();
+        picker.click();
     }
     
-    function createNewYear() {
-        if (!archivioConfigured) {
-            alert("Configura prima il cloud (Google Drive o WebDAV).");
+    async function ensureYearFolder(year) {
+        // Cerca se esiste già la cartella dell'anno nella cartella padre
+        const query = `'${selectedParentId}' in parents and mimeType='application/vnd.google-apps.folder' and name='${year}' and trashed=false`;
+        const response = await fetch(`https://www.googleapis.com/drive/v3/files?q=${encodeURIComponent(query)}&fields=files(id,name)`, {
+            headers: { 'Authorization': 'Bearer ' + googleAccessToken }
+        });
+        const data = await response.json();
+        
+        if (data.files && data.files.length > 0) {
+            return data.files[0].id;
+        }
+        
+        // Crea la cartella
+        const createResponse = await fetch('https://www.googleapis.com/drive/v3/files', {
+            method: 'POST',
+            headers: {
+                'Authorization': 'Bearer ' + googleAccessToken,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                name: year,
+                mimeType: 'application/vnd.google-apps.folder',
+                parents: [selectedParentId]
+            })
+        });
+        const newFolder = await createResponse.json();
+        return newFolder.id;
+    }
+    
+    async function createNewYear() {
+        if (!googleAccessToken) {
+            alert("Configura prima Google Drive.");
+            return;
+        }
+        if (!selectedParentId || selectedParentId === "root") {
+            alert("Seleziona prima una cartella padre valida.");
             return;
         }
         
@@ -671,22 +736,25 @@
             return;
         }
         
-        if (archivioData[newYear]) {
-            const confirmView = confirm(`L'anno ${newYear} esiste già. Vuoi visualizzarlo?`);
-            if (confirmView) {
+        const yearFolderId = await ensureYearFolder(newYear);
+        if (yearFolderId) {
+            if (archivioData[newYear]) {
+                const confirmView = confirm(`L'anno ${newYear} esiste già. Vuoi visualizzarlo?`);
+                if (confirmView) {
+                    archivioCurrentYear = newYear;
+                    localStorage.setItem('archivio_current_year_v0237', newYear);
+                    updateArchivioYearDisplay();
+                    renderArchivioDocsList();
+                }
+            } else {
+                archivioData[newYear] = [];
+                saveArchivioData();
                 archivioCurrentYear = newYear;
                 localStorage.setItem('archivio_current_year_v0237', newYear);
                 updateArchivioYearDisplay();
                 renderArchivioDocsList();
+                alert(`✅ Cartella per l'anno ${newYear} creata su Google Drive.`);
             }
-        } else {
-            archivioData[newYear] = [];
-            saveArchivioData();
-            archivioCurrentYear = newYear;
-            localStorage.setItem('archivio_current_year_v0237', newYear);
-            updateArchivioYearDisplay();
-            renderArchivioDocsList();
-            alert(`✅ Cartella per l'anno ${newYear} creata.`);
         }
     }
     
@@ -710,49 +778,132 @@
         }
     }
     
-    // Google Drive login simulation
-    function googleDriveLogin() {
-        // In a real implementation, this would use Google Identity Services OAuth 2.0
-        // For demo, we simulate a successful login
-        alert("Demo: Simulazione login Google Drive.\nIn una versione reale, si aprirebbe la finestra di autorizzazione Google.");
-        archivioCloudConfig.provider = "googledrive";
-        archivioCloudConfig.googleToken = "demo_token_" + Date.now();
-        archivioCloudConfig.webdav = { url: "", user: "", pass: "" };
-        saveCloudConfig();
-        archivioConfigured = true;
-        updateConfigUI();
-        alert("✅ Google Drive configurato con successo!");
+    // Google OAuth login
+    function googleLogin() {
+        const clientId = 'YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com'; // Sostituire con Client ID reale
+        const redirectUri = window.location.origin + window.location.pathname;
+        const scope = 'https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/drive.readonly';
+        const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=token&scope=${encodeURIComponent(scope)}&prompt=select_account`;
+        window.location.href = authUrl;
     }
     
-    function saveWebdavConfig() {
-        const url = archivioWebdavUrl.value.trim();
-        const user = archivioWebdavUser.value.trim();
-        const pass = archivioWebdavPass.value;
-        if (!url || !user) {
-            alert("Inserisci URL e Username per WebDAV.");
+    function handleOAuthRedirect() {
+        const hash = window.location.hash.substring(1);
+        const params = new URLSearchParams(hash);
+        const accessToken = params.get('access_token');
+        if (accessToken) {
+            googleAccessToken = accessToken;
+            // Ottieni info utente
+            fetch('https://www.googleapis.com/oauth2/v1/userinfo', {
+                headers: { 'Authorization': 'Bearer ' + accessToken }
+            }).then(res => res.json()).then(user => {
+                googleUserEmail = user.email;
+                saveGoogleConfig();
+                updateUIAfterLogin();
+                window.history.replaceState({}, document.title, window.location.pathname);
+            }).catch(err => console.warn(err));
+        }
+    }
+    
+    function updateUIAfterLogin() {
+        archivioPreLogin.style.display = 'none';
+        archivioPostLogin.style.display = 'block';
+        archivioUserInfo.innerHTML = `✅ Connesso come: ${googleUserEmail}`;
+        archivioParentPath.textContent = selectedParentPath;
+        archivioParentId.value = selectedParentId;
+    }
+    
+    function logout() {
+        googleAccessToken = null;
+        googleUserEmail = null;
+        localStorage.removeItem('google_access_token');
+        localStorage.removeItem('google_user_email');
+        archivioPreLogin.style.display = 'block';
+        archivioPostLogin.style.display = 'none';
+    }
+    
+    // Folder browser functions
+    async function loadFolders(parentId, path) {
+        currentFolderId = parentId;
+        currentFolderPath = path;
+        folderBrowserPath.textContent = path;
+        
+        const query = `'${parentId}' in parents and mimeType='application/vnd.google-apps.folder' and trashed=false`;
+        const response = await fetch(`https://www.googleapis.com/drive/v3/files?q=${encodeURIComponent(query)}&fields=files(id,name)`, {
+            headers: { 'Authorization': 'Bearer ' + googleAccessToken }
+        });
+        const data = await response.json();
+        
+        if (!data.files || data.files.length === 0) {
+            folderTree.innerHTML = '<div style="text-align:center; padding:20px;">Nessuna sottocartella</div>';
             return;
         }
-        archivioCloudConfig.provider = "webdav";
-        archivioCloudConfig.googleToken = null;
-        archivioCloudConfig.webdav = { url: url, user: user, pass: pass };
-        saveCloudConfig();
-        archivioConfigured = true;
-        updateConfigUI();
-        alert("✅ Configurazione WebDAV salvata!");
+        
+        let html = '';
+        for (const folder of data.files) {
+            const isSelected = (folder.id === selectedFolderId);
+            html += `
+                <div class="folder-item ${isSelected ? 'selected' : ''}" data-id="${folder.id}" data-name="${folder.name}">
+                    <span class="folder-icon">📁</span>
+                    <span class="folder-name">${escapeHtml(folder.name)}</span>
+                    <span style="font-size:0.7rem;">➡️</span>
+                </div>
+            `;
+        }
+        folderTree.innerHTML = html;
+        
+        document.querySelectorAll('.folder-item').forEach(item => {
+            item.addEventListener('click', async (e) => {
+                e.stopPropagation();
+                const folderId = item.getAttribute('data-id');
+                const folderName = item.getAttribute('data-name');
+                const newPath = currentFolderPath === "Mio Drive" ? folderName : currentFolderPath + "/" + folderName;
+                await loadFolders(folderId, newPath);
+            });
+        });
     }
     
-    function saveConfig() {
-        if (archivioProviderSelect.value === 'googledrive') {
-            if (!archivioCloudConfig.googleToken) {
-                alert("Prima effettua il login con Google Drive.");
-                return;
-            }
-            archivioCloudConfig.provider = "googledrive";
-            saveCloudConfig();
-            archivioConfigured = true;
-            alert("✅ Configurazione salvata!");
+    async function openFolderBrowser() {
+        if (!googleAccessToken) return;
+        selectedFolderId = selectedParentId;
+        selectedFolderPath = selectedParentPath;
+        await loadFolders("root", "Mio Drive");
+        folderBrowserModal.style.display = 'flex';
+        isModalOpen = true;
+    }
+    
+    function selectCurrentFolder() {
+        selectedParentId = currentFolderId;
+        selectedParentPath = currentFolderPath;
+        archivioParentPath.textContent = selectedParentPath;
+        archivioParentId.value = selectedParentId;
+        saveGoogleConfig();
+        folderBrowserModal.style.display = 'none';
+        isModalOpen = false;
+        alert(`Cartella padre selezionata: ${selectedParentPath}`);
+    }
+    
+    async function createNewFolderInBrowser() {
+        const folderName = prompt("Inserisci il nome della nuova cartella:", "ArchivioExpat");
+        if (!folderName) return;
+        
+        const response = await fetch('https://www.googleapis.com/drive/v3/files', {
+            method: 'POST',
+            headers: {
+                'Authorization': 'Bearer ' + googleAccessToken,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                name: folderName,
+                mimeType: 'application/vnd.google-apps.folder',
+                parents: [currentFolderId]
+            })
+        });
+        
+        if (response.ok) {
+            await loadFolders(currentFolderId, currentFolderPath);
         } else {
-            saveWebdavConfig();
+            alert("Errore nella creazione della cartella.");
         }
     }
     
@@ -762,23 +913,12 @@
             return;
         }
         loadArchivioData();
-        updateLensCheckUI();
+        handleOAuthRedirect();
         homePage.classList.add("hidden");
         archivioPage.classList.remove("hidden");
         pushPage('archivio');
         keepScreenOn();
     }
-    
-    // Provider select change
-    archivioProviderSelect.addEventListener('change', () => {
-        if (archivioProviderSelect.value === 'googledrive') {
-            archivioGoogleConfig.style.display = 'block';
-            archivioWebdavConfig.style.display = 'none';
-        } else {
-            archivioGoogleConfig.style.display = 'none';
-            archivioWebdavConfig.style.display = 'block';
-        }
-    });
     
     // ==================== WAKE LOCK ====================
     async function requestGlobalWakeLock() {
@@ -815,6 +955,7 @@
         if (infoModal.style.display === 'flex') { infoModal.style.display = 'none'; closed = true; }
         if (activityModal.style.display === 'flex') { activityModal.style.display = 'none'; closed = true; }
         if (globalInfoModalDiv.style.display === 'flex') { globalInfoModalDiv.style.display = 'none'; closed = true; }
+        if (folderBrowserModal.style.display === 'flex') { folderBrowserModal.style.display = 'none'; closed = true; }
         isModalOpen = false;
         return closed;
     }
@@ -855,7 +996,6 @@
                 imagePage.classList.add('hidden');
                 currentPage = 'archivio';
                 loadArchivioData();
-                updateLensCheckUI();
                 keepScreenOn();
             }
         } else {
@@ -2040,25 +2180,28 @@
     
     // Archivio Expat event listeners
     archivioExpatBtn.addEventListener('click', showArchivioPage);
-    archivioGoogleLoginBtn.addEventListener('click', googleDriveLogin);
-    archivioSaveConfigBtn.addEventListener('click', saveConfig);
+    archivioAddAccountBtn.addEventListener('click', () => {
+        window.open('https://accounts.google.com/signup', '_blank');
+    });
+    archivioLoginBtn.addEventListener('click', googleLogin);
+    archivioChangeAccountBtn.addEventListener('click', () => {
+        logout();
+        handleOAuthRedirect();
+    });
+    archivioBrowseFolderBtn.addEventListener('click', openFolderBrowser);
     archivioYearDisplay.addEventListener('click', () => { promptYear(); });
-    archivioScanBtn.addEventListener('click', openMicrosoftLens);
-    archivioUploadBtn.addEventListener('click', uploadPDFFromDownload);
+    archivioAdobeScanBtn.addEventListener('click', openAdobeScan);
+    archivioUploadBtn.addEventListener('click', uploadPDFFromDrive);
     archivioNewYearBtn.addEventListener('click', createNewYear);
     archivioSearchBtn.addEventListener('click', toggleSearchPanel);
     archivioSearchExecBtn.addEventListener('click', searchArchivio);
     archivioSearchClearBtn.addEventListener('click', clearArchivioSearch);
     
-    // Provider select change
-    archivioProviderSelect.addEventListener('change', () => {
-        if (archivioProviderSelect.value === 'googledrive') {
-            archivioGoogleConfig.style.display = 'block';
-            archivioWebdavConfig.style.display = 'none';
-        } else {
-            archivioGoogleConfig.style.display = 'none';
-            archivioWebdavConfig.style.display = 'block';
-        }
+    folderBrowserNewFolderBtn.addEventListener('click', createNewFolderInBrowser);
+    folderBrowserSelectBtn.addEventListener('click', selectCurrentFolder);
+    folderBrowserCancelBtn.addEventListener('click', () => {
+        folderBrowserModal.style.display = 'none';
+        isModalOpen = false;
     });
     
     // Esportazione/importazione rete per admin
