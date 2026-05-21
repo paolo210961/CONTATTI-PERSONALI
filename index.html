@@ -133,7 +133,7 @@
         .archivio-search-icon { font-size: 1.3rem; cursor: pointer; background: none; border: none; padding: 5px 10px; }
         .archivio-doc-item { display: flex; align-items: center; justify-content: space-between; background: white; border: 1px solid #ced4da; border-radius: 40px; padding: 10px 16px; margin: 8px 0; }
         .archivio-doc-name { font-family: monospace; font-size: 0.8rem; word-break: break-all; flex: 1; }
-        .archivio-doc-open { font-size: 1.2rem; cursor: pointer; background: none; border: none; padding: 5px 10px; }
+        .archivio-doc-open, .archivio-doc-share { font-size: 1.2rem; cursor: pointer; background: none; border: none; padding: 5px 10px; }
         .archivio-button-row { display: flex; gap: 12px; margin-top: 20px; flex-wrap: wrap; }
         .archivio-button-row button { flex: 1; min-width: 120px; }
         .archivio-search-panel { background: #f0f0f0; border-radius: 24px; padding: 12px; margin: 12px 0; display: none; }
@@ -142,7 +142,7 @@
     </style>
 </head>
 <body>
-    <div class="container">
+<div class="container">
     <!-- HOME PAGE (originale) -->
     <div id="homePage" class="page">
         <div class="title-btn" id="adminLongPressBtn"><span>📇</span><span>CONTATTI PERSONALI</span><span>📇</span></div>
@@ -226,7 +226,7 @@
         
         <div class="archivio-year-container">
             <input type="text" id="archivioYearInput" class="archivio-year-input" placeholder="xxxx" maxlength="4" inputmode="numeric" value="">
-            <button id="archivioCaricaDocBtnTop" class="small-btn" style="background:#17a2b8;">📷 CARICA DOCUMENTO</button>
+            <button id="archivioCaricaDocBtnTop" class="small-btn double-height" style="background:#17a2b8;">📷 CARICA DOCUMENTO</button>
         </div>
         <div class="archivio-folder-row">
             <span class="archivio-folder-name">📁 CARTELLA: <span id="archivioCurrentYear">--</span></span>
@@ -244,7 +244,7 @@
         </div>
         
         <div class="archivio-button-row">
-            <button id="archivioCaricaDocBtn" class="small-btn" style="background:#17a2b8;">📁 CARICA DOCUMENTO</button>
+            <button id="archivioCaricaDocBtn" class="small-btn double-height" style="background:#17a2b8;">📁 CARICA DOCUMENTO</button>
             <button id="archivioNewYearBtn" class="small-btn" style="background:#e67e22;">➕ CREA ANNO</button>
         </div>
         <div class="info-message-small" style="margin-top:16px;">ℹ️ I file vengono salvati nella cartella che hai selezionato. Su Android/Chrome puoi scegliere o creare la cartella "ARCHIO DOCUMENTI EXPAT".</div>
@@ -540,10 +540,15 @@
             const displayName = `${prog}/${year}/${month}/${day}/${doc.name}`;
             html += `<div class="archivio-doc-item" data-name="${doc.name}">
                         <span class="archivio-doc-name">${escapeHtml(displayName)}</span>
-                        <button class="archivio-doc-open" data-name="${doc.name}">🔍</button>
+                        <div style="display: flex; gap: 8px;">
+                            <button class="archivio-doc-open" data-name="${doc.name}">🔍</button>
+                            <button class="archivio-doc-share" data-name="${doc.name}">📤 APRI CON...</button>
+                        </div>
                     </div>`;
         });
         archivioDocsListArch.innerHTML = html;
+        
+        // Pulsanti visualizzazione
         document.querySelectorAll('.archivio-doc-open').forEach(btn => {
             btn.addEventListener('click', async (e) => {
                 const name = btn.getAttribute('data-name');
@@ -555,6 +560,28 @@
                     URL.revokeObjectURL(url);
                 } else {
                     alert("Impossibile aprire il file.");
+                }
+            });
+        });
+        
+        // Pulsanti condivisione
+        document.querySelectorAll('.archivio-doc-share').forEach(btn => {
+            btn.addEventListener('click', async (e) => {
+                const name = btn.getAttribute('data-name');
+                const doc = docsList.find(d => d.name === name);
+                if (!doc || !doc.handle) return;
+                const file = await doc.handle.getFile();
+                if (navigator.share) {
+                    try {
+                        await navigator.share({
+                            title: doc.name,
+                            files: [file]
+                        });
+                    } catch (err) {
+                        if (err.message !== 'Share canceled') console.warn(err);
+                    }
+                } else {
+                    alert("Condivisione non supportata sul tuo browser.");
                 }
             });
         });
@@ -685,11 +712,7 @@
         initArchivio();
         keepScreenOn();
     }
-    
-    // ==================== TUTTE LE FUNZIONI ORIGINALI (CONTATTI, NOTE, RETE, GEOLOCALIZZAZIONE, LICENZA, ecc.) ====================
-    // Per non omettere nulla, includo qui l'intero codice originale delle funzioni principali.
-    // Poiché il file è molto lungo, ho verificato che tutte le funzioni originali del tuo file siano presenti.
-    // Le funzioni che seguono sono state estratte dal file originale che hai fornito.
+    // ==================== FUNZIONI ORIGINALI (NON MODIFICATE) ====================
     
     // --- WAKE LOCK ---
     async function requestGlobalWakeLock() {
@@ -862,6 +885,7 @@
     function deleteCategory(category, index) { if (!adminAuthenticated) { alert("Solo amministratore."); return; } if (confirm("Vuoi eliminare la categoria '" + category.title + "' e tutti i suoi figli?")) { reteData.categories.splice(index, 1); saveReteData(); renderReteCategories(reteLevelContainer, reteData); } }
     function deleteChild(category, childIndex) { if (!adminAuthenticated) { alert("Solo amministratore."); return; } if (confirm("Vuoi eliminare questo figlio?")) { category.children.splice(childIndex, 1); saveReteData(); renderReteCategories(reteLevelContainer, reteData); } }
     function editChildTitle(child, newTitle) { if (!adminAuthenticated) { alert("Solo amministratore."); return false; } child.title = newTitle; saveReteData(); renderReteCategories(reteLevelContainer, reteData); return true; }
+    
     function showActivityModalForChild(child) {
         if (!adminAuthenticated) {
             const activated = localStorage.getItem('activated') === 'true';
@@ -904,6 +928,7 @@
         isModalOpen = true;
         keepScreenOn();
     }
+    
     function updateActivityButtonsForChild(child) {
         const coord = child.coordinate || "";
         const web = child.websiteUrl || "";
@@ -922,6 +947,7 @@
             activityWebBtn.ontouchend = activityWebBtn.ontouchcancel = () => { if (webTimer) clearTimeout(webTimer); };
         }
     }
+    
     activityUploadImageBtn.addEventListener('click', () => {
         if (!adminAuthenticated || !currentActivityNode) return;
         let input = document.createElement('input');
@@ -941,6 +967,7 @@
         };
         input.click();
     });
+    
     activityEditInfoBtn.addEventListener('click', () => {
         if (!adminAuthenticated || !currentActivityNode) return;
         activityInfoText.readOnly = false;
@@ -967,6 +994,7 @@
         activitySaveInfoBtn.style.display = "none";
         activityCancelInfoBtn.style.display = "none";
     });
+    
     function renderReteCategories(container, data) {
         container.innerHTML = '';
         if (!data.categories || data.categories.length === 0) {
@@ -1048,6 +1076,7 @@
             container.appendChild(addCatBtn);
         }
     }
+    
     function setupImageArea() {
         imagePreviewArea.innerHTML = '';
         if (currentImageData) {
@@ -1066,6 +1095,7 @@
             attachMainPlaceholderLongPress(ph);
         }
     }
+    
     function attachMainPlaceholderLongPress(el) {
         let timer;
         el.onmousedown = () => { timer = setTimeout(() => { if (adminAuthenticated) openMainImageGallery(); }, 3000); };
@@ -1073,6 +1103,7 @@
         el.ontouchstart = () => { timer = setTimeout(() => { if (adminAuthenticated) openMainImageGallery(); }, 3000); };
         el.ontouchend = el.ontouchcancel = () => clearTimeout(timer);
     }
+    
     function attachMainImageLongPress(img) {
         let timer;
         img.onmousedown = () => { timer = setTimeout(() => { if (adminAuthenticated) openMainImageGallery(); }, 3000); };
@@ -1080,6 +1111,7 @@
         img.ontouchstart = () => { timer = setTimeout(() => { if (adminAuthenticated) openMainImageGallery(); }, 3000); };
         img.ontouchend = img.ontouchcancel = () => clearTimeout(timer);
     }
+    
     function openMainImageGallery() {
         let input = document.createElement('input');
         input.type = 'file';
@@ -1098,6 +1130,7 @@
         };
         input.click();
     }
+    
     function loadSavedImage() {
         let saved = localStorage.getItem('monastir_image');
         if (saved) { currentImageData = saved; setupImageArea(); }
@@ -1377,7 +1410,6 @@
             contactsGrid.appendChild(btn);
         });
     }
-    
     // --- GEOLOCALIZZAZIONE (originale) ---
     function haversine(lat1,lng1,lat2,lng2) {
         const R = 6371e3;
@@ -1896,3 +1928,4 @@
 </script>
 </body>
 </html>
+
