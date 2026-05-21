@@ -10,6 +10,7 @@
     <meta name="apple-mobile-web-app-title" content="Contatti">
     <link rel="apple-touch-icon" href="icons/192.png">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
     <style>
         *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
         body{font-family:system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,sans-serif;background:#e9ecef;padding:16px;min-height:100vh;display:flex;justify-content:center;align-items:center;overflow-x:hidden}
@@ -127,7 +128,7 @@
         
         /* Stili per la nuova pagina ARCHIO DOCUMENTI EXPAT */
         .archivio-title { background: #6c757d; border: none; border-radius: 60px; padding: 14px 12px; font-size: 1.3rem; font-weight: bold; color: white; width: 100%; text-align: center; margin-bottom: 20px; box-shadow: 0 4px 8px rgba(0,0,0,0.2); word-break: break-word; }
-        .archivio-login-panel { background: #fff3e0; border-radius: 24px; padding: 16px; margin-bottom: 20px; border-left: 4px solid #e67e22; }
+        .archivio-login-panel { background: #fff3e0; border-radius: 24px; padding: 16px; margin-bottom: 20px; border-left: 4px solid #e67e22; text-align: center; }
         .archivio-year-container { display: flex; justify-content: center; margin: 16px 0; gap: 10px; flex-wrap: wrap; align-items: center; }
         .archivio-year-input { background: #f0f0f0; border-radius: 60px; padding: 12px 20px; text-align: center; font-size: 1.5rem; font-weight: bold; width: 180px; border: 1px solid #ced4da; }
         .archivio-folder-row { display: flex; align-items: center; justify-content: space-between; background: #e9ecef; padding: 12px 16px; border-radius: 32px; margin: 16px 0; }
@@ -145,7 +146,7 @@
 </head>
 <body>
 <div class="container">
-    <!-- HOME PAGE (originale, non modificata) -->
+    <!-- HOME PAGE (identica all'originale) -->
     <div id="homePage" class="page">
         <div class="title-btn" id="adminLongPressBtn"><span>📇</span><span>CONTATTI PERSONALI</span><span>📇</span></div>
         <div class="license-section">
@@ -172,7 +173,7 @@
         <input type="file" id="globalImportFileInput" accept=".txt" style="display:none;">
     </div>
 
-    <!-- EMERGENCY PAGE (originale, non modificata) -->
+    <!-- EMERGENCY PAGE (originale) -->
     <div id="emergencyPage" class="page hidden">
         <div id="currentServiceDeco" class="current-service-deco">Contatto:</div>
         <div class="dark-card"><div class="section-title">Numero servizio</div><div class="flex-row"><input type="tel" id="phoneNumber" placeholder="Numero" style="flex:2;"><button id="saveNumberBtn" class="small-btn" style="flex:0.4;">SALVA</button></div><div id="phoneSaveMsg" class="status-msg"></div></div>
@@ -207,7 +208,7 @@
         </div>
     </div>
 
-    <!-- IMAGE PAGE (originale, non modificata) -->
+    <!-- IMAGE PAGE (originale) -->
     <div id="imagePage" class="page hidden">
         <div class="image-top-box"><div class="image-top-title">MONASTIR: Facciamo Rete</div><div id="imagePreviewArea" class="image-container"><div class="image-placeholder" id="imagePlaceholder">📸 Solo amministratore: premi a lungo (3 sec) per caricare un'immagine</div></div></div>
         <div class="info-message-small">Per la consultazione, Richiedi Codice Attivazione nella Home.</div>
@@ -217,19 +218,28 @@
         <button id="forceSyncBtn" class="small-btn force-sync-btn">🔄 FORZA SINCRONIZZAZIONE</button>
     </div>
 
-    <!-- NUOVA PAGINA ARCHIO DOCUMENTI EXPAT (sostituisce la vecchia Archivio) -->
+    <!-- NUOVA PAGINA ARCHIO DOCUMENTI EXPAT -->
     <div id="archivioPage" class="page hidden">
         <div class="archivio-title" id="archivioTitle">ARCHIO DOCUMENTI EXPAT - LICENZA: ---</div>
         
-        <!-- Schermata di login obbligatorio -->
         <div id="archivioLoginArea" class="archivio-login-panel">
-            <div style="font-weight:bold; margin-bottom:8px;">🔐 ACCESSO OBBLIGATORIO</div>
-            <div class="flex-row"><input type="email" id="archivioEmail" placeholder="Email Google" style="flex:2;"><input type="password" id="archivioPassword" placeholder="Password" style="flex:2;"></div>
-            <button id="archivioDoLoginBtn" class="small-btn" style="background:#4285f4; width:100%;">🔑 LOGIN CON GOOGLE</button>
-            <div class="info-message-small">⚠️ Devi inserire email e password (anche se già loggato sul telefono). La password non viene salvata.</div>
+            <div style="font-weight:bold; margin-bottom:8px;">🔐 ACCEDI CON GOOGLE</div>
+            <div id="g_id_onload"
+                 data-client_id="166167404668-a5s87m57tbn7ieqps4sblf93du4v8r77.apps.googleusercontent.com"
+                 data-callback="handleCredentialResponse"
+                 data-auto_prompt="false">
+            </div>
+            <div class="g_id_signin"
+                 data-type="standard"
+                 data-theme="outline"
+                 data-size="large"
+                 data-text="sign_in_with"
+                 data-shape="rectangular"
+                 data-logo_alignment="left">
+            </div>
+            <div class="info-message-small">Autorizza l'accesso a Drive (solo file dell'app).</div>
         </div>
         
-        <!-- Schermata principale dopo login e creazione/verifica cartella -->
         <div id="archivioMainArea" style="display:none;">
             <div class="flex-buttons">
                 <button id="archivioChangeAccountBtn" class="small-btn" style="background:#e67e22;">🔄 CAMBIA ACCOUNT</button>
@@ -264,7 +274,7 @@
         </div>
     </div>
 
-    <!-- MODALI (originali, non modificate) -->
+    <!-- MODALI (originali) -->
     <div id="adaptiveModal" class="adaptive-modal" style="display:none;"><div class="adaptive-modal-content"><textarea id="modalTextarea" readonly></textarea><button id="closeAdaptiveBtn">CHIUDI</button></div></div>
     <div id="speakDetailModal" class="adaptive-modal" style="display:none;"><div class="adaptive-modal-content"><h3>📄 Dettaglio conversazione</h3><div class="detail-label">Italiano (originale)</div><div class="detail-text" id="speakOriginalText"></div><div class="detail-label">Francese (traduzione)</div><div class="detail-text" id="speakTranslatedText"></div><div class="modal-buttons"><button id="closeSpeakModalBtn" class="save-btn">CHIUDI</button></div></div></div>
     <div id="noteEditModal" class="adaptive-modal note-edit-modal" style="display:none;"><div class="adaptive-modal-content"><h3 id="noteModalTitle">➕ Aggiungi Nota</h3><label class="detail-label">Titolo</label><input type="text" id="editNoteTitle" placeholder="Inserisci il titolo"><label class="detail-label">Descrizione</label><textarea id="editNoteDesc" rows="4" placeholder="Inserisci la descrizione"></textarea><label class="detail-label">Includi coordinate nella copia/lettura</label><div class="coord-toggle-group"><button id="modalCoordS" class="coord-toggle-modal-btn">S</button><button id="modalCoordN" class="coord-toggle-modal-btn">N</button></div><div class="modal-audio-row"><button id="modalAudioIt" class="modal-audio-btn">🇮🇹 LEGGI in IT</button><button id="modalAudioFr" class="modal-audio-btn">🇹🇳 LEGGI in FR</button></div><div class="modal-buttons"><button id="deleteNoteModalBtn" class="delete-btn" style="display:none;">🗑️ CANCELLA NOTA</button><button id="saveNoteModalBtn" class="save-btn">SALVA</button><button id="cancelNoteModalBtn" class="cancel-btn">ANNULLA</button></div></div></div>
@@ -274,7 +284,7 @@
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
 <script>
-    // ==================== v0237 - TUTTE LE FUNZIONI ORIGINALI + NUOVO ARCHIVIO ====================
+    // ==================== TUTTE LE FUNZIONI ORIGINALI (non modificate) + NUOVO CODICE ARCHIVIO ====================
     const CURRENT_VERSION = "0237";
     let currentService = "ambulanza";
     let currentLat = null, currentLng = null;
@@ -298,7 +308,7 @@
     let currentActivityNode = null;
     let currentInfoContext = null;
     
-    // Variabili per Archivio Expat (nuovo)
+    // Variabili per Archivio Expat
     let googleAccessToken = null;
     let googleUserEmail = null;
     let archivioData = {};
@@ -306,7 +316,7 @@
     let archivioSearchTerm = "";
     let mainFolderId = null;
 
-    // ==================== DOM ELEMENTI ====================
+    // DOM elements
     const homePage = document.getElementById('homePage');
     const emergencyPage = document.getElementById('emergencyPage');
     const imagePage = document.getElementById('imagePage');
@@ -412,7 +422,7 @@
     const forceSyncBtn = document.getElementById('forceSyncBtn');
     const syncStatusDiv = document.getElementById('syncStatus');
     
-    // Elementi nuova pagina Archivio
+    // Elementi archivio
     const archivioTitle = document.getElementById('archivioTitle');
     const archivioLoginArea = document.getElementById('archivioLoginArea');
     const archivioMainArea = document.getElementById('archivioMainArea');
@@ -474,7 +484,7 @@
         }
     });
     
-    // ==================== RETE CATEGORIE (originale, non modificata) ====================
+    // ==================== RETE CATEGORIE (originale) ====================
     let reteData = { categories: [] };
     let currentImageData = null;
     function saveReteData() { localStorage.setItem('monastir_rete_data', JSON.stringify(reteData)); }
@@ -653,7 +663,108 @@
     function onClearResponse() { clearOperatorTranslation(); transcribeStatus.innerText = "🧹 Traduzione cancellata"; setTimeout(() => transcribeStatus.innerText = "", 2000); keepScreenOn(); }
     activityModal.addEventListener('click', (e) => { if (e.target === activityModal) { activityModal.style.display = 'none'; isModalOpen = false; } });
     
-    // ==================== NUOVA ARCHIVIO EXPAT (come richiesto) ====================
+    // ==================== NUOVA ARCHIVIO EXPAT (con login Google semplice) ====================
+    // Funzione chiamata dal bottone di Google One Tap
+    function handleCredentialResponse(response) {
+        const idToken = response.credential;
+        // Decodifichiamo il token per ottenere email (opzionale)
+        fetch('https://oauth2.googleapis.com/tokeninfo?id_token=' + idToken)
+            .then(res => res.json())
+            .then(tokenInfo => {
+                googleUserEmail = tokenInfo.email;
+                // Ora abbiamo l'id_token, ma per Drive serve un access_token.
+                // Usiamo il flusso implicito: reindirizzamento per ottenere access_token
+                // Tuttavia, il metodo più semplice è usare direttamente l'access token con il client id
+                // Poiché Google One Tap non restituisce access_token, dobbiamo fare un secondo passaggio
+                // Ma per semplicità e affidabilità, usiamo il metodo con reindirizzamento (più robusto)
+                startDriveAuthRedirect();
+            })
+            .catch(err => {
+                console.warn("Errore decodifica token", err);
+                startDriveAuthRedirect();
+            });
+    }
+    
+    function startDriveAuthRedirect() {
+        const clientId = '166167404668-a5s87m57tbn7ieqps4sblf93du4v8r77.apps.googleusercontent.com';
+        const redirectUri = window.location.origin + window.location.pathname;
+        const scope = 'https://www.googleapis.com/auth/drive.file';
+        const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=token&scope=${encodeURIComponent(scope)}&prompt=consent`;
+        window.location.href = authUrl;
+    }
+    
+    function handleOAuthRedirect() {
+        const hash = window.location.hash.substring(1);
+        const params = new URLSearchParams(hash);
+        const accessToken = params.get('access_token');
+        if (accessToken) {
+            googleAccessToken = accessToken;
+            localStorage.setItem('google_access_token', accessToken);
+            fetch('https://www.googleapis.com/oauth2/v1/userinfo', {
+                headers: { 'Authorization': 'Bearer ' + accessToken }
+            }).then(res => res.json()).then(user => {
+                googleUserEmail = user.email;
+                ensureMainFolder().then(() => {
+                    afterLoginSuccess();
+                }).catch(err => alert("Errore creazione cartella: " + err.message));
+            }).catch(err => alert("Errore recupero utente: " + err.message));
+            window.history.replaceState({}, document.title, window.location.pathname);
+        }
+    }
+    
+    async function ensureMainFolder() {
+        const query = `name='ARCHIO DOCUMENTI EXPAT' and mimeType='application/vnd.google-apps.folder' and trashed=false`;
+        const response = await fetch(`https://www.googleapis.com/drive/v3/files?q=${encodeURIComponent(query)}&fields=files(id,name)`, {
+            headers: { 'Authorization': 'Bearer ' + googleAccessToken }
+        });
+        const data = await response.json();
+        if (data.files && data.files.length > 0) {
+            mainFolderId = data.files[0].id;
+        } else {
+            const createResponse = await fetch('https://www.googleapis.com/drive/v3/files', {
+                method: 'POST',
+                headers: {
+                    'Authorization': 'Bearer ' + googleAccessToken,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    name: 'ARCHIO DOCUMENTI EXPAT',
+                    mimeType: 'application/vnd.google-apps.folder'
+                })
+            });
+            const newFolder = await createResponse.json();
+            if (newFolder.id) mainFolderId = newFolder.id;
+            else throw new Error("Impossibile creare la cartella principale");
+        }
+        localStorage.setItem('main_folder_id', mainFolderId);
+        localStorage.setItem('google_user_email', googleUserEmail);
+        loadArchivioData();
+    }
+    
+    function afterLoginSuccess() {
+        archivioLoginArea.style.display = 'none';
+        archivioMainArea.style.display = 'block';
+        const licenseCode = clientCodeInput.value;
+        archivioTitle.innerText = `ARCHIO DOCUMENTI EXPAT - LICENZA: ${licenseCode}`;
+        renderArchivioDocsList();
+    }
+    
+    function logoutAndChangeAccount() {
+        googleAccessToken = null;
+        googleUserEmail = null;
+        mainFolderId = null;
+        localStorage.removeItem('google_access_token');
+        localStorage.removeItem('google_user_email');
+        localStorage.removeItem('main_folder_id');
+        archivioLoginArea.style.display = 'block';
+        archivioMainArea.style.display = 'none';
+        archivioData = {};
+        archivioCurrentYear = "";
+        archivioYearInput.value = "";
+        archivioCurrentYearSpan.innerText = "--";
+        archivioDocsList.innerHTML = '<div style="text-align:center; padding:20px; color:#777;">Effettua il login per iniziare.</div>';
+    }
+    
     function saveArchivioData() { localStorage.setItem('archivio_expat_data_v0237', JSON.stringify(archivioData)); }
     function loadArchivioData() { const saved = localStorage.getItem('archivio_expat_data_v0237'); if (saved) { try { archivioData = JSON.parse(saved); } catch(e) { archivioData = {}; } } else archivioData = {}; const savedYear = localStorage.getItem('archivio_current_year_v0237'); if (savedYear && /^\d{4}$/.test(savedYear)) { archivioCurrentYear = savedYear; archivioYearInput.value = savedYear; archivioCurrentYearSpan.innerText = savedYear; } else { archivioCurrentYear = ""; archivioYearInput.value = ""; archivioCurrentYearSpan.innerText = "--"; } }
     function renderArchivioDocsList() { if (!archivioCurrentYear || archivioCurrentYear === "") { archivioDocsList.innerHTML = `<div style="text-align:center; padding:20px; color:#777;">Inserisci un anno o crealo con il pulsante sotto.</div>`; return; } const docs = archivioData[archivioCurrentYear] || []; let filteredDocs = docs; if (archivioSearchTerm.trim() !== "") { const term = archivioSearchTerm.toLowerCase(); filteredDocs = docs.filter(doc => doc.nome && doc.nome.toLowerCase().includes(term)); } if (filteredDocs.length === 0) { archivioDocsList.innerHTML = `<div style="text-align:center; padding:20px; color:#777;">Nessun documento. Carica il primo documento.</div>`; return; } let html = ''; filteredDocs.forEach((doc, idx) => { const originalIdx = docs.findIndex(d => d.id === doc.id); const progNumber = String(originalIdx + 1).padStart(3, '0'); const date = new Date(doc.data); const day = String(date.getDate()).padStart(2, '0'); const month = String(date.getMonth() + 1).padStart(2, '0'); const year = doc.anno; const displayName = `${progNumber}/${year}/${month}/${day}/${doc.nome}`; html += `<div class="archivio-doc-item" data-id="${doc.id}"><span class="archivio-doc-name">${escapeHtml(displayName)}</span><button class="archivio-doc-open" data-id="${doc.id}">🔍</button></div>`; }); archivioDocsList.innerHTML = html; document.querySelectorAll('.archivio-doc-open').forEach(btn => { btn.addEventListener('click', (e) => { e.stopPropagation(); const id = btn.getAttribute('data-id'); const doc = (archivioData[archivioCurrentYear] || []).find(d => d.id === id); if (doc && doc.path) window.open(doc.path, '_blank'); else alert("Documento non trovato."); }); }); }
@@ -662,21 +773,14 @@
     function searchArchivio() { archivioSearchTerm = archivioSearchInput.value.trim(); renderArchivioDocsList(); }
     function clearArchivioSearch() { archivioSearchInput.value = ""; archivioSearchTerm = ""; renderArchivioDocsList(); archivioSearchPanel.style.display = 'none'; }
     
-    // Funzioni per Google Drive
-    function googleLoginWithEmailPass(email, password) { const clientId = 'YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com'; const redirectUri = window.location.origin + window.location.pathname; const scope = 'https://www.googleapis.com/auth/drive.file'; const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=token&scope=${encodeURIComponent(scope)}&prompt=select_account&login_hint=${encodeURIComponent(email)}`; window.location.href = authUrl; }
-    function handleOAuthRedirect() { const hash = window.location.hash.substring(1); const params = new URLSearchParams(hash); const accessToken = params.get('access_token'); if (accessToken) { googleAccessToken = accessToken; fetch('https://www.googleapis.com/oauth2/v1/userinfo', { headers: { 'Authorization': 'Bearer ' + accessToken } }).then(res => res.json()).then(user => { googleUserEmail = user.email; ensureMainFolder().then(() => { afterLoginSuccess(); }).catch(err => { alert("Errore durante la verifica/creazione della cartella principale: " + err.message); }); window.history.replaceState({}, document.title, window.location.pathname); }).catch(err => { alert("Errore recupero info utente: " + err.message); }); } }
-    async function ensureMainFolder() { const query = `name='ARCHIO DOCUMENTI EXPAT' and mimeType='application/vnd.google-apps.folder' and trashed=false`; const response = await fetch(`https://www.googleapis.com/drive/v3/files?q=${encodeURIComponent(query)}&fields=files(id,name)`, { headers: { 'Authorization': 'Bearer ' + googleAccessToken } }); const data = await response.json(); if (data.files && data.files.length > 0) { mainFolderId = data.files[0].id; } else { const createResponse = await fetch('https://www.googleapis.com/drive/v3/files', { method: 'POST', headers: { 'Authorization': 'Bearer ' + googleAccessToken, 'Content-Type': 'application/json' }, body: JSON.stringify({ name: 'ARCHIO DOCUMENTI EXPAT', mimeType: 'application/vnd.google-apps.folder' }) }); const newFolder = await createResponse.json(); if (newFolder.id) mainFolderId = newFolder.id; else throw new Error("Impossibile creare la cartella principale"); } localStorage.setItem('google_access_token', googleAccessToken); localStorage.setItem('google_user_email', googleUserEmail); localStorage.setItem('main_folder_id', mainFolderId); loadArchivioData(); }
-    function afterLoginSuccess() { archivioLoginArea.style.display = 'none'; archivioMainArea.style.display = 'block'; const licenseCode = clientCodeInput.value; archivioTitle.innerText = `ARCHIO DOCUMENTI EXPAT - LICENZA: ${licenseCode}`; renderArchivioDocsList(); }
-    function logoutAndChangeAccount() { googleAccessToken = null; googleUserEmail = null; mainFolderId = null; localStorage.removeItem('google_access_token'); localStorage.removeItem('google_user_email'); localStorage.removeItem('main_folder_id'); archivioLoginArea.style.display = 'block'; archivioMainArea.style.display = 'none'; archivioEmail.value = ''; archivioPassword.value = ''; archivioData = {}; archivioCurrentYear = ""; archivioYearInput.value = ""; archivioCurrentYearSpan.innerText = "--"; archivioDocsList.innerHTML = '<div style="text-align:center; padding:20px; color:#777;">Effettua il login per iniziare.</div>'; }
     async function ensureYearFolder(year) { if (!mainFolderId) throw new Error("Cartella principale non disponibile"); const query = `'${mainFolderId}' in parents and name='${year}' and mimeType='application/vnd.google-apps.folder' and trashed=false`; const response = await fetch(`https://www.googleapis.com/drive/v3/files?q=${encodeURIComponent(query)}&fields=files(id,name)`, { headers: { 'Authorization': 'Bearer ' + googleAccessToken } }); const data = await response.json(); if (data.files && data.files.length > 0) { return data.files[0].id; } const createResponse = await fetch('https://www.googleapis.com/drive/v3/files', { method: 'POST', headers: { 'Authorization': 'Bearer ' + googleAccessToken, 'Content-Type': 'application/json' }, body: JSON.stringify({ name: year, mimeType: 'application/vnd.google-apps.folder', parents: [mainFolderId] }) }); const newFolder = await createResponse.json(); return newFolder.id; }
     async function uploadDocument(file, fileName, year) { const yearFolderId = await ensureYearFolder(year); const metadata = { name: fileName, parents: [yearFolderId] }; const formData = new FormData(); formData.append('metadata', new Blob([JSON.stringify(metadata)], {type: 'application/json'})); formData.append('file', file); const response = await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart', { method: 'POST', headers: { 'Authorization': 'Bearer ' + googleAccessToken }, body: formData }); if (!response.ok) throw new Error("Upload fallito"); const fileData = await response.json(); const docId = Date.now() + '_' + Math.random(); const newDoc = { id: docId, nome: fileName, data: new Date().toISOString(), anno: year, path: `https://drive.google.com/file/d/${fileData.id}/view`, driveFileId: fileData.id }; if (!archivioData[year]) archivioData[year] = []; archivioData[year].push(newDoc); saveArchivioData(); return newDoc; }
     function onCaricaDocumento() { if (!googleAccessToken) { alert("Login necessario."); return; } if (!archivioCurrentYear || archivioCurrentYear === "") { alert("Inserisci prima un anno valido."); return; } const input = document.createElement('input'); input.type = 'file'; input.accept = 'application/pdf,image/*'; input.capture = 'environment'; input.onchange = async (e) => { const file = e.target.files[0]; if (!file) return; let fileName = file.name; if (file.type.startsWith('image/')) { const reader = new FileReader(); reader.onload = async (ev) => { const imgData = ev.target.result; const { jsPDF } = window.jspdf; const pdf = new jsPDF(); const img = new Image(); img.src = imgData; await new Promise(resolve => { img.onload = resolve; }); const imgWidth = pdf.internal.pageSize.getWidth(); const imgHeight = (img.height * imgWidth) / img.width; pdf.addImage(imgData, 'JPEG', 0, 0, imgWidth, imgHeight); const pdfBlob = pdf.output('blob'); const baseName = prompt("Nome del documento (senza estensione):", file.name.replace(/\.[^/.]+$/, "").substring(0, 30)); if (!baseName) return; const finalName = baseName.trim().substring(0, 30).replace(/[^a-zA-Z0-9_\-]/g, '_') + '.pdf'; try { await uploadDocument(pdfBlob, finalName, archivioCurrentYear); renderArchivioDocsList(); alert("Documento salvato!"); } catch(err) { alert("Errore upload: " + err.message); } }; reader.readAsDataURL(file); } else { const baseName = prompt("Nome del documento (senza .pdf):", file.name.replace('.pdf', '').substring(0, 30)); if (!baseName) return; const finalName = baseName.trim().substring(0, 30).replace(/[^a-zA-Z0-9_\-]/g, '_') + '.pdf'; try { await uploadDocument(file, finalName, archivioCurrentYear); renderArchivioDocsList(); alert("Documento caricato!"); } catch(err) { alert("Errore upload: " + err.message); } } }; input.click(); }
     async function onCreateNewYear() { if (!googleAccessToken) { alert("Effettua prima il login."); return; } const newYear = prompt("Inserisci l'anno da creare (4 cifre):", ""); if (!newYear) return; if (!/^\d{4}$/.test(newYear)) { alert("Anno non valido."); return; } try { await ensureYearFolder(newYear); if (!archivioData[newYear]) archivioData[newYear] = []; saveArchivioData(); archivioCurrentYear = newYear; archivioYearInput.value = newYear; archivioCurrentYearSpan.innerText = newYear; localStorage.setItem('archivio_current_year_v0237', newYear); renderArchivioDocsList(); alert(`Cartella per l'anno ${newYear} creata su Drive.`); } catch(e) { alert("Errore: " + e.message); } }
     function showArchivioPage() { if (!licenseCheckPassed) { alert('Licenza non attiva o scaduta. Attivala dalla home per usare l\'archivio.'); return; } handleOAuthRedirect(); const savedToken = localStorage.getItem('google_access_token'); const savedEmail = localStorage.getItem('google_user_email'); const savedFolderId = localStorage.getItem('main_folder_id'); if (savedToken && savedEmail && savedFolderId) { googleAccessToken = savedToken; googleUserEmail = savedEmail; mainFolderId = savedFolderId; loadArchivioData(); afterLoginSuccess(); } else { archivioLoginArea.style.display = 'block'; archivioMainArea.style.display = 'none'; } homePage.classList.add("hidden"); archivioPage.classList.remove("hidden"); pushPage('archivio'); keepScreenOn(); }
     
-    // ==================== EVENT LISTENER PER NUOVA ARCHIVIO ====================
+    // Event listener per archivio
     archivioExpatBtn.addEventListener('click', showArchivioPage);
-    archivioDoLoginBtn.addEventListener('click', () => { const email = archivioEmail.value.trim(); const pwd = archivioPassword.value; if (!email || !pwd) { alert("Inserisci email e password."); return; } googleLoginWithEmailPass(email, pwd); });
     archivioChangeAccountBtn.addEventListener('click', logoutAndChangeAccount);
     archivioRefreshBtn.addEventListener('click', () => { renderArchivioDocsList(); });
     archivioYearInput.addEventListener('input', onYearInput);
@@ -688,8 +792,9 @@
     if (archivioCaricaDocBtn) archivioCaricaDocBtn.addEventListener('click', onCaricaDocumento);
     if (archivioCaricaDocBtnTop) archivioCaricaDocBtnTop.addEventListener('click', onCaricaDocumento);
     
-    // ==================== FUNZIONI DI INIZIALIZZAZIONE (originali) ====================
+    // ==================== INIZIALIZZAZIONE ====================
     window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); deferredPrompt = e; });
+    window.addEventListener('load', () => { handleOAuthRedirect(); });
     function init() { loadAdminCode(); loadAllNotes(); loadContactExtraText(); migratePhoneNumbers(); loadInfoTextsFromLocal(); initHomeButtons(); loadReteData(); saveNumberBtn.addEventListener('click', onSaveNumber); googleMapsBtn.addEventListener('click', () => window.open("https://maps.google.com", "_blank")); geolocationBtn.addEventListener('click', getLocationAndAddress); copyNoteBtn.addEventListener('click', copyNoteWithOptionalCoords); listenResponseBtn.addEventListener('click', startListening30s); clearResponseBtn.addEventListener('click', onClearResponse); speakToOperatorBtn.addEventListener('click', startSpeakingItalian); clearSpeakBtn.addEventListener('click', clearSpeakTranslation); exportAllBtn.addEventListener('click', exportAllNotes); importAllBtn.addEventListener('click', () => globalImportFileInput.click()); globalImportFileInput.addEventListener('change', (e) => { if (e.target.files.length) importAllNotes(e.target.files[0]); globalImportFileInput.value = ''; }); initRecognitionOperator(); initRecognitionSpeak(); initLicense(); activateLicenseBtn.addEventListener('click', onActivateLicense); if (!reteData.categories || reteData.categories.length === 0) { reteData.categories = []; saveReteData(); } performSync(true).then(() => { console.log('Sincronizzazione iniziale completata'); }); keepScreenOn(); bindWakeLockToInteraction(); backStack = ['home']; history.replaceState({ page: 'home', modal: false }, ''); }
     init();
 </script>
