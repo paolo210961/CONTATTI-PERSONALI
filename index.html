@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
-    <title>Contatti Personali - v0236</title>
+    <title>Contatti Personali - v0237</title>
     <link rel="manifest" href="manifest.json">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -23,11 +23,12 @@
         .grid-2{display:flex;flex-direction:column;gap:14px}
         .big-btn{background:white !important;color:#1e2a3a !important;border:2px solid black !important;border-radius:60px;padding:16px 12px;font-size:1.3rem;font-weight:bold;width:100%;text-align:center;cursor:pointer;transition:0.05s linear;box-shadow:none !important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
         .big-btn:active{transform:scale(0.97)}
-        .export-import-row{display:flex;gap:12px;margin-top:16px}
-        .export-import-row button{flex:1;border:none;border-radius:60px;padding:14px 8px;font-size:0.9rem;font-weight:bold;cursor:pointer;transition:0.05s linear;text-align:center;color:white;box-shadow:0 2px 4px rgba(0,0,0,0.1)}
-        .export-import-row button:active{transform:scale(0.97)}
+        .triple-btn-row{display:flex;gap:12px;margin-top:16px}
+        .triple-btn-row button{flex:1;border:none;border-radius:60px;padding:14px 8px;font-size:0.85rem;font-weight:bold;cursor:pointer;transition:0.05s linear;text-align:center;color:white;box-shadow:0 2px 4px rgba(0,0,0,0.1)}
+        .triple-btn-row button:active{transform:scale(0.97)}
         #exportAllBtn{background:#283593}
         #importAllBtn{background:#558b2f}
+        #archivioExpatBtn{background:#e67e22}
         .small-btn{padding:8px 12px;font-size:0.85rem;border-radius:40px;font-weight:bold;cursor:pointer;color:white;border:none;text-align:center;transition:0.05s linear;white-space:nowrap;box-shadow:0 2px 4px rgba(0,0,0,0.1)}
         .small-btn:active{transform:scale(0.97)}
         .double-height{padding:16px 12px;font-size:1rem}
@@ -67,7 +68,7 @@
         .coord-toggle-modal-btn.active#modalCoordN{background:#dc3545 !important}
         .modal-audio-row{display:flex;gap:12px;justify-content:center;margin:12px 0}
         .modal-audio-btn{flex:1;background:#6b8e23;color:white;border:none;border-radius:40px;padding:8px 16px;font-weight:bold;cursor:pointer}
-        @media (max-width:480px){body{padding:8px}.page{padding:16px 12px 24px}.big-btn{font-size:1rem;padding:12px 10px;white-space:normal;word-break:break-word}.small-btn{padding:6px 10px;font-size:0.75rem}.double-height{padding:12px 10px;font-size:0.9rem}.title-btn{font-size:1.2rem;padding:12px;gap:6px}.dark-card{padding:12px}.speak-box,.listen-box{padding:12px}.note-item{gap:6px}.note-btn-confirm{width:32px;height:32px}.note-btn-confirm .dot{width:14px;height:14px}.title-badge{font-size:0.7rem;padding:4px 8px}.title-field{font-size:0.8rem;padding:4px 8px;white-space:normal}.license-row{flex-wrap:wrap}}
+        @media (max-width:480px){body{padding:8px}.page{padding:16px 12px 24px}.big-btn{font-size:1rem;padding:12px 10px;white-space:normal;word-break:break-word}.small-btn{padding:6px 10px;font-size:0.75rem}.double-height{padding:12px 10px;font-size:0.9rem}.title-btn{font-size:1.2rem;padding:12px;gap:6px}.dark-card{padding:12px}.speak-box,.listen-box{padding:12px}.note-item{gap:6px}.note-btn-confirm{width:32px;height:32px}.note-btn-confirm .dot{width:14px;height:14px}.title-badge{font-size:0.7rem;padding:4px 8px}.title-field{font-size:0.8rem;padding:4px 8px;white-space:normal}.license-row{flex-wrap:wrap}.triple-btn-row button{font-size:0.7rem;padding:10px 4px}}
         #saveNumberBtn,#geolocationBtn{background:#283593 !important}
         #googleMapsBtn{background:black !important;color:white !important;border:none !important;font-weight:bold !important;box-shadow:none !important;margin:4px 0}
         .info-message{background:#e8f5e9;padding:6px 12px;border-radius:20px;margin-bottom:8px;font-size:0.75rem;font-weight:500;color:#2e7d32;display:none}
@@ -122,6 +123,20 @@
         .sync-status.error { background: #f8d7da; color: #721c24; }
         .sync-status.success { background: #d4edda; color: #155724; }
         .force-sync-btn { background: #17a2b8 !important; margin-top: 10px; }
+        
+        /* STILI PER ARCHIVIO EXPAT */
+        .archivio-year-row { display: flex; align-items: center; gap: 10px; margin: 16px 0; }
+        .archivio-year-input { flex: 2; text-align: center; font-size: 1.2rem; font-weight: bold; background: #f8f9fa; }
+        .archivio-folder-row { display: flex; align-items: center; justify-content: space-between; background: #e9ecef; padding: 12px 16px; border-radius: 32px; margin: 16px 0; }
+        .archivio-folder-name { font-size: 1.1rem; font-weight: bold; }
+        .archivio-search-icon { font-size: 1.3rem; cursor: pointer; background: none; border: none; padding: 5px 10px; }
+        .archivio-doc-item { display: flex; align-items: center; justify-content: space-between; background: white; border: 1px solid #ced4da; border-radius: 40px; padding: 10px 16px; margin: 8px 0; }
+        .archivio-doc-name { font-family: monospace; font-size: 0.8rem; word-break: break-all; flex: 1; }
+        .archivio-doc-open { font-size: 1.2rem; cursor: pointer; background: none; border: none; padding: 5px 10px; }
+        .archivio-button-row { display: flex; gap: 12px; margin-top: 20px; }
+        .archivio-button-row button { flex: 1; }
+        .archivio-search-panel { background: #f0f0f0; border-radius: 24px; padding: 12px; margin: 12px 0; display: none; }
+        .archivio-search-input { width: 100%; padding: 10px; border-radius: 40px; border: 1px solid #ced4da; }
     </style>
 </head>
 <body>
@@ -139,7 +154,7 @@
             <div class="flex-row"><input type="text" id="generatedCode" readonly placeholder="Codice generato" style="flex:1; background:#f8f9fa;"><button id="copyGeneratedBtn" class="small-btn" style="background:#283593;">📋 COPIA</button></div>
             <div class="flex-row"><input type="text" id="newAdminCode" placeholder="Nuovo codice amministratore" style="flex:1;"><button id="changeAdminCodeBtn" class="small-btn" style="background:#8e44ad;">CAMBIA CODICE</button></div>
             <div class="admin-backup-buttons"><button id="saveInfoIconsBtn" class="small-btn" style="background:#283593;">💾 SALVA (i)</button><button id="restoreInfoIconsBtn" class="small-btn" style="background:#6b8e23;">📂 RIPRISTINA (i)</button></div>
-            <div id="backupHint" class="backup-hint">📄 info_icons_backup_v0236.txt</div>
+            <div id="backupHint" class="backup-hint">📄 info_icons_backup_v0237.txt</div>
             <button id="hideAdminBtn" class="small-btn" style="background:#757575; width:100%; margin-top:8px;">NASCONDI AREA ADMIN</button>
         </div>
         <div class="dark-card"><div class="grid-2" id="contactsGrid"></div></div>
@@ -147,8 +162,8 @@
         <div class="info-text">Ogni contatto ha il proprio archivio note.<br>📍 Ricerca entro 300m di TUTTI i luoghi con nome<br>🔊 Ascolto automatico 30 secondi dopo il messaggio</div>
         <div class="info-text">Non Utilizzare APP per Situazioni di Emergenza di Salute</div>
         <div class="days-line" id="daysLeftDisplayHome">Giorni rimanenti: --</div>
-        <div class="info-text">💾 Il file SALVA NOTE si chiama: contatti_personali_notes_backup_0236.txt</div>
-        <div class="export-import-row"><button id="exportAllBtn">💾 SALVA NOTE</button><button id="importAllBtn">📂 RIPRISTINA NOTE</button></div>
+        <div class="info-text">💾 Il file SALVA NOTE si chiama: contatti_personali_notes_backup_0237.txt</div>
+        <div class="triple-btn-row"><button id="exportAllBtn">💾 SALVA NOTE</button><button id="importAllBtn">📂 RIPRISTINA NOTE</button><button id="archivioExpatBtn">📁 ARCHIVIO EXPAT</button></div>
         <input type="file" id="globalImportFileInput" accept=".txt" style="display:none;">
     </div>
     <div id="emergencyPage" class="page hidden">
@@ -192,6 +207,37 @@
         <div id="adminReteButtons" class="admin-rete-buttons hidden-btn"><button id="exportReteBtn">📤 ESPORTA RETE</button><button id="importReteBtn">📥 IMPORTA RETE DA FILE</button></div>
         <button id="forceSyncBtn" class="small-btn force-sync-btn">🔄 FORZA SINCRONIZZAZIONE</button>
     </div>
+    <div id="archivioPage" class="page hidden">
+        <div class="title-btn" style="background:#6c757d; cursor:default;">📁 ARCHIVIO VITA DA EXPAT</div>
+        
+        <div class="archivio-year-row">
+            <div class="section-title" style="margin-bottom:0;">ANNO:</div>
+            <input type="text" id="archivioYearInput" class="archivio-year-input" placeholder="2026" maxlength="4" inputmode="numeric" value="2026" readonly style="background:#f8f9fa;">
+        </div>
+        <div class="info-message-small" id="archivioYearHint">(long press 5 sec per modificare l'anno)</div>
+        
+        <div class="archivio-folder-row">
+            <span class="archivio-folder-name">📁 CARTELLA: <span id="archivioCurrentYear">2026</span></span>
+            <button id="archivioSearchBtn" class="archivio-search-icon">🔍</button>
+        </div>
+        
+        <div id="archivioSearchPanel" class="archivio-search-panel">
+            <input type="text" id="archivioSearchInput" class="archivio-search-input" placeholder="Cerca per nome documento...">
+            <button id="archivioSearchExecBtn" class="small-btn" style="background:#283593; margin-top:8px;">CERCA</button>
+            <button id="archivioSearchClearBtn" class="small-btn" style="background:#6c757d; margin-top:5px;">CLEAR</button>
+        </div>
+        
+        <div id="archivioDocsList" class="dark-card" style="max-height:400px; overflow-y:auto;">
+            <div style="text-align:center; padding:20px; color:#777;">Nessun documento. Scannerizza il primo.</div>
+        </div>
+        
+        <div class="archivio-button-row">
+            <button id="archivioScanBtn" class="small-btn" style="background:#4caf50;">📷 SCANNERIZZA NUOVO DOCUMENTO</button>
+            <button id="archivioNewYearBtn" class="small-btn" style="background:#e67e22;">➕ CREA NUOVO ANNO</button>
+        </div>
+        
+        <div class="info-message-small" style="margin-top:16px;">ℹ️ Periodo di prova: 90 giorni. Attiva la licenza per continuare ad usare l'archivio.</div>
+    </div>
     <!-- MODALI -->
     <div id="adaptiveModal" class="adaptive-modal" style="display:none;"><div class="adaptive-modal-content"><textarea id="modalTextarea" readonly></textarea><button id="closeAdaptiveBtn">CHIUDI</button></div></div>
     <div id="speakDetailModal" class="adaptive-modal" style="display:none;"><div class="adaptive-modal-content"><h3>📄 Dettaglio conversazione</h3><div class="detail-label">Italiano (originale)</div><div class="detail-text" id="speakOriginalText"></div><div class="detail-label">Francese (traduzione)</div><div class="detail-text" id="speakTranslatedText"></div><div class="modal-buttons"><button id="closeSpeakModalBtn" class="save-btn">CHIUDI</button></div></div></div>
@@ -212,8 +258,8 @@
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
 <script>
-    // v0236 - Sincronizzazione automatica anche dei testi informativi (pulsanti i) tramite rete_data.json
-    const CURRENT_VERSION = "0236";
+    // v0237 - Aggiunta ARCHIVIO EXPAT: nuova pagina con gestione documenti per anno
+    const CURRENT_VERSION = "0237";
     let currentService = "ambulanza";
     let currentLat = null, currentLng = null;
     let currentAddress = "";
@@ -243,6 +289,7 @@
     const homePage = document.getElementById('homePage');
     const emergencyPage = document.getElementById('emergencyPage');
     const imagePage = document.getElementById('imagePage');
+    const archivioPage = document.getElementById('archivioPage');
     const reteLevelContainer = document.getElementById('reteLevelContainer');
     const currentServiceDeco = document.getElementById('currentServiceDeco');
     const phoneInput = document.getElementById('phoneNumber');
@@ -290,6 +337,7 @@
     const modalAudioFr = document.getElementById('modalAudioFr');
     const exportAllBtn = document.getElementById('exportAllBtn');
     const importAllBtn = document.getElementById('importAllBtn');
+    const archivioExpatBtn = document.getElementById('archivioExpatBtn');
     const globalImportFileInput = document.getElementById('globalImportFileInput');
     const contactsGrid = document.getElementById('contactsGrid');
     const clientCodeInput = document.getElementById('clientCodeInput');
@@ -343,6 +391,18 @@
     const forceSyncBtn = document.getElementById('forceSyncBtn');
     const syncStatusDiv = document.getElementById('syncStatus');
     
+    // Archivio Expat DOM elements
+    const archivioYearInput = document.getElementById('archivioYearInput');
+    const archivioCurrentYearSpan = document.getElementById('archivioCurrentYear');
+    const archivioSearchBtn = document.getElementById('archivioSearchBtn');
+    const archivioSearchPanel = document.getElementById('archivioSearchPanel');
+    const archivioSearchInput = document.getElementById('archivioSearchInput');
+    const archivioSearchExecBtn = document.getElementById('archivioSearchExecBtn');
+    const archivioSearchClearBtn = document.getElementById('archivioSearchClearBtn');
+    const archivioDocsList = document.getElementById('archivioDocsList');
+    const archivioScanBtn = document.getElementById('archivioScanBtn');
+    const archivioNewYearBtn = document.getElementById('archivioNewYearBtn');
+    
     let currentActivityNode = null;
     let currentEditId = null;
     let currentEditIncludeCoords = false;
@@ -359,6 +419,230 @@
         infoOperator: "Informazioni sull'ascolto operatore.\nPremi 'ASCOLTA OPERATORE' per avviare un ascolto di 30 secondi. La voce dell'operatore viene tradotta in italiano e salvata.",
         infoSpeak: "Informazioni sulla conversazione con operatore.\nPremi 'PARLA CON OPERATORE' e parla in italiano. La tua voce viene tradotta in francese e letta ad alta voce."
     };
+    
+    // ==================== ARCHIVIO EXPAT FUNCTIONS ====================
+    let archivioData = {}; // { "2026": [ { id, nome, data, path } ] }
+    let archivioCurrentYear = "2026";
+    let archivioSearchTerm = "";
+    
+    function loadArchivioData() {
+        const saved = localStorage.getItem('archivio_expat_data');
+        if (saved) {
+            try {
+                archivioData = JSON.parse(saved);
+            } catch(e) { console.warn(e); }
+        }
+        if (!archivioData) archivioData = {};
+        // Load current year from storage
+        const savedYear = localStorage.getItem('archivio_current_year');
+        if (savedYear && /^\d{4}$/.test(savedYear)) {
+            archivioCurrentYear = savedYear;
+        } else {
+            archivioCurrentYear = "2026";
+        }
+        updateArchivioYearDisplay();
+        renderArchivioDocsList();
+    }
+    
+    function saveArchivioData() {
+        localStorage.setItem('archivio_expat_data', JSON.stringify(archivioData));
+    }
+    
+    function saveArchivioCurrentYear() {
+        localStorage.setItem('archivio_current_year', archivioCurrentYear);
+    }
+    
+    function updateArchivioYearDisplay() {
+        archivioYearInput.value = archivioCurrentYear;
+        archivioCurrentYearSpan.textContent = archivioCurrentYear;
+    }
+    
+    function setArchivioYear(year) {
+        if (!/^\d{4}$/.test(year)) {
+            alert("Inserisci un anno valido (4 cifre, es. 2026)");
+            return false;
+        }
+        archivioCurrentYear = year;
+        updateArchivioYearDisplay();
+        saveArchivioCurrentYear();
+        renderArchivioDocsList();
+        return true;
+    }
+    
+    function renderArchivioDocsList() {
+        const docs = archivioData[archivioCurrentYear] || [];
+        let filteredDocs = docs;
+        if (archivioSearchTerm.trim() !== "") {
+            const term = archivioSearchTerm.toLowerCase();
+            filteredDocs = docs.filter(doc => doc.nome && doc.nome.toLowerCase().includes(term));
+        }
+        
+        if (filteredDocs.length === 0) {
+            archivioDocsList.innerHTML = `<div style="text-align:center; padding:20px; color:#777;">Nessun documento. Scannerizza il primo.</div>`;
+            return;
+        }
+        
+        let html = '';
+        filteredDocs.forEach((doc, idx) => {
+            const originalIdx = docs.findIndex(d => d.id === doc.id);
+            const progNumber = String(originalIdx + 1).padStart(3, '0');
+            const date = new Date(doc.data);
+            const day = String(date.getDate()).padStart(2, '0');
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const year = doc.anno;
+            const displayName = `${progNumber}/${year}/${month}/${day}/${doc.nome}`;
+            html += `
+                <div class="archivio-doc-item" data-id="${doc.id}">
+                    <span class="archivio-doc-name">${escapeHtml(displayName)}</span>
+                    <button class="archivio-doc-open" data-id="${doc.id}">🔍</button>
+                </div>
+            `;
+        });
+        archivioDocsList.innerHTML = html;
+        
+        // Attach open document handlers
+        document.querySelectorAll('.archivio-doc-open').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const id = btn.getAttribute('data-id');
+                const doc = (archivioData[archivioCurrentYear] || []).find(d => d.id === id);
+                if (doc && doc.path) {
+                    // Open the PDF file
+                    window.open(doc.path, '_blank');
+                } else {
+                    alert("Documento non trovato.");
+                }
+            });
+        });
+    }
+    
+    async function scanNewDocument() {
+        // Simulate scanner - in real environment would use cordova-plugin-camera or similar
+        // For web demo, we use file input
+        return new Promise((resolve) => {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = 'application/pdf,image/*';
+            input.multiple = true;
+            input.onchange = async (e) => {
+                const files = Array.from(e.target.files);
+                if (files.length === 0) { resolve(null); return; }
+                
+                const nomeFile = prompt("Inserisci il nome del documento (max 30 caratteri):", "documento");
+                if (!nomeFile || nomeFile.trim() === "") {
+                    alert("Nome documento obbligatorio.");
+                    resolve(null);
+                    return;
+                }
+                const cleanNome = nomeFile.trim().substring(0, 30);
+                
+                // For each file, create a PDF blob and save
+                for (let i = 0; i < files.length; i++) {
+                    const file = files[i];
+                    const fileData = await fileToDataURL(file);
+                    const docId = Date.now() + '_' + Math.random() + '_' + i;
+                    const newDoc = {
+                        id: docId,
+                        nome: i === 0 ? cleanNome : `${cleanNome}_${i+1}`,
+                        data: new Date().toISOString(),
+                        anno: archivioCurrentYear,
+                        path: fileData // store as data URL for demo (in real app would save to filesystem)
+                    };
+                    if (!archivioData[archivioCurrentYear]) archivioData[archivioCurrentYear] = [];
+                    archivioData[archivioCurrentYear].push(newDoc);
+                }
+                saveArchivioData();
+                renderArchivioDocsList();
+                alert(`${files.length} documento/i archiviato/i correttamente.`);
+                resolve(true);
+            };
+            input.click();
+        });
+    }
+    
+    function fileToDataURL(file) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => resolve(reader.result);
+            reader.onerror = reject;
+            reader.readAsDataURL(file);
+        });
+    }
+    
+    function createNewYear() {
+        const newYear = prompt("Inserisci il nuovo anno (4 cifre):", "");
+        if (!newYear) return;
+        if (!/^\d{4}$/.test(newYear)) {
+            alert("Inserisci un anno valido (4 cifre).");
+            return;
+        }
+        if (archivioData[newYear]) {
+            const confirmView = confirm(`L'anno ${newYear} esiste già. Vuoi visualizzarlo?`);
+            if (confirmView) {
+                archivioCurrentYear = newYear;
+                updateArchivioYearDisplay();
+                saveArchivioCurrentYear();
+                renderArchivioDocsList();
+            }
+        } else {
+            archivioData[newYear] = [];
+            saveArchivioData();
+            archivioCurrentYear = newYear;
+            updateArchivioYearDisplay();
+            saveArchivioCurrentYear();
+            renderArchivioDocsList();
+            alert(`Cartella per l'anno ${newYear} creata.`);
+        }
+    }
+    
+    function searchArchivio() {
+        const searchTerm = archivioSearchInput.value.trim();
+        archivioSearchTerm = searchTerm;
+        renderArchivioDocsList();
+    }
+    
+    function clearArchivioSearch() {
+        archivioSearchInput.value = "";
+        archivioSearchTerm = "";
+        renderArchivioDocsList();
+        archivioSearchPanel.style.display = 'none';
+    }
+    
+    function toggleArchivioSearchPanel() {
+        if (archivioSearchPanel.style.display === 'none' || archivioSearchPanel.style.display === '') {
+            archivioSearchPanel.style.display = 'block';
+        } else {
+            archivioSearchPanel.style.display = 'none';
+        }
+    }
+    
+    // Long press per modificare l'anno
+    let yearPressTimer = null;
+    function startYearPressTimer() {
+        yearPressTimer = setTimeout(() => {
+            const newYear = prompt("Modifica anno (4 cifre):", archivioCurrentYear);
+            if (newYear && /^\d{4}$/.test(newYear)) {
+                setArchivioYear(newYear);
+            } else if (newYear) {
+                alert("Formato anno non valido. Usa 4 cifre.");
+            }
+        }, 5000);
+    }
+    function cancelYearPressTimer() {
+        if (yearPressTimer) clearTimeout(yearPressTimer);
+    }
+    
+    function showArchivioPage() {
+        if (!licenseCheckPassed) {
+            alert('Licenza non attiva o scaduta. Attivala dalla home per usare l\'archivio.');
+            return;
+        }
+        loadArchivioData();
+        homePage.classList.add("hidden");
+        archivioPage.classList.remove("hidden");
+        pushPage('archivio');
+        keepScreenOn();
+    }
     
     // ==================== WAKE LOCK ====================
     async function requestGlobalWakeLock() {
@@ -407,6 +691,7 @@
                 homePage.classList.remove('hidden');
                 emergencyPage.classList.add('hidden');
                 imagePage.classList.add('hidden');
+                archivioPage.classList.add('hidden');
                 releaseImagePageWakeLock();
                 currentPage = 'home';
                 keepScreenOn();
@@ -414,6 +699,7 @@
                 homePage.classList.add('hidden');
                 imagePage.classList.remove('hidden');
                 emergencyPage.classList.add('hidden');
+                archivioPage.classList.add('hidden');
                 currentPage = 'image';
                 requestImagePageWakeLock();
                 updateAdminReteButtonsVisibility();
@@ -423,7 +709,16 @@
                 homePage.classList.add('hidden');
                 emergencyPage.classList.remove('hidden');
                 imagePage.classList.add('hidden');
+                archivioPage.classList.add('hidden');
                 currentPage = 'emergency';
+                keepScreenOn();
+            } else if (prev === 'archivio') {
+                homePage.classList.add('hidden');
+                archivioPage.classList.remove('hidden');
+                emergencyPage.classList.add('hidden');
+                imagePage.classList.add('hidden');
+                currentPage = 'archivio';
+                loadArchivioData();
                 keepScreenOn();
             }
         } else {
@@ -431,6 +726,7 @@
             homePage.classList.remove('hidden');
             emergencyPage.classList.add('hidden');
             imagePage.classList.add('hidden');
+            archivioPage.classList.add('hidden');
             currentPage = 'home';
             releaseImagePageWakeLock();
             keepScreenOn();
@@ -493,7 +789,6 @@
                     setupImageArea();
                     updated = true;
                 }
-                // Sincronizzazione testi informativi
                 if (remoteData.infoTexts && typeof remoteData.infoTexts === 'object') {
                     let infoUpdated = false;
                     for (let key in remoteData.infoTexts) {
@@ -1584,7 +1879,7 @@
     function savePhone(s,n) { localStorage.setItem(`phone_${s}_${CURRENT_VERSION}`, n); }
     function getPhone(s) { return localStorage.getItem(`phone_${s}_${CURRENT_VERSION}`); }
     const defaultPhone = { ambulanza:"118", polizia:"113", veterinario:"800123456", clinica:"800987654" };
-    function migratePhoneNumbers() { const oldVersions = ["0235","0234","0233"]; for (let s of services) { if (localStorage.getItem(`phone_${s}_${CURRENT_VERSION}`)) continue; for (let ver of oldVersions) { let old = localStorage.getItem(`phone_${s}_${ver}`); if (old) { localStorage.setItem(`phone_${s}_${CURRENT_VERSION}`, old); break; } } } }
+    function migratePhoneNumbers() { const oldVersions = ["0236","0235","0234"]; for (let s of services) { if (localStorage.getItem(`phone_${s}_${CURRENT_VERSION}`)) continue; for (let ver of oldVersions) { let old = localStorage.getItem(`phone_${s}_${ver}`); if (old) { localStorage.setItem(`phone_${s}_${CURRENT_VERSION}`, old); break; } } } }
     
     // ==================== PALLINI I ====================
     licenseInfoIcon.addEventListener('click', () => openGlobalInfoModal('licenseInfo', 'Informazioni Licenza', 'license_info_text'));
@@ -1617,6 +1912,22 @@
     function onSaveNumber() { let n = phoneInput.value.trim(); if (n) { savePhone(currentService, n); phoneSaveMsg.innerText = "✅ Numero salvato nell'archivio"; setTimeout(()=>phoneSaveMsg.innerText="",2000); } else phoneSaveMsg.innerText = "⚠️ Inserisci un numero valido"; keepScreenOn(); }
     function onClearResponse() { clearOperatorTranslation(); transcribeStatus.innerText = "🧹 Traduzione cancellata"; setTimeout(() => transcribeStatus.innerText = "", 2000); keepScreenOn(); }
     activityModal.addEventListener('click', (e) => { if (e.target === activityModal) { activityModal.style.display = 'none'; isModalOpen = false; } });
+    
+    // Archivio Expat event listeners
+    archivioExpatBtn.addEventListener('click', showArchivioPage);
+    archivioScanBtn.addEventListener('click', scanNewDocument);
+    archivioNewYearBtn.addEventListener('click', createNewYear);
+    archivioSearchBtn.addEventListener('click', toggleArchivioSearchPanel);
+    archivioSearchExecBtn.addEventListener('click', searchArchivio);
+    archivioSearchClearBtn.addEventListener('click', clearArchivioSearch);
+    
+    // Long press per modificare l'anno
+    archivioYearInput.addEventListener('mousedown', startYearPressTimer);
+    archivioYearInput.addEventListener('mouseup', cancelYearPressTimer);
+    archivioYearInput.addEventListener('mouseleave', cancelYearPressTimer);
+    archivioYearInput.addEventListener('touchstart', startYearPressTimer, { passive: true });
+    archivioYearInput.addEventListener('touchend', cancelYearPressTimer);
+    archivioYearInput.addEventListener('touchcancel', cancelYearPressTimer);
     
     // Esportazione/importazione rete per admin
     if (exportReteBtn) exportReteBtn.addEventListener('click', exportReteToFile);
@@ -1658,6 +1969,12 @@
         initLicense();
         activateLicenseBtn.addEventListener('click', onActivateLicense);
         if (!reteData.categories || reteData.categories.length === 0) { reteData.categories = []; saveReteData(); }
+        
+        // Sincronizzazione iniziale all'avvio (senza aprire MONASTIR)
+        performSync(true).then(() => {
+            console.log('Sincronizzazione iniziale completata');
+        });
+        
         keepScreenOn();
         bindWakeLockToInteraction();
         backStack = ['home'];
