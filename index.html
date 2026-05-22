@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
-    <title>Contatti Personali - v0237</title>
+    <title>Contatti Personali - v0238</title>
     <link rel="manifest" href="manifest.json">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -133,7 +133,8 @@
         .archivio-search-icon { font-size: 1.3rem; cursor: pointer; background: none; border: none; padding: 5px 10px; }
         .archivio-doc-item { display: flex; align-items: center; justify-content: space-between; background: white; border: 1px solid #ced4da; border-radius: 40px; padding: 10px 16px; margin: 8px 0; }
         .archivio-doc-name { font-family: monospace; font-size: 0.8rem; word-break: break-all; flex: 1; }
-        .archivio-doc-open, .archivio-doc-share { font-size: 1.2rem; cursor: pointer; background: none; border: none; padding: 5px 10px; }
+        .archivio-doc-open, .archivio-doc-share, .archivio-doc-delete { font-size: 1.2rem; cursor: pointer; background: none; border: none; padding: 5px 10px; }
+        .archivio-doc-delete { color: #dc3545; }
         .archivio-button-row { display: flex; gap: 12px; margin-top: 20px; flex-wrap: wrap; }
         .archivio-button-row button { flex: 1; min-width: 120px; }
         .archivio-search-panel { background: #f0f0f0; border-radius: 24px; padding: 12px; margin: 12px 0; display: none; }
@@ -142,7 +143,7 @@
     </style>
 </head>
 <body>
-    <div class="container">
+<div class="container">
     <!-- HOME PAGE (originale) -->
     <div id="homePage" class="page">
         <div class="title-btn" id="adminLongPressBtn"><span>📇</span><span>CONTATTI PERSONALI</span><span>📇</span></div>
@@ -157,7 +158,7 @@
             <div class="flex-row"><input type="text" id="generatedCode" readonly placeholder="Codice generato" style="flex:1; background:#f8f9fa;"><button id="copyGeneratedBtn" class="small-btn" style="background:#283593;">📋 COPIA</button></div>
             <div class="flex-row"><input type="text" id="newAdminCode" placeholder="Nuovo codice amministratore" style="flex:1;"><button id="changeAdminCodeBtn" class="small-btn" style="background:#8e44ad;">CAMBIA CODICE</button></div>
             <div class="admin-backup-buttons"><button id="saveInfoIconsBtn" class="small-btn" style="background:#283593;">💾 SALVA (i)</button><button id="restoreInfoIconsBtn" class="small-btn" style="background:#6b8e23;">📂 RIPRISTINA (i)</button></div>
-            <div id="backupHint" class="backup-hint">📄 info_icons_backup_v0237.txt</div>
+            <div id="backupHint" class="backup-hint">📄 info_icons_backup_v0238.txt</div>
             <button id="hideAdminBtn" class="small-btn" style="background:#757575; width:100%; margin-top:8px;">NASCONDI AREA ADMIN</button>
         </div>
         <div class="dark-card"><div class="grid-2" id="contactsGrid"></div></div>
@@ -165,12 +166,11 @@
         <div class="info-text">Ogni contatto ha il proprio archivio note.<br>📍 Ricerca entro 300m di TUTTI i luoghi con nome<br>🔊 Ascolto automatico 30 secondi dopo il messaggio</div>
         <div class="info-text">Non Utilizzare APP per Situazioni di Emergenza di Salute</div>
         <div class="days-line" id="daysLeftDisplayHome">Giorni rimanenti: --</div>
-        <div class="info-text">💾 Il file SALVA NOTE si chiama: contatti_personali_notes_backup_0237.txt</div>
+        <div class="info-text">💾 Il file SALVA NOTE si chiama: contatti_personali_notes_backup_0238.txt</div>
         <div class="triple-btn-row"><button id="exportAllBtn">💾 SALVA NOTE</button><button id="importAllBtn">📂 RIPRISTINA NOTE</button><button id="archivioExpatBtn">📁 ARCHIVIO EXPAT</button></div>
         <input type="file" id="globalImportFileInput" accept=".txt" style="display:none;">
     </div>
-
-    <!-- EMERGENCY PAGE (originale) -->
+                                                                                                                                                           <!-- EMERGENCY PAGE (originale) -->
     <div id="emergencyPage" class="page hidden">
         <div id="currentServiceDeco" class="current-service-deco">Contatto:</div>
         <div class="dark-card"><div class="section-title">Numero servizio</div><div class="flex-row"><input type="tel" id="phoneNumber" placeholder="Numero" style="flex:2;"><button id="saveNumberBtn" class="small-btn" style="flex:0.4;">SALVA</button></div><div id="phoneSaveMsg" class="status-msg"></div></div>
@@ -215,7 +215,7 @@
         <button id="forceSyncBtn" class="small-btn force-sync-btn">🔄 FORZA SINCRONIZZAZIONE</button>
     </div>
 
-    <!-- NUOVA PAGINA ARCHIVIO LOCALE (senza pulsante selezione cartella) -->
+    <!-- NUOVA PAGINA ARCHIVIO LOCALE (modificata v0238) -->
     <div id="archivioPage" class="page hidden">
         <div class="archivio-title">ARCHIVIO DOCUMENTI LOCALE</div>
         <div id="archivioRootInfo" class="info-message-small" style="background:#e8f5e9; padding:8px; border-radius:16px; margin-bottom:16px;">📁 Caricamento in corso...</div>
@@ -267,8 +267,8 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script>
-    // ==================== v0237 - TUTTE LE FUNZIONI ORIGINALI + ARCHIVIO LOCALE ====================
-    const CURRENT_VERSION = "0237";
+    // ==================== v0238 - TUTTE LE FUNZIONI ORIGINALI + ARCHIVIO LOCALE MODIFICATO ====================
+    const CURRENT_VERSION = "0238";
     let currentService = "ambulanza";
     let currentLat = null, currentLng = null;
     let currentAddress = "";
@@ -362,7 +362,7 @@
     const newAdminCode = document.getElementById('newAdminCode');
     const changeAdminCodeBtn = document.getElementById('changeAdminCodeBtn');
     const daysHomeDisplay = document.getElementById('daysLeftDisplayHome');
-    const infoModal = document.getElementById('infoModal');
+    const infoModalDiv = document.getElementById('infoModal');
     const infoModalText = document.getElementById('infoModalText');
     const closeInfoModalBtn = document.getElementById('closeInfoModalBtn');
     const imagePreviewArea = document.getElementById('imagePreviewArea');
@@ -418,8 +418,7 @@
     let currentYear = "";
     let searchTerm = "";
     let docsList = [];
-    
-    // ==================== FUNZIONI ARCHIVIO LOCALE ====================
+                                                                                                                                                                      // ==================== FUNZIONI ARCHIVIO LOCALE (modificate v0238) ====================
     async function saveRootHandle() {
         if (!rootDirectoryHandle) return;
         const db = await idbOpen();
@@ -455,7 +454,6 @@
         });
     }
     
-    // Selezione cartella principale (solo al primo avvio o se non esiste)
     async function selectRootFolderFirstTime() {
         if (!window.showDirectoryPicker) {
             alert("Il tuo browser non supporta la selezione di cartelle. Usa Chrome/Edge su Android.");
@@ -526,10 +524,7 @@
         renderDocsList();
     }
     
-    // Formatta il nome visualizzato: 001/2026/05/21/descrizione.pdf
     function formatDisplayName(fileName, idx) {
-        // Il nome file è nel formato: 001_2026_05_21_descrizione.pdf
-        // Estraiamo le parti
         let parts = fileName.replace('.pdf', '').split('_');
         let prog = parts[0] || "001";
         let year = parts[1] || "----";
@@ -537,6 +532,47 @@
         let day = parts[3] || "--";
         let desc = parts.slice(4).join('_') || "documento";
         return `${prog}/${year}/${month}/${day}/${desc}.pdf`;
+    }
+    
+    async function openPdfModal(fileHandle) {
+        const file = await fileHandle.getFile();
+        const url = URL.createObjectURL(file);
+        // Creiamo un iframe modale
+        let modal = document.getElementById('pdfViewerModalArch');
+        if (!modal) {
+            modal = document.createElement('div');
+            modal.id = 'pdfViewerModalArch';
+            modal.className = 'adaptive-modal';
+            modal.style.display = 'none';
+            modal.innerHTML = `<div class="adaptive-modal-content" style="width:90%; max-width:800px; height:80%;">
+                                <h3>Anteprima documento</h3>
+                                <iframe id="pdfViewerFrameArch" style="width:100%; height:80%; border:none;"></iframe>
+                                <div class="modal-buttons"><button id="closePdfViewerArch" class="save-btn">CHIUDI</button></div>
+                              </div>`;
+            document.body.appendChild(modal);
+            document.getElementById('closePdfViewerArch').onclick = () => {
+                modal.style.display = 'none';
+                document.getElementById('pdfViewerFrameArch').src = '';
+            };
+            modal.onclick = (e) => { if (e.target === modal) modal.style.display = 'none'; };
+        }
+        const iframe = document.getElementById('pdfViewerFrameArch');
+        iframe.src = url;
+        modal.style.display = 'flex';
+        // revochiamo l'URL dopo un po'? Non subito perché l'iframe lo usa.
+        setTimeout(() => URL.revokeObjectURL(url), 60000);
+    }
+    
+    async function deleteDocumentFile(fileHandle, fileName) {
+        if (confirm(`Eliminare definitivamente il documento "${fileName}"?`)) {
+            try {
+                await fileHandle.remove();
+                await refreshFileList();
+                showArchivioMessage("✅ Documento eliminato.", false);
+            } catch(e) {
+                alert("Errore durante l'eliminazione: " + e.message);
+            }
+        }
     }
     
     function renderDocsList() {
@@ -556,69 +592,80 @@
                         <span class="archivio-doc-name">${escapeHtml(displayName)}</span>
                         <div style="display: flex; gap: 8px;">
                             <button class="archivio-doc-open" data-name="${doc.name}">🔍</button>
-                            <button class="archivio-doc-share" data-name="${doc.name}">📤 APRI CON...</button>
+                            <button class="archivio-doc-delete" data-name="${doc.name}">🗑️</button>
                         </div>
                     </div>`;
         });
         archivioDocsListArch.innerHTML = html;
         
-        // Pulsanti visualizzazione
         document.querySelectorAll('.archivio-doc-open').forEach(btn => {
             btn.addEventListener('click', async (e) => {
                 const name = btn.getAttribute('data-name');
                 const doc = docsList.find(d => d.name === name);
                 if (doc && doc.handle) {
-                    const file = await doc.handle.getFile();
-                    const url = URL.createObjectURL(file);
-                    window.open(url, '_blank');
-                    URL.revokeObjectURL(url);
+                    await openPdfModal(doc.handle);
                 } else {
                     alert("Impossibile aprire il file.");
                 }
             });
         });
         
-        // Pulsanti condivisione
-        document.querySelectorAll('.archivio-doc-share').forEach(btn => {
+        document.querySelectorAll('.archivio-doc-delete').forEach(btn => {
             btn.addEventListener('click', async (e) => {
                 const name = btn.getAttribute('data-name');
                 const doc = docsList.find(d => d.name === name);
-                if (!doc || !doc.handle) return;
-                const file = await doc.handle.getFile();
-                if (navigator.share) {
-                    try {
-                        await navigator.share({
-                            title: doc.name,
-                            files: [file]
-                        });
-                    } catch (err) {
-                        if (err.message !== 'Share canceled') console.warn(err);
-                    }
+                if (doc && doc.handle) {
+                    await deleteDocumentFile(doc.handle, name);
                 } else {
-                    alert("Condivisione non supportata sul tuo browser.");
+                    alert("Impossibile eliminare il file.");
                 }
             });
         });
     }
     
-    async function createYearFolder() {
+    // Funzione modificata: creazione anno solo manuale con controllo esistenza
+    async function createYearFolderManuale() {
         if (!rootDirectoryHandle) { alert("Cartella principale non disponibile."); return; }
         const year = archivioYearInputArch.value.trim();
         if (!/^\d{4}$/.test(year)) { alert("Inserisci un anno a 4 cifre."); return; }
         try {
-            await rootDirectoryHandle.getDirectoryHandle(year, { create: true });
-            currentYear = year;
-            localStorage.setItem('archivio_current_year_local', year);
-            archivioYearInputArch.value = year;
-            archivioCurrentYearSpanArch.innerText = year;
-            await refreshFileList();
-            alert(`Cartella ${year} creata.`);
-        } catch(e) {
-            alert("Errore nella creazione della cartella: " + e.message);
+            // Verifica se la cartella esiste già
+            await rootDirectoryHandle.getDirectoryHandle(year, { create: false });
+            // Se arriva qui, esiste già
+            showArchivioMessage(`⚠️ Anno ${year} già esistente.`, true);
+        } catch (e) {
+            // La cartella non esiste, la creiamo
+            if (e.name === 'NotFoundError') {
+                try {
+                    await rootDirectoryHandle.getDirectoryHandle(year, { create: true });
+                    currentYear = year;
+                    localStorage.setItem('archivio_current_year_local', year);
+                    archivioYearInputArch.value = year;
+                    archivioCurrentYearSpanArch.innerText = year;
+                    await refreshFileList();
+                    showArchivioMessage(`✅ Anno ${year} creato.`, false);
+                } catch(err) {
+                    alert("Errore nella creazione della cartella: " + err.message);
+                }
+            } else {
+                alert("Errore: " + e.message);
+            }
         }
     }
     
-    // Calcola il prossimo numero progressivo per l'anno corrente
+    function showArchivioMessage(msg, isError = false) {
+        const msgDiv = document.createElement('div');
+        msgDiv.className = 'status-msg';
+        msgDiv.style.color = isError ? 'red' : 'green';
+        msgDiv.style.textAlign = 'center';
+        msgDiv.style.margin = '8px 0';
+        msgDiv.innerText = msg;
+        const container = document.querySelector('#archivioPage .archivio-year-container');
+        container.parentNode.insertBefore(msgDiv, container.nextSibling);
+        setTimeout(() => msgDiv.remove(), 3000);
+    }
+    
+    // Funzione per ottenere il prossimo numero progressivo per l'anno (reset ogni anno)
     async function getNextProgressiveNumber() {
         if (!rootDirectoryHandle || !currentYear) return 1;
         let yearHandle;
@@ -637,7 +684,7 @@
         return maxNum + 1;
     }
     
-    // Upload di multipli file (immagini o PDF) - creazione PDF multipagina per immagini
+    // Upload documenti con supporto multiplo immagini -> PDF unico
     async function uploadDocument() {
         if (!rootDirectoryHandle) { alert("Cartella principale non disponibile."); return; }
         if (!currentYear) { alert("Inserisci un anno valido."); return; }
@@ -657,11 +704,9 @@
             const files = Array.from(ev.target.files);
             if (files.length === 0) return;
             
-            // Separa PDF e immagini
             const pdfFiles = files.filter(f => f.type === 'application/pdf');
             const imageFiles = files.filter(f => f.type.startsWith('image/'));
             
-            // Ottieni descrizione dall'utente
             let userDescription = prompt("Inserisci la descrizione del documento (es. fattura, contratto, ...):", "");
             if (userDescription === null) return;
             userDescription = userDescription.trim().replace(/[^a-zA-Z0-9_\-]/g, '_').substring(0, 50);
@@ -671,7 +716,7 @@
             const year = now.getFullYear();
             const month = String(now.getMonth() + 1).padStart(2, '0');
             const day = String(now.getDate()).padStart(2, '0');
-            const baseProg = await getNextProgressiveNumber();
+            let baseProg = await getNextProgressiveNumber();
             
             // Gestione PDF singoli
             for (let i = 0; i < pdfFiles.length; i++) {
@@ -724,6 +769,7 @@
         input.click();
     }
     
+    // Event handler per l'input dell'anno (solo aggiorna variabile, NON crea automaticamente)
     function onYearInput() {
         const year = archivioYearInputArch.value.trim();
         if (year.length === 4 && /^\d{4}$/.test(year)) {
@@ -771,7 +817,8 @@
         initArchivio();
         keepScreenOn();
     }
-        // ==================== FUNZIONI ORIGINALI (NON MODIFICATE) ====================
+    
+    // ==================== FUNZIONI ORIGINALI (NON MODIFICATE) ====================
     
     // --- WAKE LOCK ---
     async function requestGlobalWakeLock() {
@@ -805,9 +852,11 @@
         if (adaptiveModal.style.display === 'flex') { adaptiveModal.style.display = 'none'; closed = true; }
         if (speakDetailModal.style.display === 'flex') { speakDetailModal.style.display = 'none'; closed = true; }
         if (noteEditModal.style.display === 'flex') { noteEditModal.style.display = 'none'; closed = true; }
-        if (infoModal.style.display === 'flex') { infoModal.style.display = 'none'; closed = true; }
+        if (infoModalDiv.style.display === 'flex') { infoModalDiv.style.display = 'none'; closed = true; }
         if (activityModal.style.display === 'flex') { activityModal.style.display = 'none'; closed = true; }
         if (globalInfoModalDiv.style.display === 'flex') { globalInfoModalDiv.style.display = 'none'; closed = true; }
+        const pdfModal = document.getElementById('pdfViewerModalArch');
+        if (pdfModal && pdfModal.style.display === 'flex') { pdfModal.style.display = 'none'; closed = true; }
         isModalOpen = false;
         return closed;
     }
@@ -1268,13 +1317,13 @@
             };
             buttonsDiv.appendChild(emailBtn);
         }
-        infoModal.style.display = 'flex';
+        infoModalDiv.style.display = 'flex';
         isModalOpen = true;
         keepScreenOn();
     }
-    function closeInfoModalFunc() { infoModal.style.display = 'none'; isModalOpen = false; }
+    function closeInfoModalFunc() { infoModalDiv.style.display = 'none'; isModalOpen = false; }
     closeInfoModalBtn.onclick = closeInfoModalFunc;
-    infoModal.onclick = (e) => { if (e.target === infoModal) closeInfoModalFunc(); };
+    infoModalDiv.onclick = (e) => { if (e.target === infoModalDiv) closeInfoModalFunc(); };
     function loadAdminCode() { let saved = localStorage.getItem('adminCode'); if (saved && saved.trim()) adminCode = saved; else { adminCode = "admin2025"; localStorage.setItem('adminCode', adminCode); } }
     function saveAdminCode(newCode) { if (newCode && newCode.trim()) { adminCode = newCode; localStorage.setItem('adminCode', adminCode); alert("Codice admin cambiato."); } else alert("Codice non valido."); }
     function generateUnlockCodeAdmin(clientCode, firstRun) { const message = `${clientCode}|${firstRun}`; const hash = CryptoJS.HmacSHA256(message, SECRET_KEY); return hashTo20Digits(hash); }
@@ -1469,7 +1518,8 @@
             contactsGrid.appendChild(btn);
         });
     }
-        // --- GEOLOCALIZZAZIONE (originale) ---
+    
+    // --- GEOLOCALIZZAZIONE (originale) ---
     function haversine(lat1,lng1,lat2,lng2) {
         const R = 6371e3;
         const φ1 = lat1 * Math.PI/180, φ2 = lat2 * Math.PI/180;
@@ -1919,14 +1969,14 @@
     function onClearResponse() { clearOperatorTranslation(); transcribeStatus.innerText = "🧹 Traduzione cancellata"; setTimeout(() => transcribeStatus.innerText = "", 2000); keepScreenOn(); }
     activityModal.addEventListener('click', (e) => { if (e.target === activityModal) { activityModal.style.display = 'none'; isModalOpen = false; } });
     
-    // --- EVENT LISTENER PER ARCHIVIO LOCALE ---
+    // --- EVENT LISTENER PER ARCHIVIO LOCALE (modificati) ---
     archivioExpatBtn.addEventListener('click', showArchivioPage);
     archivioYearInputArch.addEventListener('input', onYearInput);
     archivioYearInputArch.addEventListener('blur', onYearInput);
     archivioSearchBtnArch.addEventListener('click', toggleSearchPanel);
     archivioSearchExecBtnArch.addEventListener('click', searchDocs);
     archivioSearchClearBtnArch.addEventListener('click', clearSearch);
-    archivioNewYearBtnArch.addEventListener('click', createYearFolder);
+    archivioNewYearBtnArch.addEventListener('click', createYearFolderManuale);  // ora manuale
     archivioCaricaDocBtnArch.addEventListener('click', uploadDocument);
     archivioCaricaDocBtnTopArch.addEventListener('click', uploadDocument);
     
