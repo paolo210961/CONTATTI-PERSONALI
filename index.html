@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
-    <title>Contatti Personali - v0238</title>
+    <title>Contatti Personali - v0237</title>
     <link rel="manifest" href="manifest.json">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -133,20 +133,17 @@
         .archivio-search-icon { font-size: 1.3rem; cursor: pointer; background: none; border: none; padding: 5px 10px; }
         .archivio-doc-item { display: flex; align-items: center; justify-content: space-between; background: white; border: 1px solid #ced4da; border-radius: 40px; padding: 10px 16px; margin: 8px 0; }
         .archivio-doc-name { font-family: monospace; font-size: 0.8rem; word-break: break-all; flex: 1; }
-        .archivio-doc-open, .archivio-doc-delete { font-size: 1.2rem; cursor: pointer; background: none; border: none; padding: 5px 10px; }
-        .archivio-doc-delete { color: #dc3545; }
+        .archivio-doc-open, .archivio-doc-share { font-size: 1.2rem; cursor: pointer; background: none; border: none; padding: 5px 10px; }
         .archivio-button-row { display: flex; gap: 12px; margin-top: 20px; flex-wrap: wrap; }
         .archivio-button-row button { flex: 1; min-width: 120px; }
         .archivio-search-panel { background: #f0f0f0; border-radius: 24px; padding: 12px; margin: 12px 0; display: none; }
         .archivio-search-input { width: 100%; padding: 10px; border-radius: 40px; border: 1px solid #ced4da; }
         .flex-buttons { display: flex; gap: 12px; justify-content: center; margin: 12px 0; }
-        .info-i-btn { background: #17a2b8; color: white; border: none; border-radius: 50%; width: 36px; height: 36px; font-size: 1rem; font-weight: bold; cursor: pointer; }
-        .info-i-btn:active { transform: scale(0.95); }
     </style>
 </head>
 <body>
-<div class="container">
-    <!-- HOME PAGE -->
+    <div class="container">
+    <!-- HOME PAGE (originale) -->
     <div id="homePage" class="page">
         <div class="title-btn" id="adminLongPressBtn"><span>📇</span><span>CONTATTI PERSONALI</span><span>📇</span></div>
         <div class="license-section">
@@ -160,7 +157,7 @@
             <div class="flex-row"><input type="text" id="generatedCode" readonly placeholder="Codice generato" style="flex:1; background:#f8f9fa;"><button id="copyGeneratedBtn" class="small-btn" style="background:#283593;">📋 COPIA</button></div>
             <div class="flex-row"><input type="text" id="newAdminCode" placeholder="Nuovo codice amministratore" style="flex:1;"><button id="changeAdminCodeBtn" class="small-btn" style="background:#8e44ad;">CAMBIA CODICE</button></div>
             <div class="admin-backup-buttons"><button id="saveInfoIconsBtn" class="small-btn" style="background:#283593;">💾 SALVA (i)</button><button id="restoreInfoIconsBtn" class="small-btn" style="background:#6b8e23;">📂 RIPRISTINA (i)</button></div>
-            <div id="backupHint" class="backup-hint">📄 info_icons_backup_v0238.txt</div>
+            <div id="backupHint" class="backup-hint">📄 info_icons_backup_v0237.txt</div>
             <button id="hideAdminBtn" class="small-btn" style="background:#757575; width:100%; margin-top:8px;">NASCONDI AREA ADMIN</button>
         </div>
         <div class="dark-card"><div class="grid-2" id="contactsGrid"></div></div>
@@ -168,12 +165,12 @@
         <div class="info-text">Ogni contatto ha il proprio archivio note.<br>📍 Ricerca entro 300m di TUTTI i luoghi con nome<br>🔊 Ascolto automatico 30 secondi dopo il messaggio</div>
         <div class="info-text">Non Utilizzare APP per Situazioni di Emergenza di Salute</div>
         <div class="days-line" id="daysLeftDisplayHome">Giorni rimanenti: --</div>
-        <div class="info-text">💾 Il file SALVA NOTE si chiama: contatti_personali_notes_backup_0238.txt</div>
+        <div class="info-text">💾 Il file SALVA NOTE si chiama: contatti_personali_notes_backup_0237.txt</div>
         <div class="triple-btn-row"><button id="exportAllBtn">💾 SALVA NOTE</button><button id="importAllBtn">📂 RIPRISTINA NOTE</button><button id="archivioExpatBtn">📁 ARCHIVIO EXPAT</button></div>
         <input type="file" id="globalImportFileInput" accept=".txt" style="display:none;">
     </div>
 
-    <!-- EMERGENCY PAGE -->
+    <!-- EMERGENCY PAGE (originale) -->
     <div id="emergencyPage" class="page hidden">
         <div id="currentServiceDeco" class="current-service-deco">Contatto:</div>
         <div class="dark-card"><div class="section-title">Numero servizio</div><div class="flex-row"><input type="tel" id="phoneNumber" placeholder="Numero" style="flex:2;"><button id="saveNumberBtn" class="small-btn" style="flex:0.4;">SALVA</button></div><div id="phoneSaveMsg" class="status-msg"></div></div>
@@ -208,7 +205,7 @@
         </div>
     </div>
 
-    <!-- IMAGE PAGE -->
+    <!-- IMAGE PAGE (originale) -->
     <div id="imagePage" class="page hidden">
         <div class="image-top-box"><div class="image-top-title">MONASTIR: Facciamo Rete</div><div id="imagePreviewArea" class="image-container"><div class="image-placeholder" id="imagePlaceholder">📸 Solo amministratore: premi a lungo (3 sec) per caricare un'immagine</div></div></div>
         <div class="info-message-small">Per la consultazione, Richiedi Codice Attivazione nella Home.</div>
@@ -218,48 +215,38 @@
         <button id="forceSyncBtn" class="small-btn force-sync-btn">🔄 FORZA SINCRONIZZAZIONE</button>
     </div>
 
-    <!-- ARCHIVIO LOCALE PAGE (IndexedDB - universale) -->
+    <!-- NUOVA PAGINA ARCHIVIO LOCALE (senza pulsante selezione cartella) -->
     <div id="archivioPage" class="page hidden">
         <div class="archivio-title">ARCHIVIO DOCUMENTI LOCALE</div>
+        <div id="archivioRootInfo" class="info-message-small" style="background:#e8f5e9; padding:8px; border-radius:16px; margin-bottom:16px;">📁 Caricamento in corso...</div>
         
         <div class="archivio-year-container">
             <input type="text" id="archivioYearInput" class="archivio-year-input" placeholder="xxxx" maxlength="4" inputmode="numeric" value="">
-            <div style="display: flex; gap: 8px;">
-                <button id="archivioCaricaDocBtnTop" class="small-btn double-height" style="background:#17a2b8;">📷 CARICA DOCUMENTO</button>
-                <button id="archivioInfoBtnTop" class="info-i-btn" title="Informazioni archivio">i</button>
-            </div>
+            <button id="archivioCaricaDocBtnTop" class="small-btn double-height" style="background:#17a2b8;">📷 CARICA DOCUMENTO</button>
         </div>
         <div class="archivio-folder-row">
-            <span class="archivio-folder-name">📁 ANNO: <span id="archivioCurrentYear">--</span></span>
+            <span class="archivio-folder-name">📁 CARTELLA: <span id="archivioCurrentYear">--</span></span>
             <button id="archivioSearchBtn" class="archivio-search-icon">🔍</button>
         </div>
         
         <div id="archivioSearchPanel" class="archivio-search-panel">
             <input type="text" id="archivioSearchInput" class="archivio-search-input" placeholder="Cerca per nome documento...">
-            <div style="display: flex; gap: 8px; margin-top: 8px;">
-                <button id="archivioSearchExecBtn" class="small-btn" style="background:#283593; flex:1;">CERCA</button>
-                <button id="archivioSearchClearBtn" class="small-btn" style="background:#6c757d; flex:1;">CLEAR</button>
-            </div>
+            <button id="archivioSearchExecBtn" class="small-btn" style="background:#283593; margin-top:8px;">CERCA</button>
+            <button id="archivioSearchClearBtn" class="small-btn" style="background:#6c757d; margin-top:5px;">CLEAR</button>
         </div>
         
         <div id="archivioDocsList" class="dark-card" style="max-height:400px; overflow-y:auto;">
-            <div style="text-align:center; padding:20px;">Inserisci un anno.</div>
+            <div style="text-align:center; padding:20px; color:#777;">Seleziona la cartella principale e un anno.</div>
         </div>
         
         <div class="archivio-button-row">
-            <div style="display: flex; gap: 8px; width: 100%;">
-                <button id="archivioCaricaDocBtn" class="small-btn double-height" style="background:#17a2b8; flex:2;">📁 CARICA DOCUMENTO</button>
-                <button id="archivioInfoBtn" class="info-i-btn" title="Informazioni archivio">i</button>
-            </div>
+            <button id="archivioCaricaDocBtn" class="small-btn double-height" style="background:#17a2b8;">📁 CARICA DOCUMENTO</button>
             <button id="archivioNewYearBtn" class="small-btn" style="background:#e67e22;">➕ CREA ANNO</button>
-            <button id="backupYearBtn" class="small-btn" style="background:#4caf50;">💾 BACKUP ANNO</button>
-            <button id="backupAllBtn" class="small-btn" style="background:#2196f3;">💿 BACKUP TUTTO</button>
-            <button id="importBackupBtn" class="small-btn" style="background:#ff9800;">📥 RIPRISTINA BACKUP</button>
         </div>
-        <div class="info-message-small">ℹ️ I documenti sono salvati nel database del browser. Funziona su tutti i dispositivi.</div>
+        <div class="info-message-small" style="margin-top:16px;">ℹ️ I file vengono salvati nella cartella che hai selezionato. Per cambiare cartella, cancella i dati dell'app.</div>
     </div>
 
-    <!-- MODALI -->
+    <!-- MODALI (originali) -->
     <div id="adaptiveModal" class="adaptive-modal" style="display:none;"><div class="adaptive-modal-content"><textarea id="modalTextarea" readonly></textarea><button id="closeAdaptiveBtn">CHIUDI</button></div></div>
     <div id="speakDetailModal" class="adaptive-modal" style="display:none;"><div class="adaptive-modal-content"><h3>📄 Dettaglio conversazione</h3><div class="detail-label">Italiano (originale)</div><div class="detail-text" id="speakOriginalText"></div><div class="detail-label">Francese (traduzione)</div><div class="detail-text" id="speakTranslatedText"></div><div class="modal-buttons"><button id="closeSpeakModalBtn" class="save-btn">CHIUDI</button></div></div></div>
     <div id="noteEditModal" class="adaptive-modal note-edit-modal" style="display:none;"><div class="adaptive-modal-content"><h3 id="noteModalTitle">➕ Aggiungi Nota</h3><label class="detail-label">Titolo</label><input type="text" id="editNoteTitle" placeholder="Inserisci il titolo"><label class="detail-label">Descrizione</label><textarea id="editNoteDesc" rows="4" placeholder="Inserisci la descrizione"></textarea><label class="detail-label">Includi coordinate nella copia/lettura</label><div class="coord-toggle-group"><button id="modalCoordS" class="coord-toggle-modal-btn">S</button><button id="modalCoordN" class="coord-toggle-modal-btn">N</button></div><div class="modal-audio-row"><button id="modalAudioIt" class="modal-audio-btn">🇮🇹 LEGGI in IT</button><button id="modalAudioFr" class="modal-audio-btn">🇹🇳 LEGGI in FR</button></div><div class="modal-buttons"><button id="deleteNoteModalBtn" class="delete-btn" style="display:none;">🗑️ CANCELLA NOTA</button><button id="saveNoteModalBtn" class="save-btn">SALVA</button><button id="cancelNoteModalBtn" class="cancel-btn">ANNULLA</button></div></div></div>
@@ -276,25 +263,12 @@
             <div class="modal-buttons" style="justify-content:center; gap:12px;"><button id="activityCoordBtn" class="small-btn" style="background:#283593;">📍 TROVAMI</button><button id="activityWebBtn" class="small-btn" style="background:#2c3e50;">🌐 APRI SITO</button></div>
         </div>
     </div>
-    
-    <!-- MODALE PDF PER ARCHIVIO -->
-    <div id="pdfViewerModalArch" class="adaptive-modal" style="display:none;">
-        <div class="adaptive-modal-content" style="width:90%; max-width:800px; height:80%;">
-            <h3>Anteprima documento</h3>
-            <iframe id="pdfViewerFrameArch" style="width:100%; height:70%; border:none;"></iframe>
-            <div style="display: flex; gap: 12px; justify-content: center; margin-top: 16px;">
-                <button id="sharePdfBtnArch" class="save-btn" style="background:#4caf50;">📤 CONDIVIDI</button>
-                <button id="closePdfViewerArch" class="cancel-btn">CHIUDI</button>
-            </div>
-        </div>
-    </div>
 </div>
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script>
-    // ==================== v0238 - VERSIONE COMPLETA ====================
-    const CURRENT_VERSION = "0238";
+    // ==================== v0237 - TUTTE LE FUNZIONI ORIGINALI + ARCHIVIO LOCALE ====================
+    const CURRENT_VERSION = "0237";
     let currentService = "ambulanza";
     let currentLat = null, currentLng = null;
     let currentAddress = "";
@@ -303,7 +277,6 @@
     let selectedNormalNoteId = null;
     let globalWakeLock = null;
     let imagePageWakeLock = null;
-    let currentInfoContext = null;
     let contactExtraText = {
         ambulanza: "", polizia: "", veterinario: "", clinica: "MONASTIR: Facciamo Rete"
     };
@@ -313,6 +286,7 @@
     const SECRET_KEY = "ChiaveSegreta123";
     let adminCode = "admin2025", adminAuthenticated = false;
     
+    // PWA install prompt
     let deferredPrompt = null;
     window.addEventListener('beforeinstallprompt', (e) => {
         e.preventDefault();
@@ -388,7 +362,7 @@
     const newAdminCode = document.getElementById('newAdminCode');
     const changeAdminCodeBtn = document.getElementById('changeAdminCodeBtn');
     const daysHomeDisplay = document.getElementById('daysLeftDisplayHome');
-    const infoModalDiv = document.getElementById('infoModal');
+    const infoModal = document.getElementById('infoModal');
     const infoModalText = document.getElementById('infoModalText');
     const closeInfoModalBtn = document.getElementById('closeInfoModalBtn');
     const imagePreviewArea = document.getElementById('imagePreviewArea');
@@ -425,7 +399,7 @@
     const forceSyncBtn = document.getElementById('forceSyncBtn');
     const syncStatusDiv = document.getElementById('syncStatus');
     
-    // Elementi archivio
+    // Elementi per il nuovo archivio locale
     const archivioYearInputArch = document.getElementById('archivioYearInput');
     const archivioCurrentYearSpanArch = document.getElementById('archivioCurrentYear');
     const archivioSearchBtnArch = document.getElementById('archivioSearchBtn');
@@ -437,14 +411,1065 @@
     const archivioCaricaDocBtnArch = document.getElementById('archivioCaricaDocBtn');
     const archivioCaricaDocBtnTopArch = document.getElementById('archivioCaricaDocBtnTop');
     const archivioNewYearBtnArch = document.getElementById('archivioNewYearBtn');
+    const archivioRootInfo = document.getElementById('archivioRootInfo');
     
-    // Variabili archivio (IndexedDB)
+    // Variabili archivio locale
+    let rootDirectoryHandle = null;
     let currentYear = "";
     let searchTerm = "";
+    let docsList = [];
     
-    // ==================== FUNZIONI ORIGINALI (GEOLOCALIZZAZIONE, NOTE, ECC.) ====================
+    // ==================== FUNZIONI ARCHIVIO LOCALE ====================
+    async function saveRootHandle() {
+        if (!rootDirectoryHandle) return;
+        const db = await idbOpen();
+        const tx = db.transaction('roots', 'readwrite');
+        tx.objectStore('roots').put(rootDirectoryHandle, 'mainRoot');
+        await tx.done;
+    }
     
-    // --- GEOLOCALIZZAZIONE ---
+    async function loadRootHandle() {
+        const db = await idbOpen();
+        const tx = db.transaction('roots', 'readonly');
+        const handle = await tx.objectStore('roots').get('mainRoot');
+        if (handle) {
+            if (await handle.queryPermission({ mode: 'readwrite' }) === 'granted') {
+                rootDirectoryHandle = handle;
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    function idbOpen() {
+        return new Promise((resolve, reject) => {
+            const request = indexedDB.open('ArchiveFileSystem', 1);
+            request.onupgradeneeded = () => {
+                const db = request.result;
+                if (!db.objectStoreNames.contains('roots')) {
+                    db.createObjectStore('roots');
+                }
+            };
+            request.onsuccess = () => resolve(request.result);
+            request.onerror = () => reject(request.error);
+        });
+    }
+    
+    // Selezione cartella principale (solo al primo avvio o se non esiste)
+    async function selectRootFolderFirstTime() {
+        if (!window.showDirectoryPicker) {
+            alert("Il tuo browser non supporta la selezione di cartelle. Usa Chrome/Edge su Android.");
+            return false;
+        }
+        try {
+            const handle = await window.showDirectoryPicker();
+            rootDirectoryHandle = handle;
+            await saveRootHandle();
+            archivioRootInfo.innerText = `📁 Cartella principale: ${handle.name}`;
+            return true;
+        } catch (err) {
+            console.warn(err);
+            alert("Selezione annullata o errore. L'app non può funzionare senza una cartella principale.");
+            return false;
+        }
+    }
+    
+    async function ensureRootFolder() {
+        const hasRoot = await loadRootHandle();
+        if (!hasRoot) {
+            archivioRootInfo.innerText = "📁 Seleziona la cartella principale (es. ARCHIO DOCUMENTI EXPAT)";
+            const success = await selectRootFolderFirstTime();
+            if (!success) return false;
+        }
+        return true;
+    }
+    
+    async function loadCurrentYearAndList() {
+        if (!rootDirectoryHandle) {
+            archivioDocsListArch.innerHTML = '<div style="text-align:center; padding:20px;">Cartella principale non disponibile.</div>';
+            return;
+        }
+        const savedYear = localStorage.getItem('archivio_current_year_local');
+        if (savedYear && /^\d{4}$/.test(savedYear)) {
+            currentYear = savedYear;
+            archivioYearInputArch.value = currentYear;
+            archivioCurrentYearSpanArch.innerText = currentYear;
+        } else {
+            currentYear = "";
+            archivioYearInputArch.value = "";
+            archivioCurrentYearSpanArch.innerText = "--";
+        }
+        await refreshFileList();
+    }
+    
+    async function refreshFileList() {
+        if (!rootDirectoryHandle || !currentYear) {
+            archivioDocsListArch.innerHTML = '<div style="text-align:center; padding:20px;">Seleziona un anno valido.</div>';
+            return;
+        }
+        let yearHandle;
+        try {
+            yearHandle = await rootDirectoryHandle.getDirectoryHandle(currentYear, { create: false });
+        } catch (e) {
+            archivioDocsListArch.innerHTML = `<div style="text-align:center; padding:20px;">Cartella ${currentYear} non esiste ancora. Usa "CREA ANNO".</div>`;
+            return;
+        }
+        const files = [];
+        for await (const [name, handle] of yearHandle.entries()) {
+            if (handle.kind === 'file' && name.endsWith('.pdf')) {
+                const info = await handle.getFile();
+                files.push({ name, handle, year: currentYear, mtime: info.lastModified });
+            }
+        }
+        files.sort((a,b) => b.mtime - a.mtime);
+        docsList = files;
+        renderDocsList();
+    }
+    
+    // Formatta il nome visualizzato: 001/2026/05/21/descrizione.pdf
+    function formatDisplayName(fileName, idx) {
+        // Il nome file è nel formato: 001_2026_05_21_descrizione.pdf
+        // Estraiamo le parti
+        let parts = fileName.replace('.pdf', '').split('_');
+        let prog = parts[0] || "001";
+        let year = parts[1] || "----";
+        let month = parts[2] || "--";
+        let day = parts[3] || "--";
+        let desc = parts.slice(4).join('_') || "documento";
+        return `${prog}/${year}/${month}/${day}/${desc}.pdf`;
+    }
+    
+    function renderDocsList() {
+        let filtered = docsList;
+        if (searchTerm.trim() !== "") {
+            const term = searchTerm.toLowerCase();
+            filtered = docsList.filter(d => d.name.toLowerCase().includes(term));
+        }
+        if (filtered.length === 0) {
+            archivioDocsListArch.innerHTML = '<div style="text-align:center; padding:20px;">Nessun documento in questo anno.</div>';
+            return;
+        }
+        let html = '';
+        filtered.forEach((doc, idx) => {
+            const displayName = formatDisplayName(doc.name, idx);
+            html += `<div class="archivio-doc-item" data-name="${doc.name}">
+                        <span class="archivio-doc-name">${escapeHtml(displayName)}</span>
+                        <div style="display: flex; gap: 8px;">
+                            <button class="archivio-doc-open" data-name="${doc.name}">🔍</button>
+                            <button class="archivio-doc-share" data-name="${doc.name}">📤 APRI CON...</button>
+                        </div>
+                    </div>`;
+        });
+        archivioDocsListArch.innerHTML = html;
+        
+        // Pulsanti visualizzazione
+        document.querySelectorAll('.archivio-doc-open').forEach(btn => {
+            btn.addEventListener('click', async (e) => {
+                const name = btn.getAttribute('data-name');
+                const doc = docsList.find(d => d.name === name);
+                if (doc && doc.handle) {
+                    const file = await doc.handle.getFile();
+                    const url = URL.createObjectURL(file);
+                    window.open(url, '_blank');
+                    URL.revokeObjectURL(url);
+                } else {
+                    alert("Impossibile aprire il file.");
+                }
+            });
+        });
+        
+        // Pulsanti condivisione
+        document.querySelectorAll('.archivio-doc-share').forEach(btn => {
+            btn.addEventListener('click', async (e) => {
+                const name = btn.getAttribute('data-name');
+                const doc = docsList.find(d => d.name === name);
+                if (!doc || !doc.handle) return;
+                const file = await doc.handle.getFile();
+                if (navigator.share) {
+                    try {
+                        await navigator.share({
+                            title: doc.name,
+                            files: [file]
+                        });
+                    } catch (err) {
+                        if (err.message !== 'Share canceled') console.warn(err);
+                    }
+                } else {
+                    alert("Condivisione non supportata sul tuo browser.");
+                }
+            });
+        });
+    }
+    
+    async function createYearFolder() {
+        if (!rootDirectoryHandle) { alert("Cartella principale non disponibile."); return; }
+        const year = archivioYearInputArch.value.trim();
+        if (!/^\d{4}$/.test(year)) { alert("Inserisci un anno a 4 cifre."); return; }
+        try {
+            await rootDirectoryHandle.getDirectoryHandle(year, { create: true });
+            currentYear = year;
+            localStorage.setItem('archivio_current_year_local', year);
+            archivioYearInputArch.value = year;
+            archivioCurrentYearSpanArch.innerText = year;
+            await refreshFileList();
+            alert(`Cartella ${year} creata.`);
+        } catch(e) {
+            alert("Errore nella creazione della cartella: " + e.message);
+        }
+    }
+    
+    // Calcola il prossimo numero progressivo per l'anno corrente
+    async function getNextProgressiveNumber() {
+        if (!rootDirectoryHandle || !currentYear) return 1;
+        let yearHandle;
+        try {
+            yearHandle = await rootDirectoryHandle.getDirectoryHandle(currentYear, { create: false });
+        } catch(e) {
+            return 1;
+        }
+        let maxNum = 0;
+        for await (const [name] of yearHandle.entries()) {
+            if (name.endsWith('.pdf')) {
+                let prog = parseInt(name.split('_')[0]);
+                if (!isNaN(prog) && prog > maxNum) maxNum = prog;
+            }
+        }
+        return maxNum + 1;
+    }
+    
+    // Upload di multipli file (immagini o PDF) - creazione PDF multipagina per immagini
+    async function uploadDocument() {
+        if (!rootDirectoryHandle) { alert("Cartella principale non disponibile."); return; }
+        if (!currentYear) { alert("Inserisci un anno valido."); return; }
+        let yearHandle;
+        try {
+            yearHandle = await rootDirectoryHandle.getDirectoryHandle(currentYear, { create: true });
+        } catch(e) {
+            alert("Impossibile accedere alla cartella dell'anno: " + e.message);
+            return;
+        }
+        
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = 'image/*,application/pdf';
+        input.multiple = true;
+        input.onchange = async (ev) => {
+            const files = Array.from(ev.target.files);
+            if (files.length === 0) return;
+            
+            // Separa PDF e immagini
+            const pdfFiles = files.filter(f => f.type === 'application/pdf');
+            const imageFiles = files.filter(f => f.type.startsWith('image/'));
+            
+            // Ottieni descrizione dall'utente
+            let userDescription = prompt("Inserisci la descrizione del documento (es. fattura, contratto, ...):", "");
+            if (userDescription === null) return;
+            userDescription = userDescription.trim().replace(/[^a-zA-Z0-9_\-]/g, '_').substring(0, 50);
+            if (userDescription === "") userDescription = "documento";
+            
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+            const baseProg = await getNextProgressiveNumber();
+            
+            // Gestione PDF singoli
+            for (let i = 0; i < pdfFiles.length; i++) {
+                const file = pdfFiles[i];
+                const progNum = String(baseProg + i).padStart(3, '0');
+                const finalName = `${progNum}_${year}_${month}_${day}_${userDescription}.pdf`;
+                const fileHandle = await yearHandle.getFileHandle(finalName, { create: true });
+                const writable = await fileHandle.createWritable();
+                await writable.write(file);
+                await writable.close();
+            }
+            
+            // Gestione immagini: crea un PDF multipagina
+            if (imageFiles.length > 0) {
+                const { jsPDF } = window.jspdf;
+                const pdf = new jsPDF();
+                let firstPage = true;
+                
+                for (let i = 0; i < imageFiles.length; i++) {
+                    const file = imageFiles[i];
+                    const imgData = await new Promise((resolve) => {
+                        const reader = new FileReader();
+                        reader.onload = (e) => resolve(e.target.result);
+                        reader.readAsDataURL(file);
+                    });
+                    const img = new Image();
+                    await new Promise((resolve) => {
+                        img.onload = resolve;
+                        img.src = imgData;
+                    });
+                    const imgWidth = pdf.internal.pageSize.getWidth();
+                    const imgHeight = (img.height * imgWidth) / img.width;
+                    if (!firstPage) pdf.addPage();
+                    pdf.addImage(imgData, 'JPEG', 0, 0, imgWidth, imgHeight);
+                    firstPage = false;
+                }
+                
+                const pdfBlob = pdf.output('blob');
+                const progNum = String(baseProg + pdfFiles.length).padStart(3, '0');
+                const finalName = `${progNum}_${year}_${month}_${day}_${userDescription}.pdf`;
+                const fileHandle = await yearHandle.getFileHandle(finalName, { create: true });
+                const writable = await fileHandle.createWritable();
+                await writable.write(pdfBlob);
+                await writable.close();
+            }
+            
+            await refreshFileList();
+            alert(`${pdfFiles.length + (imageFiles.length > 0 ? 1 : 0)} documento/i salvato/i nella cartella ${currentYear}.`);
+        };
+        input.click();
+    }
+    
+    function onYearInput() {
+        const year = archivioYearInputArch.value.trim();
+        if (year.length === 4 && /^\d{4}$/.test(year)) {
+            currentYear = year;
+            archivioCurrentYearSpanArch.innerText = year;
+            localStorage.setItem('archivio_current_year_local', year);
+            refreshFileList();
+        } else if (year === "") {
+            currentYear = "";
+            archivioCurrentYearSpanArch.innerText = "--";
+            archivioDocsListArch.innerHTML = '<div style="text-align:center; padding:20px;">Inserisci un anno.</div>';
+        }
+    }
+    
+    function toggleSearchPanel() {
+        if (archivioSearchPanelArch.style.display === 'none') archivioSearchPanelArch.style.display = 'block';
+        else archivioSearchPanelArch.style.display = 'none';
+    }
+    function searchDocs() {
+        searchTerm = archivioSearchInputArch.value.trim();
+        renderDocsList();
+    }
+    function clearSearch() {
+        archivioSearchInputArch.value = "";
+        searchTerm = "";
+        renderDocsList();
+        archivioSearchPanelArch.style.display = 'none';
+    }
+    
+    function escapeHtml(str) { return str.replace(/[&<>]/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;' }[m])); }
+    
+    async function initArchivio() {
+        const rootOk = await ensureRootFolder();
+        if (!rootOk) return;
+        await loadCurrentYearAndList();
+    }
+    
+    function showArchivioPage() {
+        if (!licenseCheckPassed) {
+            alert('Licenza non attiva o scaduta. Attivala dalla home.');
+            return;
+        }
+        homePage.classList.add("hidden");
+        archivioPage.classList.remove("hidden");
+        initArchivio();
+        keepScreenOn();
+    }
+        // ==================== FUNZIONI ORIGINALI (NON MODIFICATE) ====================
+    
+    // --- WAKE LOCK ---
+    async function requestGlobalWakeLock() {
+        if ('wakeLock' in navigator) {
+            try {
+                if (globalWakeLock) { try { globalWakeLock.release(); } catch(e){} globalWakeLock = null; }
+                globalWakeLock = await navigator.wakeLock.request('screen');
+            } catch(err) { console.warn('WakeLock fallito:', err); }
+        }
+    }
+    async function keepScreenOn() {
+        await requestGlobalWakeLock();
+        if (window._keepScreenInterval) clearInterval(window._keepScreenInterval);
+        window._keepScreenInterval = setInterval(() => { if (globalWakeLock === null) requestGlobalWakeLock(); }, 120000);
+    }
+    function bindWakeLockToInteraction() {
+        ['touchstart','mousedown','click','keydown'].forEach(ev => {
+            document.body.addEventListener(ev, () => { if (globalWakeLock === null) requestGlobalWakeLock(); }, { passive: false });
+        });
+    }
+    function releaseImagePageWakeLock() { if (imagePageWakeLock) { imagePageWakeLock.release(); imagePageWakeLock = null; } }
+    async function requestImagePageWakeLock() { if ('wakeLock' in navigator) { try { imagePageWakeLock = await navigator.wakeLock.request('screen'); } catch(e){} } }
+    
+    // --- GESTIONE TASTO INDIETRO ---
+    let currentPage = 'home';
+    let isModalOpen = false;
+    let backStack = ['home'];
+    function pushPage(page) { backStack.push(page); currentPage = page; history.pushState({ page: page, modal: isModalOpen }, ''); }
+    function closeAllModals() {
+        let closed = false;
+        if (adaptiveModal.style.display === 'flex') { adaptiveModal.style.display = 'none'; closed = true; }
+        if (speakDetailModal.style.display === 'flex') { speakDetailModal.style.display = 'none'; closed = true; }
+        if (noteEditModal.style.display === 'flex') { noteEditModal.style.display = 'none'; closed = true; }
+        if (infoModal.style.display === 'flex') { infoModal.style.display = 'none'; closed = true; }
+        if (activityModal.style.display === 'flex') { activityModal.style.display = 'none'; closed = true; }
+        if (globalInfoModalDiv.style.display === 'flex') { globalInfoModalDiv.style.display = 'none'; closed = true; }
+        isModalOpen = false;
+        return closed;
+    }
+    window.addEventListener('popstate', (event) => {
+        if (closeAllModals()) return;
+        if (backStack.length > 1) {
+            backStack.pop();
+            let prev = backStack[backStack.length - 1];
+            if (prev === 'home') { homePage.classList.remove('hidden'); emergencyPage.classList.add('hidden'); imagePage.classList.add('hidden'); archivioPage.classList.add('hidden'); releaseImagePageWakeLock(); currentPage = 'home'; keepScreenOn(); }
+            else if (prev === 'image') { homePage.classList.add('hidden'); imagePage.classList.remove('hidden'); emergencyPage.classList.add('hidden'); archivioPage.classList.add('hidden'); currentPage = 'image'; requestImagePageWakeLock(); updateAdminReteButtonsVisibility(); performSync(true); keepScreenOn(); }
+            else if (prev === 'emergency') { homePage.classList.add('hidden'); emergencyPage.classList.remove('hidden'); imagePage.classList.add('hidden'); archivioPage.classList.add('hidden'); currentPage = 'emergency'; keepScreenOn(); }
+            else if (prev === 'archivio') { homePage.classList.add('hidden'); archivioPage.classList.remove('hidden'); emergencyPage.classList.add('hidden'); imagePage.classList.add('hidden'); currentPage = 'archivio'; initArchivio(); keepScreenOn(); }
+        } else {
+            if (!homePage.classList.contains('hidden')) return;
+            homePage.classList.remove('hidden'); emergencyPage.classList.add('hidden'); imagePage.classList.add('hidden'); archivioPage.classList.add('hidden'); currentPage = 'home'; releaseImagePageWakeLock(); keepScreenOn();
+        }
+    });
+    
+    // --- RETE CATEGORIE (originale) ---
+    let reteData = { categories: [] };
+    let currentImageData = null;
+    function saveReteData() { localStorage.setItem('monastir_rete_data', JSON.stringify(reteData)); }
+    function loadReteData() {
+        const saved = localStorage.getItem('monastir_rete_data');
+        if (saved) {
+            try {
+                reteData = JSON.parse(saved);
+                if (!reteData.categories) reteData.categories = [];
+                reteData.categories.forEach(cat => {
+                    if (!cat.children) cat.children = [];
+                    cat.children.forEach(child => {
+                        if (!child.title) child.title = "";
+                        if (!child.infoText) child.infoText = "";
+                        if (!child.infoImage) child.infoImage = null;
+                        if (!child.coordinate) child.coordinate = "";
+                        if (!child.websiteUrl) child.websiteUrl = "";
+                    });
+                });
+            } catch(e) { console.warn(e); }
+        }
+        if (!reteData.categories) reteData.categories = [];
+    }
+    function showSyncStatus(message, isError = false) {
+        if (syncStatusDiv) {
+            syncStatusDiv.textContent = message;
+            syncStatusDiv.style.display = 'block';
+            syncStatusDiv.className = 'sync-status' + (isError ? ' error' : ' success');
+            setTimeout(() => { if (syncStatusDiv.style.display === 'block') syncStatusDiv.style.display = 'none'; }, 5000);
+        }
+    }
+    async function performSync(showMessages = true) {
+        if (showMessages) showSyncStatus('🔄 Sincronizzazione in corso...', false);
+        try {
+            const url = window.location.href.substring(0, window.location.href.lastIndexOf('/') + 1) + 'rete_data.json?t=' + Date.now();
+            const response = await fetch(url);
+            if (response.ok) {
+                const remoteData = await response.json();
+                let updated = false;
+                if (remoteData.categories && Array.isArray(remoteData.categories)) {
+                    reteData = { categories: remoteData.categories };
+                    saveReteData();
+                    updated = true;
+                }
+                if (remoteData.mainImage && typeof remoteData.mainImage === 'string' && remoteData.mainImage.startsWith('data:image')) {
+                    currentImageData = remoteData.mainImage;
+                    localStorage.setItem('monastir_image', currentImageData);
+                    setupImageArea();
+                    updated = true;
+                }
+                if (remoteData.infoTexts && typeof remoteData.infoTexts === 'object') {
+                    for (let key in remoteData.infoTexts) {
+                        if (infoTexts.hasOwnProperty(key)) infoTexts[key] = remoteData.infoTexts[key];
+                    }
+                    localStorage.setItem('infoTextsBackup', JSON.stringify(infoTexts));
+                    updated = true;
+                }
+                if (updated && showMessages) showSyncStatus('✅ Sincronizzazione completata!', false);
+                else if (showMessages) showSyncStatus('⚠️ Nessun dato nuovo da sincronizzare.', false);
+            } else {
+                if (showMessages) showSyncStatus('❌ File rete_data.json non trovato sul server.', true);
+            }
+        } catch(e) {
+            console.warn('Errore sincronizzazione rete:', e);
+            if (showMessages) showSyncStatus('❌ Errore di rete: ' + e.message, true);
+        }
+    }
+    function exportReteToFile() {
+        const exportData = { categories: reteData.categories, mainImage: currentImageData || null, infoTexts: infoTexts };
+        const dataStr = JSON.stringify(exportData, null, 2);
+        const blob = new Blob([dataStr], {type: 'application/json'});
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'rete_data.json';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        alert('File rete_data.json esportato con successo.');
+    }
+    function importReteFromFile(file) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            try {
+                const imported = JSON.parse(e.target.result);
+                if (imported.categories && Array.isArray(imported.categories)) {
+                    reteData = { categories: imported.categories };
+                    saveReteData();
+                    if (imported.mainImage && typeof imported.mainImage === 'string' && imported.mainImage.startsWith('data:image')) {
+                        currentImageData = imported.mainImage;
+                        localStorage.setItem('monastir_image', currentImageData);
+                        setupImageArea();
+                    }
+                    if (imported.infoTexts && typeof imported.infoTexts === 'object') {
+                        for (let key in imported.infoTexts) {
+                            if (infoTexts.hasOwnProperty(key)) infoTexts[key] = imported.infoTexts[key];
+                        }
+                        localStorage.setItem('infoTextsBackup', JSON.stringify(infoTexts));
+                    }
+                    renderReteCategories(reteLevelContainer, reteData);
+                    alert('Rete importata correttamente.');
+                } else {
+                    alert('Formato file non valido.');
+                }
+            } catch(err) {
+                alert('Errore durante l\'importazione: ' + err.message);
+            }
+        };
+        reader.readAsText(file);
+    }
+    function addCategory() { if (!adminAuthenticated) { alert("Solo amministratore."); return; } reteData.categories.push({ title: "Tasto vuoto", children: [] }); saveReteData(); renderReteCategories(reteLevelContainer, reteData); }
+    function addChildToCategory(category) { if (!adminAuthenticated) { alert("Solo amministratore."); return; } if (!category.children) category.children = []; category.children.push({ id: Date.now() + '_' + Math.random(), title: "Selezione attività", infoText: "", infoImage: null, coordinate: "", websiteUrl: "" }); saveReteData(); renderReteCategories(reteLevelContainer, reteData); }
+    function editCategoryTitle(category, newTitle) { if (!adminAuthenticated) { alert("Solo amministratore."); return false; } category.title = newTitle; saveReteData(); renderReteCategories(reteLevelContainer, reteData); return true; }
+    function deleteCategory(category, index) { if (!adminAuthenticated) { alert("Solo amministratore."); return; } if (confirm("Vuoi eliminare la categoria '" + category.title + "' e tutti i suoi figli?")) { reteData.categories.splice(index, 1); saveReteData(); renderReteCategories(reteLevelContainer, reteData); } }
+    function deleteChild(category, childIndex) { if (!adminAuthenticated) { alert("Solo amministratore."); return; } if (confirm("Vuoi eliminare questo figlio?")) { category.children.splice(childIndex, 1); saveReteData(); renderReteCategories(reteLevelContainer, reteData); } }
+    function editChildTitle(child, newTitle) { if (!adminAuthenticated) { alert("Solo amministratore."); return false; } child.title = newTitle; saveReteData(); renderReteCategories(reteLevelContainer, reteData); return true; }
+    
+    function showActivityModalForChild(child) {
+        if (!adminAuthenticated) {
+            const activated = localStorage.getItem('activated') === 'true';
+            if (!activated) {
+                alert("NEGATO ACCESSO – RICHIEDI ATTIVAZIONE – VAI NELLA SCHERMATA HOME");
+                return;
+            }
+        }
+        currentActivityNode = child;
+        activityModalTitle.innerText = (child.title && child.title.trim()) ? child.title : "Descrittivo attività senza titolo";
+        activityInfoText.value = child.infoText || "Nessuna informazione aggiuntiva.";
+        activityInfoText.readOnly = true;
+        activityImageContainer.innerHTML = '';
+        if (child.infoImage) {
+            let img = document.createElement('img');
+            img.src = child.infoImage;
+            img.className = 'info-mini-img';
+            img.style.maxWidth = '100%';
+            img.style.maxHeight = '120px';
+            img.style.objectFit = 'contain';
+            activityImageContainer.appendChild(img);
+        } else {
+            let placeholder = document.createElement('div');
+            placeholder.className = 'info-mini-placeholder';
+            placeholder.innerText = "Nessuna foto disponibile";
+            activityImageContainer.appendChild(placeholder);
+        }
+        if (adminAuthenticated) {
+            activityAdminImageButtons.classList.remove('hidden-btn');
+            activityInfoAdminButtons.classList.remove('hidden-btn');
+            activityEditInfoBtn.style.display = "block";
+            activitySaveInfoBtn.style.display = "none";
+            activityCancelInfoBtn.style.display = "none";
+        } else {
+            activityAdminImageButtons.classList.add('hidden-btn');
+            activityInfoAdminButtons.classList.add('hidden-btn');
+        }
+        updateActivityButtonsForChild(child);
+        activityModal.style.display = 'flex';
+        isModalOpen = true;
+        keepScreenOn();
+    }
+    
+    function updateActivityButtonsForChild(child) {
+        const coord = child.coordinate || "";
+        const web = child.websiteUrl || "";
+        activityCoordBtn.onclick = () => { if (coord.trim()) window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(coord)}`, '_blank'); else alert("Nessuna coordinata impostata."); };
+        activityWebBtn.onclick = () => { if (web.trim()) { let full = web.trim(); if (!full.startsWith('http')) full = 'https://' + full; window.open(full, '_blank'); } else alert("Nessun sito web associato."); };
+        if (adminAuthenticated) {
+            let coordTimer = null;
+            activityCoordBtn.onmousedown = () => { coordTimer = setTimeout(() => { let newCoord = prompt("Modifica coordinate (formato: latitudine,longitudine):", child.coordinate || ""); if (newCoord !== null) { if (newCoord.trim() === "") { child.coordinate = ""; saveReteData(); updateActivityButtonsForChild(child); showActivityModalForChild(child); } else if (newCoord.includes(',') && !isNaN(parseFloat(newCoord.split(',')[0])) && !isNaN(parseFloat(newCoord.split(',')[1]))) { child.coordinate = newCoord.trim(); saveReteData(); updateActivityButtonsForChild(child); showActivityModalForChild(child); } else { alert("Formato non valido. Usa lat,lon (es. 43.841977,11.170855)"); } } }, 3000); };
+            activityCoordBtn.onmouseup = activityCoordBtn.onmouseleave = () => { if (coordTimer) clearTimeout(coordTimer); };
+            activityCoordBtn.ontouchstart = () => { coordTimer = setTimeout(() => { let newCoord = prompt("Modifica coordinate:", child.coordinate || ""); if (newCoord !== null) { if (newCoord.trim() === "") { child.coordinate = ""; saveReteData(); updateActivityButtonsForChild(child); showActivityModalForChild(child); } else if (newCoord.includes(',') && !isNaN(parseFloat(newCoord.split(',')[0])) && !isNaN(parseFloat(newCoord.split(',')[1]))) { child.coordinate = newCoord.trim(); saveReteData(); updateActivityButtonsForChild(child); showActivityModalForChild(child); } else { alert("Formato non valido."); } } }, 3000); };
+            activityCoordBtn.ontouchend = activityCoordBtn.ontouchcancel = () => { if (coordTimer) clearTimeout(coordTimer); };
+            let webTimer = null;
+            activityWebBtn.onmousedown = () => { webTimer = setTimeout(() => { let newUrl = prompt("Modifica sito web (es. https://www.example.com):", child.websiteUrl || ""); if (newUrl !== null) { child.websiteUrl = newUrl.trim(); saveReteData(); updateActivityButtonsForChild(child); showActivityModalForChild(child); } }, 3000); };
+            activityWebBtn.onmouseup = activityWebBtn.onmouseleave = () => { if (webTimer) clearTimeout(webTimer); };
+            activityWebBtn.ontouchstart = () => { webTimer = setTimeout(() => { let newUrl = prompt("Modifica sito web:", child.websiteUrl || ""); if (newUrl !== null) { child.websiteUrl = newUrl.trim(); saveReteData(); updateActivityButtonsForChild(child); showActivityModalForChild(child); } }, 3000); };
+            activityWebBtn.ontouchend = activityWebBtn.ontouchcancel = () => { if (webTimer) clearTimeout(webTimer); };
+        }
+    }
+    
+    activityUploadImageBtn.addEventListener('click', () => {
+        if (!adminAuthenticated || !currentActivityNode) return;
+        let input = document.createElement('input');
+        input.type = 'file';
+        input.accept = 'image/*';
+        input.onchange = (e) => {
+            let file = e.target.files[0];
+            if (file) {
+                let reader = new FileReader();
+                reader.onload = (ev) => {
+                    currentActivityNode.infoImage = ev.target.result;
+                    saveReteData();
+                    showActivityModalForChild(currentActivityNode);
+                };
+                reader.readAsDataURL(file);
+            }
+        };
+        input.click();
+    });
+    
+    activityEditInfoBtn.addEventListener('click', () => {
+        if (!adminAuthenticated || !currentActivityNode) return;
+        activityInfoText.readOnly = false;
+        activityEditInfoBtn.style.display = "none";
+        activitySaveInfoBtn.style.display = "block";
+        activityCancelInfoBtn.style.display = "block";
+    });
+    activitySaveInfoBtn.addEventListener('click', () => {
+        if (!adminAuthenticated || !currentActivityNode) return;
+        currentActivityNode.infoText = activityInfoText.value;
+        saveReteData();
+        activityInfoText.readOnly = true;
+        activityEditInfoBtn.style.display = "block";
+        activitySaveInfoBtn.style.display = "none";
+        activityCancelInfoBtn.style.display = "none";
+        alert("Informazioni salvate.");
+        showActivityModalForChild(currentActivityNode);
+    });
+    activityCancelInfoBtn.addEventListener('click', () => {
+        if (!currentActivityNode) return;
+        activityInfoText.value = currentActivityNode.infoText || "Nessuna informazione aggiuntiva.";
+        activityInfoText.readOnly = true;
+        activityEditInfoBtn.style.display = "block";
+        activitySaveInfoBtn.style.display = "none";
+        activityCancelInfoBtn.style.display = "none";
+    });
+    
+    function renderReteCategories(container, data) {
+        container.innerHTML = '';
+        if (!data.categories || data.categories.length === 0) {
+            let empty = document.createElement('div');
+            empty.style.textAlign = 'center';
+            empty.style.padding = '20px';
+            empty.innerText = adminAuthenticated ? 'Nessuna categoria. Premi "+ AGGIUNGI TASTO" per aggiungere.' : 'Nessuna categoria disponibile.';
+            container.appendChild(empty);
+        } else {
+            data.categories.forEach((cat, idx) => {
+                let catDiv = document.createElement('div');
+                catDiv.className = 'rete-category';
+                let catNameSpan = document.createElement('span');
+                catNameSpan.className = 'category-name';
+                catNameSpan.innerText = (cat.title && cat.title.trim()) ? cat.title : "Tasto vuoto";
+                catNameSpan.style.userSelect = 'none';
+                catNameSpan.style.webkitUserSelect = 'none';
+                if (adminAuthenticated) {
+                    let pressTimer = null;
+                    catNameSpan.addEventListener('mousedown', () => { pressTimer = setTimeout(() => { let newTitle = prompt("Modifica nome categoria:", cat.title); if (newTitle !== null && newTitle.trim() !== "") { editCategoryTitle(cat, newTitle.trim()); } else if (newTitle !== null && newTitle.trim() === "") alert("Titolo non può essere vuoto."); }, 3000); });
+                    catNameSpan.addEventListener('mouseup', () => { if (pressTimer) clearTimeout(pressTimer); });
+                    catNameSpan.addEventListener('mouseleave', () => { if (pressTimer) clearTimeout(pressTimer); });
+                    catNameSpan.addEventListener('touchstart', () => { pressTimer = setTimeout(() => { let newTitle = prompt("Modifica nome categoria:", cat.title); if (newTitle !== null && newTitle.trim() !== "") { editCategoryTitle(cat, newTitle.trim()); } else if (newTitle !== null && newTitle.trim() === "") alert("Titolo non può essere vuoto."); }, 3000); });
+                    catNameSpan.addEventListener('touchend', () => { if (pressTimer) clearTimeout(pressTimer); });
+                    catNameSpan.addEventListener('touchcancel', () => { if (pressTimer) clearTimeout(pressTimer); });
+                }
+                catDiv.appendChild(catNameSpan);
+                let addBtn = document.createElement('button');
+                addBtn.innerText = '+';
+                addBtn.className = 'small-icon';
+                addBtn.onclick = (e) => { e.stopPropagation(); addChildToCategory(cat); };
+                if (adminAuthenticated) catDiv.appendChild(addBtn);
+                let delBtn = document.createElement('button');
+                delBtn.innerText = '🗑️';
+                delBtn.className = 'delete-icon';
+                delBtn.onclick = (e) => { e.stopPropagation(); deleteCategory(cat, idx); };
+                if (adminAuthenticated) catDiv.appendChild(delBtn);
+                container.appendChild(catDiv);
+                if (cat.children && cat.children.length > 0) {
+                    let childrenDiv = document.createElement('div');
+                    childrenDiv.className = 'rete-children';
+                    cat.children.forEach((child, childIdx) => {
+                        let childDiv = document.createElement('div');
+                        childDiv.className = 'rete-child';
+                        let childNameSpan = document.createElement('span');
+                        childNameSpan.className = 'child-name';
+                        childNameSpan.innerText = (child.title && child.title.trim()) ? child.title : "Selezione attività";
+                        childNameSpan.onclick = (e) => { e.stopPropagation(); showActivityModalForChild(child); };
+                        if (adminAuthenticated) {
+                            let pressTimer = null;
+                            childNameSpan.addEventListener('mousedown', () => { pressTimer = setTimeout(() => { let newTitle = prompt("Modifica nome attività:", child.title); if (newTitle !== null && newTitle.trim() !== "") { editChildTitle(child, newTitle.trim()); } else if (newTitle !== null && newTitle.trim() === "") alert("Titolo non può essere vuoto."); }, 3000); });
+                            childNameSpan.addEventListener('mouseup', () => { if (pressTimer) clearTimeout(pressTimer); });
+                            childNameSpan.addEventListener('mouseleave', () => { if (pressTimer) clearTimeout(pressTimer); });
+                            childNameSpan.addEventListener('touchstart', () => { pressTimer = setTimeout(() => { let newTitle = prompt("Modifica nome attività:", child.title); if (newTitle !== null && newTitle.trim() !== "") { editChildTitle(child, newTitle.trim()); } else if (newTitle !== null && newTitle.trim() === "") alert("Titolo non può essere vuoto."); }, 3000); });
+                            childNameSpan.addEventListener('touchend', () => { if (pressTimer) clearTimeout(pressTimer); });
+                            childNameSpan.addEventListener('touchcancel', () => { if (pressTimer) clearTimeout(pressTimer); });
+                        }
+                        childDiv.appendChild(childNameSpan);
+                        let delChildBtn = document.createElement('button');
+                        delChildBtn.innerText = '-';
+                        delChildBtn.className = 'delete-child-icon';
+                        delChildBtn.onclick = (e) => { e.stopPropagation(); deleteChild(cat, childIdx); };
+                        if (adminAuthenticated) childDiv.appendChild(delChildBtn);
+                        childrenDiv.appendChild(childDiv);
+                    });
+                    container.appendChild(childrenDiv);
+                }
+            });
+        }
+        if (adminAuthenticated) {
+            let addCatBtn = document.createElement('button');
+            addCatBtn.innerText = '+ AGGIUNGI TASTO (premi 3 sec)';
+            addCatBtn.className = 'add-category-btn';
+            let addTimer = null;
+            addCatBtn.onmousedown = () => { addTimer = setTimeout(() => { addCategory(); }, 3000); };
+            addCatBtn.onmouseup = addCatBtn.onmouseleave = () => { if (addTimer) clearTimeout(addTimer); };
+            addCatBtn.ontouchstart = () => { addTimer = setTimeout(() => { addCategory(); }, 3000); };
+            addCatBtn.ontouchend = addCatBtn.ontouchcancel = () => { if (addTimer) clearTimeout(addTimer); };
+            container.appendChild(addCatBtn);
+        }
+    }
+    
+    function setupImageArea() {
+        imagePreviewArea.innerHTML = '';
+        if (currentImageData) {
+            let img = document.createElement('img');
+            img.src = currentImageData;
+            img.className = 'uploaded-image';
+            img.style.maxWidth = '100%';
+            img.style.maxHeight = '180px';
+            imagePreviewArea.appendChild(img);
+            attachMainImageLongPress(img);
+        } else {
+            let ph = document.createElement('div');
+            ph.className = 'image-placeholder';
+            ph.innerText = adminAuthenticated ? '📸 Premi a lungo (3 sec) per caricare un\'immagine' : '🔐 Solo amministratore';
+            imagePreviewArea.appendChild(ph);
+            attachMainPlaceholderLongPress(ph);
+        }
+    }
+    
+    function attachMainPlaceholderLongPress(el) {
+        let timer;
+        el.onmousedown = () => { timer = setTimeout(() => { if (adminAuthenticated) openMainImageGallery(); }, 3000); };
+        el.onmouseup = el.onmouseleave = () => clearTimeout(timer);
+        el.ontouchstart = () => { timer = setTimeout(() => { if (adminAuthenticated) openMainImageGallery(); }, 3000); };
+        el.ontouchend = el.ontouchcancel = () => clearTimeout(timer);
+    }
+    
+    function attachMainImageLongPress(img) {
+        let timer;
+        img.onmousedown = () => { timer = setTimeout(() => { if (adminAuthenticated) openMainImageGallery(); }, 3000); };
+        img.onmouseup = img.onmouseleave = () => clearTimeout(timer);
+        img.ontouchstart = () => { timer = setTimeout(() => { if (adminAuthenticated) openMainImageGallery(); }, 3000); };
+        img.ontouchend = img.ontouchcancel = () => clearTimeout(timer);
+    }
+    
+    function openMainImageGallery() {
+        let input = document.createElement('input');
+        input.type = 'file';
+        input.accept = 'image/*';
+        input.onchange = (e) => {
+            let file = e.target.files[0];
+            if (file) {
+                let reader = new FileReader();
+                reader.onload = (ev) => {
+                    currentImageData = ev.target.result;
+                    setupImageArea();
+                    localStorage.setItem('monastir_image', currentImageData);
+                };
+                reader.readAsDataURL(file);
+            }
+        };
+        input.click();
+    }
+    
+    function loadSavedImage() {
+        let saved = localStorage.getItem('monastir_image');
+        if (saved) { currentImageData = saved; setupImageArea(); }
+        else setupImageArea();
+    }
+    
+    // --- LICENZA (originale) ---
+    function generateRandomClientCode() { return Math.floor(1000000000 + Math.random() * 9000000000).toString(); }
+    function hashTo20Digits(hash) { let hex = hash.toString(CryptoJS.enc.Hex); let decimal = BigInt('0x' + hex).toString(); return decimal.slice(0,20).padStart(20,'0'); }
+    function verifyUnlockCode(clientCode, firstRun, unlockCode) { const message = `${clientCode}|${firstRun}`; const hash = CryptoJS.HmacSHA256(message, SECRET_KEY); const expected = hashTo20Digits(hash); return expected === unlockCode; }
+    async function getCurrentUTCTime() { try { let res = await fetch('https://worldtimeapi.org/api/timezone/Etc/UTC'); if (!res.ok) throw new Error(); let data = await res.json(); return new Date(data.utc_datetime); } catch(e) { return new Date(); } }
+    async function initLicense() {
+        const now = await getCurrentUTCTime();
+        let firstRun = localStorage.getItem('firstRun');
+        if (!firstRun) {
+            firstRun = now.getTime();
+            localStorage.setItem('firstRun', firstRun);
+            let newClientCode = generateRandomClientCode();
+            localStorage.setItem('clientCode', newClientCode);
+            localStorage.setItem('activated', 'false');
+            localStorage.setItem('expiryDate', firstRun + 90 * 86400000);
+        }
+        firstRun = parseInt(firstRun);
+        clientCode = localStorage.getItem('clientCode') || generateRandomClientCode();
+        if (!localStorage.getItem('clientCode')) localStorage.setItem('clientCode', clientCode);
+        const activated = localStorage.getItem('activated') === 'true';
+        let expiry = parseInt(localStorage.getItem('expiryDate'));
+        if (activated && expiry < firstRun + 365 * 86400000) { expiry = firstRun + 365 * 86400000; localStorage.setItem('expiryDate', expiry); }
+        const nowTime = now.getTime();
+        if (nowTime > expiry) { licenseActive = false; licenseCheckPassed = false; }
+        else { licenseActive = activated; licenseCheckPassed = true; }
+        daysRemaining = Math.ceil((expiry - nowTime) / 86400000);
+        updateLicenseUI();
+        if (clientCodeInput) clientCodeInput.value = clientCode;
+        if (daysHomeDisplay) {
+            daysHomeDisplay.innerHTML = `v${CURRENT_VERSION} - Scade: ${daysRemaining} giorni <button id="copyRequestBtnMoved" class="small-btn" style="background:#e67e22;">📋 Richiedi attivazione</button>`;
+            let moved = document.getElementById('copyRequestBtnMoved');
+            if (moved) moved.onclick = () => openActivationRequestModal();
+        }
+    }
+    function updateLicenseUI() {
+        let activated = localStorage.getItem('activated') === 'true';
+        if (activated) { unlockCodeInput.disabled = true; activateLicenseBtn.disabled = true; }
+        else { unlockCodeInput.disabled = false; activateLicenseBtn.disabled = false; }
+    }
+    async function onActivateLicense() {
+        let unlockCode = unlockCodeInput.value.trim();
+        if (!/^\d{20}$/.test(unlockCode)) { alert('20 cifre.'); return; }
+        let firstRun = localStorage.getItem('firstRun');
+        if (!firstRun) { alert('Errore primo avvio.'); return; }
+        if (verifyUnlockCode(clientCode, parseInt(firstRun), unlockCode)) {
+            let newExpiry = parseInt(firstRun) + 365 * 86400000;
+            localStorage.setItem('activated', 'true');
+            localStorage.setItem('expiryDate', newExpiry);
+            await initLicense();
+            alert('Licenza attivata per 365 giorni.');
+        } else alert('Codice non valido.');
+    }
+    function openActivationRequestModal() {
+        const modalContent = `Per attivare la licenza, invia un bonifico di €48,00 a Paolo Maiorana IBAN: IT31R0339512900052702573770 con causale il tuo codice cliente. Dopo il pagamento, premi il pulsante qui sotto per inviare automaticamente i tuoi dati di attivazione all'amministratore.`;
+        infoModalText.innerText = modalContent;
+        const buttonsDiv = document.querySelector('#infoModal .modal-buttons');
+        let existingEmailBtn = document.getElementById('sendActivationEmailBtn');
+        if (!existingEmailBtn) {
+            const emailBtn = document.createElement('button');
+            emailBtn.id = 'sendActivationEmailBtn';
+            emailBtn.className = 'save-btn';
+            emailBtn.style.background = '#4caf50';
+            emailBtn.innerText = '📧 Invia dati per attivazione';
+            emailBtn.onclick = () => {
+                const clientCodeVal = clientCodeInput.value;
+                const firstRunVal = localStorage.getItem('firstRun');
+                const subject = encodeURIComponent('Richiesta attivazione licenza Contatti Personali');
+                const body = encodeURIComponent(`Codice Cliente: ${clientCodeVal}\nFirst Run: ${firstRunVal}`);
+                window.location.href = `mailto:gliamicidipaolino@gmail.com?subject=${subject}&body=${body}`;
+            };
+            buttonsDiv.appendChild(emailBtn);
+        }
+        infoModal.style.display = 'flex';
+        isModalOpen = true;
+        keepScreenOn();
+    }
+    function closeInfoModalFunc() { infoModal.style.display = 'none'; isModalOpen = false; }
+    closeInfoModalBtn.onclick = closeInfoModalFunc;
+    infoModal.onclick = (e) => { if (e.target === infoModal) closeInfoModalFunc(); };
+    function loadAdminCode() { let saved = localStorage.getItem('adminCode'); if (saved && saved.trim()) adminCode = saved; else { adminCode = "admin2025"; localStorage.setItem('adminCode', adminCode); } }
+    function saveAdminCode(newCode) { if (newCode && newCode.trim()) { adminCode = newCode; localStorage.setItem('adminCode', adminCode); alert("Codice admin cambiato."); } else alert("Codice non valido."); }
+    function generateUnlockCodeAdmin(clientCode, firstRun) { const message = `${clientCode}|${firstRun}`; const hash = CryptoJS.HmacSHA256(message, SECRET_KEY); return hashTo20Digits(hash); }
+    function onGenerateUnlock() { let cc = adminClientCode.value.trim(); let fr = adminFirstRun.value.trim(); if (!/^\d{6,10}$/.test(cc)) { alert("Codice cliente 6-10 cifre."); return; } if (!/^\d+$/.test(fr) || fr.length<10) { alert("First Run non valido."); return; } generatedCode.value = generateUnlockCodeAdmin(cc, fr); }
+    function copyGenerated() { if (generatedCode.value) { navigator.clipboard.writeText(generatedCode.value); alert("Copiato."); } else alert("Nessun codice."); }
+    function showAdminSection() { adminSection.style.display = 'block'; updateAdminReteButtonsVisibility(); }
+    function hideAdminSection() { adminSection.style.display = 'none'; updateAdminReteButtonsVisibility(); }
+    function updateAdminReteButtonsVisibility() {
+        if (adminReteButtons) {
+            if (adminAuthenticated && imagePage && !imagePage.classList.contains('hidden')) {
+                adminReteButtons.classList.remove('hidden-btn');
+            } else {
+                adminReteButtons.classList.add('hidden-btn');
+            }
+        }
+    }
+    let adminTimer = null;
+    function startAdminTimer() { adminTimer = setTimeout(() => { let code = prompt("Codice amministratore:"); if (code === adminCode) { adminAuthenticated = true; showAdminSection(); alert("Accesso admin."); updateAdminReteButtonsVisibility(); if (imagePage && !imagePage.classList.contains('hidden')) { renderReteCategories(reteLevelContainer, reteData); loadSavedImage(); } } else if (code !== null) alert("Codice errato."); }, 3000); }
+    function cancelAdminTimer() { if (adminTimer) clearTimeout(adminTimer); }
+    adminLongPressBtn.addEventListener('mousedown', startAdminTimer);
+    adminLongPressBtn.addEventListener('mouseup', cancelAdminTimer);
+    adminLongPressBtn.addEventListener('mouseleave', cancelAdminTimer);
+    adminLongPressBtn.addEventListener('touchstart', startAdminTimer, { passive: true });
+    adminLongPressBtn.addEventListener('touchend', cancelAdminTimer);
+    adminLongPressBtn.addEventListener('touchcancel', cancelAdminTimer);
+    generateUnlockBtn.onclick = onGenerateUnlock;
+    copyGeneratedBtn.onclick = copyGenerated;
+    hideAdminBtn.onclick = hideAdminSection;
+    changeAdminCodeBtn.onclick = () => { let nc = newAdminCode.value.trim(); if (nc) saveAdminCode(nc); else alert("Inserisci nuovo codice."); };
+    
+    // --- SALVA / RIPRISTINA TESTI PALLINI I (originale) ---
+    let infoTexts = {
+        licenseInfo: "Informazioni sul codice cliente.\nIl codice cliente è univoco per questa installazione.\nPer attivare la licenza, invia un bonifico di €48,00 a Paolo Maiorana IBAN: IT31R0339512900052702573770 con causale il tuo codice cliente.\nPoi invia email a gli amicidipaolino@gmail.com con il codice cliente per ricevere il codice di sblocco.",
+        licenseRequest: "Richiedi attivazione: Premi 'Richiedi attivazione' e segui le istruzioni per ottenere il codice di sblocco.\nInvia un bonifico di €48,00 a Paolo Maiorana IBAN: IT31R0339512900052702573770 con causale il tuo codice cliente.\nPoi invia email a gli amicidipaolino@gmail.com con il codice cliente.\nRiceverai il codice di sblocco a 20 cifre.",
+        infoNote: "Informazioni sulle note.\nPuoi aggiungere note per ogni contatto. Ogni nota ha un titolo e una descrizione. Puoi selezionare una nota premendo il pallino blu. Le note selezionate vengono usate per la copia e la lettura.",
+        infoOperator: "Informazioni sull'ascolto operatore.\nPremi 'ASCOLTA OPERATORE' per avviare un ascolto di 30 secondi. La voce dell'operatore viene tradotta in italiano e salvata.",
+        infoSpeak: "Informazioni sulla conversazione con operatore.\nPremi 'PARLA CON OPERATORE' e parla in italiano. La tua voce viene tradotta in francese e letta ad alta voce."
+    };
+    function saveInfoIconsToFile() {
+        let content = "# INFO ICONS BACKUP v" + CURRENT_VERSION + "\n# Formato: context|testo\n";
+        for (let key in infoTexts) content += key + "|" + infoTexts[key].replace(/\n/g, '\\n') + "\n";
+        const blob = new Blob([content], {type: 'text/plain'});
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        const filename = `info_icons_backup_${CURRENT_VERSION}.txt`;
+        a.download = filename;
+        a.click();
+        URL.revokeObjectURL(a.href);
+        backupHint.innerText = `💾 Salvato: ${filename}`;
+        setTimeout(() => { if (backupHint.innerText === `💾 Salvato: ${filename}`) backupHint.innerText = ""; }, 5000);
+    }
+    function restoreInfoIconsFromFile(file) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            const content = e.target.result;
+            const lines = content.split(/\r?\n/);
+            let newInfoTexts = {};
+            for (let line of lines) {
+                line = line.trim();
+                if (line.startsWith("#") || line === "") continue;
+                let sep = line.indexOf('|');
+                if (sep !== -1) {
+                    let key = line.substring(0, sep);
+                    let value = line.substring(sep+1).replace(/\\n/g, '\n');
+                    if (infoTexts.hasOwnProperty(key)) newInfoTexts[key] = value;
+                }
+            }
+            if (Object.keys(newInfoTexts).length === 0) { alert("Nessun dato valido trovato nel file."); return; }
+            for (let k in newInfoTexts) infoTexts[k] = newInfoTexts[k];
+            localStorage.setItem('infoTextsBackup', JSON.stringify(infoTexts));
+            alert("Testi informativi ripristinati con successo.");
+        };
+        reader.readAsText(file, "UTF-8");
+    }
+    saveInfoIconsBtn.addEventListener('click', saveInfoIconsToFile);
+    restoreInfoIconsBtn.addEventListener('click', () => {
+        let input = document.createElement('input');
+        input.type = 'file';
+        input.accept = '.txt';
+        input.onchange = (e) => { if (e.target.files.length) restoreInfoIconsFromFile(e.target.files[0]); input.remove(); };
+        input.click();
+    });
+    function loadInfoTextsFromLocal() {
+        let saved = localStorage.getItem('infoTextsBackup');
+        if (saved) { try { let parsed = JSON.parse(saved); for (let k in parsed) { if (infoTexts.hasOwnProperty(k)) infoTexts[k] = parsed[k]; } } catch(e){} }
+    }
+    
+    // --- MODALE INFORMATIVA (originale) ---
+    function openGlobalInfoModal(context, title, storageKey) {
+        currentInfoContext = { context, storageKey };
+        globalInfoModalTitle.innerText = title;
+        globalInfoTextarea.value = infoTexts[context] || "";
+        globalInfoTextarea.readOnly = !adminAuthenticated;
+        globalInfoEditBtn.style.display = adminAuthenticated ? "block" : "none";
+        globalInfoSaveBtn.style.display = "none";
+        if (context === 'licenseInfo') {
+            globalInfoDownloadBtn.style.display = "block";
+        } else {
+            globalInfoDownloadBtn.style.display = "none";
+        }
+        globalInfoModalDiv.style.display = 'flex';
+        isModalOpen = true;
+        keepScreenOn();
+    }
+    function installPWA() {
+        if (deferredPrompt) {
+            deferredPrompt.prompt();
+            deferredPrompt.userChoice.then((choiceResult) => {
+                if (choiceResult.outcome === 'accepted') {
+                    console.log('Utente ha accettato l\'installazione');
+                }
+                deferredPrompt = null;
+            });
+        } else {
+            alert("Installazione non disponibile in questo momento.\n\nPuoi aggiungere manualmente questa app alla schermata Home:\n- Su Android: menu Chrome → 'Aggiungi a schermata Home'\n- Su iOS: condividi → 'Aggiungi a Home'");
+        }
+    }
+    globalInfoDownloadBtn.addEventListener('click', installPWA);
+    globalInfoEditBtn.addEventListener('click', () => {
+        if (!adminAuthenticated) return;
+        globalInfoTextarea.readOnly = false;
+        globalInfoEditBtn.style.display = "none";
+        globalInfoSaveBtn.style.display = "block";
+    });
+    globalInfoSaveBtn.addEventListener('click', () => {
+        if (!adminAuthenticated) return;
+        infoTexts[currentInfoContext.context] = globalInfoTextarea.value;
+        localStorage.setItem('infoTextsBackup', JSON.stringify(infoTexts));
+        globalInfoTextarea.readOnly = true;
+        globalInfoEditBtn.style.display = "block";
+        globalInfoSaveBtn.style.display = "none";
+        alert("Testo salvato.");
+    });
+    globalInfoCloseBtn.addEventListener('click', () => { globalInfoModalDiv.style.display = 'none'; currentInfoContext = null; isModalOpen = false; });
+    globalInfoModalDiv.addEventListener('click', (e) => { if (e.target === globalInfoModalDiv) { globalInfoModalDiv.style.display = 'none'; isModalOpen = false; } });
+    
+    // --- CONTATTI HOME (originale) ---
+    function saveContactExtraText() { services.forEach(s => localStorage.setItem(`contactExtra_${s}_${CURRENT_VERSION}`, contactExtraText[s])); }
+    function loadContactExtraText() { services.forEach(s => { let saved = localStorage.getItem(`contactExtra_${s}_${CURRENT_VERSION}`); if (saved !== null) contactExtraText[s] = saved; else contactExtraText[s] = (s === 'clinica') ? "MONASTIR: Facciamo Rete" : ""; }); }
+    function getContactButtonText(s) { let extra = contactExtraText[s]; if (extra && extra.trim()) return extra; if (s === 'clinica') return "MONASTIR: Facciamo Rete"; return `Contatto: premi 5 sc. per modifica`; }
+    function updateContactButtons() { document.querySelectorAll('.big-btn').forEach(btn => { let s = btn.getAttribute('data-service'); if (s) btn.innerText = getContactButtonText(s); }); }
+    function showCustomPrompt(service, currentExtra) {
+        if (service === 'clinica') return;
+        let ov = document.createElement('div'); ov.className = 'custom-prompt';
+        ov.innerHTML = `<div class="custom-prompt-content"><h3>Modifica testo</h3><input id="custInp" maxlength="14" value="${currentExtra}"><div><button id="okBtn">OK</button><button id="cancelBtn">ANNULLA</button></div></div>`;
+        document.body.appendChild(ov);
+        let inp = ov.querySelector('#custInp'); let ok = ov.querySelector('#okBtn'); let cancel = ov.querySelector('#cancelBtn');
+        let close = () => ov.remove();
+        ok.onclick = () => { let newText = inp.value.trim(); if (newText.length>14) newText=newText.slice(0,14); contactExtraText[service]=newText; saveContactExtraText(); updateContactButtons(); close(); };
+        cancel.onclick = close;
+        inp.focus();
+        keepScreenOn();
+    }
+    function initHomeButtons() {
+        contactsGrid.innerHTML = '';
+        services.forEach(service => {
+            let btn = document.createElement('button');
+            btn.className = 'big-btn';
+            btn.setAttribute('data-service', service);
+            btn.innerText = getContactButtonText(service);
+            btn.onclick = () => {
+                if (service === 'clinica') {
+                    homePage.classList.add('hidden');
+                    imagePage.classList.remove('hidden');
+                    requestImagePageWakeLock();
+                    updateAdminReteButtonsVisibility();
+                    performSync(true).then(() => {
+                        renderReteCategories(reteLevelContainer, reteData);
+                        loadSavedImage();
+                    });
+                    pushPage('image');
+                    keepScreenOn();
+                } else {
+                    showEmergency(service);
+                    pushPage('emergency');
+                    keepScreenOn();
+                }
+            };
+            if (service !== 'clinica') {
+                let t;
+                btn.onmousedown = () => { t = setTimeout(() => showCustomPrompt(service, contactExtraText[service]), 5000); };
+                btn.onmouseup = btn.onmouseleave = () => clearTimeout(t);
+                btn.ontouchstart = () => { t = setTimeout(() => showCustomPrompt(service, contactExtraText[service]), 5000); };
+                btn.ontouchend = btn.ontouchcancel = () => clearTimeout(t);
+            } else {
+                let adminT;
+                btn.onmousedown = () => { adminT = setTimeout(() => { if (!adminAuthenticated) { alert("Solo admin."); return; } let nt = prompt("Nuovo testo:", contactExtraText.clinica); if (nt && nt.trim()) { contactExtraText.clinica = nt.trim(); saveContactExtraText(); updateContactButtons(); } }, 3000); };
+                btn.onmouseup = btn.onmouseleave = () => clearTimeout(adminT);
+                btn.ontouchstart = () => { adminT = setTimeout(() => { if (!adminAuthenticated) { alert("Solo admin."); return; } let nt = prompt("Nuovo testo:", contactExtraText.clinica); if (nt && nt.trim()) { contactExtraText.clinica = nt.trim(); saveContactExtraText(); updateContactButtons(); } }, 3000); };
+                btn.ontouchend = btn.ontouchcancel = () => clearTimeout(adminT);
+            }
+            contactsGrid.appendChild(btn);
+        });
+    }
+        // --- GEOLOCALIZZAZIONE (originale) ---
     function haversine(lat1,lng1,lat2,lng2) {
         const R = 6371e3;
         const φ1 = lat1 * Math.PI/180, φ2 = lat2 * Math.PI/180;
@@ -579,7 +1604,7 @@
         gpsStatus.innerHTML = "";
     }
     
-    // --- GESTIONE NOTE ---
+    // --- GESTIONE NOTE (originale) ---
     function getNormalNotesKey(s) { return `normalNotes_${s}_${CURRENT_VERSION}`; }
     function getSelectedNormalIdKey(s) { return `selectedNormalNote_${s}_${CURRENT_VERSION}`; }
     function saveNormalNotesForService(s) { localStorage.setItem(getNormalNotesKey(s), JSON.stringify(normalNotes[s])); }
@@ -728,11 +1753,10 @@
         keepScreenOn();
     }
     
-    // --- TRADUZIONI ---
+    // --- TRADUZIONI (originale) ---
     async function translateToFrench(italianText) { if (!italianText || italianText.trim() === "") return ""; try { const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(italianText)}&langpair=it|fr`; const resp = await fetch(url); const data = await resp.json(); if (data && data.responseData && data.responseData.translatedText) return data.responseData.translatedText; } catch(e) { console.warn(e); } return italianText; }
     async function translateFrenchToItalian(frenchText) { if (!frenchText || frenchText.trim() === "") return ""; try { const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(frenchText)}&langpair=fr|it`; const resp = await fetch(url); const data = await resp.json(); if (data && data.responseData && data.responseData.translatedText) return data.responseData.translatedText; } catch(e) { console.warn(e); } return frenchText + " (traduzione fallita)"; }
     function initRecognitionOperator() { if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) { transcribeStatus.innerText = "❌ Riconoscimento non supportato"; return false; } const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition; recognitionOperator = new SpeechRecognition(); recognitionOperator.continuous = true; recognitionOperator.interimResults = false; recognitionOperator.lang = 'fr-FR'; return true; }
-    let recognitionOperator = null, recognitionTimeout = null;
     async function startListening30s() {
         if (!recognitionOperator && !initRecognitionOperator()) return;
         if (recognitionTimeout) clearTimeout(recognitionTimeout);
@@ -757,7 +1781,6 @@
         keepScreenOn();
     }
     function initRecognitionSpeak() { if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) { speakStatus.innerText = "❌ Riconoscimento non supportato"; return false; } const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition; recognitionSpeak = new SpeechRecognition(); recognitionSpeak.continuous = true; recognitionSpeak.interimResults = false; recognitionSpeak.lang = 'it-IT'; return true; }
-    let recognitionSpeak = null, lastItalianText = "", lastFrenchTranslation = "";
     async function speakFrenchWithMicroPause(text, langCode = 'fr-FR') { if (!window.speechSynthesis) return; speechSynthesis.cancel(); const words = text.split(/\s+/); for (let i = 0; i < words.length; i++) { const utterance = new SpeechSynthesisUtterance(words[i]); utterance.lang = langCode; utterance.rate = 1.0; speechSynthesis.speak(utterance); await new Promise(r => setTimeout(r, 200)); } }
     async function startSpeakingItalian() {
         if (!recognitionSpeak && !initRecognitionSpeak()) return;
@@ -808,7 +1831,7 @@
     function showTemporaryMessage(element, message, duration = 15000) { if (!element) return; element.innerText = message; element.style.display = 'block'; if (element._hideTimeout) clearTimeout(element._hideTimeout); element._hideTimeout = setTimeout(() => { element.style.display = 'none'; }, duration); }
     function playBeep() { try { let ctx = new (window.AudioContext || window.webkitAudioContext)(); let osc = ctx.createOscillator(); let gain = ctx.createGain(); osc.connect(gain); gain.connect(ctx.destination); osc.frequency.value = 880; gain.gain.value = 0.3; osc.type = "sine"; osc.start(); gain.gain.exponentialRampToValueAtTime(0.00001, ctx.currentTime + 0.8); osc.stop(ctx.currentTime + 0.8); ctx.resume(); } catch(e) { console.warn("beep fallito", e); } }
     
-    // --- ESPORTA/IMPORTA NOTE ---
+    // --- ESPORTA/IMPORTA NOTE (originale) ---
     function exportAllNotes() {
         let content = "";
         content += "[NUMERI TELEFONO]\n"; for (let s of services) { let phone = getPhone(s) || defaultPhone[s]; content += `${s.toUpperCase()}=${phone}\n`; }
@@ -863,12 +1886,8 @@
     function getPhone(s) { return localStorage.getItem(`phone_${s}_${CURRENT_VERSION}`); }
     const defaultPhone = { ambulanza:"118", polizia:"113", veterinario:"800123456", clinica:"800987654" };
     function migratePhoneNumbers() { const oldVersions = ["0236","0235","0234"]; for (let s of services) { if (localStorage.getItem(`phone_${s}_${CURRENT_VERSION}`)) continue; for (let ver of oldVersions) { let old = localStorage.getItem(`phone_${s}_${ver}`); if (old) { localStorage.setItem(`phone_${s}_${CURRENT_VERSION}`, old); break; } } } }
-    function saveContactExtraText() { for (let s of services) { if (s !== 'clinica') localStorage.setItem(`contactExtra_${s}_${CURRENT_VERSION}`, contactExtraText[s]); } }
-    function loadContactExtraText() { for (let s of services) { if (s !== 'clinica') { let val = localStorage.getItem(`contactExtra_${s}_${CURRENT_VERSION}`); if (val) contactExtraText[s] = val; } } }
-    function updateContactButtons() { }
-    function escapeHtml(str) { return str.replace(/[&<>]/g, function(m) { if (m === '&') return '&amp;'; if (m === '<') return '&lt;'; if (m === '>') return '&gt;'; return m;}); }
     
-    // --- PALLINI I ---
+    // --- PALLINI I (originale) ---
     licenseInfoIcon.addEventListener('click', () => openGlobalInfoModal('licenseInfo', 'Informazioni Licenza', 'license_info_text'));
     infoNoteBtn.addEventListener('click', () => openGlobalInfoModal('infoNote', 'Informazioni Note', 'info_note_text'));
     infoOperatorBtn.addEventListener('click', () => openGlobalInfoModal('infoOperator', 'Informazioni Ascolto Operatore', 'info_operator_text'));
@@ -900,635 +1919,18 @@
     function onClearResponse() { clearOperatorTranslation(); transcribeStatus.innerText = "🧹 Traduzione cancellata"; setTimeout(() => transcribeStatus.innerText = "", 2000); keepScreenOn(); }
     activityModal.addEventListener('click', (e) => { if (e.target === activityModal) { activityModal.style.display = 'none'; isModalOpen = false; } });
     
-    // --- FUNZIONI DI SUPPORTO ---
-    async function keepScreenOn() {
-        if ('wakeLock' in navigator && !globalWakeLock) {
-            try { globalWakeLock = await navigator.wakeLock.request('screen'); } catch(e) { console.warn("Wake Lock:", e); }
-        }
-    }
-    function bindWakeLockToInteraction() {
-        const events = ['touchstart', 'click', 'keydown'];
-        events.forEach(ev => document.body.addEventListener(ev, keepScreenOn));
-    }
-    function openGlobalInfoModal(id, title, textKey) {
-        const modal = document.getElementById('globalInfoModal');
-        const modalTitle = document.getElementById('infoModalTitle');
-        const modalText = document.getElementById('infoModalText');
-        modalTitle.innerText = title;
-        let infoText = "";
-        if (textKey === 'license_info_text') infoText = "Licenza d'uso personale. Contatta l'assistenza per attivazione.";
-        else if (textKey === 'info_note_text') infoText = "Le note sono salvate localmente. Premi il pallino blu per selezionare una nota, poi usa i pulsanti Copia/Leggi. Nella modifica puoi includere le coordinate attuali.";
-        else if (textKey === 'info_operator_text') infoText = "Ascolta l'operatore in francese per 30 secondi, trascrive e traduce in italiano automaticamente.";
-        else if (textKey === 'info_speak_text') infoText = "Parla in italiano, verrà tradotto in francese e letto ad alta voce.";
-        else infoText = "Informazioni disponibili.";
-        modalText.innerText = infoText;
-        modal.style.display = 'flex';
-        document.getElementById('closeInfoModal').onclick = () => modal.style.display = 'none';
-    }
-    
-    // --- LICENZA (bozza) ---
-    function initLicense() { licenseCheckPassed = true; }
-    function onActivateLicense() { licenseCheckPassed = true; alert("Licenza attivata (demo)."); }
-    
-    // ==================== NUOVA GESTIONE ARCHIVIO DOCUMENTI (IndexedDB) ====================
-    let archivioDB = null;
-
-    function openArchivioDB() {
-        return new Promise((resolve, reject) => {
-            if (archivioDB) return resolve(archivioDB);
-            const request = indexedDB.open("SOSDriveArchivio", 2);
-            request.onupgradeneeded = (event) => {
-                const db = event.target.result;
-                if (!db.objectStoreNames.contains("documenti")) {
-                    const store = db.createObjectStore("documenti", { keyPath: "id" });
-                    store.createIndex("anno", "anno", { unique: false });
-                    store.createIndex("nomeUtente", "nomeUtente", { unique: false });
-                }
-            };
-            request.onsuccess = (event) => {
-                archivioDB = event.target.result;
-                resolve(archivioDB);
-            };
-            request.onerror = (event) => reject(event.target.error);
-        });
-    }
-
-    async function getNextProgressivo(anno) {
-        const db = await openArchivioDB();
-        return new Promise((resolve, reject) => {
-            const tx = db.transaction("documenti", "readonly");
-            const store = tx.objectStore("documenti");
-            const index = store.index("anno");
-            const range = IDBKeyRange.only(anno);
-            let max = 0;
-            index.openCursor(range).onsuccess = (e) => {
-                const cursor = e.target.result;
-                if (cursor) {
-                    const progressivo = parseInt(cursor.value.numeroProgressivo, 10);
-                    if (progressivo > max) max = progressivo;
-                    cursor.continue();
-                } else {
-                    resolve((max + 1).toString().padStart(3, '0'));
-                }
-            };
-            index.openCursor(range).onerror = reject;
-        });
-    }
-
-    async function saveDocument(anno, numeroProgressivo, nomeUtente, fileBlob) {
-        const now = new Date();
-        const year = now.getFullYear();
-        const month = (now.getMonth()+1).toString().padStart(2,'0');
-        const day = now.getDate().toString().padStart(2,'0');
-        const nomeCompleto = `${numeroProgressivo}_${year}_${month}_${day}_${nomeUtente}.pdf`;
-        const doc = {
-            id: `${anno}_${numeroProgressivo}_${Date.now()}`,
-            anno: anno,
-            numeroProgressivo: numeroProgressivo,
-            nomeUtente: nomeUtente,
-            nomeCompleto: nomeCompleto,
-            dataCreazione: new Date().toISOString(),
-            fileBlob: fileBlob
-        };
-        const db = await openArchivioDB();
-        return new Promise((resolve, reject) => {
-            const tx = db.transaction("documenti", "readwrite");
-            const store = tx.objectStore("documenti");
-            const request = store.add(doc);
-            request.onsuccess = () => resolve(doc);
-            request.onerror = reject;
-        });
-    }
-    
-    async function saveDocumentWithErrorHandling(anno, numeroProgressivo, nomeUtente, fileBlob) {
-        try {
-            return await saveDocument(anno, numeroProgressivo, nomeUtente, fileBlob);
-        } catch (e) {
-            if (e.name === 'QuotaExceededError' || e.code === 22 || (e.message && e.message.includes('quota'))) {
-                const userChoice = confirm(
-                    '⚠️ SPAZIO DI ARCHIVIAZIONE ESAURITO!\n\n' +
-                    'Il tuo browser non ha più spazio disponibile per salvare nuovi documenti.\n\n' +
-                    'Cosa vuoi fare?\n' +
-                    '• Premi "OK" per eseguire un BACKUP di tutti i documenti e poi liberare spazio.\n' +
-                    '• Premi "ANNULLA" per rimanere qui (non potrai salvare nuovi documenti).'
-                );
-                if (userChoice) {
-                    await backupAllYears();
-                }
-                throw e;
-            }
-            throw e;
-        }
-    }
-
-    async function loadDocumentsForYear(anno, search = "") {
-        const db = await openArchivioDB();
-        return new Promise((resolve, reject) => {
-            const tx = db.transaction("documenti", "readonly");
-            const store = tx.objectStore("documenti");
-            const index = store.index("anno");
-            const range = IDBKeyRange.only(anno);
-            const docs = [];
-            index.openCursor(range).onsuccess = (e) => {
-                const cursor = e.target.result;
-                if (cursor) {
-                    let doc = cursor.value;
-                    if (search.trim() !== "") {
-                        if (!doc.nomeUtente.toLowerCase().includes(search.toLowerCase())) {
-                            cursor.continue();
-                            return;
-                        }
-                    }
-                    docs.push(doc);
-                    cursor.continue();
-                } else {
-                    docs.sort((a,b) => parseInt(a.numeroProgressivo) - parseInt(b.numeroProgressivo));
-                    resolve(docs);
-                }
-            };
-            index.openCursor(range).onerror = reject;
-        });
-    }
-
-    async function deleteDocument(docId) {
-        const db = await openArchivioDB();
-        return new Promise((resolve, reject) => {
-            const tx = db.transaction("documenti", "readwrite");
-            const store = tx.objectStore("documenti");
-            const request = store.delete(docId);
-            request.onsuccess = resolve;
-            request.onerror = reject;
-        });
-    }
-
-    async function getDocumentBlob(docId) {
-        const db = await openArchivioDB();
-        return new Promise((resolve, reject) => {
-            const tx = db.transaction("documenti", "readonly");
-            const store = tx.objectStore("documenti");
-            const request = store.get(docId);
-            request.onsuccess = () => resolve(request.result?.fileBlob);
-            request.onerror = reject;
-        });
-    }
-
-    async function renderDocsList() {
-        if (!currentYear) {
-            archivioDocsListArch.innerHTML = "<div style='text-align:center; padding:20px;'>Inserisci un anno.</div>";
-            return;
-        }
-        const docs = await loadDocumentsForYear(currentYear, searchTerm);
-        if (docs.length === 0) {
-            archivioDocsListArch.innerHTML = "<div style='text-align:center; padding:20px;'>📭 Nessun documento trovato.</div>";
-            return;
-        }
-        let html = "";
-        for (const doc of docs) {
-            const parts = doc.nomeCompleto.replace('.pdf','').split('_');
-            const progressivo = parts[0];
-            const annoFile = parts[1];
-            const mese = parts[2];
-            const giorno = parts[3];
-            const desc = parts.slice(4).join('_') || "documento";
-            const displayName = `${progressivo}/${annoFile}/${mese}/${giorno}/${desc}.pdf`;
-            html += `
-                <div class="archivio-doc-item" data-id="${doc.id}">
-                    <span class="archivio-doc-name">📄 ${displayName}</span>
-                    <div style="display: flex; gap: 8px;">
-                        <button class="archivio-doc-open" data-id="${doc.id}">🔍</button>
-                        <button class="archivio-doc-delete" data-id="${doc.id}">🗑️</button>
-                    </div>
-                </div>
-            `;
-        }
-        archivioDocsListArch.innerHTML = html;
-        
-        document.querySelectorAll('.archivio-doc-open').forEach(btn => {
-            btn.addEventListener('click', async (e) => {
-                const id = btn.getAttribute('data-id');
-                const blob = await getDocumentBlob(id);
-                if (blob) {
-                    const url = URL.createObjectURL(blob);
-                    const modal = document.getElementById('pdfViewerModalArch');
-                    const iframe = document.getElementById('pdfViewerFrameArch');
-                    iframe.src = url;
-                    modal.style.display = 'flex';
-                    
-                    const shareBtn = document.getElementById('sharePdfBtnArch');
-                    const oldShareClick = shareBtn._clickHandler;
-                    if (oldShareClick) shareBtn.removeEventListener('click', oldShareClick);
-                    const newShareHandler = () => {
-                        if (navigator.share) {
-                            navigator.share({
-                                title: 'Documento PDF',
-                                files: [new File([blob], 'documento.pdf', {type: 'application/pdf'})]
-                            }).catch(err => { if (err.message !== 'Share canceled') console.warn(err); });
-                        } else {
-                            alert("La condivisione non è supportata su questo browser.");
-                        }
-                    };
-                    shareBtn.addEventListener('click', newShareHandler);
-                    shareBtn._clickHandler = newShareHandler;
-                    
-                    const closeModal = () => {
-                        modal.style.display = 'none';
-                        iframe.src = '';
-                        URL.revokeObjectURL(url);
-                    };
-                    document.getElementById('closePdfViewerArch').onclick = closeModal;
-                    modal.onclick = (e) => { if (e.target === modal) closeModal(); };
-                } else {
-                    alert("Impossibile aprire il file.");
-                }
-            });
-        });
-        
-        document.querySelectorAll('.archivio-doc-delete').forEach(btn => {
-            btn.addEventListener('click', async (e) => {
-                if (confirm("Eliminare definitivamente questo documento?")) {
-                    const id = btn.getAttribute('data-id');
-                    await deleteDocument(id);
-                    renderDocsList();
-                    showArchivioMessage("✅ Documento eliminato.", false);
-                }
-            });
-        });
-    }
-
-    async function createYearFolderManuale() {
-        const year = archivioYearInputArch.value.trim();
-        if (!/^\d{4}$/.test(year)) { alert("Inserisci un anno a 4 cifre."); return; }
-        const docs = await loadDocumentsForYear(year, "");
-        if (docs.length > 0) {
-            showArchivioMessage(`⚠️ Anno ${year} già esistente (contiene documenti).`, true);
-            return;
-        }
-        currentYear = year;
-        localStorage.setItem('archivio_current_year_local', year);
-        archivioYearInputArch.value = year;
-        archivioCurrentYearSpanArch.innerText = year;
-        renderDocsList();
-        showArchivioMessage(`✅ Anno ${year} pronto per ricevere documenti.`, false);
-    }
-
-    async function getNextProgressiveNumber() {
-        if (!currentYear) return 1;
-        return await getNextProgressivo(currentYear);
-    }
-
-    async function uploadDocument() {
-        if (!currentYear) {
-            alert("Inserisci un anno valido.");
-            return;
-        }
-        const input = document.createElement('input');
-        input.type = 'file';
-        input.accept = 'image/*,application/pdf';
-        input.multiple = true;
-        input.onchange = async (ev) => {
-            const files = Array.from(ev.target.files);
-            if (files.length === 0) return;
-            
-            const pdfFiles = files.filter(f => f.type === 'application/pdf');
-            const imageFiles = files.filter(f => f.type.startsWith('image/'));
-            
-            let userDescription = prompt("Inserisci la descrizione del documento (es. fattura, contratto, ...):", "");
-            if (userDescription === null) return;
-            userDescription = userDescription.trim().replace(/[^a-zA-Z0-9_\-]/g, '_').substring(0, 50);
-            if (userDescription === "") userDescription = "documento";
-            
-            const now = new Date();
-            const year = now.getFullYear();
-            const month = String(now.getMonth() + 1).padStart(2, '0');
-            const day = String(now.getDate()).padStart(2, '0');
-            let baseProg = await getNextProgressiveNumber();
-            
-            for (let i = 0; i < pdfFiles.length; i++) {
-                const file = pdfFiles[i];
-                const progNum = String(parseInt(baseProg) + i).padStart(3, '0');
-                await saveDocumentWithErrorHandling(currentYear, progNum, userDescription, file);
-            }
-            
-            if (imageFiles.length > 0) {
-                const { jsPDF } = window.jspdf;
-                const pdf = new jsPDF();
-                let firstPage = true;
-                for (let i = 0; i < imageFiles.length; i++) {
-                    const file = imageFiles[i];
-                    const imgData = await new Promise((resolve) => {
-                        const reader = new FileReader();
-                        reader.onload = (e) => resolve(e.target.result);
-                        reader.readAsDataURL(file);
-                    });
-                    const img = new Image();
-                    await new Promise((resolve) => {
-                        img.onload = resolve;
-                        img.src = imgData;
-                    });
-                    const imgWidth = pdf.internal.pageSize.getWidth();
-                    const imgHeight = (img.height * imgWidth) / img.width;
-                    if (!firstPage) pdf.addPage();
-                    pdf.addImage(imgData, 'JPEG', 0, 0, imgWidth, imgHeight);
-                    firstPage = false;
-                }
-                const pdfBlob = pdf.output('blob');
-                const progNum = String(parseInt(baseProg) + pdfFiles.length).padStart(3, '0');
-                await saveDocumentWithErrorHandling(currentYear, progNum, userDescription, pdfBlob);
-            }
-            
-            await renderDocsList();
-            alert(`${pdfFiles.length + (imageFiles.length > 0 ? 1 : 0)} documento/i salvato/i nell'anno ${currentYear}.`);
-        };
-        input.click();
-    }
-
-    function onYearInput() {
-        const year = archivioYearInputArch.value.trim();
-        if (year.length === 4 && /^\d{4}$/.test(year)) {
-            currentYear = year;
-            localStorage.setItem('archivio_current_year_local', year);
-            archivioCurrentYearSpanArch.innerText = year;
-            renderDocsList();
-        } else if (year === "") {
-            currentYear = "";
-            archivioCurrentYearSpanArch.innerText = "--";
-            archivioDocsListArch.innerHTML = '<div style="text-align:center; padding:20px;">Inserisci un anno.</div>';
-        }
-    }
-
-    function showArchivioMessage(msg, isError = false) {
-        const msgDiv = document.createElement('div');
-        msgDiv.className = 'status-msg';
-        msgDiv.style.color = isError ? 'red' : 'green';
-        msgDiv.style.textAlign = 'center';
-        msgDiv.style.margin = '8px 0';
-        msgDiv.innerText = msg;
-        const container = document.querySelector('#archivioPage .archivio-year-container');
-        if (container) container.parentNode.insertBefore(msgDiv, container.nextSibling);
-        setTimeout(() => msgDiv.remove(), 3000);
-    }
-
-    async function initArchivio() {
-        await openArchivioDB();
-        const savedYear = localStorage.getItem('archivio_current_year_local');
-        if (savedYear && /^\d{4}$/.test(savedYear)) {
-            currentYear = savedYear;
-            archivioYearInputArch.value = currentYear;
-            archivioCurrentYearSpanArch.innerText = currentYear;
-        } else {
-            currentYear = "";
-            archivioYearInputArch.value = "";
-            archivioCurrentYearSpanArch.innerText = "--";
-        }
-        await renderDocsList();
-    }
-
-    function toggleSearchPanel() {
-        if (archivioSearchPanelArch.style.display === 'none') archivioSearchPanelArch.style.display = 'block';
-        else archivioSearchPanelArch.style.display = 'none';
-    }
-    function searchDocs() {
-        searchTerm = archivioSearchInputArch.value.trim();
-        renderDocsList();
-        showArchivioMessage(`🔍 Ricerca: "${searchTerm || 'tutti i documenti'}"`, false);
-    }
-    function clearSearch() {
-        archivioSearchInputArch.value = "";
-        searchTerm = "";
-        renderDocsList();
-        archivioSearchPanelArch.style.display = 'none';
-        showArchivioMessage("🔍 Ricerca cancellata", false);
-    }
-
-    function showArchivioPage() {
-        if (!licenseCheckPassed) {
-            alert('Licenza non attiva o scaduta. Attivala dalla home.');
-            return;
-        }
-        homePage.classList.add("hidden");
-        archivioPage.classList.remove("hidden");
-        initArchivio();
-        keepScreenOn();
-    }
-    
-    // ==================== FUNZIONI BACKUP ====================
-    
-    async function backupYear(anno) {
-        const docs = await loadDocumentsForYear(anno, "");
-        if (docs.length === 0) {
-            alert(`Nessun documento trovato per l'anno ${anno}.`);
-            return;
-        }
-        
-        const exportData = {
-            exportDate: new Date().toISOString(),
-            version: CURRENT_VERSION,
-            anno: anno,
-            documents: []
-        };
-        
-        for (const doc of docs) {
-            const docCopy = { ...doc };
-            if (docCopy.fileBlob) {
-                docCopy.fileBase64 = await blobToBase64(docCopy.fileBlob);
-                delete docCopy.fileBlob;
-            }
-            exportData.documents.push(docCopy);
-        }
-        
-        const jsonStr = JSON.stringify(exportData, null, 2);
-        const blob = new Blob([jsonStr], {type: 'application/json'});
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `backup_anno_${anno}_${CURRENT_VERSION}_${Date.now()}.json`;
-        a.click();
-        URL.revokeObjectURL(url);
-        
-        alert(`✅ Backup dell'anno ${anno} completato!\nSono stati esportati ${docs.length} documenti.`);
-    }
-    
-    async function backupAllYears() {
-        const db = await openArchivioDB();
-        const allDocs = await getAllDocumentsFromDB(db);
-        
-        if (allDocs.length === 0) {
-            alert("Nessun documento da esportare.");
-            return;
-        }
-        
-        const docsByYear = {};
-        for (const doc of allDocs) {
-            if (!docsByYear[doc.anno]) docsByYear[doc.anno] = [];
-            docsByYear[doc.anno].push(doc);
-        }
-        
-        const exportData = {
-            exportDate: new Date().toISOString(),
-            version: CURRENT_VERSION,
-            years: docsByYear
-        };
-        
-        for (const anno in docsByYear) {
-            for (const doc of docsByYear[anno]) {
-                if (doc.fileBlob) {
-                    doc.fileBase64 = await blobToBase64(doc.fileBlob);
-                    delete doc.fileBlob;
-                }
-            }
-        }
-        
-        const jsonStr = JSON.stringify(exportData, null, 2);
-        const blob = new Blob([jsonStr], {type: 'application/json'});
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `backup_completo_archivio_${CURRENT_VERSION}_${Date.now()}.json`;
-        a.click();
-        URL.revokeObjectURL(url);
-        
-        alert(`✅ Backup completo completato!\n\nSono stati esportati ${allDocs.length} documenti da ${Object.keys(docsByYear).length} anni.`);
-    }
-    
-    async function importBackup(file) {
-        return new Promise((resolve, reject) => {
-            const reader = new FileReader();
-            reader.onload = async (e) => {
-                try {
-                    const data = JSON.parse(e.target.result);
-                    let importedCount = 0;
-                    
-                    if (data.years) {
-                        for (const anno in data.years) {
-                            for (const docData of data.years[anno]) {
-                                if (docData.fileBase64) {
-                                    const blob = base64ToBlob(docData.fileBase64);
-                                    await saveDocument(docData.anno, docData.numeroProgressivo, docData.nomeUtente, blob);
-                                    importedCount++;
-                                }
-                            }
-                        }
-                    } else if (data.documents) {
-                        for (const docData of data.documents) {
-                            if (docData.fileBase64) {
-                                const blob = base64ToBlob(docData.fileBase64);
-                                await saveDocument(docData.anno, docData.numeroProgressivo, docData.nomeUtente, blob);
-                                importedCount++;
-                            }
-                        }
-                    }
-                    
-                    alert(`✅ Importazione completata!\nSono stati ripristinati ${importedCount} documenti.`);
-                    await renderDocsList();
-                    resolve();
-                } catch (err) {
-                    alert("Errore durante l'importazione: " + err.message);
-                    reject(err);
-                }
-            };
-            reader.onerror = () => reject(reader.error);
-            reader.readAsText(file);
-        });
-    }
-    
-    function blobToBase64(blob) {
-        return new Promise((resolve, reject) => {
-            const reader = new FileReader();
-            reader.onload = () => resolve(reader.result.split(',')[1]);
-            reader.onerror = reject;
-            reader.readAsDataURL(blob);
-        });
-    }
-    
-    function base64ToBlob(base64, mimeType = 'application/pdf') {
-        const byteCharacters = atob(base64);
-        const byteNumbers = new Array(byteCharacters.length);
-        for (let i = 0; i < byteCharacters.length; i++) {
-            byteNumbers[i] = byteCharacters.charCodeAt(i);
-        }
-        const byteArray = new Uint8Array(byteNumbers);
-        return new Blob([byteArray], {type: mimeType});
-    }
-    
-    async function getAllDocumentsFromDB(db) {
-        return new Promise((resolve, reject) => {
-            const tx = db.transaction("documenti", "readonly");
-            const store = tx.objectStore("documenti");
-            const request = store.getAll();
-            request.onsuccess = () => resolve(request.result);
-            request.onerror = () => reject(request.error);
-        });
-    }
-    
-    function showArchivioInfo() {
-        alert(
-            "📁 ARCHIVIO DOCUMENTI\n\n" +
-            "• CREA ANNO: inserisci un anno (es. 2025) e premi il pulsante\n" +
-            "• CARICA DOCUMENTO: seleziona foto o PDF (più foto → unico PDF)\n" +
-            "• I nomi dei file sono automatici: 001_2025_05_22_descrizione.pdf\n" +
-            "• 🔍 cerca per descrizione\n" +
-            "• 🔍 (lente) apre l'anteprima del PDF\n" +
-            "• 🗑️ elimina il documento (con conferma)\n" +
-            "• BACKUP ANNO: esporta tutti i documenti dell'anno in un file JSON\n" +
-            "• BACKUP TUTTO: esporta tutti i documenti di tutti gli anni\n" +
-            "• RIPRISTINA BACKUP: importa un file JSON e ripristina i documenti\n\n" +
-            "⚠️ Su iPhone lo spazio è limitato (~50MB). Fai backup regolari."
-        );
-    }
-
-    // ==================== EVENT LISTENER ====================
+    // --- EVENT LISTENER PER ARCHIVIO LOCALE ---
     archivioExpatBtn.addEventListener('click', showArchivioPage);
     archivioYearInputArch.addEventListener('input', onYearInput);
     archivioYearInputArch.addEventListener('blur', onYearInput);
     archivioSearchBtnArch.addEventListener('click', toggleSearchPanel);
     archivioSearchExecBtnArch.addEventListener('click', searchDocs);
     archivioSearchClearBtnArch.addEventListener('click', clearSearch);
-    archivioNewYearBtnArch.addEventListener('click', createYearFolderManuale);
+    archivioNewYearBtnArch.addEventListener('click', createYearFolder);
     archivioCaricaDocBtnArch.addEventListener('click', uploadDocument);
     archivioCaricaDocBtnTopArch.addEventListener('click', uploadDocument);
     
-    // Pulsanti info
-    const infoBtns = document.querySelectorAll('#archivioInfoBtn, #archivioInfoBtnTop');
-    infoBtns.forEach(btn => {
-        if (btn) btn.addEventListener('click', showArchivioInfo);
-    });
-    
-    // Pulsanti backup
-    const backupYearBtn = document.getElementById('backupYearBtn');
-    const backupAllBtn = document.getElementById('backupAllBtn');
-    const importBackupBtn = document.getElementById('importBackupBtn');
-    
-    if (backupYearBtn) {
-        backupYearBtn.addEventListener('click', async () => {
-            if (!currentYear) {
-                alert("Seleziona un anno prima di fare il backup.");
-                return;
-            }
-            await backupYear(currentYear);
-        });
-    }
-    
-    if (backupAllBtn) {
-        backupAllBtn.addEventListener('click', async () => {
-            await backupAllYears();
-        });
-    }
-    
-    if (importBackupBtn) {
-        importBackupBtn.addEventListener('click', () => {
-            const input = document.createElement('input');
-            input.type = 'file';
-            input.accept = 'application/json';
-            input.onchange = async (e) => {
-                if (e.target.files.length) {
-                    await importBackup(e.target.files[0]);
-                }
-            };
-            input.click();
-        });
-    }
-    
-    // ==================== ESPORTAZIONE/IMPORTAZIONE RETE PER ADMIN ====================
+    // --- ESPORTAZIONE/IMPORTAZIONE RETE PER ADMIN ---
     if (exportReteBtn) exportReteBtn.addEventListener('click', exportReteToFile);
     if (importReteBtn) importReteBtn.addEventListener('click', () => {
         const input = document.createElement('input');
@@ -1544,18 +1946,7 @@
         });
     });
     
-    // Funzioni rete mancanti (minime per compatibilità)
-    let reteData = { categories: [] };
-    let currentImageData = null;
-    function saveReteData() { localStorage.setItem('monastir_rete_data', JSON.stringify(reteData)); }
-    function loadReteData() { const saved = localStorage.getItem('monastir_rete_data'); if (saved) reteData = JSON.parse(saved); }
-    function performSync() { return Promise.resolve(); }
-    function renderReteCategories() {}
-    function loadSavedImage() {}
-    function exportReteToFile() {}
-    function importReteFromFile() {}
-    
-    // ==================== INIZIALIZZAZIONE ====================
+    // --- INIZIALIZZAZIONE ---
     function init() {
         loadAdminCode();
         loadAllNotes();
@@ -1579,30 +1970,17 @@
         initRecognitionSpeak();
         initLicense();
         activateLicenseBtn.addEventListener('click', onActivateLicense);
+        if (!reteData.categories || reteData.categories.length === 0) { reteData.categories = []; saveReteData(); }
+        
+        performSync(true).then(() => {
+            console.log('Sincronizzazione iniziale completata');
+        });
         
         keepScreenOn();
         bindWakeLockToInteraction();
-        
-        openArchivioDB().catch(console.warn);
+        backStack = ['home'];
+        history.replaceState({ page: 'home', modal: false }, '');
     }
-    
-    function initHomeButtons() {
-        document.querySelectorAll('.service-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                const service = btn.getAttribute('data-service');
-                if (service) showEmergency(service);
-            });
-        });
-    }
-    function loadAdminCode() { let saved = localStorage.getItem('adminCode'); if (saved && saved.trim()) adminCode = saved; else { adminCode = "admin2025"; localStorage.setItem('adminCode', adminCode); } }
-    function loadInfoTextsFromLocal() { let saved = localStorage.getItem('infoTextsBackup'); if (saved) { try { let parsed = JSON.parse(saved); for (let k in parsed) { if (infoTexts.hasOwnProperty(k)) infoTexts[k] = parsed[k]; } } catch(e){} } }
-    let infoTexts = {
-        licenseInfo: "Informazioni sul codice cliente.\nIl codice cliente è univoco per questa installazione.",
-        infoNote: "Informazioni sulle note.\nPuoi aggiungere note per ogni contatto.",
-        infoOperator: "Informazioni sull'ascolto operatore.\nPremi 'ASCOLTA OPERATORE' per avviare un ascolto di 30 secondi.",
-        infoSpeak: "Informazioni sulla conversazione con operatore.\nPremi 'PARLA CON OPERATORE' e parla in italiano."
-    };
-    
     init();
 </script>
 </body>
