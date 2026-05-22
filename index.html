@@ -144,7 +144,7 @@
 </head>
 <body>
 <div class="container">
-    <!-- HOME PAGE (originale) -->
+    <!-- HOME PAGE -->
     <div id="homePage" class="page">
         <div class="title-btn" id="adminLongPressBtn"><span>📇</span><span>CONTATTI PERSONALI</span><span>📇</span></div>
         <div class="license-section">
@@ -170,7 +170,7 @@
         <div class="triple-btn-row"><button id="exportAllBtn">💾 SALVA NOTE</button><button id="importAllBtn">📂 RIPRISTINA NOTE</button><button id="archivioExpatBtn">📁 ARCHIVIO EXPAT</button></div>
         <input type="file" id="globalImportFileInput" accept=".txt" style="display:none;">
     </div>
-                                                                                                                                                           <!-- EMERGENCY PAGE (originale) -->
+    <!-- EMERGENCY PAGE -->
     <div id="emergencyPage" class="page hidden">
         <div id="currentServiceDeco" class="current-service-deco">Contatto:</div>
         <div class="dark-card"><div class="section-title">Numero servizio</div><div class="flex-row"><input type="tel" id="phoneNumber" placeholder="Numero" style="flex:2;"><button id="saveNumberBtn" class="small-btn" style="flex:0.4;">SALVA</button></div><div id="phoneSaveMsg" class="status-msg"></div></div>
@@ -205,7 +205,7 @@
         </div>
     </div>
 
-    <!-- IMAGE PAGE (originale) -->
+    <!-- IMAGE PAGE -->
     <div id="imagePage" class="page hidden">
         <div class="image-top-box"><div class="image-top-title">MONASTIR: Facciamo Rete</div><div id="imagePreviewArea" class="image-container"><div class="image-placeholder" id="imagePlaceholder">📸 Solo amministratore: premi a lungo (3 sec) per caricare un'immagine</div></div></div>
         <div class="info-message-small">Per la consultazione, Richiedi Codice Attivazione nella Home.</div>
@@ -215,7 +215,7 @@
         <button id="forceSyncBtn" class="small-btn force-sync-btn">🔄 FORZA SINCRONIZZAZIONE</button>
     </div>
 
-    <!-- NUOVA PAGINA ARCHIVIO LOCALE (modificata v0238) -->
+    <!-- ARCHIVIO LOCALE PAGE (MODIFICATA v0238) -->
     <div id="archivioPage" class="page hidden">
         <div class="archivio-title">ARCHIVIO DOCUMENTI LOCALE</div>
         <div id="archivioRootInfo" class="info-message-small" style="background:#e8f5e9; padding:8px; border-radius:16px; margin-bottom:16px;">📁 Caricamento in corso...</div>
@@ -246,7 +246,7 @@
         <div class="info-message-small" style="margin-top:16px;">ℹ️ I file vengono salvati nella cartella che hai selezionato. Per cambiare cartella, cancella i dati dell'app.</div>
     </div>
 
-    <!-- MODALI (originali) -->
+    <!-- MODALI -->
     <div id="adaptiveModal" class="adaptive-modal" style="display:none;"><div class="adaptive-modal-content"><textarea id="modalTextarea" readonly></textarea><button id="closeAdaptiveBtn">CHIUDI</button></div></div>
     <div id="speakDetailModal" class="adaptive-modal" style="display:none;"><div class="adaptive-modal-content"><h3>📄 Dettaglio conversazione</h3><div class="detail-label">Italiano (originale)</div><div class="detail-text" id="speakOriginalText"></div><div class="detail-label">Francese (traduzione)</div><div class="detail-text" id="speakTranslatedText"></div><div class="modal-buttons"><button id="closeSpeakModalBtn" class="save-btn">CHIUDI</button></div></div></div>
     <div id="noteEditModal" class="adaptive-modal note-edit-modal" style="display:none;"><div class="adaptive-modal-content"><h3 id="noteModalTitle">➕ Aggiungi Nota</h3><label class="detail-label">Titolo</label><input type="text" id="editNoteTitle" placeholder="Inserisci il titolo"><label class="detail-label">Descrizione</label><textarea id="editNoteDesc" rows="4" placeholder="Inserisci la descrizione"></textarea><label class="detail-label">Includi coordinate nella copia/lettura</label><div class="coord-toggle-group"><button id="modalCoordS" class="coord-toggle-modal-btn">S</button><button id="modalCoordN" class="coord-toggle-modal-btn">N</button></div><div class="modal-audio-row"><button id="modalAudioIt" class="modal-audio-btn">🇮🇹 LEGGI in IT</button><button id="modalAudioFr" class="modal-audio-btn">🇹🇳 LEGGI in FR</button></div><div class="modal-buttons"><button id="deleteNoteModalBtn" class="delete-btn" style="display:none;">🗑️ CANCELLA NOTA</button><button id="saveNoteModalBtn" class="save-btn">SALVA</button><button id="cancelNoteModalBtn" class="cancel-btn">ANNULLA</button></div></div></div>
@@ -263,8 +263,20 @@
             <div class="modal-buttons" style="justify-content:center; gap:12px;"><button id="activityCoordBtn" class="small-btn" style="background:#283593;">📍 TROVAMI</button><button id="activityWebBtn" class="small-btn" style="background:#2c3e50;">🌐 APRI SITO</button></div>
         </div>
     </div>
+    
+    <!-- MODALE PDF PER ARCHIVIO -->
+    <div id="pdfViewerModalArch" class="adaptive-modal" style="display:none;">
+        <div class="adaptive-modal-content" style="width:90%; max-width:800px; height:80%;">
+            <h3>Anteprima documento</h3>
+            <iframe id="pdfViewerFrameArch" style="width:100%; height:80%; border:none;"></iframe>
+            <div class="modal-buttons">
+                <button id="closePdfViewerArch" class="save-btn">CHIUDI</button>
+            </div>
+        </div>
+    </div>
 </div>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script>
     // ==================== v0238 - TUTTE LE FUNZIONI ORIGINALI + ARCHIVIO LOCALE MODIFICATO ====================
@@ -277,6 +289,7 @@
     let selectedNormalNoteId = null;
     let globalWakeLock = null;
     let imagePageWakeLock = null;
+    let currentInfoContext = null;
     let contactExtraText = {
         ambulanza: "", polizia: "", veterinario: "", clinica: "MONASTIR: Facciamo Rete"
     };
@@ -286,7 +299,6 @@
     const SECRET_KEY = "ChiaveSegreta123";
     let adminCode = "admin2025", adminAuthenticated = false;
     
-    // PWA install prompt
     let deferredPrompt = null;
     window.addEventListener('beforeinstallprompt', (e) => {
         e.preventDefault();
@@ -418,7 +430,8 @@
     let currentYear = "";
     let searchTerm = "";
     let docsList = [];
-                                                                                                                                                                      // ==================== FUNZIONI ARCHIVIO LOCALE (modificate v0238) ====================
+
+    // ==================== FUNZIONI ARCHIVIO LOCALE (MODIFICATE v0238) ====================
     async function saveRootHandle() {
         if (!rootDirectoryHandle) return;
         const db = await idbOpen();
@@ -537,30 +550,17 @@
     async function openPdfModal(fileHandle) {
         const file = await fileHandle.getFile();
         const url = URL.createObjectURL(file);
-        // Creiamo un iframe modale
-        let modal = document.getElementById('pdfViewerModalArch');
-        if (!modal) {
-            modal = document.createElement('div');
-            modal.id = 'pdfViewerModalArch';
-            modal.className = 'adaptive-modal';
-            modal.style.display = 'none';
-            modal.innerHTML = `<div class="adaptive-modal-content" style="width:90%; max-width:800px; height:80%;">
-                                <h3>Anteprima documento</h3>
-                                <iframe id="pdfViewerFrameArch" style="width:100%; height:80%; border:none;"></iframe>
-                                <div class="modal-buttons"><button id="closePdfViewerArch" class="save-btn">CHIUDI</button></div>
-                              </div>`;
-            document.body.appendChild(modal);
-            document.getElementById('closePdfViewerArch').onclick = () => {
-                modal.style.display = 'none';
-                document.getElementById('pdfViewerFrameArch').src = '';
-            };
-            modal.onclick = (e) => { if (e.target === modal) modal.style.display = 'none'; };
-        }
+        const modal = document.getElementById('pdfViewerModalArch');
         const iframe = document.getElementById('pdfViewerFrameArch');
         iframe.src = url;
         modal.style.display = 'flex';
-        // revochiamo l'URL dopo un po'? Non subito perché l'iframe lo usa.
-        setTimeout(() => URL.revokeObjectURL(url), 60000);
+        const closeModal = () => {
+            modal.style.display = 'none';
+            iframe.src = '';
+            URL.revokeObjectURL(url);
+        };
+        document.getElementById('closePdfViewerArch').onclick = closeModal;
+        modal.onclick = (e) => { if (e.target === modal) closeModal(); };
     }
     
     async function deleteDocumentFile(fileHandle, fileName) {
@@ -629,12 +629,9 @@
         const year = archivioYearInputArch.value.trim();
         if (!/^\d{4}$/.test(year)) { alert("Inserisci un anno a 4 cifre."); return; }
         try {
-            // Verifica se la cartella esiste già
             await rootDirectoryHandle.getDirectoryHandle(year, { create: false });
-            // Se arriva qui, esiste già
             showArchivioMessage(`⚠️ Anno ${year} già esistente.`, true);
         } catch (e) {
-            // La cartella non esiste, la creiamo
             if (e.name === 'NotFoundError') {
                 try {
                     await rootDirectoryHandle.getDirectoryHandle(year, { create: true });
@@ -661,7 +658,7 @@
         msgDiv.style.margin = '8px 0';
         msgDiv.innerText = msg;
         const container = document.querySelector('#archivioPage .archivio-year-container');
-        container.parentNode.insertBefore(msgDiv, container.nextSibling);
+        if (container) container.parentNode.insertBefore(msgDiv, container.nextSibling);
         setTimeout(() => msgDiv.remove(), 3000);
     }
     
@@ -817,7 +814,6 @@
         initArchivio();
         keepScreenOn();
     }
-    
     // ==================== FUNZIONI ORIGINALI (NON MODIFICATE) ====================
     
     // --- WAKE LOCK ---
@@ -875,7 +871,7 @@
         }
     });
     
-    // --- RETE CATEGORIE (originale) ---
+    // --- RETE CATEGORIE ---
     let reteData = { categories: [] };
     let currentImageData = null;
     function saveReteData() { localStorage.setItem('monastir_rete_data', JSON.stringify(reteData)); }
@@ -1245,7 +1241,7 @@
         else setupImageArea();
     }
     
-    // --- LICENZA (originale) ---
+    // --- LICENZA ---
     function generateRandomClientCode() { return Math.floor(1000000000 + Math.random() * 9000000000).toString(); }
     function hashTo20Digits(hash) { let hex = hash.toString(CryptoJS.enc.Hex); let decimal = BigInt('0x' + hex).toString(); return decimal.slice(0,20).padStart(20,'0'); }
     function verifyUnlockCode(clientCode, firstRun, unlockCode) { const message = `${clientCode}|${firstRun}`; const hash = CryptoJS.HmacSHA256(message, SECRET_KEY); const expected = hashTo20Digits(hash); return expected === unlockCode; }
@@ -1354,7 +1350,7 @@
     hideAdminBtn.onclick = hideAdminSection;
     changeAdminCodeBtn.onclick = () => { let nc = newAdminCode.value.trim(); if (nc) saveAdminCode(nc); else alert("Inserisci nuovo codice."); };
     
-    // --- SALVA / RIPRISTINA TESTI PALLINI I (originale) ---
+    // --- SALVA / RIPRISTINA TESTI PALLINI I ---
     let infoTexts = {
         licenseInfo: "Informazioni sul codice cliente.\nIl codice cliente è univoco per questa installazione.\nPer attivare la licenza, invia un bonifico di €48,00 a Paolo Maiorana IBAN: IT31R0339512900052702573770 con causale il tuo codice cliente.\nPoi invia email a gli amicidipaolino@gmail.com con il codice cliente per ricevere il codice di sblocco.",
         licenseRequest: "Richiedi attivazione: Premi 'Richiedi attivazione' e segui le istruzioni per ottenere il codice di sblocco.\nInvia un bonifico di €48,00 a Paolo Maiorana IBAN: IT31R0339512900052702573770 con causale il tuo codice cliente.\nPoi invia email a gli amicidipaolino@gmail.com con il codice cliente.\nRiceverai il codice di sblocco a 20 cifre.",
@@ -1411,7 +1407,7 @@
         if (saved) { try { let parsed = JSON.parse(saved); for (let k in parsed) { if (infoTexts.hasOwnProperty(k)) infoTexts[k] = parsed[k]; } } catch(e){} }
     }
     
-    // --- MODALE INFORMATIVA (originale) ---
+    // --- MODALE INFORMATIVA ---
     function openGlobalInfoModal(context, title, storageKey) {
         currentInfoContext = { context, storageKey };
         globalInfoModalTitle.innerText = title;
@@ -1460,7 +1456,7 @@
     globalInfoCloseBtn.addEventListener('click', () => { globalInfoModalDiv.style.display = 'none'; currentInfoContext = null; isModalOpen = false; });
     globalInfoModalDiv.addEventListener('click', (e) => { if (e.target === globalInfoModalDiv) { globalInfoModalDiv.style.display = 'none'; isModalOpen = false; } });
     
-    // --- CONTATTI HOME (originale) ---
+    // --- CONTATTI HOME ---
     function saveContactExtraText() { services.forEach(s => localStorage.setItem(`contactExtra_${s}_${CURRENT_VERSION}`, contactExtraText[s])); }
     function loadContactExtraText() { services.forEach(s => { let saved = localStorage.getItem(`contactExtra_${s}_${CURRENT_VERSION}`); if (saved !== null) contactExtraText[s] = saved; else contactExtraText[s] = (s === 'clinica') ? "MONASTIR: Facciamo Rete" : ""; }); }
     function getContactButtonText(s) { let extra = contactExtraText[s]; if (extra && extra.trim()) return extra; if (s === 'clinica') return "MONASTIR: Facciamo Rete"; return `Contatto: premi 5 sc. per modifica`; }
@@ -1519,7 +1515,7 @@
         });
     }
     
-    // --- GEOLOCALIZZAZIONE (originale) ---
+    // --- GEOLOCALIZZAZIONE ---
     function haversine(lat1,lng1,lat2,lng2) {
         const R = 6371e3;
         const φ1 = lat1 * Math.PI/180, φ2 = lat2 * Math.PI/180;
@@ -1654,7 +1650,7 @@
         gpsStatus.innerHTML = "";
     }
     
-    // --- GESTIONE NOTE (originale) ---
+    // --- GESTIONE NOTE ---
     function getNormalNotesKey(s) { return `normalNotes_${s}_${CURRENT_VERSION}`; }
     function getSelectedNormalIdKey(s) { return `selectedNormalNote_${s}_${CURRENT_VERSION}`; }
     function saveNormalNotesForService(s) { localStorage.setItem(getNormalNotesKey(s), JSON.stringify(normalNotes[s])); }
@@ -1803,7 +1799,7 @@
         keepScreenOn();
     }
     
-    // --- TRADUZIONI (originale) ---
+    // --- TRADUZIONI ---
     async function translateToFrench(italianText) { if (!italianText || italianText.trim() === "") return ""; try { const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(italianText)}&langpair=it|fr`; const resp = await fetch(url); const data = await resp.json(); if (data && data.responseData && data.responseData.translatedText) return data.responseData.translatedText; } catch(e) { console.warn(e); } return italianText; }
     async function translateFrenchToItalian(frenchText) { if (!frenchText || frenchText.trim() === "") return ""; try { const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(frenchText)}&langpair=fr|it`; const resp = await fetch(url); const data = await resp.json(); if (data && data.responseData && data.responseData.translatedText) return data.responseData.translatedText; } catch(e) { console.warn(e); } return frenchText + " (traduzione fallita)"; }
     function initRecognitionOperator() { if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) { transcribeStatus.innerText = "❌ Riconoscimento non supportato"; return false; } const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition; recognitionOperator = new SpeechRecognition(); recognitionOperator.continuous = true; recognitionOperator.interimResults = false; recognitionOperator.lang = 'fr-FR'; return true; }
@@ -1881,7 +1877,7 @@
     function showTemporaryMessage(element, message, duration = 15000) { if (!element) return; element.innerText = message; element.style.display = 'block'; if (element._hideTimeout) clearTimeout(element._hideTimeout); element._hideTimeout = setTimeout(() => { element.style.display = 'none'; }, duration); }
     function playBeep() { try { let ctx = new (window.AudioContext || window.webkitAudioContext)(); let osc = ctx.createOscillator(); let gain = ctx.createGain(); osc.connect(gain); gain.connect(ctx.destination); osc.frequency.value = 880; gain.gain.value = 0.3; osc.type = "sine"; osc.start(); gain.gain.exponentialRampToValueAtTime(0.00001, ctx.currentTime + 0.8); osc.stop(ctx.currentTime + 0.8); ctx.resume(); } catch(e) { console.warn("beep fallito", e); } }
     
-    // --- ESPORTA/IMPORTA NOTE (originale) ---
+    // --- ESPORTA/IMPORTA NOTE ---
     function exportAllNotes() {
         let content = "";
         content += "[NUMERI TELEFONO]\n"; for (let s of services) { let phone = getPhone(s) || defaultPhone[s]; content += `${s.toUpperCase()}=${phone}\n`; }
@@ -1937,7 +1933,7 @@
     const defaultPhone = { ambulanza:"118", polizia:"113", veterinario:"800123456", clinica:"800987654" };
     function migratePhoneNumbers() { const oldVersions = ["0236","0235","0234"]; for (let s of services) { if (localStorage.getItem(`phone_${s}_${CURRENT_VERSION}`)) continue; for (let ver of oldVersions) { let old = localStorage.getItem(`phone_${s}_${ver}`); if (old) { localStorage.setItem(`phone_${s}_${CURRENT_VERSION}`, old); break; } } } }
     
-    // --- PALLINI I (originale) ---
+    // --- PALLINI I ---
     licenseInfoIcon.addEventListener('click', () => openGlobalInfoModal('licenseInfo', 'Informazioni Licenza', 'license_info_text'));
     infoNoteBtn.addEventListener('click', () => openGlobalInfoModal('infoNote', 'Informazioni Note', 'info_note_text'));
     infoOperatorBtn.addEventListener('click', () => openGlobalInfoModal('infoOperator', 'Informazioni Ascolto Operatore', 'info_operator_text'));
@@ -1976,7 +1972,7 @@
     archivioSearchBtnArch.addEventListener('click', toggleSearchPanel);
     archivioSearchExecBtnArch.addEventListener('click', searchDocs);
     archivioSearchClearBtnArch.addEventListener('click', clearSearch);
-    archivioNewYearBtnArch.addEventListener('click', createYearFolderManuale);  // ora manuale
+    archivioNewYearBtnArch.addEventListener('click', createYearFolderManuale);
     archivioCaricaDocBtnArch.addEventListener('click', uploadDocument);
     archivioCaricaDocBtnTopArch.addEventListener('click', uploadDocument);
     
