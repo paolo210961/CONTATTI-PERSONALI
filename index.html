@@ -170,6 +170,7 @@
         <div class="triple-btn-row"><button id="exportAllBtn">💾 SALVA NOTE</button><button id="importAllBtn">📂 RIPRISTINA NOTE</button><button id="archivioExpatBtn">📁 ARCHIVIO EXPAT</button></div>
         <input type="file" id="globalImportFileInput" accept=".txt" style="display:none;">
     </div>
+
     <!-- EMERGENCY PAGE -->
     <div id="emergencyPage" class="page hidden">
         <div id="currentServiceDeco" class="current-service-deco">Contatto:</div>
@@ -245,8 +246,7 @@
         </div>
         <div class="info-message-small" style="margin-top:16px;">ℹ️ I file vengono salvati nella cartella che hai selezionato. Per cambiare cartella, cancella i dati dell'app.</div>
     </div>
-
-    <!-- MODALI -->
+        <!-- MODALI -->
     <div id="adaptiveModal" class="adaptive-modal" style="display:none;"><div class="adaptive-modal-content"><textarea id="modalTextarea" readonly></textarea><button id="closeAdaptiveBtn">CHIUDI</button></div></div>
     <div id="speakDetailModal" class="adaptive-modal" style="display:none;"><div class="adaptive-modal-content"><h3>📄 Dettaglio conversazione</h3><div class="detail-label">Italiano (originale)</div><div class="detail-text" id="speakOriginalText"></div><div class="detail-label">Francese (traduzione)</div><div class="detail-text" id="speakTranslatedText"></div><div class="modal-buttons"><button id="closeSpeakModalBtn" class="save-btn">CHIUDI</button></div></div></div>
     <div id="noteEditModal" class="adaptive-modal note-edit-modal" style="display:none;"><div class="adaptive-modal-content"><h3 id="noteModalTitle">➕ Aggiungi Nota</h3><label class="detail-label">Titolo</label><input type="text" id="editNoteTitle" placeholder="Inserisci il titolo"><label class="detail-label">Descrizione</label><textarea id="editNoteDesc" rows="4" placeholder="Inserisci la descrizione"></textarea><label class="detail-label">Includi coordinate nella copia/lettura</label><div class="coord-toggle-group"><button id="modalCoordS" class="coord-toggle-modal-btn">S</button><button id="modalCoordN" class="coord-toggle-modal-btn">N</button></div><div class="modal-audio-row"><button id="modalAudioIt" class="modal-audio-btn">🇮🇹 LEGGI in IT</button><button id="modalAudioFr" class="modal-audio-btn">🇹🇳 LEGGI in FR</button></div><div class="modal-buttons"><button id="deleteNoteModalBtn" class="delete-btn" style="display:none;">🗑️ CANCELLA NOTA</button><button id="saveNoteModalBtn" class="save-btn">SALVA</button><button id="cancelNoteModalBtn" class="cancel-btn">ANNULLA</button></div></div></div>
@@ -430,8 +430,7 @@
     let currentYear = "";
     let searchTerm = "";
     let docsList = [];
-
-    // ==================== FUNZIONI ARCHIVIO LOCALE (MODIFICATE v0238) ====================
+        // ==================== FUNZIONI ARCHIVIO LOCALE (MODIFICATE v0238) ====================
     async function saveRootHandle() {
         if (!rootDirectoryHandle) return;
         const db = await idbOpen();
@@ -814,8 +813,8 @@
         initArchivio();
         keepScreenOn();
     }
-    // ==================== FUNZIONI ORIGINALI (NON MODIFICATE) ====================
     
+    // ==================== FUNZIONI ORIGINALI (GEOLOCALIZZAZIONE, NOTE, TRADUZIONI, ecc.) ====================
     // --- WAKE LOCK ---
     async function requestGlobalWakeLock() {
         if ('wakeLock' in navigator) {
@@ -990,6 +989,7 @@
     function deleteChild(category, childIndex) { if (!adminAuthenticated) { alert("Solo amministratore."); return; } if (confirm("Vuoi eliminare questo figlio?")) { category.children.splice(childIndex, 1); saveReteData(); renderReteCategories(reteLevelContainer, reteData); } }
     function editChildTitle(child, newTitle) { if (!adminAuthenticated) { alert("Solo amministratore."); return false; } child.title = newTitle; saveReteData(); renderReteCategories(reteLevelContainer, reteData); return true; }
     
+    let currentActivityNode = null;
     function showActivityModalForChild(child) {
         if (!adminAuthenticated) {
             const activated = localStorage.getItem('activated') === 'true';
@@ -1803,6 +1803,7 @@
     async function translateToFrench(italianText) { if (!italianText || italianText.trim() === "") return ""; try { const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(italianText)}&langpair=it|fr`; const resp = await fetch(url); const data = await resp.json(); if (data && data.responseData && data.responseData.translatedText) return data.responseData.translatedText; } catch(e) { console.warn(e); } return italianText; }
     async function translateFrenchToItalian(frenchText) { if (!frenchText || frenchText.trim() === "") return ""; try { const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(frenchText)}&langpair=fr|it`; const resp = await fetch(url); const data = await resp.json(); if (data && data.responseData && data.responseData.translatedText) return data.responseData.translatedText; } catch(e) { console.warn(e); } return frenchText + " (traduzione fallita)"; }
     function initRecognitionOperator() { if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) { transcribeStatus.innerText = "❌ Riconoscimento non supportato"; return false; } const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition; recognitionOperator = new SpeechRecognition(); recognitionOperator.continuous = true; recognitionOperator.interimResults = false; recognitionOperator.lang = 'fr-FR'; return true; }
+    let recognitionOperator = null, recognitionTimeout = null;
     async function startListening30s() {
         if (!recognitionOperator && !initRecognitionOperator()) return;
         if (recognitionTimeout) clearTimeout(recognitionTimeout);
@@ -1827,6 +1828,7 @@
         keepScreenOn();
     }
     function initRecognitionSpeak() { if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) { speakStatus.innerText = "❌ Riconoscimento non supportato"; return false; } const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition; recognitionSpeak = new SpeechRecognition(); recognitionSpeak.continuous = true; recognitionSpeak.interimResults = false; recognitionSpeak.lang = 'it-IT'; return true; }
+    let recognitionSpeak = null, lastItalianText = "", lastFrenchTranslation = "";
     async function speakFrenchWithMicroPause(text, langCode = 'fr-FR') { if (!window.speechSynthesis) return; speechSynthesis.cancel(); const words = text.split(/\s+/); for (let i = 0; i < words.length; i++) { const utterance = new SpeechSynthesisUtterance(words[i]); utterance.lang = langCode; utterance.rate = 1.0; speechSynthesis.speak(utterance); await new Promise(r => setTimeout(r, 200)); } }
     async function startSpeakingItalian() {
         if (!recognitionSpeak && !initRecognitionSpeak()) return;
