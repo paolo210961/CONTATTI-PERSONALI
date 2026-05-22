@@ -1,0 +1,1119 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <title>Archivio Documenti Expat</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+        body {
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, sans-serif;
+            background: #e9ecef;
+            padding: 16px;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .page {
+            background: white;
+            border-radius: 32px;
+            padding: 24px 20px 32px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.05);
+        }
+        .hidden {
+            display: none !important;
+        }
+        button {
+            background: #0066cc;
+            border: none;
+            color: white;
+            padding: 10px 16px;
+            border-radius: 40px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.05s linear;
+            margin: 4px;
+        }
+        button:active {
+            transform: scale(0.96);
+            background: #004999;
+        }
+        input {
+            width: 100%;
+            padding: 12px 16px;
+            border-radius: 32px;
+            border: 1px solid #ced4da;
+            font-size: 0.9rem;
+            background: #fff;
+        }
+        .archivio-title {
+            background: #6c757d;
+            border-radius: 60px;
+            padding: 14px 12px;
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: white;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .archivio-year-container {
+            display: flex;
+            justify-content: center;
+            margin: 16px 0;
+            gap: 10px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        .archivio-year-input {
+            background: #f0f0f0;
+            border-radius: 60px;
+            padding: 12px 20px;
+            text-align: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+            width: 180px;
+            border: 1px solid #ced4da;
+        }
+        .archivio-folder-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #e9ecef;
+            padding: 12px 16px;
+            border-radius: 32px;
+            margin: 16px 0;
+        }
+        .archivio-folder-name {
+            font-size: 1.1rem;
+            font-weight: bold;
+        }
+        .archivio-search-icon {
+            font-size: 1.3rem;
+            cursor: pointer;
+            background: none;
+            border: none;
+            padding: 5px 10px;
+        }
+        .dark-card {
+            background: #d2d6dc;
+            border-left: 6px solid #2c3e50;
+            border-radius: 24px;
+            padding: 16px;
+            margin: 16px 0;
+        }
+        .archivio-doc-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: white;
+            border: 1px solid #ced4da;
+            border-radius: 40px;
+            padding: 10px 16px;
+            margin: 8px 0;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .archivio-doc-name {
+            font-family: monospace;
+            font-size: 0.75rem;
+            word-break: break-all;
+            flex: 2;
+        }
+        .doc-actions {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .archivio-doc-open, .archivio-doc-delete, .archivio-doc-export {
+            font-size: 1.1rem;
+            cursor: pointer;
+            background: none;
+            border: none;
+            padding: 5px 10px;
+        }
+        .archivio-doc-delete {
+            color: #dc3545;
+        }
+        .archivio-doc-export {
+            color: #17a2b8;
+        }
+        .archivio-button-row {
+            display: flex;
+            gap: 12px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+        .archivio-button-row button {
+            flex: 1;
+            min-width: 120px;
+        }
+        .archivio-search-panel {
+            background: #f0f0f0;
+            border-radius: 24px;
+            padding: 12px;
+            margin: 12px 0;
+            display: none;
+        }
+        .archivio-search-input {
+            width: 100%;
+            padding: 10px;
+            border-radius: 40px;
+            border: 1px solid #ced4da;
+        }
+        .status-msg {
+            font-size: 0.7rem;
+            color: #2c3e66;
+            margin-top: 6px;
+            text-align: center;
+        }
+        .info-i-btn {
+            background: #17a2b8;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 36px;
+            height: 36px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .info-message-small {
+            font-size: 0.7rem;
+            color: #555;
+            text-align: center;
+            margin-top: 8px;
+        }
+        .adaptive-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+        }
+        .adaptive-modal-content {
+            background: white;
+            border-radius: 32px;
+            padding: 20px;
+            max-width: 90%;
+            max-height: 80%;
+            width: auto;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            margin-top: 20px;
+        }
+        .save-btn {
+            background: #283593;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 40px;
+            font-weight: bold;
+        }
+        .cancel-btn {
+            background: #8e44ad;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 40px;
+            font-weight: bold;
+        }
+        iframe {
+            width: 100%;
+            height: 70%;
+            border: none;
+        }
+        .flex-buttons {
+            display: flex;
+            gap: 8px;
+            margin-top: 8px;
+        }
+        .flex-buttons button {
+            flex: 1;
+        }
+        .android-only-alert {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 10px;
+            border-radius: 16px;
+            margin: 8px 0;
+            font-size: 0.75rem;
+        }
+        hr {
+            margin: 16px 0;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="page">
+        <div class="archivio-title">📁 ARCHIVIO DOCUMENTI EXPAT</div>
+        
+        <div class="archivio-year-container">
+            <input type="text" id="archivioYearInput" class="archivio-year-input" placeholder="2025" maxlength="4" inputmode="numeric">
+            <div style="display: flex; gap: 8px;">
+                <button id="archivioCaricaDocBtnTop" style="background:#17a2b8;">📷 CARICA</button>
+                <button id="archivioInfoBtnTop" class="info-i-btn" title="Informazioni">i</button>
+            </div>
+        </div>
+        
+        <div class="archivio-folder-row">
+            <span class="archivio-folder-name">📁 ANNO: <span id="archivioCurrentYear">--</span></span>
+            <button id="archivioSearchBtn" class="archivio-search-icon">🔍</button>
+        </div>
+        
+        <div id="archivioSearchPanel" class="archivio-search-panel">
+            <input type="text" id="archivioSearchInput" class="archivio-search-input" placeholder="Cerca per nome documento...">
+            <div class="flex-buttons">
+                <button id="archivioSearchExecBtn" style="background:#283593;">CERCA</button>
+                <button id="archivioSearchClearBtn" style="background:#6c757d;">CLEAR</button>
+            </div>
+        </div>
+        
+        <div class="dark-card" style="max-height: 450px; overflow-y: auto;">
+            <div id="archivioDocsList" style="text-align:center; padding:20px; color:#777;">Inserisci un anno</div>
+        </div>
+        
+        <!-- Pulsanti extra per gestione cartella fisica (visibili a tutti, ma su iPhone mostrano alert) -->
+        <div id="androidExtraButtons">
+            <div style="display: flex; gap: 8px; flex-wrap: wrap; margin: 8px 0;">
+                <button id="selectRootBtn" style="background:#283593;">📁 Seleziona cartella archivio</button>
+                <button id="createYearFolderBtn" style="background:#e67e22;">📂 Crea anno (sottocartella)</button>
+                <button id="openRootBtn" style="background:#17a2b8;">📂 Apri cartella archivio</button>
+                <button id="exportMultipleBtn" style="background:#4caf50;">📤 ESPORTA MULTIPLO</button>
+            </div>
+            <div id="iphoneMessage" class="android-only-alert" style="display: none;">
+                ℹ️ Su iPhone le funzioni di gestione cartella (selezione cartella, creazione sottocartelle, esportazione multipla) non sono supportate. Puoi comunque usare l'archivio interno, esportare i PDF uno alla volta con il pulsante 📤, e fare backup in formato JSON.
+            </div>
+        </div>
+        
+        <div class="archivio-button-row">
+            <button id="archivioCaricaDocBtn" style="background:#17a2b8;">📁 CARICA DOCUMENTO</button>
+            <button id="archivioNewYearBtn" style="background:#e67e22;">➕ CREA ANNO</button>
+            <button id="backupYearBtn" style="background:#4caf50;">💾 BACKUP ANNO</button>
+            <button id="backupAllBtn" style="background:#2196f3;">💿 BACKUP TUTTO</button>
+            <button id="importBackupBtn" style="background:#ff9800;">📥 RIPRISTINA</button>
+        </div>
+        <div class="info-message-small">
+            ℹ️ I documenti sono salvati nel database interno (IndexedDB).<br>
+            Usa i backup per esportare/importare tutti i dati.
+        </div>
+    </div>
+</div>
+
+<!-- MODALE PDF -->
+<div id="pdfViewerModalArch" class="adaptive-modal" style="display:none;">
+    <div class="adaptive-modal-content" style="width:90%; max-width:800px; height:80%;">
+        <h3>Anteprima documento</h3>
+        <iframe id="pdfViewerFrameArch" style="width:100%; height:70%;"></iframe>
+        <div class="modal-buttons">
+            <button id="sharePdfBtnArch" class="save-btn" style="background:#4caf50;">📤 CONDIVIDI</button>
+            <button id="closePdfViewerArch" class="cancel-btn">CHIUDI</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // ==================== ARCHIVIO DOCUMENTI v2.0 (completo) ====================
+    const VERSION = "archivio_v2.0";
+    
+    // Rilevamento dispositivo
+    function isAndroid() {
+        return /Android/.test(navigator.userAgent);
+    }
+    function isIPhone() {
+        return /iPhone|iPad|iPod/.test(navigator.userAgent);
+    }
+    
+    // DOM elements
+    const archivioYearInput = document.getElementById('archivioYearInput');
+    const archivioCurrentYearSpan = document.getElementById('archivioCurrentYear');
+    const archivioSearchBtn = document.getElementById('archivioSearchBtn');
+    const archivioSearchPanel = document.getElementById('archivioSearchPanel');
+    const archivioSearchInput = document.getElementById('archivioSearchInput');
+    const archivioSearchExecBtn = document.getElementById('archivioSearchExecBtn');
+    const archivioSearchClearBtn = document.getElementById('archivioSearchClearBtn');
+    const archivioDocsList = document.getElementById('archivioDocsList');
+    const archivioCaricaDocBtn = document.getElementById('archivioCaricaDocBtn');
+    const archivioCaricaDocBtnTop = document.getElementById('archivioCaricaDocBtnTop');
+    const archivioNewYearBtn = document.getElementById('archivioNewYearBtn');
+    const backupYearBtn = document.getElementById('backupYearBtn');
+    const backupAllBtn = document.getElementById('backupAllBtn');
+    const importBackupBtn = document.getElementById('importBackupBtn');
+    const infoBtns = document.querySelectorAll('#archivioInfoBtn, #archivioInfoBtnTop');
+    const selectRootBtn = document.getElementById('selectRootBtn');
+    const createYearFolderBtn = document.getElementById('createYearFolderBtn');
+    const openRootBtn = document.getElementById('openRootBtn');
+    const exportMultipleBtn = document.getElementById('exportMultipleBtn');
+    const iphoneMessage = document.getElementById('iphoneMessage');
+    
+    // Mostra messaggio informativo per iPhone
+    if (isIPhone()) {
+        if (iphoneMessage) iphoneMessage.style.display = 'block';
+    } else {
+        if (iphoneMessage) iphoneMessage.style.display = 'none';
+    }
+    
+    // Funzione per mostrare alert "solo Android"
+    function showAndroidOnlyAlert() {
+        alert(
+            "⚠️ FUNZIONE NON DISPONIBILE SU QUESTO DISPOSITIVO\n\n" +
+            "Questa funzione richiede Android con Chrome o Edge.\n\n" +
+            "Su iPhone puoi comunque:\n" +
+            "• Salvare PDF nell'archivio interno (IndexedDB)\n" +
+            "• Esportare i PDF uno alla volta con il pulsante 📤\n" +
+            "• Fare backup completi in formato JSON"
+        );
+    }
+    
+    // Variabili per IndexedDB
+    let currentYear = "";
+    let searchTerm = "";
+    let archivioDB = null;
+    
+    // Variabili per gestione cartella fisica (solo Android)
+    let rootHandle = null;
+    
+    // ==================== DATABASE INDEXEDDB ====================
+    function openArchivioDB() {
+        return new Promise((resolve, reject) => {
+            if (archivioDB) return resolve(archivioDB);
+            const request = indexedDB.open("SOSDriveArchivio", 2);
+            request.onupgradeneeded = (event) => {
+                const db = event.target.result;
+                if (!db.objectStoreNames.contains("documenti")) {
+                    const store = db.createObjectStore("documenti", { keyPath: "id" });
+                    store.createIndex("anno", "anno", { unique: false });
+                    store.createIndex("nomeUtente", "nomeUtente", { unique: false });
+                }
+            };
+            request.onsuccess = (event) => {
+                archivioDB = event.target.result;
+                resolve(archivioDB);
+            };
+            request.onerror = (event) => reject(event.target.error);
+        });
+    }
+    
+    // ==================== OPERAZIONI DOCUMENTI (IndexedDB) ====================
+    async function getNextProgressivo(anno) {
+        const db = await openArchivioDB();
+        return new Promise((resolve, reject) => {
+            const tx = db.transaction("documenti", "readonly");
+            const store = tx.objectStore("documenti");
+            const index = store.index("anno");
+            const range = IDBKeyRange.only(anno);
+            let max = 0;
+            index.openCursor(range).onsuccess = (e) => {
+                const cursor = e.target.result;
+                if (cursor) {
+                    const progressivo = parseInt(cursor.value.numeroProgressivo, 10);
+                    if (progressivo > max) max = progressivo;
+                    cursor.continue();
+                } else {
+                    resolve((max + 1).toString().padStart(3, '0'));
+                }
+            };
+            index.openCursor(range).onerror = reject;
+        });
+    }
+    
+    async function saveDocument(anno, numeroProgressivo, nomeUtente, fileBlob) {
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = (now.getMonth()+1).toString().padStart(2,'0');
+        const day = now.getDate().toString().padStart(2,'0');
+        const nomeCompleto = `${numeroProgressivo}_${year}_${month}_${day}_${nomeUtente}.pdf`;
+        const doc = {
+            id: `${anno}_${numeroProgressivo}_${Date.now()}`,
+            anno: anno,
+            numeroProgressivo: numeroProgressivo,
+            nomeUtente: nomeUtente,
+            nomeCompleto: nomeCompleto,
+            dataCreazione: new Date().toISOString(),
+            fileBlob: fileBlob
+        };
+        const db = await openArchivioDB();
+        return new Promise((resolve, reject) => {
+            const tx = db.transaction("documenti", "readwrite");
+            const store = tx.objectStore("documenti");
+            const request = store.add(doc);
+            request.onsuccess = () => resolve(doc);
+            request.onerror = reject;
+        });
+    }
+    
+    async function saveDocumentWithErrorHandling(anno, numeroProgressivo, nomeUtente, fileBlob) {
+        try {
+            return await saveDocument(anno, numeroProgressivo, nomeUtente, fileBlob);
+        } catch (e) {
+            if (e.name === 'QuotaExceededError' || (e.message && e.message.includes('quota'))) {
+                const userChoice = confirm(
+                    '⚠️ SPAZIO ESAURITO!\n\nNon c\'è più spazio nel database per salvare nuovi documenti.\n\n' +
+                    'Premi OK per fare un BACKUP completo, poi elimina documenti vecchi.'
+                );
+                if (userChoice) {
+                    await backupAllYears();
+                }
+                throw e;
+            }
+            throw e;
+        }
+    }
+    
+    async function loadDocumentsForYear(anno, search = "") {
+        const db = await openArchivioDB();
+        return new Promise((resolve, reject) => {
+            const tx = db.transaction("documenti", "readonly");
+            const store = tx.objectStore("documenti");
+            const index = store.index("anno");
+            const range = IDBKeyRange.only(anno);
+            const docs = [];
+            index.openCursor(range).onsuccess = (e) => {
+                const cursor = e.target.result;
+                if (cursor) {
+                    let doc = cursor.value;
+                    if (search.trim() !== "") {
+                        if (!doc.nomeUtente.toLowerCase().includes(search.toLowerCase())) {
+                            cursor.continue();
+                            return;
+                        }
+                    }
+                    docs.push(doc);
+                    cursor.continue();
+                } else {
+                    docs.sort((a,b) => parseInt(a.numeroProgressivo) - parseInt(b.numeroProgressivo));
+                    resolve(docs);
+                }
+            };
+            index.openCursor(range).onerror = reject;
+        });
+    }
+    
+    async function deleteDocument(docId) {
+        const db = await openArchivioDB();
+        return new Promise((resolve, reject) => {
+            const tx = db.transaction("documenti", "readwrite");
+            const store = tx.objectStore("documenti");
+            const request = store.delete(docId);
+            request.onsuccess = resolve;
+            request.onerror = reject;
+        });
+    }
+    
+    async function getDocumentBlob(docId) {
+        const db = await openArchivioDB();
+        return new Promise((resolve, reject) => {
+            const tx = db.transaction("documenti", "readonly");
+            const store = tx.objectStore("documenti");
+            const request = store.get(docId);
+            request.onsuccess = () => resolve(request.result?.fileBlob);
+            request.onerror = reject;
+        });
+    }
+    
+    // ==================== RENDER LISTA DOCUMENTI ====================
+    async function renderDocsList() {
+        if (!currentYear) {
+            archivioDocsList.innerHTML = "<div style='padding:20px;'>Inserisci un anno.</div>";
+            return;
+        }
+        const docs = await loadDocumentsForYear(currentYear, searchTerm);
+        if (docs.length === 0) {
+            archivioDocsList.innerHTML = "<div style='padding:20px;'>📭 Nessun documento trovato.</div>";
+            return;
+        }
+        let html = "";
+        for (const doc of docs) {
+            const parts = doc.nomeCompleto.replace('.pdf','').split('_');
+            const progressivo = parts[0];
+            const annoFile = parts[1];
+            const mese = parts[2];
+            const giorno = parts[3];
+            const desc = parts.slice(4).join('_') || "documento";
+            const displayName = `${progressivo}/${annoFile}/${mese}/${giorno}/${desc}.pdf`;
+            html += `
+                <div class="archivio-doc-item" data-id="${doc.id}">
+                    <span class="archivio-doc-name">📄 ${displayName}</span>
+                    <div class="doc-actions">
+                        <button class="archivio-doc-open" data-id="${doc.id}" title="Anteprima">🔍</button>
+                        <button class="archivio-doc-export" data-id="${doc.id}" title="Esporta PDF">📤</button>
+                        <button class="archivio-doc-delete" data-id="${doc.id}" title="Elimina">🗑️</button>
+                    </div>
+                </div>
+            `;
+        }
+        archivioDocsList.innerHTML = html;
+        
+        // Anteprima PDF
+        document.querySelectorAll('.archivio-doc-open').forEach(btn => {
+            btn.addEventListener('click', async (e) => {
+                const id = btn.getAttribute('data-id');
+                const blob = await getDocumentBlob(id);
+                if (blob) {
+                    const url = URL.createObjectURL(blob);
+                    const modal = document.getElementById('pdfViewerModalArch');
+                    const iframe = document.getElementById('pdfViewerFrameArch');
+                    iframe.src = url;
+                    modal.style.display = 'flex';
+                    
+                    const shareBtn = document.getElementById('sharePdfBtnArch');
+                    shareBtn.onclick = () => {
+                        if (navigator.share) {
+                            navigator.share({
+                                title: 'Documento PDF',
+                                files: [new File([blob], 'documento.pdf', {type: 'application/pdf'})]
+                            }).catch(err => { if (err.message !== 'Share canceled') console.warn(err); });
+                        } else {
+                            alert("Condivisione non supportata.");
+                        }
+                    };
+                    
+                    document.getElementById('closePdfViewerArch').onclick = () => {
+                        modal.style.display = 'none';
+                        iframe.src = '';
+                        URL.revokeObjectURL(url);
+                    };
+                    modal.onclick = (e) => { if (e.target === modal) modal.style.display = 'none'; };
+                } else {
+                    alert("Impossibile aprire il file.");
+                }
+            });
+        });
+        
+        // Esportazione singolo PDF (funziona su tutti i dispositivi)
+        document.querySelectorAll('.archivio-doc-export').forEach(btn => {
+            btn.addEventListener('click', async (e) => {
+                const id = btn.getAttribute('data-id');
+                const doc = (await loadDocumentsForYear(currentYear, "")).find(d => d.id === id);
+                if (doc && doc.fileBlob) {
+                    const blob = doc.fileBlob;
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = doc.nomeCompleto;
+                    a.click();
+                    URL.revokeObjectURL(url);
+                    showMessage(`✅ "${doc.nomeCompleto}" esportato.`, false);
+                } else {
+                    alert("Errore: file non trovato.");
+                }
+            });
+        });
+        
+        // Eliminazione
+        document.querySelectorAll('.archivio-doc-delete').forEach(btn => {
+            btn.addEventListener('click', async (e) => {
+                if (confirm("Eliminare definitivamente questo documento?")) {
+                    const id = btn.getAttribute('data-id');
+                    await deleteDocument(id);
+                    renderDocsList();
+                    showMessage("✅ Documento eliminato.", false);
+                }
+            });
+        });
+    }
+    
+    // ==================== GESTIONE ANNI LOGICI ====================
+    async function createYearFolderManuale() {
+        const year = archivioYearInput.value.trim();
+        if (!/^\d{4}$/.test(year)) { alert("Inserisci un anno a 4 cifre."); return; }
+        const docs = await loadDocumentsForYear(year, "");
+        if (docs.length > 0) {
+            showMessage(`⚠️ Anno ${year} già esistente.`, true);
+            return;
+        }
+        currentYear = year;
+        localStorage.setItem('archivio_current_year_local', year);
+        archivioYearInput.value = year;
+        archivioCurrentYearSpan.innerText = year;
+        renderDocsList();
+        showMessage(`✅ Anno ${year} creato.`, false);
+    }
+    
+    function onYearInput() {
+        const year = archivioYearInput.value.trim();
+        if (year.length === 4 && /^\d{4}$/.test(year)) {
+            currentYear = year;
+            localStorage.setItem('archivio_current_year_local', year);
+            archivioCurrentYearSpan.innerText = year;
+            renderDocsList();
+        } else if (year === "") {
+            currentYear = "";
+            archivioCurrentYearSpan.innerText = "--";
+            archivioDocsList.innerHTML = '<div style="padding:20px;">Inserisci un anno.</div>';
+        }
+    }
+    
+    // ==================== UPLOAD DOCUMENTI ====================
+    async function uploadDocument() {
+        if (!currentYear) {
+            alert("Inserisci un anno valido.");
+            return;
+        }
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = 'image/*,application/pdf';
+        input.multiple = true;
+        input.onchange = async (ev) => {
+            const files = Array.from(ev.target.files);
+            if (files.length === 0) return;
+            
+            const pdfFiles = files.filter(f => f.type === 'application/pdf');
+            const imageFiles = files.filter(f => f.type.startsWith('image/'));
+            
+            let userDescription = prompt("Descrizione del documento:", "");
+            if (userDescription === null) return;
+            userDescription = userDescription.trim().replace(/[^a-zA-Z0-9_\-]/g, '_').substring(0, 50);
+            if (userDescription === "") userDescription = "documento";
+            
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+            let baseProg = await getNextProgressivo(currentYear);
+            
+            // PDF singoli
+            for (let i = 0; i < pdfFiles.length; i++) {
+                const file = pdfFiles[i];
+                const progNum = String(parseInt(baseProg) + i).padStart(3, '0');
+                await saveDocumentWithErrorHandling(currentYear, progNum, userDescription, file);
+            }
+            
+            // Immagini → PDF
+            if (imageFiles.length > 0) {
+                const { jsPDF } = window.jspdf;
+                const pdf = new jsPDF();
+                let firstPage = true;
+                for (let i = 0; i < imageFiles.length; i++) {
+                    const file = imageFiles[i];
+                    const imgData = await new Promise((resolve) => {
+                        const reader = new FileReader();
+                        reader.onload = (e) => resolve(e.target.result);
+                        reader.readAsDataURL(file);
+                    });
+                    const img = new Image();
+                    await new Promise((resolve) => { img.onload = resolve; img.src = imgData; });
+                    const imgWidth = pdf.internal.pageSize.getWidth();
+                    const imgHeight = (img.height * imgWidth) / img.width;
+                    if (!firstPage) pdf.addPage();
+                    pdf.addImage(imgData, 'JPEG', 0, 0, imgWidth, imgHeight);
+                    firstPage = false;
+                }
+                const pdfBlob = pdf.output('blob');
+                const progNum = String(parseInt(baseProg) + pdfFiles.length).padStart(3, '0');
+                await saveDocumentWithErrorHandling(currentYear, progNum, userDescription, pdfBlob);
+            }
+            
+            await renderDocsList();
+            alert(`${pdfFiles.length + (imageFiles.length > 0 ? 1 : 0)} documento/i salvato/i nell'archivio.`);
+        };
+        input.click();
+    }
+    
+    // ==================== FUNZIONI GESTIONE CARTELLA FISICA (solo Android) ====================
+    function openHandleDB() {
+        return new Promise((resolve, reject) => {
+            const request = indexedDB.open('ArchiveHandles', 1);
+            request.onupgradeneeded = () => {
+                const db = request.result;
+                if (!db.objectStoreNames.contains('handles')) {
+                    db.createObjectStore('handles');
+                }
+            };
+            request.onsuccess = () => resolve(request.result);
+            request.onerror = () => reject(request.error);
+        });
+    }
+    
+    async function saveRootHandle(handle) {
+        const db = await openHandleDB();
+        const tx = db.transaction('handles', 'readwrite');
+        tx.objectStore('handles').put(handle, 'root');
+        await tx.done;
+    }
+    
+    async function getRootHandle() {
+        const db = await openHandleDB();
+        const tx = db.transaction('handles', 'readonly');
+        const result = await tx.objectStore('handles').get('root');
+        return result || null;
+    }
+    
+    async function selectRootFolder() {
+        if (isIPhone()) {
+            showAndroidOnlyAlert();
+            return false;
+        }
+        if (!window.showDirectoryPicker) {
+            alert("Il tuo browser non supporta la selezione di cartelle. Usa Chrome/Edge su Android.");
+            return false;
+        }
+        try {
+            rootHandle = await window.showDirectoryPicker();
+            await saveRootHandle(rootHandle);
+            showMessage(`✅ Cartella "${rootHandle.name}" selezionata.`, false);
+            return true;
+        } catch(e) {
+            if (e.name !== 'AbortError') {
+                console.warn(e);
+                alert("Errore nella selezione della cartella: " + e.message);
+            }
+            return false;
+        }
+    }
+    
+    async function createYearFolderPhysical() {
+        if (isIPhone()) {
+            showAndroidOnlyAlert();
+            return;
+        }
+        const year = archivioYearInput.value.trim();
+        if (!/^\d{4}$/.test(year)) {
+            alert("Inserisci un anno a 4 cifre.");
+            return;
+        }
+        if (!rootHandle) {
+            rootHandle = await getRootHandle();
+        }
+        if (!rootHandle) {
+            alert("Prima seleziona la cartella 'Archivi Expat' usando il pulsante '📁 Seleziona cartella archivio'.");
+            return;
+        }
+        try {
+            const yearHandle = await rootHandle.getDirectoryHandle(year, { create: true });
+            showMessage(`✅ Cartella fisica "${yearHandle.name}" creata in "${rootHandle.name}".`, false);
+        } catch(e) {
+            alert("Errore nella creazione della cartella: " + e.message);
+        }
+    }
+    
+    async function openRootFolder() {
+        if (isIPhone()) {
+            showAndroidOnlyAlert();
+            return;
+        }
+        if (!rootHandle) {
+            rootHandle = await getRootHandle();
+        }
+        if (!rootHandle) {
+            alert("Nessuna cartella selezionata. Usa '📁 Seleziona cartella archivio' prima.");
+            return;
+        }
+        alert(`📂 La cartella selezionata è: "${rootHandle.name}"\n\nPuoi aprirla manualmente con un file manager.`);
+    }
+    
+    async function exportMultipleToPhysicalFolder() {
+        if (isIPhone()) {
+            showAndroidOnlyAlert();
+            return;
+        }
+        if (!rootHandle) {
+            rootHandle = await getRootHandle();
+        }
+        if (!rootHandle) {
+            alert("Prima seleziona la cartella 'Archivi Expat'.");
+            return;
+        }
+        const docs = await loadDocumentsForYear(currentYear, "");
+        if (docs.length === 0) {
+            alert("Nessun documento da esportare.");
+            return;
+        }
+        let modalHtml = '<div style="max-height:300px; overflow-y:auto;">';
+        for (const doc of docs) {
+            modalHtml += `<div style="margin:8px 0;"><input type="checkbox" class="exportCheckbox" value="${doc.id}"> ${doc.nomeCompleto}</div>`;
+        }
+        modalHtml += '</div><div style="display:flex; gap:8px; margin-top:16px;"><button id="confirmExportBtn" class="save-btn" style="flex:1;">ESPORTA SELEZIONATI</button><button id="cancelExportBtn" class="cancel-btn" style="flex:1;">ANNULLA</button></div>';
+        
+        const modal = document.createElement('div');
+        modal.className = 'adaptive-modal';
+        modal.style.display = 'flex';
+        modal.innerHTML = `<div class="adaptive-modal-content"><h3>Seleziona PDF da esportare nella cartella "${rootHandle.name}/${currentYear}"</h3>${modalHtml}</div>`;
+        document.body.appendChild(modal);
+        
+        document.getElementById('cancelExportBtn').onclick = () => modal.remove();
+        document.getElementById('confirmExportBtn').onclick = async () => {
+            const selected = [];
+            document.querySelectorAll('.exportCheckbox:checked').forEach(cb => {
+                selected.push(cb.value);
+            });
+            if (selected.length === 0) {
+                alert("Nessun documento selezionato.");
+                modal.remove();
+                return;
+            }
+            let yearHandle;
+            try {
+                yearHandle = await rootHandle.getDirectoryHandle(currentYear, { create: true });
+            } catch(e) {
+                alert("Errore: " + e.message);
+                modal.remove();
+                return;
+            }
+            let successCount = 0;
+            for (const id of selected) {
+                const doc = docs.find(d => d.id === id);
+                if (doc) {
+                    const blob = await getDocumentBlob(doc.id);
+                    if (blob) {
+                        try {
+                            const fileHandle = await yearHandle.getFileHandle(doc.nomeCompleto, { create: true });
+                            const writable = await fileHandle.createWritable();
+                            await writable.write(blob);
+                            await writable.close();
+                            successCount++;
+                        } catch(e) {
+                            console.warn("Errore su " + doc.nomeCompleto, e);
+                        }
+                    }
+                }
+            }
+            alert(`✅ Esportati ${successCount} documenti su ${selected.length} in "${rootHandle.name}/${currentYear}"`);
+            modal.remove();
+        };
+    }
+    
+    // ==================== FUNZIONI BACKUP JSON ====================
+    async function backupYear(anno) {
+        const docs = await loadDocumentsForYear(anno, "");
+        if (docs.length === 0) { alert("Nessun documento."); return; }
+        
+        const exportData = { exportDate: new Date().toISOString(), version: VERSION, anno: anno, documents: [] };
+        for (const doc of docs) {
+            const docCopy = { ...doc };
+            if (docCopy.fileBlob) {
+                docCopy.fileBase64 = await blobToBase64(docCopy.fileBlob);
+                delete docCopy.fileBlob;
+            }
+            exportData.documents.push(docCopy);
+        }
+        downloadJson(exportData, `backup_anno_${anno}.json`);
+        alert(`✅ Backup anno ${anno} completato (${docs.length} documenti).`);
+    }
+    
+    async function backupAllYears() {
+        const db = await openArchivioDB();
+        const allDocs = await new Promise((resolve, reject) => {
+            const tx = db.transaction("documenti", "readonly");
+            const request = tx.objectStore("documenti").getAll();
+            request.onsuccess = () => resolve(request.result);
+            request.onerror = () => reject(request.error);
+        });
+        if (allDocs.length === 0) { alert("Nessun documento."); return; }
+        
+        const docsByYear = {};
+        for (const doc of allDocs) {
+            if (!docsByYear[doc.anno]) docsByYear[doc.anno] = [];
+            docsByYear[doc.anno].push(doc);
+        }
+        const exportData = { exportDate: new Date().toISOString(), version: VERSION, years: docsByYear };
+        for (const anno in docsByYear) {
+            for (const doc of docsByYear[anno]) {
+                if (doc.fileBlob) {
+                    doc.fileBase64 = await blobToBase64(doc.fileBlob);
+                    delete doc.fileBlob;
+                }
+            }
+        }
+        downloadJson(exportData, `backup_completo_${Date.now()}.json`);
+        alert(`✅ Backup completo (${allDocs.length} documenti).`);
+    }
+    
+    async function importBackup(file) {
+        const reader = new FileReader();
+        reader.onload = async (e) => {
+            try {
+                const data = JSON.parse(e.target.result);
+                let count = 0;
+                if (data.years) {
+                    for (const anno in data.years) {
+                        for (const doc of data.years[anno]) {
+                            if (doc.fileBase64) {
+                                const blob = base64ToBlob(doc.fileBase64);
+                                await saveDocument(doc.anno, doc.numeroProgressivo, doc.nomeUtente, blob);
+                                count++;
+                            }
+                        }
+                    }
+                } else if (data.documents) {
+                    for (const doc of data.documents) {
+                        if (doc.fileBase64) {
+                            const blob = base64ToBlob(doc.fileBase64);
+                            await saveDocument(doc.anno, doc.numeroProgressivo, doc.nomeUtente, blob);
+                            count++;
+                        }
+                    }
+                }
+                alert(`✅ Importati ${count} documenti.`);
+                await renderDocsList();
+            } catch(err) { alert("Errore: " + err.message); }
+        };
+        reader.readAsText(file);
+    }
+    
+    function blobToBase64(blob) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => resolve(reader.result.split(',')[1]);
+            reader.onerror = reject;
+            reader.readAsDataURL(blob);
+        });
+    }
+    
+    function base64ToBlob(base64) {
+        const byteCharacters = atob(base64);
+        const byteArray = new Uint8Array(byteCharacters.length);
+        for (let i = 0; i < byteCharacters.length; i++) byteArray[i] = byteCharacters.charCodeAt(i);
+        return new Blob([byteArray], {type: 'application/pdf'});
+    }
+    
+    function downloadJson(data, filename) {
+        const blob = new Blob([JSON.stringify(data, null, 2)], {type: 'application/json'});
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        a.click();
+        URL.revokeObjectURL(url);
+    }
+    
+    // ==================== UI ====================
+    function showMessage(msg, isError = false) {
+        const div = document.createElement('div');
+        div.className = 'status-msg';
+        div.style.color = isError ? 'red' : 'green';
+        div.innerText = msg;
+        const container = document.querySelector('.archivio-year-container');
+        container.parentNode.insertBefore(div, container.nextSibling);
+        setTimeout(() => div.remove(), 3000);
+    }
+    
+    function toggleSearchPanel() {
+        archivioSearchPanel.style.display = archivioSearchPanel.style.display === 'none' ? 'block' : 'none';
+    }
+    function searchDocs() {
+        searchTerm = archivioSearchInput.value.trim();
+        renderDocsList();
+        showMessage(`🔍 Ricerca: "${searchTerm || 'tutti'}"`, false);
+    }
+    function clearSearch() {
+        archivioSearchInput.value = "";
+        searchTerm = "";
+        renderDocsList();
+        archivioSearchPanel.style.display = 'none';
+        showMessage("🔍 Ricerca cancellata", false);
+    }
+    
+    function showArchivioInfo() {
+        let msg = "📁 ARCHIVIO DOCUMENTI EXPAT\n\n" +
+            "• CREA ANNO: inserisci anno (2025) e premi\n" +
+            "• CARICA: seleziona foto/PDF (più foto → PDF unico)\n" +
+            "• 🔍 (lente): anteprima PDF\n" +
+            "• 📤 (esporta): salva il PDF sul dispositivo\n" +
+            "• 🗑️: elimina documento\n" +
+            "• BACKUP ANNO: esporta tutto l'anno in JSON\n" +
+            "• BACKUP TUTTO: esporta tutto in JSON\n" +
+            "• RIPRISTINA: importa da backup JSON\n\n";
+        if (isAndroid()) {
+            msg += "✅ ANDROID: hai anche le funzioni extra (seleziona cartella, crea sottocartella, esporta multiplo).\n";
+        } else {
+            msg += "ℹ️ IPHONE: le funzioni di gestione cartella non sono supportate.\n";
+        }
+        msg += "\n⚠️ I documenti sono salvati nel database interno (IndexedDB).\nFai backup regolari.";
+        alert(msg);
+    }
+    
+    // ==================== INIZIALIZZAZIONE ====================
+    async function init() {
+        await openArchivioDB();
+        
+        if (isAndroid()) {
+            rootHandle = await getRootHandle();
+            if (rootHandle) {
+                showMessage(`📁 Cartella "${rootHandle.name}" già selezionata.`, false);
+            }
+        }
+        
+        const savedYear = localStorage.getItem('archivio_current_year_local');
+        if (savedYear && /^\d{4}$/.test(savedYear)) {
+            currentYear = savedYear;
+            archivioYearInput.value = currentYear;
+            archivioCurrentYearSpan.innerText = currentYear;
+            await renderDocsList();
+        }
+        
+        archivioYearInput.addEventListener('input', onYearInput);
+        archivioYearInput.addEventListener('blur', onYearInput);
+        archivioSearchBtn.addEventListener('click', toggleSearchPanel);
+        archivioSearchExecBtn.addEventListener('click', searchDocs);
+        archivioSearchClearBtn.addEventListener('click', clearSearch);
+        archivioNewYearBtn.addEventListener('click', createYearFolderManuale);
+        archivioCaricaDocBtn.addEventListener('click', uploadDocument);
+        archivioCaricaDocBtnTop.addEventListener('click', uploadDocument);
+        backupYearBtn.addEventListener('click', () => { if (currentYear) backupYear(currentYear); else alert("Seleziona un anno."); });
+        backupAllBtn.addEventListener('click', backupAllYears);
+        importBackupBtn.addEventListener('click', () => {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = 'application/json';
+            input.onchange = (e) => { if (e.target.files.length) importBackup(e.target.files[0]); };
+            input.click();
+        });
+        infoBtns.forEach(btn => btn.addEventListener('click', showArchivioInfo));
+        
+        if (selectRootBtn) {
+            selectRootBtn.addEventListener('click', () => {
+                if (isIPhone()) showAndroidOnlyAlert();
+                else selectRootFolder();
+            });
+        }
+        if (createYearFolderBtn) {
+            createYearFolderBtn.addEventListener('click', () => {
+                if (isIPhone()) showAndroidOnlyAlert();
+                else createYearFolderPhysical();
+            });
+        }
+        if (openRootBtn) {
+            openRootBtn.addEventListener('click', () => {
+                if (isIPhone()) showAndroidOnlyAlert();
+                else openRootFolder();
+            });
+        }
+        if (exportMultipleBtn) {
+            exportMultipleBtn.addEventListener('click', () => {
+                if (isIPhone()) showAndroidOnlyAlert();
+                else {
+                    if (!currentYear) {
+                        alert("Seleziona un anno prima di esportare.");
+                        return;
+                    }
+                    exportMultipleToPhysicalFolder();
+                }
+            });
+        }
+    }
+    
+    init();
+</script>
+</body>
+</html>
