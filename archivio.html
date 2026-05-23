@@ -72,10 +72,6 @@
             padding: 12px;
             margin-bottom: 12px;
         }
-        .genius-btn i, .genius-btn .fa-camera {
-            font-size: 1.4rem;
-        }
-        /* Icone emoji più grandi */
         .genius-btn .genius-icon {
             font-size: 1.5rem;
         }
@@ -160,7 +156,7 @@
         .doc-view { color: #0066cc; }
         .doc-download { color: #28a745; }
         
-        /* Convertitore compatto */
+        /* ==================== CONVERTITORE BLOCCATO (senza wrap) ==================== */
         .converter-section {
             margin-top: 16px;
         }
@@ -181,15 +177,20 @@
             font-size: 0.65rem;
             color: #6c757d;
         }
+        
+        /* Riga convertitore - senza wrap! */
         .converter-row {
             display: flex;
             align-items: center;
             justify-content: space-between;
             background: #f8f9fa;
             border-radius: 60px;
-            padding: 6px 12px;
+            padding: 6px 10px;
             margin-bottom: 8px;
-            gap: 6px;
+            gap: 8px;
+            flex-wrap: nowrap;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
         }
         .currency-from {
             display: flex;
@@ -210,7 +211,7 @@
             color: #E70000;
         }
         .currency-from input {
-            width: 130px;
+            width: 120px;
             padding: 8px 6px;
             border: 1px solid #ced4da;
             border-radius: 40px;
@@ -229,7 +230,7 @@
             background: white;
             padding: 6px 10px;
             border-radius: 40px;
-            min-width: 110px;
+            min-width: 105px;
             text-align: center;
             border: 1px solid #ced4da;
             color: #004C97;
@@ -241,44 +242,11 @@
             background: white;
             padding: 6px 10px;
             border-radius: 40px;
-            min-width: 110px;
+            min-width: 105px;
             text-align: center;
             border: 1px solid #ced4da;
             color: #E70000;
             flex-shrink: 0;
-        }
-        
-        /* Responsive per schermi piccoli */
-        @media (max-width: 480px) {
-            .converter-row {
-                flex-wrap: wrap;
-                border-radius: 24px;
-                padding: 8px;
-            }
-            .currency-from {
-                width: 100%;
-                justify-content: space-between;
-            }
-            .currency-from input {
-                flex: 1;
-                width: auto;
-            }
-            .arrow {
-                width: 100%;
-                text-align: center;
-                margin: 4px 0;
-            }
-            .result-value-eur, .result-value-tnd {
-                width: 100%;
-                text-align: center;
-            }
-            .doc-item {
-                flex-direction: column;
-                align-items: stretch;
-            }
-            .doc-actions {
-                justify-content: flex-end;
-            }
         }
         
         /* Pulsanti affiancati */
@@ -350,7 +318,7 @@
             </div>
         </div>
         
-        <!-- CONVERTITORE COMPATTO -->
+        <!-- CONVERTITORE BLOCCATO (senza wrap) -->
         <div class="converter-section">
             <div class="converter-header">
                 <span class="converter-title">💱 Convertitore Valuta</span>
@@ -392,7 +360,7 @@
 
 <script>
     // ==================== EXPAT ARCHIVIO ====================
-    const VERSION = "expat_archivio_v7.3";
+    const VERSION = "expat_archivio_v7.4";
     
     function isAndroid() { return /Android/.test(navigator.userAgent); }
     function isIPhone() { return /iPhone|iPad|iPod/.test(navigator.userAgent); }
