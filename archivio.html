@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
-    <title>Expat Archivio + Convertitore</title>
+    <title>Expat Archivio + Convertitore (Tasso di mercato)</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         * {
@@ -173,10 +173,6 @@
             font-weight: bold;
             color: #1e2a3a;
         }
-        .update-date {
-            font-size: 0.65rem;
-            color: #6c757d;
-        }
         .converter-row {
             display: flex;
             align-items: center;
@@ -274,14 +270,23 @@
             gap: 6px;
             flex: 1;
         }
+        /* Tasto refresh: giallo di base, grigio scuro quando premuto */
         .refresh-btn {
-            background: #17a2b8;
+            background: #ffc107;
             font-size: 1rem;
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 6px;
             flex: 1;
+            color: #1e2a3a;
+            font-weight: bold;
+            transition: 0.05s linear;
+        }
+        .refresh-btn:active {
+            background: #6c757d !important;
+            color: white;
+            transform: scale(0.97);
         }
         .invite-btn {
             background: #4caf50;
@@ -407,6 +412,18 @@
             border: none;
             min-height: 500px;
         }
+        /* Unica riga informativa sotto il convertitore */
+        .info-rate-line {
+            font-size: 0.7rem;
+            text-align: center;
+            margin-top: 10px;
+            margin-bottom: 6px;
+            padding: 6px;
+            background: #f1f3f5;
+            border-radius: 20px;
+            color: #1e2a3a;
+            word-break: break-word;
+        }
     </style>
 </head>
 <body>
@@ -433,10 +450,9 @@
         <div class="converter-section">
             <div class="converter-header">
                 <span class="converter-title">💱 Convertitore Valuta</span>
-                <span class="update-date" id="updateDateDisplay">📅 Agg. in corso...</span>
             </div>
             <div id="errorMsg" class="error-message" style="display: none;"></div>
-            <div id="loadingMsg" class="loading-small">⏳ Aggiornamento tassi...</div>
+            <div id="loadingMsg" class="loading-small">⏳ Acquisizione tasso di mercato...</div>
             <div id="converterContent" style="display: none;">
                 <div class="converter-row">
                     <div class="currency-from">
@@ -455,6 +471,8 @@
                     <div class="result-value-eur" id="tndToEurResult">--.-- EUR</div>
                 </div>
             </div>
+            <!-- Unica riga informativa -->
+            <div id="infoRateLine" class="info-rate-line">💱 Convertitore Valuta - di mercato raccolto il: --</div>
             <div class="double-buttons">
                 <button id="openCalculatorBtn" class="calc-btn">🧮 CALCOLATRICE</button>
                 <div class="info-refresh-group">
@@ -474,7 +492,7 @@
         </div>
     </div>
 </div>
-<!-- Modale PDF viewer (riutilizzabile) -->
+<!-- Modale PDF viewer -->
 <div id="pdfModal" class="adaptive-modal" style="display:none;">
     <div class="adaptive-modal-content" style="width:90%; max-width:800px; height:80%;">
         <h3 id="pdfModalTitle">Documento PDF</h3>
@@ -486,10 +504,10 @@
     </div>
 </div>
 <script>
-    const VERSION = "expat_archivio_v8.2";
+    const VERSION = "expat_archivio_market_v11_final";
     let isInviteModalOpen = false;
-    let currentPdfBlob = null;  // per salvare il blob se necessario
-    let currentPdfUrl = null;   // oggetto URL da revocare
+    let currentPdfBlob = null;
+    let currentPdfUrl = null;
 
     function showPdfModal(blob, title = "Documento PDF") {
         const modal = document.getElementById('pdfModal');
@@ -560,7 +578,7 @@
         else if (wakeLock) { wakeLock.release(); wakeLock = null; }
     });
     let infoTexts = {
-        expatArchivio: "📁 EXPAT ARCHIVIO\n\n• Seleziona una cartella (solo Android).\n• Verranno elencati tutti i PDF.\n• 🔍 visualizza, 📥 scarica.\n• Genius Scan per scansionare.\n\n" + (isIPhone() ? "⚠️ iPhone: selezione cartella non supportata." : "✅ Android: usa Chrome/Edge.")
+        expatArchivio: "📁 EXPAT ARCHIVIO (tasso di mercato)\n\n• Seleziona una cartella (solo Android).\n• Verranno elencati tutti i PDF.\n• 🔍 visualizza, 📥 scarica.\n• Genius Scan per scansionare.\n• Convertitore con tasso di mercato EUR/TND (agg. ogni 5 min).\n\n" + (isIPhone() ? "⚠️ iPhone: selezione cartella non supportata." : "✅ Android: usa Chrome/Edge.")
     };
     const savedInfoTexts = localStorage.getItem('expatArchivioInfoText');
     if (savedInfoTexts) {
@@ -784,9 +802,9 @@
         isInviteModalOpen = true;
         const appLink = "https://paolo210961.github.io/CONTATTI-PERSONALI/";
         let defaultMessage = "🎉 *Prova la app per 90 giorni gratuitamente!* 🎉\n\n" +
-                        "Gestisci documenti, converti valuta (EUR/TND), scannerizza con Genius Scan e organizza i tuoi PDF in una cartella.\n\n" +
+                        "Gestisci documenti, converti valuta (EUR/TND tasso di mercato), scannerizza con Genius Scan e organizza i tuoi PDF in una cartella.\n\n" +
                         "✅ Archivio PDF su cartella personale\n" +
-                        "✅ Convertitore di valuta aggiornato\n" +
+                        "✅ Convertitore di valuta (mercato) aggiornato ogni 5 minuti\n" +
                         "✅ Integrazione con Genius Scan\n" +
                         "✅ Visualizza e invia geolocalizzazione\n" +
                         "✅ Traduzione vocale automatica italiano ↔ francese (serve connessione internet)\n\n" +
@@ -848,15 +866,19 @@
         modal.onclick = (e) => { if (e.target === modal) closeModal(); };
     }
     function escapeHtml(str) { return str.replace(/[&<>]/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;' }[m])); }
-    let currentRateEURtoTND = null, currentRateTNDtoEUR = null;
+    
+    // ------------------- CONVERTITORE MERCATO CON RIGA UNICA -------------------
+    let currentRateEURtoTND = null;
+    let currentRateTNDtoEUR = null;
     const eurInput = document.getElementById('eurAmount');
     const tndInput = document.getElementById('tndAmount');
     const eurToTndResult = document.getElementById('eurToTndResult');
     const tndToEurResult = document.getElementById('tndToEurResult');
-    const updateDateDisplay = document.getElementById('updateDateDisplay');
+    const infoRateLine = document.getElementById('infoRateLine');
     const loadingMsgConv = document.getElementById('loadingMsg');
     const converterContent = document.getElementById('converterContent');
     const errorMsgDivConv = document.getElementById('errorMsg');
+
     function updateResults() {
         if (currentRateEURtoTND === null || currentRateTNDtoEUR === null) return;
         const eurVal = parseFloat(eurInput.value);
@@ -866,51 +888,136 @@
         if (!isNaN(tndVal)) tndToEurResult.textContent = (tndVal * currentRateTNDtoEUR).toFixed(3) + ' EUR';
         else tndToEurResult.textContent = '0.000 EUR';
     }
-    function formatDate(utcString) {
-        if (!utcString) return 'Data non disponibile';
-        try { 
-            return new Date(utcString).toLocaleString('it-IT', { day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit' }); 
-        } catch(e) { return utcString; }
+
+    async function fetchWithTimeout(url, timeoutMs = 8000) {
+        const controller = new AbortController();
+        const id = setTimeout(() => controller.abort(), timeoutMs);
+        try {
+            const response = await fetch(url, { signal: controller.signal });
+            clearTimeout(id);
+            return response;
+        } catch (err) {
+            clearTimeout(id);
+            throw err;
+        }
     }
+
     async function fetchExchangeRates() {
         errorMsgDivConv.style.display = 'none';
         loadingMsgConv.style.display = 'block';
         converterContent.style.display = 'none';
-        try {
-            const url = `https://open.er-api.com/v6/latest/EUR?t=${Date.now()}`;
-            const response = await fetch(url);
-            if (!response.ok) throw new Error();
-            const data = await response.json();
-            if (data.result !== 'success') throw new Error();
-            const eurToTnd = data.rates?.TND;
-            if (!eurToTnd) throw new Error();
-            currentRateEURtoTND = eurToTnd;
-            currentRateTNDtoEUR = 1 / eurToTnd;
-            updateDateDisplay.innerHTML = `📅 Agg. ${formatDate(data.time_last_update_utc)}`;
-            loadingMsgConv.style.display = 'none';
-            converterContent.style.display = 'block';
-            updateResults();
-        } catch(error) {
-            console.error(error);
-            errorMsgDivConv.textContent = '❌ Errore nel caricamento tassi. Verifica la connessione.';
-            errorMsgDivConv.style.display = 'block';
-            loadingMsgConv.style.display = 'none';
+        
+        // Aggiorna la riga informativa con messaggio di caricamento
+        infoRateLine.innerHTML = "💱 Convertitore Valuta - acquisizione tasso in corso...";
+        
+        const apis = [
+            {
+                name: "Frankfurter",
+                url: `https://api.frankfurter.app/latest?from=EUR&to=TND&t=${Date.now()}`,
+                parse: (data) => {
+                    if (data.rates && data.rates.TND) return { rate: data.rates.TND, date: data.date };
+                    throw new Error("TND non trovato");
+                }
+            },
+            {
+                name: "ExchangeRate-API (free)",
+                url: `https://api.exchangerate-api.com/v4/latest/EUR?t=${Date.now()}`,
+                parse: (data) => {
+                    if (data.rates && data.rates.TND) return { rate: data.rates.TND, date: data.date };
+                    throw new Error("TND non trovato");
+                }
+            },
+            {
+                name: "Open ER",
+                url: `https://open.er-api.com/v6/latest/EUR?t=${Date.now()}`,
+                parse: (data) => {
+                    if (data.rates && data.rates.TND) return { rate: data.rates.TND, date: data.time_last_update_utc || new Date().toISOString().split('T')[0] };
+                    throw new Error("TND non trovato");
+                }
+            }
+        ];
+        
+        let lastError = null;
+        for (const api of apis) {
+            try {
+                const response = await fetchWithTimeout(api.url, 8000);
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                const data = await response.json();
+                const { rate, date } = api.parse(data);
+                if (rate && !isNaN(rate)) {
+                    currentRateEURtoTND = rate;
+                    currentRateTNDtoEUR = 1 / rate;
+                    
+                    // Formatta data/ora locale con secondi
+                    const now = new Date();
+                    const day = now.toLocaleDateString('it-IT');
+                    const time = now.toLocaleTimeString('it-IT');
+                    const sourceName = api.name;
+                    
+                    // Unica riga informativa
+                    infoRateLine.innerHTML = `💱 Convertitore Valuta - di mercato raccolto il: ${day} alle ore: ${time} (fonte: ${sourceName})`;
+                    
+                    // Salva in localStorage
+                    localStorage.setItem('last_market_rate_time', `${day} ${time}`);
+                    localStorage.setItem('last_market_rate_value', currentRateEURtoTND);
+                    localStorage.setItem('last_market_source', sourceName);
+                    
+                    loadingMsgConv.style.display = 'none';
+                    converterContent.style.display = 'block';
+                    updateResults();
+                    
+                    // Feedback pulsante refresh (giallo di base, ma mostriamo rapido cambiamento)
+                    const refreshBtn = document.getElementById('refreshRateBtn');
+                    const originalBg = refreshBtn.style.background;
+                    refreshBtn.style.background = '#6c757d'; // grigio scuro temporaneo
+                    setTimeout(() => {
+                        refreshBtn.style.background = ''; // torna al giallo definito dal CSS
+                    }, 200);
+                    
+                    return; // successo
+                }
+            } catch (err) {
+                console.warn(`API ${api.name} fallita:`, err);
+                lastError = err;
+            }
+        }
+        
+        // Tutti falliti
+        errorMsgDivConv.textContent = '⚠️ Impossibile ottenere tasso di mercato. Verifica connessione.';
+        errorMsgDivConv.style.display = 'block';
+        loadingMsgConv.style.display = 'none';
+        
+        const lastTime = localStorage.getItem('last_market_rate_time');
+        const lastRate = localStorage.getItem('last_market_rate_value');
+        const lastSource = localStorage.getItem('last_market_source');
+        if (lastTime && lastRate) {
+            infoRateLine.innerHTML = `💱 Convertitore Valuta - di mercato raccolto il: ${lastTime} (fonte: ${lastSource || 'sconosciuta'}) [valore memorizzato]`;
+            if (currentRateEURtoTND === null) {
+                currentRateEURtoTND = parseFloat(lastRate);
+                currentRateTNDtoEUR = 1 / currentRateEURtoTND;
+                converterContent.style.display = 'block';
+                updateResults();
+            }
+        } else {
+            infoRateLine.innerHTML = "💱 Convertitore Valuta - premere refresh per ottenere il tasso di mercato";
         }
     }
+    
     eurInput.addEventListener('input', () => {
-        const val = parseFloat(eurInput.value);
-        if (!isNaN(val) && currentRateEURtoTND !== null) {
-            tndInput.value = (val * currentRateEURtoTND).toFixed(2);
+        if (currentRateEURtoTND !== null) {
+            const val = parseFloat(eurInput.value);
+            if (!isNaN(val)) tndInput.value = (val * currentRateEURtoTND).toFixed(2);
         }
         updateResults();
     });
     tndInput.addEventListener('input', () => {
-        const val = parseFloat(tndInput.value);
-        if (!isNaN(val) && currentRateTNDtoEUR !== null) {
-            eurInput.value = (val * currentRateTNDtoEUR).toFixed(2);
+        if (currentRateTNDtoEUR !== null) {
+            const val = parseFloat(tndInput.value);
+            if (!isNaN(val)) eurInput.value = (val * currentRateTNDtoEUR).toFixed(2);
         }
         updateResults();
     });
+    
     async function init() {
         const savedHandle = await getRootHandle();
         if (savedHandle) { rootHandle = savedHandle; await listPdfFiles(); }
@@ -923,9 +1030,11 @@
         if (attachPdfBtn) attachPdfBtn.addEventListener('click', uploadAttachedPdf);
         if (circolareBtn) circolareBtn.addEventListener('click', openCircolare);
         if (refreshRateBtn) refreshRateBtn.addEventListener('click', fetchExchangeRates);
-        fetchExchangeRates();
-        setInterval(fetchExchangeRates, 60 * 60 * 1000);
+        
+        await fetchExchangeRates();
+        setInterval(fetchExchangeRates, 5 * 60 * 1000);
     }
+    
     function checkAdminPassword() {
         const password = prompt("Inserisci la password amministratore:");
         if (password === "admin2025") {
@@ -937,13 +1046,9 @@
         }
     }
     const titleBtn = document.querySelector('.archivio-title');
-    titleBtn.addEventListener('dblclick', () => {
-        checkAdminPassword();
-    });
+    titleBtn.addEventListener('dblclick', () => { checkAdminPassword(); });
     titleBtn.addEventListener('touchstart', (e) => {
-        if (e.touches.length === 2) {
-            checkAdminPassword();
-        }
+        if (e.touches.length === 2) { checkAdminPassword(); }
     });
     init();
 </script>
