@@ -140,7 +140,6 @@
             <button id="generateUnlockBtn" class="small-btn" style="background:#e67e22; width:100%; margin-bottom:8px;">🔑 GENERA CODICE SBLOCC</button>
             <div class="flex-row"><input type="text" id="generatedCode" readonly placeholder="Codice generato" style="flex:1; background:#f8f9fa;"><button id="copyGeneratedBtn" class="small-btn" style="background:#283593;">📋 COPIA</button></div>
             <div class="flex-row"><input type="text" id="newAdminCode" placeholder="Nuovo codice amministratore" style="flex:1;"><button id="changeAdminCodeBtn" class="small-btn" style="background:#8e44ad;">CAMBIA CODICE</button></div>
-            <!-- CAMPO EMAIL AMMINISTRATORE MODIFICABILE -->
             <div class="flex-row">
                 <input type="email" id="adminEmailInput" placeholder="Email amministratore" value="gliamicidipaolino@gmail.com" style="flex:2;">
                 <button id="saveAdminEmailBtn" class="small-btn" style="background:#4caf50;">💾 SALVA EMAIL</button>
@@ -249,7 +248,7 @@
     const SECRET_KEY = "ChiaveSegreta123";
     let adminCode = "admin2025", adminAuthenticated = false;
     
-    // EMAIL AMMINISTRATORE MODIFICABILE
+    // Email amministratore modificabile
     let adminEmail = localStorage.getItem('adminEmail') || "gliamicidipaolino@gmail.com";
     
     let deferredPrompt = null;
@@ -887,9 +886,61 @@
     }
     function releaseImagePageWakeLock() { if (imagePageWakeLock) { imagePageWakeLock.release(); imagePageWakeLock = null; } }
     async function requestImagePageWakeLock() { if ('wakeLock' in navigator) { try { imagePageWakeLock = await navigator.wakeLock.request('screen'); } catch(e){} } }
-    let backStack = ['home'];
+    
+    // --- GESTIONE TASTO INDIETRO (MODIFICATA) ---
+    let backStack = ['home'];  // Stack delle pagine visitate
     let isModalOpen = false;
-    function pushPage(page) { backStack.push(page); history.pushState({ page: page, modal: isModalOpen }, ''); }
+    
+    function pushPage(page) {
+        backStack.push(page);
+        history.pushState({ page: page, modal: isModalOpen }, '');
+    }
+    
+    function closeAllModals() {
+        let closed = false;
+        if (adaptiveModal.style.display === 'flex') { adaptiveModal.style.display = 'none'; closed = true; }
+        if (speakDetailModal.style.display === 'flex') { speakDetailModal.style.display = 'none'; closed = true; }
+        if (noteEditModal.style.display === 'flex') { noteEditModal.style.display = 'none'; closed = true; }
+        if (infoModalDiv.style.display === 'flex') { infoModalDiv.style.display = 'none'; closed = true; }
+        if (activityModal.style.display === 'flex') { activityModal.style.display = 'none'; closed = true; }
+        if (globalInfoModalDiv.style.display === 'flex') { globalInfoModalDiv.style.display = 'none'; closed = true; }
+        isModalOpen = false;
+        return closed;
+    }
+    
+    window.addEventListener('popstate', (event) => {
+        // Chiudi eventuali modali aperti
+        if (closeAllModals()) return;
+        
+        // Se abbiamo più di una pagina nello stack, torniamo indietro
+        if (backStack.length > 1) {
+            backStack.pop();  // Rimuovi la pagina corrente
+            let prevPage = backStack[backStack.length - 1];
+            
+            // Mostra la pagina corretta
+            homePage.classList.add('hidden');
+            emergencyPage.classList.add('hidden');
+            imagePage.classList.add('hidden');
+            
+            if (prevPage === 'home') {
+                homePage.classList.remove('hidden');
+                releaseImagePageWakeLock();
+                currentPage = 'home';
+            } else if (prevPage === 'emergency') {
+                emergencyPage.classList.remove('hidden');
+                currentPage = 'emergency';
+            } else if (prevPage === 'image') {
+                imagePage.classList.remove('hidden');
+                requestImagePageWakeLock();
+                updateAdminReteButtonsVisibility();
+                performSync(true);
+                currentPage = 'image';
+            }
+            keepScreenOn();
+        }
+        // Se siamo sulla home (backStack.length === 1), lasciamo che il browser gestisca l'uscita
+    });
+    
     function openGlobalInfoModal(id, title, textKey) {
         const modal = document.getElementById('globalInfoModal');
         const modalTitle = document.getElementById('globalInfoModalTitle');
@@ -904,6 +955,8 @@
         modalText.value = infoText;
         modal.style.display = 'flex';
         document.getElementById('globalInfoCloseBtn').onclick = () => modal.style.display = 'none';
+        isModalOpen = true;
+        keepScreenOn();
     }
     
     // --- LICENZA ---
@@ -1337,7 +1390,6 @@
     
     // ==================== NUOVA FUNZIONE PER RICHIESTA ATTIVAZIONE (MODIFICATA) ====================
     function openActivationRequestModal() {
-        // Prima modale: istruzioni per bonifico + pulsante per proseguire
         const modalHtml = `
             <div class="adaptive-modal" id="activationStep1Modal" style="display:flex;">
                 <div class="adaptive-modal-content">
@@ -1483,9 +1535,13 @@
         bindWakeLockToInteraction();
         backStack = ['home'];
         history.replaceState({ page: 'home', modal: false }, '');
+        
+        // Forza lo stato iniziale
+        currentPage = 'home';
     }
     
     // Funzioni admin e info
+    let currentPage = 'home';
     function loadAdminCode() { let saved = localStorage.getItem('adminCode'); if (saved && saved.trim()) adminCode = saved; else { adminCode = "admin2025"; localStorage.setItem('adminCode', adminCode); } }
     function loadInfoTextsFromLocal() {
         let saved = localStorage.getItem('infoTextsBackup');
@@ -1495,7 +1551,7 @@
         licenseInfo: "Informazioni sul codice cliente.\nIl codice cliente è univoco per questa installazione.\nPer attivare la licenza, invia un bonifico di €48,00 a Paolo Maiorana IBAN: IT31R0339512900052702573770 con causale il tuo codice cliente.\nPoi invia email a gli amicidipaolino@gmail.com con il codice cliente per ricevere il codice di sblocco.",
         licenseRequest: "Richiedi attivazione: Premi 'Richiedi attivazione' e segui le istruzioni per ottenere il codice di sblocco.\nInvia un bonifico di €48,00 a Paolo Maiorana IBAN: IT31R0339512900052702573770 con causale il tuo codice cliente.\nPoi invia email a gli amicidipaolino@gmail.com con il codice cliente.\nRiceverai il codice di sblocco a 20 cifre.",
         infoNote: "Informazioni sulle note.\nPuoi aggiungere note per ogni contatto. Ogni nota ha un titolo e una descrizione. Puoi selezionare una nota premendo il pallino blu. Le note selezionate vengono usate per la copia e la lettura.",
-        infoOperator: "Informazioni sull'ascolto operatore.\nPremi 'ASCOLTA OPERATORE' per avviare un ascolto di 30 secondi. La voce dell'operatore viene tradotta in italiano e salvata.",
+        infoOperator: "Informazioni sull'ascolto operatore.\nPremi 'ASCOLTA OPERATORE' per avviare un ascolto di 30 secondi. La voce dell'operatore viene tradotta in italiana e salvata.",
         infoSpeak: "Informazioni sulla conversazione con operatore.\nPremi 'PARLA CON OPERATORE' e parla in italiano. La tua voce viene tradotta in francese e letta ad alta voce."
     };
     
