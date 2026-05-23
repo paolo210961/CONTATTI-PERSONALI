@@ -3,552 +3,136 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
-    <title>Expat Archivio + Convertitore (Tasso di mercato)</title>
+    <title>Expat Archivio + Convertitore (Tasso manuale)</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
-        }
-        body {
-            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, sans-serif;
-            background: #e9ecef;
-            padding: 16px;
-            min-height: 100vh;
-        }
-        .container {
-            max-width: 600px;
-            margin: 0 auto;
-        }
-        .page {
-            background: white;
-            border-radius: 32px;
-            padding: 20px 16px 24px;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.05);
-        }
-        .archivio-title {
-            background: linear-gradient(135deg, #1e2a3a, #2c3e66);
-            border-radius: 60px;
-            padding: 12px 12px;
-            font-size: 1.3rem;
-            font-weight: bold;
-            color: white;
-            text-align: center;
-            margin-bottom: 16px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-        }
-        button {
-            border: none;
-            color: white;
-            padding: 12px 16px;
-            border-radius: 60px;
-            font-size: 0.95rem;
-            font-weight: bold;
-            cursor: pointer;
-            transition: 0.05s linear;
-            text-align: center;
-            width: 100%;
-        }
-        button:active {
-            transform: scale(0.97);
-        }
-        .genius-btn {
-            background: #FF6600;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 12px;
-            font-size: 1rem;
-            padding: 12px;
-            margin-bottom: 12px;
-        }
-        .genius-btn .genius-icon {
-            font-size: 1.5rem;
-        }
-        .select-folder-btn {
-            background: #283593;
-            margin-bottom: 16px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 4px;
-            padding: 10px 16px;
-            line-height: 1.3;
-        }
-        .select-folder-btn .btn-line1 {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
-        .select-folder-btn .btn-line2 {
-            font-size: 1.1rem;
-            font-weight: bold;
-        }
-        .dark-card {
-            background: #d2d6dc;
-            border-left: 6px solid #2c3e50;
-            border-radius: 24px;
-            padding: 12px;
-            margin: 16px 0;
-        }
-        .message-box {
-            background: white;
-            border-radius: 20px;
-            padding: 20px 16px;
-            text-align: center;
-            border: 1px solid #ced4da;
-        }
-        .message-title {
-            font-size: 1.1rem;
-            font-weight: bold;
-            color: #1e2a3a;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            margin-bottom: 8px;
-        }
-        .message-text {
-            font-size: 0.85rem;
-            color: #6c757d;
-        }
-        .file-list {
-            max-height: 400px;
-            overflow-y: auto;
-        }
-        .doc-item {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            background: white;
-            border: 1px solid #ced4da;
-            border-radius: 40px;
-            padding: 8px 12px;
-            margin: 6px 0;
-            flex-wrap: wrap;
-            gap: 8px;
-        }
-        .doc-name {
-            font-family: monospace;
-            font-size: 0.75rem;
-            word-break: break-all;
-            flex: 1;
-            min-width: 120px;
-        }
-        .doc-actions {
-            display: flex;
-            gap: 6px;
-            flex-shrink: 0;
-        }
-        .doc-view, .doc-download {
-            font-size: 1.1rem;
-            cursor: pointer;
-            background: none;
-            border: none;
-            padding: 4px 8px;
-            width: auto;
-        }
-        .doc-view { color: #0066cc; }
-        .doc-download { color: #28a745; }
-        .converter-section {
-            margin-top: 16px;
-        }
-        .converter-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: baseline;
-            flex-wrap: wrap;
-            margin-bottom: 10px;
-            gap: 8px;
-        }
-        .converter-title {
-            font-size: 0.95rem;
-            font-weight: bold;
-            color: #1e2a3a;
-        }
-        .converter-row {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            background: #f8f9fa;
-            border-radius: 60px;
-            padding: 6px 10px;
-            margin-bottom: 8px;
-            gap: 8px;
-            flex-wrap: nowrap;
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
-        }
-        .currency-from {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            flex-shrink: 0;
-        }
-        .currency-from .eur-symbol {
-            font-weight: bold;
-            font-size: 0.85rem;
-            min-width: 45px;
-            color: #004C97;
-        }
-        .currency-from .tnd-symbol {
-            font-weight: bold;
-            font-size: 0.85rem;
-            min-width: 45px;
-            color: #E70000;
-        }
-        .currency-from input {
-            width: 120px;
-            padding: 8px 6px;
-            border: 1px solid #ced4da;
-            border-radius: 40px;
-            font-size: 0.85rem;
-            text-align: center;
-            background: white;
-        }
-        .arrow {
-            font-size: 0.9rem;
-            flex-shrink: 0;
-            color: #6c757d;
-        }
-        .result-value-eur {
-            font-weight: bold;
-            font-size: 0.85rem;
-            background: white;
-            padding: 6px 10px;
-            border-radius: 40px;
-            min-width: 105px;
-            text-align: center;
-            border: 1px solid #ced4da;
-            color: #004C97;
-            flex-shrink: 0;
-        }
-        .result-value-tnd {
-            font-weight: bold;
-            font-size: 0.85rem;
-            background: white;
-            padding: 6px 10px;
-            border-radius: 40px;
-            min-width: 105px;
-            text-align: center;
-            border: 1px solid #ced4da;
-            color: #E70000;
-            flex-shrink: 0;
-        }
-        .double-buttons {
-            display: flex;
-            gap: 12px;
-            margin: 12px 0 8px;
-        }
-        .double-buttons button {
-            flex: 1;
-            margin: 0;
-        }
-        .calc-btn {
-            background: #283593;
-        }
-        .info-refresh-group {
-            display: flex;
-            gap: 8px;
-            flex: 1;
-        }
-        .info-btn-black {
-            background: black;
-            font-size: 1.2rem;
-            font-family: 'Times New Roman', serif;
-            font-style: italic;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-            flex: 1;
-        }
-        /* Tasto refresh: giallo di base, grigio scuro quando premuto */
-        .refresh-btn {
-            background: #ffc107;
-            font-size: 1rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-            flex: 1;
-            color: #1e2a3a;
-            font-weight: bold;
-            transition: 0.05s linear;
-        }
-        .refresh-btn:active {
-            background: #6c757d !important;
-            color: white;
-            transform: scale(0.97);
-        }
-        .invite-btn {
-            background: #4caf50;
-            margin-top: 12px;
-            padding: 14px;
-            font-size: 1rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-        }
-        .circolare-btn {
-            background: #8e44ad;
-            margin-top: 8px;
-            padding: 12px;
-            font-size: 0.9rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
-        .attach-pdf-btn {
-            background: #8e44ad;
-            margin-top: 8px;
-            padding: 10px;
-            font-size: 0.9rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
-        .adaptive-modal {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.7);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 2000;
-        }
-        .adaptive-modal-content {
-            background: white;
-            border-radius: 32px;
-            padding: 20px;
-            max-width: 90%;
-            max-height: 80%;
-            width: auto;
-            display: flex;
-            flex-direction: column;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-            overflow-y: auto;
-        }
-        .preview-modal-content {
-            max-width: 500px;
-        }
-        .preview-message-text {
-            background: #f8f9fa;
-            border-radius: 16px;
-            padding: 16px;
-            margin: 16px 0;
-            font-size: 0.9rem;
-            white-space: pre-wrap;
-            word-break: break-word;
-            border: 1px solid #ced4da;
-            max-height: 300px;
-            overflow-y: auto;
-        }
-        .preview-message-text[contenteditable="true"] {
-            background: white;
-            border: 2px solid #283593;
-        }
-        .edit-note {
-            font-size: 0.7rem;
-            color: #6c757d;
-            text-align: center;
-            margin-top: 8px;
-            cursor: pointer;
-            text-decoration: underline;
-        }
-        .modal-buttons {
-            display: flex;
-            gap: 10px;
-            justify-content: flex-end;
-            margin-top: 20px;
-        }
-        .save-btn {
-            background: #283593;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 40px;
-            font-weight: bold;
-        }
-        .cancel-btn {
-            background: #8e44ad;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 40px;
-            font-weight: bold;
-        }
-        .error-message {
-            background: #f8d7da;
-            color: #721c24;
-            padding: 8px;
-            border-radius: 16px;
-            text-align: center;
-            margin-bottom: 10px;
-            font-size: 0.7rem;
-        }
-        .loading-small {
-            text-align: center;
-            color: #6c757d;
-            padding: 8px;
-            font-size: 0.7rem;
-        }
-        iframe {
-            width: 100%;
-            height: 80%;
-            border: none;
-            min-height: 500px;
-        }
-        /* Unica riga informativa sotto il convertitore */
-        .info-rate-line {
-            font-size: 0.7rem;
-            text-align: center;
-            margin-top: 10px;
-            margin-bottom: 6px;
-            padding: 6px;
-            background: #f1f3f5;
-            border-radius: 20px;
-            color: #1e2a3a;
-            word-break: break-word;
-        }
+        *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+        body{font-family:system-ui,'Segoe UI',Roboto,Helvetica,sans-serif;background:#e9ecef;padding:16px;min-height:100vh}
+        .container{max-width:600px;margin:0 auto}
+        .page{background:white;border-radius:32px;padding:20px 16px 24px;box-shadow:0 8px 24px rgba(0,0,0,0.05)}
+        .archivio-title{background:linear-gradient(135deg,#1e2a3a,#2c3e66);border-radius:60px;padding:12px;font-size:1.3rem;font-weight:bold;color:white;text-align:center;margin-bottom:16px;display:flex;align-items:center;justify-content:center;gap:10px}
+        button{border:none;color:white;padding:12px 16px;border-radius:60px;font-size:0.95rem;font-weight:bold;cursor:pointer;transition:0.05s linear;width:100%}
+        button:active{transform:scale(0.97)}
+        .genius-btn{background:#FF6600;display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:12px}
+        .select-folder-btn{background:#283593;margin-bottom:16px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:10px 16px}
+        .dark-card{background:#d2d6dc;border-left:6px solid #2c3e50;border-radius:24px;padding:12px;margin:16px 0}
+        .message-box{background:white;border-radius:20px;padding:20px 16px;text-align:center;border:1px solid #ced4da}
+        .file-list{max-height:400px;overflow-y:auto}
+        .doc-item{display:flex;align-items:center;justify-content:space-between;background:white;border:1px solid #ced4da;border-radius:40px;padding:8px 12px;margin:6px 0;flex-wrap:wrap;gap:8px}
+        .doc-name{font-family:monospace;font-size:0.75rem;word-break:break-all;flex:1;min-width:120px}
+        .doc-actions{display:flex;gap:6px;flex-shrink:0}
+        .doc-view,.doc-download{font-size:1.1rem;cursor:pointer;background:none;border:none;padding:4px 8px;width:auto}
+        .doc-view{color:#0066cc}
+        .doc-download{color:#28a745}
+        .converter-section{margin-top:16px}
+        .converter-row{display:flex;align-items:center;justify-content:space-between;background:#f8f9fa;border-radius:60px;padding:6px 10px;margin-bottom:8px;gap:8px;flex-wrap:nowrap;overflow-x:auto}
+        .currency-from{display:flex;align-items:center;gap:6px;flex-shrink:0}
+        .currency-from .eur-symbol{font-weight:bold;font-size:0.85rem;min-width:45px;color:#004C97}
+        .currency-from .tnd-symbol{font-weight:bold;font-size:0.85rem;min-width:45px;color:#E70000}
+        /* CAMPO EUR: sfondo giallo acceso, testo grassetto */
+        .currency-from input.eur-field{width:120px;padding:8px 6px;border:1px solid #ced4da;border-radius:40px;font-size:0.85rem;text-align:center;background:#FFEB3B;font-weight:bold}
+        /* CAMPO TND: sfondo bianco, testo normale */
+        .currency-from input.tnd-field{width:120px;padding:8px 6px;border:1px solid #ced4da;border-radius:40px;font-size:0.85rem;text-align:center;background:white;font-weight:normal}
+        .arrow{font-size:0.9rem;flex-shrink:0;color:#6c757d}
+        .result-value-eur{font-weight:bold;font-size:0.85rem;background:white;padding:6px 10px;border-radius:40px;min-width:105px;text-align:center;border:1px solid #ced4da;color:#004C97;flex-shrink:0}
+        .result-value-tnd{font-weight:bold;font-size:0.85rem;background:white;padding:6px 10px;border-radius:40px;min-width:105px;text-align:center;border:1px solid #ced4da;color:#E70000;flex-shrink:0}
+        .rate-row{display:flex;align-items:center;justify-content:space-between;background:#f8f9fa;border-radius:60px;padding:6px 10px;margin-bottom:8px;gap:8px;flex-wrap:wrap}
+        .rate-label{font-weight:bold;font-size:0.85rem;color:#1e2a3a;flex-shrink:0}
+        /* Campo tasso: sfondo giallo acceso, testo grassetto, più largo */
+        .rate-input{width:130px;padding:8px 6px;border:1px solid #ced4da;border-radius:40px;font-size:0.95rem;font-weight:bold;text-align:center;background:#FFEB3B;flex-shrink:0}
+        .double-buttons{display:flex;gap:12px;margin:12px 0 8px}
+        .double-buttons button{flex:1}
+        .calc-btn{background:#283593}
+        .info-refresh-group{display:flex;gap:8px;flex:1}
+        .info-btn-black{background:black;font-size:1.2rem;font-family:'Times New Roman',serif;font-style:italic;display:flex;align-items:center;justify-content:center;gap:6px;flex:1}
+        /* Pulsante rosso TASSO BCT */
+        .bct-btn{background:#dc3545 !important;display:flex;align-items:center;justify-content:center;gap:8px;flex:1}
+        .invite-btn{background:#4caf50;margin-top:12px;padding:14px;font-size:1rem;display:flex;align-items:center;justify-content:center;gap:10px}
+        .circolare-btn{background:#8e44ad;margin-top:8px;padding:12px;font-size:0.9rem;display:flex;align-items:center;justify-content:center;gap:8px}
+        .attach-pdf-btn{background:#8e44ad;margin-top:8px;padding:10px;font-size:0.9rem;display:flex;align-items:center;justify-content:center;gap:8px}
+        .adaptive-modal{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.7);display:flex;justify-content:center;align-items:center;z-index:2000}
+        .adaptive-modal-content{background:white;border-radius:32px;padding:20px;max-width:90%;max-height:80%;width:auto;display:flex;flex-direction:column;box-shadow:0 10px 30px rgba(0,0,0,0.3);overflow-y:auto}
+        .preview-modal-content{max-width:500px}
+        .preview-message-text{background:#f8f9fa;border-radius:16px;padding:16px;margin:16px 0;font-size:0.9rem;white-space:pre-wrap;word-break:break-word;border:1px solid #ced4da;max-height:300px;overflow-y:auto}
+        .preview-message-text[contenteditable="true"]{background:white;border:2px solid #283593}
+        .edit-note{font-size:0.7rem;color:#6c757d;text-align:center;margin-top:8px;cursor:pointer;text-decoration:underline}
+        .modal-buttons{display:flex;gap:10px;justify-content:flex-end;margin-top:20px}
+        .save-btn{background:#283593;color:white;border:none;padding:10px 20px;border-radius:40px;font-weight:bold}
+        .cancel-btn{background:#8e44ad;color:white;border:none;padding:10px 20px;border-radius:40px;font-weight:bold}
+        .error-message{background:#f8d7da;color:#721c24;padding:8px;border-radius:16px;text-align:center;margin-bottom:10px;font-size:0.7rem;display:none}
+        .loading-small{text-align:center;color:#6c757d;padding:8px;font-size:0.7rem;display:none}
+        iframe{width:100%;height:80%;border:none;min-height:500px}
+        .info-rate-line{font-size:0.7rem;text-align:center;margin-top:10px;margin-bottom:6px;padding:6px;background:#f1f3f5;border-radius:20px;color:#1e2a3a;word-break:break-word}
     </style>
 </head>
 <body>
 <div class="container">
     <div class="page">
-        <div class="archivio-title">
-            🗃️📄 EXPAT ARCHIVIO 🗃️📄
-        </div>
-        <button id="openGeniusScanBtn" class="genius-btn">
-            <span class="genius-icon">📸</span> GENIUS SCAN <span class="genius-icon">📸</span>
-        </button>
-        <button id="selectRootBtn" class="select-folder-btn">
-            <span class="btn-line1">📂 Selezione-Visualizza 📂</span>
-            <span class="btn-line2">CARTELLA ARCHIVIO</span>
-        </button>
-        <div class="dark-card">
-            <div id="fileListArea" class="file-list">
-                <div class="message-box">
-                    <div class="message-title">⚠️ PERMESSO SCADUTO</div>
-                    <div class="message-text">Clicca sul Tasto Seleziona-Visualizza Cartella Archivio e concedi le autorizzazioni necessarie</div>
-                </div>
-            </div>
-        </div>
+        <div class="archivio-title">🗃️📄 EXPAT ARCHIVIO 🗃️📄</div>
+        <button id="openGeniusScanBtn" class="genius-btn"><span class="genius-icon">📸</span> GENIUS SCAN <span class="genius-icon">📸</span></button>
+        <button id="selectRootBtn" class="select-folder-btn"><span class="btn-line1">📂 Selezione-Visualizza 📂</span><span class="btn-line2">CARTELLA ARCHIVIO</span></button>
+        <div class="dark-card"><div id="fileListArea" class="file-list"><div class="message-box"><div class="message-title">⚠️ PERMESSO SCADUTO</div><div class="message-text">Clicca sul Tasto Seleziona-Visualizza Cartella Archivio e concedi le autorizzazioni necessarie</div></div></div></div>
         <div class="converter-section">
-            <div class="converter-header">
-                <span class="converter-title">💱 Convertitore Valuta</span>
+            <div class="rate-row">
+                <span class="rate-label">💱 INSERICI Cambio di Tasso TND corrente:</span>
+                <input type="number" id="exchangeRate" class="rate-input" step="0.0001" value="3.3937" placeholder="es. 3.3937">
             </div>
-            <div id="errorMsg" class="error-message" style="display: none;"></div>
-            <div id="loadingMsg" class="loading-small">⏳ Acquisizione tasso di mercato...</div>
-            <div id="converterContent" style="display: none;">
+            <div id="converterContent">
                 <div class="converter-row">
-                    <div class="currency-from">
-                        <span class="eur-symbol">🇪🇺 EUR</span>
-                        <input type="number" id="eurAmount" step="any" placeholder="0" value="100">
-                    </div>
+                    <div class="currency-from"><span class="eur-symbol">🇪🇺 EUR</span><input type="number" id="eurAmount" class="eur-field" step="any" placeholder="0" value="100"></div>
                     <span class="arrow">→</span>
                     <div class="result-value-tnd" id="eurToTndResult">--.-- TND</div>
                 </div>
                 <div class="converter-row">
-                    <div class="currency-from">
-                        <span class="tnd-symbol">🇹🇳 TND</span>
-                        <input type="number" id="tndAmount" step="any" placeholder="0" value="100">
-                    </div>
+                    <div class="currency-from"><span class="tnd-symbol">🇹🇳 TND</span><input type="number" id="tndAmount" class="tnd-field" step="any" placeholder="0" value="100"></div>
                     <span class="arrow">→</span>
                     <div class="result-value-eur" id="tndToEurResult">--.-- EUR</div>
                 </div>
             </div>
-            <!-- Unica riga informativa -->
-            <div id="infoRateLine" class="info-rate-line">💱 Convertitore Valuta - di mercato raccolto il: --</div>
+            <div id="infoRateLine" class="info-rate-line">💱 Inserisci il tasso manualmente (es. dal sito BCT) e i calcoli sono automatici</div>
             <div class="double-buttons">
                 <button id="openCalculatorBtn" class="calc-btn">🧮 CALCOLATRICE</button>
                 <div class="info-refresh-group">
                     <button id="infoBtn" class="info-btn-black">𝒊</button>
-                    <button id="refreshRateBtn" class="refresh-btn">⟳</button>
+                    <button id="bctLinkBtn" class="bct-btn">🔗 TASSO BCT</button>
                 </div>
             </div>
-            <button id="attachPdfBtn" class="attach-pdf-btn" style="display: none;">
-                <i class="fas fa-paperclip"></i> Allega PDF all'invito (solo admin)
-            </button>
-            <button id="inviteFriendBtn" class="invite-btn">
-                <i class="fab fa-whatsapp"></i> INVITA UN AMICO ALLA PROVA GRATUITA DEI 90gg
-            </button>
-            <button id="circolareBtn" class="circolare-btn">
-                <i class="fas fa-file-pdf"></i> AdE - Circolare 20e - AIRE
-            </button>
+            <button id="attachPdfBtn" class="attach-pdf-btn" style="display:none;"><i class="fas fa-paperclip"></i> Allega PDF all'invito (solo admin)</button>
+            <button id="inviteFriendBtn" class="invite-btn"><i class="fab fa-whatsapp"></i> INVITA UN AMICO ALLA PROVA GRATUITA DEI 90gg</button>
+            <button id="circolareBtn" class="circolare-btn"><i class="fas fa-file-pdf"></i> AdE - Circolare 20e - AIRE</button>
         </div>
     </div>
 </div>
-<!-- Modale PDF viewer -->
-<div id="pdfModal" class="adaptive-modal" style="display:none;">
-    <div class="adaptive-modal-content" style="width:90%; max-width:800px; height:80%;">
-        <h3 id="pdfModalTitle">Documento PDF</h3>
-        <iframe id="pdfFrame" style="width:100%; height:80%; border:none;"></iframe>
-        <div class="modal-buttons">
-            <button id="pdfDownloadBtn" class="save-btn" style="background:#4caf50;">📥 Scarica PDF</button>
-            <button id="pdfCloseBtn" class="cancel-btn">CHIUDI</button>
-        </div>
-    </div>
-</div>
+<div id="pdfModal" class="adaptive-modal" style="display:none;"><div class="adaptive-modal-content" style="width:90%; max-width:800px; height:80%;"><h3 id="pdfModalTitle">Documento PDF</h3><iframe id="pdfFrame" style="width:100%; height:80%; border:none;"></iframe><div class="modal-buttons"><button id="pdfDownloadBtn" class="save-btn" style="background:#4caf50;">📥 Scarica PDF</button><button id="pdfCloseBtn" class="cancel-btn">CHIUDI</button></div></div></div>
 <script>
-    const VERSION = "expat_archivio_market_v11_final";
+    // ==================== EXPAT ARCHIVIO + CONVERTITORE (TASSO MANUALE) ====================
+    const VERSION = "expat_archivio_manual_v4";
     let isInviteModalOpen = false;
-    let currentPdfBlob = null;
-    let currentPdfUrl = null;
-
-    function showPdfModal(blob, title = "Documento PDF") {
+    let currentPdfBlob = null, currentPdfUrl = null;
+    function showPdfModal(blob, title) {
         const modal = document.getElementById('pdfModal');
         const iframe = document.getElementById('pdfFrame');
         const titleSpan = document.getElementById('pdfModalTitle');
         const downloadBtn = document.getElementById('pdfDownloadBtn');
-        if (currentPdfUrl) {
-            URL.revokeObjectURL(currentPdfUrl);
-            currentPdfUrl = null;
-        }
+        if (currentPdfUrl) URL.revokeObjectURL(currentPdfUrl);
         const url = URL.createObjectURL(blob);
         currentPdfUrl = url;
         currentPdfBlob = blob;
         iframe.src = url;
         titleSpan.innerText = title;
         modal.style.display = 'flex';
-        downloadBtn.onclick = () => {
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = title.replace(/[^a-z0-9]/gi, '_') + '.pdf';
-            a.click();
-        };
+        downloadBtn.onclick = () => { const a = document.createElement('a'); a.href = url; a.download = title.replace(/[^a-z0-9]/gi, '_') + '.pdf'; a.click(); };
     }
-
     function closePdfModal() {
         const modal = document.getElementById('pdfModal');
         modal.style.display = 'none';
         const iframe = document.getElementById('pdfFrame');
         iframe.src = '';
-        if (currentPdfUrl) {
-            URL.revokeObjectURL(currentPdfUrl);
-            currentPdfUrl = null;
-        }
+        if (currentPdfUrl) { URL.revokeObjectURL(currentPdfUrl); currentPdfUrl = null; }
         currentPdfBlob = null;
     }
-
     document.getElementById('pdfCloseBtn').addEventListener('click', closePdfModal);
-    document.getElementById('pdfModal').addEventListener('click', (e) => {
-        if (e.target === document.getElementById('pdfModal')) closePdfModal();
-    });
-
+    document.getElementById('pdfModal').addEventListener('click', (e) => { if (e.target === document.getElementById('pdfModal')) closePdfModal(); });
     function isAndroid() { return /Android/.test(navigator.userAgent); }
     function isIPhone() { return /iPhone|iPad|iPod/.test(navigator.userAgent); }
     let adminAuthenticated = false;
@@ -560,464 +144,184 @@
     const inviteFriendBtn = document.getElementById('inviteFriendBtn');
     const attachPdfBtn = document.getElementById('attachPdfBtn');
     const circolareBtn = document.getElementById('circolareBtn');
-    const refreshRateBtn = document.getElementById('refreshRateBtn');
-    let rootHandle = null;
-    let currentFiles = [];
+    let rootHandle = null, currentFiles = [];
     let attachedPdfBase64 = localStorage.getItem('invite_pdf_base64') || null;
     let wakeLock = null;
-    async function requestWakeLock() {
-        if ('wakeLock' in navigator && !wakeLock) {
-            try {
-                wakeLock = await navigator.wakeLock.request('screen');
-            } catch(e) { console.warn('Wake Lock fallito:', e); }
-        }
-    }
+    async function requestWakeLock() { if ('wakeLock' in navigator && !wakeLock) { try { wakeLock = await navigator.wakeLock.request('screen'); } catch(e) { console.warn(e); } } }
     requestWakeLock();
-    document.addEventListener('visibilitychange', () => {
-        if (document.visibilityState === 'visible') requestWakeLock();
-        else if (wakeLock) { wakeLock.release(); wakeLock = null; }
-    });
-    let infoTexts = {
-        expatArchivio: "📁 EXPAT ARCHIVIO (tasso di mercato)\n\n• Seleziona una cartella (solo Android).\n• Verranno elencati tutti i PDF.\n• 🔍 visualizza, 📥 scarica.\n• Genius Scan per scansionare.\n• Convertitore con tasso di mercato EUR/TND (agg. ogni 5 min).\n\n" + (isIPhone() ? "⚠️ iPhone: selezione cartella non supportata." : "✅ Android: usa Chrome/Edge.")
-    };
+    document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') requestWakeLock(); else if (wakeLock) { wakeLock.release(); wakeLock = null; } });
+    let infoTexts = { expatArchivio: "📁 EXPAT ARCHIVIO (tasso manuale)\n\n• Seleziona una cartella (solo Android).\n• PDF visualizzabili e scaricabili.\n• Genius Scan per scansionare.\n• Convertitore: inserisci tu il tasso EUR/TND (es. dal sito BCT) e i calcoli sono automatici.\n\n" + (isIPhone() ? "⚠️ iPhone: selezione cartella non supportata." : "✅ Android: usa Chrome/Edge.") };
     const savedInfoTexts = localStorage.getItem('expatArchivioInfoText');
-    if (savedInfoTexts) {
-        try { const parsed = JSON.parse(savedInfoTexts); if (parsed.expatArchivio) infoTexts.expatArchivio = parsed.expatArchivio; } catch(e) {}
-    }
+    if (savedInfoTexts) { try { const parsed = JSON.parse(savedInfoTexts); if (parsed.expatArchivio) infoTexts.expatArchivio = parsed.expatArchivio; } catch(e) {} }
     function saveInfoText() { localStorage.setItem('expatArchivioInfoText', JSON.stringify(infoTexts)); }
     function showInfo() { alert(infoTexts.expatArchivio); }
     let pressTimer = null;
-    infoBtn.addEventListener('mousedown', () => {
-        pressTimer = setTimeout(() => {
-            let newText = prompt("Modifica il testo informativo (amministratore):", infoTexts.expatArchivio);
-            if (newText !== null && newText.trim() !== "") {
-                infoTexts.expatArchivio = newText.trim();
-                saveInfoText();
-                alert("Testo aggiornato!");
-            }
-        }, 3000);
-    });
+    infoBtn.addEventListener('mousedown', () => { pressTimer = setTimeout(() => { let newText = prompt("Modifica il testo informativo (amministratore):", infoTexts.expatArchivio); if (newText !== null && newText.trim() !== "") { infoTexts.expatArchivio = newText.trim(); saveInfoText(); alert("Testo aggiornato!"); } }, 3000); });
     infoBtn.addEventListener('mouseup', () => clearTimeout(pressTimer));
     infoBtn.addEventListener('mouseleave', () => clearTimeout(pressTimer));
-    infoBtn.addEventListener('touchstart', () => {
-        pressTimer = setTimeout(() => {
-            let newText = prompt("Modifica il testo informativo (amministratore):", infoTexts.expatArchivio);
-            if (newText !== null && newText.trim() !== "") {
-                infoTexts.expatArchivio = newText.trim();
-                saveInfoText();
-                alert("Testo aggiornato!");
-            }
-        }, 3000);
-    });
+    infoBtn.addEventListener('touchstart', () => { pressTimer = setTimeout(() => { let newText = prompt("Modifica il testo informativo (amministratore):", infoTexts.expatArchivio); if (newText !== null && newText.trim() !== "") { infoTexts.expatArchivio = newText.trim(); saveInfoText(); alert("Testo aggiornato!"); } }, 3000); });
     infoBtn.addEventListener('touchend', () => clearTimeout(pressTimer));
     infoBtn.addEventListener('touchcancel', () => clearTimeout(pressTimer));
-    function openHandleDB() {
-        return new Promise((resolve, reject) => {
-            const request = indexedDB.open('ExpatArchiveHandles', 1);
-            request.onupgradeneeded = () => {
-                const db = request.result;
-                if (!db.objectStoreNames.contains('handles')) db.createObjectStore('handles');
-            };
-            request.onsuccess = () => resolve(request.result);
-            request.onerror = () => reject(request.error);
-        });
-    }
-    async function saveRootHandle(handle) {
-        const db = await openHandleDB();
-        const tx = db.transaction('handles', 'readwrite');
-        tx.objectStore('handles').put(handle, 'root');
-        await tx.done;
-    }
-    async function getRootHandle() {
-        const db = await openHandleDB();
-        const tx = db.transaction('handles', 'readonly');
-        const result = await tx.objectStore('handles').get('root');
-        return result || null;
-    }
-    async function clearRootHandle() {
-        const db = await openHandleDB();
-        const tx = db.transaction('handles', 'readwrite');
-        tx.objectStore('handles').delete('root');
-        await tx.done;
-    }
-    function showPermissionDenied() {
-        fileListArea.innerHTML = `
-            <div class="message-box">
-                <div class="message-title">⚠️ PERMESSO SCADUTO</div>
-                <div class="message-text">Clicca sul Tasto Seleziona-Visualizza Cartella Archivio e concedi le autorizzazioni necessarie</div>
-            </div>
-        `;
-    }
+    function openHandleDB() { return new Promise((resolve, reject) => { const request = indexedDB.open('ExpatArchiveHandles', 1); request.onupgradeneeded = () => { const db = request.result; if (!db.objectStoreNames.contains('handles')) db.createObjectStore('handles'); }; request.onsuccess = () => resolve(request.result); request.onerror = () => reject(request.error); }); }
+    async function saveRootHandle(handle) { const db = await openHandleDB(); const tx = db.transaction('handles', 'readwrite'); tx.objectStore('handles').put(handle, 'root'); await tx.done; }
+    async function getRootHandle() { const db = await openHandleDB(); const tx = db.transaction('handles', 'readonly'); const result = await tx.objectStore('handles').get('root'); return result || null; }
+    async function clearRootHandle() { const db = await openHandleDB(); const tx = db.transaction('handles', 'readwrite'); tx.objectStore('handles').delete('root'); await tx.done; }
+    function showPermissionDenied() { fileListArea.innerHTML = `<div class="message-box"><div class="message-title">⚠️ PERMESSO SCADUTO</div><div class="message-text">Clicca sul Tasto Seleziona-Visualizza Cartella Archivio e concedi le autorizzazioni necessarie</div></div>`; }
     async function listPdfFiles() {
         if (!rootHandle) { showPermissionDenied(); return; }
         let isGranted = false;
-        try {
-            const permission = await rootHandle.queryPermission({ mode: 'read' });
-            isGranted = (permission === 'granted');
-        } catch(e) { isGranted = false; }
-        if (!isGranted) {
-            showPermissionDenied();
-            rootHandle = null;
-            await clearRootHandle();
-            return;
-        }
+        try { const permission = await rootHandle.queryPermission({ mode: 'read' }); isGranted = (permission === 'granted'); } catch(e) { isGranted = false; }
+        if (!isGranted) { showPermissionDenied(); rootHandle = null; await clearRootHandle(); return; }
         const files = [];
-        try {
-            for await (const [name, handle] of rootHandle.entries()) {
-                if (handle.kind === 'file' && name.toLowerCase().endsWith('.pdf')) {
-                    files.push({ name, handle });
-                }
-            }
-        } catch(e) {
-            console.warn(e);
-            showPermissionDenied();
-            rootHandle = null;
-            await clearRootHandle();
-            return;
-        }
+        try { for await (const [name, handle] of rootHandle.entries()) { if (handle.kind === 'file' && name.toLowerCase().endsWith('.pdf')) files.push({ name, handle }); } } catch(e) { console.warn(e); showPermissionDenied(); rootHandle = null; await clearRootHandle(); return; }
         currentFiles = files;
-        if (files.length === 0) {
-            fileListArea.innerHTML = `<div class="message-box"><div class="message-title">📭 NESSUN PDF TROVATO</div><div class="message-text">Aggiungi file PDF nella cartella e riprova</div></div>`;
-            return;
-        }
+        if (files.length === 0) { fileListArea.innerHTML = `<div class="message-box"><div class="message-title">📭 NESSUN PDF TROVATO</div><div class="message-text">Aggiungi file PDF nella cartella e riprova</div></div>`; return; }
         let html = "";
-        for (const file of files) {
-            html += `<div class="doc-item">
-                        <span class="doc-name">📄 ${escapeHtml(file.name)}</span>
-                        <div class="doc-actions">
-                            <button class="doc-view" data-name="${escapeHtml(file.name)}">🔍</button>
-                            <button class="doc-download" data-name="${escapeHtml(file.name)}">📥</button>
-                        </div>
-                    </div>`;
-        }
+        for (const file of files) html += `<div class="doc-item"><span class="doc-name">📄 ${escapeHtml(file.name)}</span><div class="doc-actions"><button class="doc-view" data-name="${escapeHtml(file.name)}">🔍</button><button class="doc-download" data-name="${escapeHtml(file.name)}">📥</button></div></div>`;
         fileListArea.innerHTML = html;
-        document.querySelectorAll('.doc-view').forEach(btn => {
-            btn.addEventListener('click', async (e) => {
-                const fileName = btn.getAttribute('data-name');
-                const file = currentFiles.find(f => f.name === fileName);
-                if (file && file.handle) {
-                    const blob = await file.handle.getFile();
-                    showPdfModal(blob, file.name);
-                } else alert("Impossibile aprire il file.");
-            });
-        });
-        document.querySelectorAll('.doc-download').forEach(btn => {
-            btn.addEventListener('click', async (e) => {
-                const fileName = btn.getAttribute('data-name');
-                const file = currentFiles.find(f => f.name === fileName);
-                if (file && file.handle) {
-                    const blob = await file.handle.getFile();
-                    const url = URL.createObjectURL(blob);
-                    const a = document.createElement('a');
-                    a.href = url;
-                    a.download = file.name;
-                    a.click();
-                    setTimeout(() => URL.revokeObjectURL(url), 1000);
-                } else alert("Impossibile scaricare il file.");
-            });
-        });
+        document.querySelectorAll('.doc-view').forEach(btn => { btn.addEventListener('click', async (e) => { const fileName = btn.getAttribute('data-name'); const file = currentFiles.find(f => f.name === fileName); if (file && file.handle) { const blob = await file.handle.getFile(); showPdfModal(blob, file.name); } else alert("Impossibile aprire il file."); }); });
+        document.querySelectorAll('.doc-download').forEach(btn => { btn.addEventListener('click', async (e) => { const fileName = btn.getAttribute('data-name'); const file = currentFiles.find(f => f.name === fileName); if (file && file.handle) { const blob = await file.handle.getFile(); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = file.name; a.click(); setTimeout(() => URL.revokeObjectURL(url), 1000); } else alert("Impossibile scaricare il file."); }); });
     }
     async function selectAndShowFolder() {
         if (isIPhone()) { alert("La selezione di una cartella non è supportata su iPhone."); showPermissionDenied(); return; }
         if (!window.showDirectoryPicker) { alert("Usa Chrome/Edge su Android."); showPermissionDenied(); return; }
-        try {
-            const handle = await window.showDirectoryPicker();
-            rootHandle = handle;
-            await saveRootHandle(rootHandle);
-            await listPdfFiles();
-        } catch(e) { if (e.name !== 'AbortError') { console.warn(e); alert("Errore selezione cartella."); showPermissionDenied(); } }
-    }
+        try { const handle = await window.showDirectoryPicker(); rootHandle = handle; await saveRootHandle(rootHandle); await listPdfFiles(); } catch(e) { if (e.name !== 'AbortError') { console.warn(e); alert("Errore selezione cartella."); showPermissionDenied(); } } }
     function openGeniusScan() {
         const isAndroid = /Android/.test(navigator.userAgent);
         const isIOS = /iPhone|iPad|iPod/.test(navigator.userAgent);
         let timeoutId = null, hasLostFocus = false;
         const onBlur = () => { hasLostFocus = true; if (timeoutId) clearTimeout(timeoutId); window.removeEventListener('blur', onBlur); };
         window.addEventListener('blur', onBlur);
-        if (isAndroid) {
-            window.location.href = "intent://scan/#Intent;package=com.thegrizzlylabs.geniusscan.free;scheme=zxing;end";
-            timeoutId = setTimeout(() => {
-                if (!hasLostFocus && confirm("Genius Scan non si è aperto. Scaricare dal Play Store?"))
-                    window.open("https://play.google.com/store/apps/details?id=com.thegrizzlylabs.geniusscan.free", "_blank");
-                window.removeEventListener('blur', onBlur);
-            }, 5000);
-        } else if (isIOS) {
-            window.location.href = "geniuscan://";
-            timeoutId = setTimeout(() => {
-                if (!hasLostFocus && confirm("Genius Scan non si è aperto. Scaricare dall'App Store?"))
-                    window.open("https://apps.apple.com/app/genius-scan/id377672876", "_blank");
-                window.removeEventListener('blur', onBlur);
-            }, 5000);
-        } else alert("Link solo su mobile.");
+        if (isAndroid) { window.location.href = "intent://scan/#Intent;package=com.thegrizzlylabs.geniusscan.free;scheme=zxing;end"; timeoutId = setTimeout(() => { if (!hasLostFocus && confirm("Genius Scan non si è aperto. Scaricare dal Play Store?")) window.open("https://play.google.com/store/apps/details?id=com.thegrizzlylabs.geniusscan.free", "_blank"); window.removeEventListener('blur', onBlur); }, 5000); }
+        else if (isIOS) { window.location.href = "geniuscan://"; timeoutId = setTimeout(() => { if (!hasLostFocus && confirm("Genius Scan non si è aperto. Scaricare dall'App Store?")) window.open("https://apps.apple.com/app/genius-scan/id377672876", "_blank"); window.removeEventListener('blur', onBlur); }, 5000); }
+        else alert("Link solo su mobile.");
     }
     function openSystemCalculator() {
-        if (isAndroid()) {
-            window.location.href = "intent://#Intent;package=com.sec.android.app.popupcalculator;scheme=android-app;end";
-            setTimeout(() => {
-                window.location.href = "intent://#Intent;package=com.android.calculator2;scheme=android-app;end";
-            }, 500);
-        } else {
-            alert("Su iPhone/iPad, apri l'app Calcolatrice dal telefono.");
-        }
+        if (isAndroid()) { window.location.href = "intent://#Intent;package=com.sec.android.app.popupcalculator;scheme=android-app;end"; setTimeout(() => { window.location.href = "intent://#Intent;package=com.android.calculator2;scheme=android-app;end"; }, 500); }
+        else { alert("Su iPhone/iPad, apri l'app Calcolatrice dal telefono."); }
     }
-    async function uploadAttachedPdf() {
-        if (!adminAuthenticated) {
-            alert("Solo amministratore può caricare il PDF allegato.");
-            return;
-        }
-        const input = document.createElement('input');
-        input.type = 'file';
-        input.accept = 'application/pdf';
-        input.onchange = async (e) => {
-            const file = e.target.files[0];
-            if (file && file.type === 'application/pdf') {
-                const reader = new FileReader();
-                reader.onload = (ev) => {
-                    attachedPdfBase64 = ev.target.result;
-                    localStorage.setItem('invite_pdf_base64', attachedPdfBase64);
-                    alert("✅ PDF allegato salvato (sostituisce il precedente)");
-                };
-                reader.readAsDataURL(file);
-            } else {
-                alert("Seleziona un file PDF valido.");
-            }
-        };
-        input.click();
-    }
-    function openCircolare() {
-        fetch("https://www.agenziasardaentrate.it/wp-content/uploads/2024/11/circolare-ADE-20-E-04-11-2024.pdf")
-            .then(response => response.blob())
-            .then(blob => {
-                showPdfModal(blob, "Circolare ADE 20E");
-            })
-            .catch(err => {
-                alert("Impossibile caricare il PDF. Verifica la connessione.");
-                console.error(err);
-            });
-    }
+    async function uploadAttachedPdf() { if (!adminAuthenticated) { alert("Solo amministratore può caricare il PDF allegato."); return; } const input = document.createElement('input'); input.type = 'file'; input.accept = 'application/pdf'; input.onchange = async (e) => { const file = e.target.files[0]; if (file && file.type === 'application/pdf') { const reader = new FileReader(); reader.onload = (ev) => { attachedPdfBase64 = ev.target.result; localStorage.setItem('invite_pdf_base64', attachedPdfBase64); alert("✅ PDF allegato salvato (sostituisce il precedente)"); }; reader.readAsDataURL(file); } else { alert("Seleziona un file PDF valido."); } }; input.click(); }
+    function openCircolare() { fetch("https://www.agenziasardaentrate.it/wp-content/uploads/2024/11/circolare-ADE-20-E-04-11-2024.pdf").then(response => response.blob()).then(blob => { showPdfModal(blob, "Circolare ADE 20E"); }).catch(err => { alert("Impossibile caricare il PDF. Verifica la connessione."); console.error(err); }); }
     function inviteFriend() {
-        if (isInviteModalOpen) {
-            alert("Attendi: la finestra di anteprima è già aperta.");
-            return;
-        }
+        if (isInviteModalOpen) { alert("Attendi: la finestra di anteprima è già aperta."); return; }
         isInviteModalOpen = true;
         const appLink = "https://paolo210961.github.io/CONTATTI-PERSONALI/";
-        let defaultMessage = "🎉 *Prova la app per 90 giorni gratuitamente!* 🎉\n\n" +
-                        "Gestisci documenti, converti valuta (EUR/TND tasso di mercato), scannerizza con Genius Scan e organizza i tuoi PDF in una cartella.\n\n" +
-                        "✅ Archivio PDF su cartella personale\n" +
-                        "✅ Convertitore di valuta (mercato) aggiornato ogni 5 minuti\n" +
-                        "✅ Integrazione con Genius Scan\n" +
-                        "✅ Visualizza e invia geolocalizzazione\n" +
-                        "✅ Traduzione vocale automatica italiano ↔ francese (serve connessione internet)\n\n" +
-                        "👉 *Prova subito:* " + appLink;
-        const modal = document.createElement('div');
-        modal.className = 'adaptive-modal';
-        modal.style.display = 'flex';
-        modal.innerHTML = `
-            <div class="adaptive-modal-content preview-modal-content">
-                <h3>📱 Anteprima messaggio</h3>
-                <div id="previewMessageText" class="preview-message-text" contenteditable="true">${escapeHtml(defaultMessage)}</div>
-                <div class="edit-note" id="editNoteToggle">✏️ Tocca per modificare il testo</div>
-                <div class="modal-buttons" style="margin-top: 20px;">
-                    <button id="sendWhatsAppBtn" class="save-btn" style="background:#4caf50;">📤 INVIA SU WHATSAPP</button>
-                    <button id="cancelPreviewBtn" class="cancel-btn">ANNULLA</button>
-                </div>
-            </div>
-        `;
+        let defaultMessage = "🎉 *Prova la app per 90 giorni gratuitamente!* 🎉\n\nGestisci documenti, converti valuta (EUR/TND tasso manuale), scannerizza con Genius Scan e organizza i tuoi PDF in una cartella.\n\n✅ Archivio PDF su cartella personale\n✅ Convertitore di valuta (tasso inserito manualmente)\n✅ Integrazione con Genius Scan\n✅ Visualizza e invia geolocalizzazione\n✅ Traduzione vocale automatica italiano ↔ francese\n\n👉 *Prova subito:* " + appLink;
+        const modal = document.createElement('div'); modal.className = 'adaptive-modal'; modal.style.display = 'flex'; modal.innerHTML = `<div class="adaptive-modal-content preview-modal-content"><h3>📱 Anteprima messaggio</h3><div id="previewMessageText" class="preview-message-text" contenteditable="true">${escapeHtml(defaultMessage)}</div><div class="edit-note" id="editNoteToggle">✏️ Tocca per modificare il testo</div><div class="modal-buttons" style="margin-top: 20px;"><button id="sendWhatsAppBtn" class="save-btn" style="background:#4caf50;">📤 INVIA SU WHATSAPP</button><button id="cancelPreviewBtn" class="cancel-btn">ANNULLA</button></div></div>`;
         document.body.appendChild(modal);
-        const messageDiv = document.getElementById('previewMessageText');
-        const sendBtn = document.getElementById('sendWhatsAppBtn');
-        const cancelBtn = document.getElementById('cancelPreviewBtn');
-        const editNote = document.getElementById('editNoteToggle');
-        let isEditing = true;
-        editNote.addEventListener('click', () => {
-            isEditing = !isEditing;
-            messageDiv.contentEditable = isEditing;
-            editNote.innerText = isEditing ? "✏️ Tocca per modificare il testo" : "🔒 Modifica disattivata. Tocca per riattivare";
-        });
-        const closeModal = () => {
-            modal.remove();
-            isInviteModalOpen = false;
-        };
-        sendBtn.onclick = async () => {
-            const finalMessage = messageDiv.innerText;
-            const encodedMessage = encodeURIComponent(finalMessage);
-            let whatsappUrl = `https://wa.me/?text=${encodedMessage}`;
-            if (attachedPdfBase64) {
-                const blob = await (await fetch(attachedPdfBase64)).blob();
-                const file = new File([blob], "allegato_invito.pdf", { type: 'application/pdf' });
-                if (navigator.share) {
-                    try {
-                        await navigator.share({
-                            title: 'Invito app',
-                            text: finalMessage,
-                            files: [file]
-                        });
-                        closeModal();
-                        return;
-                    } catch (err) {
-                        console.warn("Share fallito, apro WhatsApp senza allegato", err);
-                    }
-                }
-            }
-            window.open(whatsappUrl, '_blank');
-            closeModal();
-        };
-        cancelBtn.onclick = closeModal;
-        modal.onclick = (e) => { if (e.target === modal) closeModal(); };
+        const messageDiv = document.getElementById('previewMessageText'); const sendBtn = document.getElementById('sendWhatsAppBtn'); const cancelBtn = document.getElementById('cancelPreviewBtn'); const editNote = document.getElementById('editNoteToggle'); let isEditing = true;
+        editNote.addEventListener('click', () => { isEditing = !isEditing; messageDiv.contentEditable = isEditing; editNote.innerText = isEditing ? "✏️ Tocca per modificare il testo" : "🔒 Modifica disattivata. Tocca per riattivare"; });
+        const closeModal = () => { modal.remove(); isInviteModalOpen = false; };
+        sendBtn.onclick = async () => { const finalMessage = messageDiv.innerText; const encodedMessage = encodeURIComponent(finalMessage); let whatsappUrl = `https://wa.me/?text=${encodedMessage}`; if (attachedPdfBase64) { const blob = await (await fetch(attachedPdfBase64)).blob(); const file = new File([blob], "allegato_invito.pdf", { type: 'application/pdf' }); if (navigator.share) { try { await navigator.share({ title: 'Invito app', text: finalMessage, files: [file] }); closeModal(); return; } catch (err) { console.warn(err); } } } window.open(whatsappUrl, '_blank'); closeModal(); };
+        cancelBtn.onclick = closeModal; modal.onclick = (e) => { if (e.target === modal) closeModal(); };
     }
     function escapeHtml(str) { return str.replace(/[&<>]/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;' }[m])); }
-    
-    // ------------------- CONVERTITORE MERCATO CON RIGA UNICA -------------------
-    let currentRateEURtoTND = null;
-    let currentRateTNDtoEUR = null;
+
+    // ==================== CONVERTITORE A TASSO MANUALE ====================
+    let updating = false;
     const eurInput = document.getElementById('eurAmount');
     const tndInput = document.getElementById('tndAmount');
     const eurToTndResult = document.getElementById('eurToTndResult');
     const tndToEurResult = document.getElementById('tndToEurResult');
+    const exchangeRateInput = document.getElementById('exchangeRate');
     const infoRateLine = document.getElementById('infoRateLine');
-    const loadingMsgConv = document.getElementById('loadingMsg');
-    const converterContent = document.getElementById('converterContent');
-    const errorMsgDivConv = document.getElementById('errorMsg');
 
-    function updateResults() {
-        if (currentRateEURtoTND === null || currentRateTNDtoEUR === null) return;
-        const eurVal = parseFloat(eurInput.value);
-        if (!isNaN(eurVal)) eurToTndResult.textContent = (eurVal * currentRateEURtoTND).toFixed(3) + ' TND';
-        else eurToTndResult.textContent = '0.000 TND';
-        const tndVal = parseFloat(tndInput.value);
-        if (!isNaN(tndVal)) tndToEurResult.textContent = (tndVal * currentRateTNDtoEUR).toFixed(3) + ' EUR';
-        else tndToEurResult.textContent = '0.000 EUR';
+    function updateFromEuro() {
+        if (updating) return;
+        updating = true;
+        let rate = parseFloat(exchangeRateInput.value);
+        if (isNaN(rate) || rate <= 0) {
+            eurToTndResult.textContent = '? TND';
+            infoRateLine.innerHTML = "⚠️ Inserisci un tasso valido (es. 3.3937)";
+            updating = false;
+            return;
+        }
+        let euro = parseFloat(eurInput.value);
+        if (isNaN(euro)) euro = 0;
+        let tnd = euro * rate;
+        tndInput.value = tnd.toFixed(2);
+        eurToTndResult.textContent = tnd.toFixed(3) + ' TND';
+        let tndVal = parseFloat(tndInput.value);
+        if (!isNaN(tndVal)) {
+            let eurCalc = tndVal / rate;
+            tndToEurResult.textContent = eurCalc.toFixed(3) + ' EUR';
+        }
+        infoRateLine.innerHTML = `💱 Tasso corrente: 1 EUR = ${rate.toFixed(4)} TND (modificabile manualmente)`;
+        updating = false;
     }
 
-    async function fetchWithTimeout(url, timeoutMs = 8000) {
-        const controller = new AbortController();
-        const id = setTimeout(() => controller.abort(), timeoutMs);
-        try {
-            const response = await fetch(url, { signal: controller.signal });
-            clearTimeout(id);
-            return response;
-        } catch (err) {
-            clearTimeout(id);
-            throw err;
+    function updateFromTnd() {
+        if (updating) return;
+        updating = true;
+        let rate = parseFloat(exchangeRateInput.value);
+        if (isNaN(rate) || rate <= 0) {
+            tndToEurResult.textContent = '? EUR';
+            infoRateLine.innerHTML = "⚠️ Inserisci un tasso valido (es. 3.3937)";
+            updating = false;
+            return;
         }
+        let tnd = parseFloat(tndInput.value);
+        if (isNaN(tnd)) tnd = 0;
+        let euro = tnd / rate;
+        eurInput.value = euro.toFixed(2);
+        tndToEurResult.textContent = euro.toFixed(3) + ' EUR';
+        let euroVal = parseFloat(eurInput.value);
+        if (!isNaN(euroVal)) {
+            let tndCalc = euroVal * rate;
+            eurToTndResult.textContent = tndCalc.toFixed(3) + ' TND';
+        }
+        infoRateLine.innerHTML = `💱 Tasso corrente: 1 EUR = ${rate.toFixed(4)} TND (modificabile manualmente)`;
+        updating = false;
     }
 
-    async function fetchExchangeRates() {
-        errorMsgDivConv.style.display = 'none';
-        loadingMsgConv.style.display = 'block';
-        converterContent.style.display = 'none';
-        
-        // Aggiorna la riga informativa con messaggio di caricamento
-        infoRateLine.innerHTML = "💱 Convertitore Valuta - acquisizione tasso in corso...";
-        
-        const apis = [
-            {
-                name: "Frankfurter",
-                url: `https://api.frankfurter.app/latest?from=EUR&to=TND&t=${Date.now()}`,
-                parse: (data) => {
-                    if (data.rates && data.rates.TND) return { rate: data.rates.TND, date: data.date };
-                    throw new Error("TND non trovato");
-                }
-            },
-            {
-                name: "ExchangeRate-API (free)",
-                url: `https://api.exchangerate-api.com/v4/latest/EUR?t=${Date.now()}`,
-                parse: (data) => {
-                    if (data.rates && data.rates.TND) return { rate: data.rates.TND, date: data.date };
-                    throw new Error("TND non trovato");
-                }
-            },
-            {
-                name: "Open ER",
-                url: `https://open.er-api.com/v6/latest/EUR?t=${Date.now()}`,
-                parse: (data) => {
-                    if (data.rates && data.rates.TND) return { rate: data.rates.TND, date: data.time_last_update_utc || new Date().toISOString().split('T')[0] };
-                    throw new Error("TND non trovato");
-                }
-            }
-        ];
-        
-        let lastError = null;
-        for (const api of apis) {
-            try {
-                const response = await fetchWithTimeout(api.url, 8000);
-                if (!response.ok) throw new Error(`HTTP ${response.status}`);
-                const data = await response.json();
-                const { rate, date } = api.parse(data);
-                if (rate && !isNaN(rate)) {
-                    currentRateEURtoTND = rate;
-                    currentRateTNDtoEUR = 1 / rate;
-                    
-                    // Formatta data/ora locale con secondi
-                    const now = new Date();
-                    const day = now.toLocaleDateString('it-IT');
-                    const time = now.toLocaleTimeString('it-IT');
-                    const sourceName = api.name;
-                    
-                    // Unica riga informativa
-                    infoRateLine.innerHTML = `💱 Convertitore Valuta - di mercato raccolto il: ${day} alle ore: ${time} (fonte: ${sourceName})`;
-                    
-                    // Salva in localStorage
-                    localStorage.setItem('last_market_rate_time', `${day} ${time}`);
-                    localStorage.setItem('last_market_rate_value', currentRateEURtoTND);
-                    localStorage.setItem('last_market_source', sourceName);
-                    
-                    loadingMsgConv.style.display = 'none';
-                    converterContent.style.display = 'block';
-                    updateResults();
-                    
-                    // Feedback pulsante refresh (giallo di base, ma mostriamo rapido cambiamento)
-                    const refreshBtn = document.getElementById('refreshRateBtn');
-                    const originalBg = refreshBtn.style.background;
-                    refreshBtn.style.background = '#6c757d'; // grigio scuro temporaneo
-                    setTimeout(() => {
-                        refreshBtn.style.background = ''; // torna al giallo definito dal CSS
-                    }, 200);
-                    
-                    return; // successo
-                }
-            } catch (err) {
-                console.warn(`API ${api.name} fallita:`, err);
-                lastError = err;
-            }
+    function updateFromRate() {
+        if (updating) return;
+        updating = true;
+        let rate = parseFloat(exchangeRateInput.value);
+        if (isNaN(rate) || rate <= 0) {
+            eurToTndResult.textContent = '? TND';
+            tndToEurResult.textContent = '? EUR';
+            infoRateLine.innerHTML = "⚠️ Inserisci un tasso valido (es. 3.3937)";
+            updating = false;
+            return;
         }
-        
-        // Tutti falliti
-        errorMsgDivConv.textContent = '⚠️ Impossibile ottenere tasso di mercato. Verifica connessione.';
-        errorMsgDivConv.style.display = 'block';
-        loadingMsgConv.style.display = 'none';
-        
-        const lastTime = localStorage.getItem('last_market_rate_time');
-        const lastRate = localStorage.getItem('last_market_rate_value');
-        const lastSource = localStorage.getItem('last_market_source');
-        if (lastTime && lastRate) {
-            infoRateLine.innerHTML = `💱 Convertitore Valuta - di mercato raccolto il: ${lastTime} (fonte: ${lastSource || 'sconosciuta'}) [valore memorizzato]`;
-            if (currentRateEURtoTND === null) {
-                currentRateEURtoTND = parseFloat(lastRate);
-                currentRateTNDtoEUR = 1 / currentRateEURtoTND;
-                converterContent.style.display = 'block';
-                updateResults();
-            }
+        let euro = parseFloat(eurInput.value);
+        if (!isNaN(euro)) {
+            let tnd = euro * rate;
+            tndInput.value = tnd.toFixed(2);
+            eurToTndResult.textContent = tnd.toFixed(3) + ' TND';
+            tndToEurResult.textContent = (tnd / rate).toFixed(3) + ' EUR';
         } else {
-            infoRateLine.innerHTML = "💱 Convertitore Valuta - premere refresh per ottenere il tasso di mercato";
+            let tnd = parseFloat(tndInput.value);
+            if (!isNaN(tnd)) {
+                let euroCalc = tnd / rate;
+                eurInput.value = euroCalc.toFixed(2);
+                tndToEurResult.textContent = euroCalc.toFixed(3) + ' EUR';
+                eurToTndResult.textContent = tnd.toFixed(3) + ' TND';
+            } else {
+                eurInput.value = '0';
+                tndInput.value = '0';
+                eurToTndResult.textContent = '0.000 TND';
+                tndToEurResult.textContent = '0.000 EUR';
+            }
         }
+        infoRateLine.innerHTML = `💱 Tasso corrente: 1 EUR = ${rate.toFixed(4)} TND (modificabile manualmente)`;
+        updating = false;
     }
-    
-    eurInput.addEventListener('input', () => {
-        if (currentRateEURtoTND !== null) {
-            const val = parseFloat(eurInput.value);
-            if (!isNaN(val)) tndInput.value = (val * currentRateEURtoTND).toFixed(2);
-        }
-        updateResults();
+
+    eurInput.addEventListener('input', updateFromEuro);
+    tndInput.addEventListener('input', updateFromTnd);
+    exchangeRateInput.addEventListener('input', updateFromRate);
+
+    // Pulsante BCT rosso
+    document.getElementById('bctLinkBtn').addEventListener('click', () => {
+        window.open('https://www.bct.gov.tn/bct/siteprod/cours.jsp?utm_source=chatgpt.com', '_blank');
     });
-    tndInput.addEventListener('input', () => {
-        if (currentRateTNDtoEUR !== null) {
-            const val = parseFloat(tndInput.value);
-            if (!isNaN(val)) eurInput.value = (val * currentRateTNDtoEUR).toFixed(2);
-        }
-        updateResults();
-    });
-    
+
+    // Inizializza i calcoli
+    updateFromRate();
+
+    // ==================== INIT ====================
     async function init() {
         const savedHandle = await getRootHandle();
         if (savedHandle) { rootHandle = savedHandle; await listPdfFiles(); }
@@ -1029,27 +333,19 @@
         inviteFriendBtn.addEventListener('click', inviteFriend);
         if (attachPdfBtn) attachPdfBtn.addEventListener('click', uploadAttachedPdf);
         if (circolareBtn) circolareBtn.addEventListener('click', openCircolare);
-        if (refreshRateBtn) refreshRateBtn.addEventListener('click', fetchExchangeRates);
-        
-        await fetchExchangeRates();
-        setInterval(fetchExchangeRates, 5 * 60 * 1000);
     }
-    
+
     function checkAdminPassword() {
         const password = prompt("Inserisci la password amministratore:");
         if (password === "admin2025") {
             adminAuthenticated = true;
             document.getElementById('attachPdfBtn').style.display = 'flex';
             alert("Modalità amministratore attivata.");
-        } else if (password !== null) {
-            alert("Password errata.");
-        }
+        } else if (password !== null) { alert("Password errata."); }
     }
     const titleBtn = document.querySelector('.archivio-title');
     titleBtn.addEventListener('dblclick', () => { checkAdminPassword(); });
-    titleBtn.addEventListener('touchstart', (e) => {
-        if (e.touches.length === 2) { checkAdminPassword(); }
-    });
+    titleBtn.addEventListener('touchstart', (e) => { if (e.touches.length === 2) { checkAdminPassword(); } });
     init();
 </script>
 </body>
