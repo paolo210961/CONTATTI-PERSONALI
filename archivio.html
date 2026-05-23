@@ -1,30 +1,652 @@
-function openGeniusScan() {
-    const isAndroid = /Android/.test(navigator.userAgent);
-    const isIOS = /iPhone|iPad|iPod/.test(navigator.userAgent);
-    let timeoutId = null, hasLostFocus = false;
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <title>Expat Archivio + Convertitore</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+        body {
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, sans-serif;
+            background: #e9ecef;
+            padding: 16px;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .page {
+            background: white;
+            border-radius: 32px;
+            padding: 20px 16px 24px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.05);
+        }
+        
+        /* Titolo blu con icone */
+        .archivio-title {
+            background: linear-gradient(135deg, #1e2a3a, #2c3e66);
+            border-radius: 60px;
+            padding: 12px 12px;
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: white;
+            text-align: center;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        button {
+            border: none;
+            color: white;
+            padding: 12px 16px;
+            border-radius: 60px;
+            font-size: 0.95rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.05s linear;
+            text-align: center;
+            width: 100%;
+        }
+        button:active {
+            transform: scale(0.97);
+        }
+        
+        .genius-btn {
+            background: #FF6600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            font-size: 1rem;
+            padding: 12px;
+            margin-bottom: 12px;
+        }
+        
+        .select-folder-btn {
+            background: #283593;
+            margin-bottom: 16px;
+        }
+        
+        /* Dark card */
+        .dark-card {
+            background: #d2d6dc;
+            border-left: 6px solid #2c3e50;
+            border-radius: 24px;
+            padding: 12px;
+            margin: 16px 0;
+        }
+        
+        .message-box {
+            background: white;
+            border-radius: 20px;
+            padding: 20px 16px;
+            text-align: center;
+            border: 1px solid #ced4da;
+        }
+        .message-title {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: #1e2a3a;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 8px;
+        }
+        .message-text {
+            font-size: 0.85rem;
+            color: #6c757d;
+        }
+        
+        .file-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .doc-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: white;
+            border: 1px solid #ced4da;
+            border-radius: 40px;
+            padding: 8px 12px;
+            margin: 6px 0;
+        }
+        .doc-name {
+            font-family: monospace;
+            font-size: 0.75rem;
+            word-break: break-all;
+            flex: 1;
+        }
+        .doc-actions {
+            display: flex;
+            gap: 6px;
+        }
+        .doc-view, .doc-download {
+            font-size: 1.1rem;
+            cursor: pointer;
+            background: none;
+            border: none;
+            padding: 4px 8px;
+            width: auto;
+        }
+        .doc-view { color: #0066cc; }
+        .doc-download { color: #28a745; }
+        
+        /* Convertitore compatto */
+        .converter-section {
+            margin-top: 16px;
+        }
+        .converter-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            flex-wrap: wrap;
+            margin-bottom: 12px;
+        }
+        .converter-title {
+            font-size: 1rem;
+            font-weight: bold;
+            color: #1e2a3a;
+        }
+        .update-date {
+            font-size: 0.7rem;
+            color: #6c757d;
+        }
+        .converter-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #f8f9fa;
+            border-radius: 60px;
+            padding: 8px 16px;
+            margin-bottom: 10px;
+        }
+        .currency-from {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex: 1;
+        }
+        .currency-from .eur-symbol {
+            font-weight: bold;
+            font-size: 0.9rem;
+            min-width: 45px;
+            color: #004C97;
+        }
+        .currency-from .tnd-symbol {
+            font-weight: bold;
+            font-size: 0.9rem;
+            min-width: 45px;
+            color: #E70000;
+        }
+        .currency-from input {
+            flex: 1;
+            padding: 8px 12px;
+            border: 1px solid #ced4da;
+            border-radius: 40px;
+            font-size: 0.9rem;
+            text-align: center;
+            background: white;
+        }
+        .arrow {
+            font-size: 1.2rem;
+            margin: 0 8px;
+            color: #6c757d;
+        }
+        .result-value-eur {
+            font-weight: bold;
+            font-size: 0.9rem;
+            background: white;
+            padding: 6px 12px;
+            border-radius: 40px;
+            min-width: 100px;
+            text-align: center;
+            border: 1px solid #ced4da;
+            color: #004C97;
+        }
+        .result-value-tnd {
+            font-weight: bold;
+            font-size: 0.9rem;
+            background: white;
+            padding: 6px 12px;
+            border-radius: 40px;
+            min-width: 100px;
+            text-align: center;
+            border: 1px solid #ced4da;
+            color: #E70000;
+        }
+        
+        /* Pulsanti affiancati */
+        .double-buttons {
+            display: flex;
+            gap: 12px;
+            margin: 12px 0 8px;
+        }
+        .double-buttons button {
+            flex: 1;
+            margin: 0;
+        }
+        .calc-btn {
+            background: #283593;
+        }
+        .info-btn-black {
+            background: black;
+            font-size: 1.2rem;
+            font-family: 'Times New Roman', serif;
+            font-style: italic;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+        
+        .error-message {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 8px;
+            border-radius: 16px;
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 0.7rem;
+        }
+        .loading-small {
+            text-align: center;
+            color: #6c757d;
+            padding: 8px;
+            font-size: 0.7rem;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="page">
+        <!-- TITOLO -->
+        <div class="archivio-title">
+            📁 EXPAT ARCHIVIO 📁
+        </div>
+        
+        <!-- GENIUS SCAN -->
+        <button id="openGeniusScanBtn" class="genius-btn">
+            📸 GENIUS SCAN 📸
+        </button>
+        
+        <!-- SELEZIONA CARTELLA -->
+        <button id="selectRootBtn" class="select-folder-btn">📂 Seleziona-Visualizza Cartella ARCHIVIO</button>
+        
+        <!-- DARK CARD LISTA PDF -->
+        <div class="dark-card">
+            <div id="fileListArea" class="file-list">
+                <div class="message-box">
+                    <div class="message-title">⚠️ PERMESSO SCADUTO</div>
+                    <div class="message-text">Clicca sul Tasto Seleziona-Visualizza Cartella Archivio e concedi le autorizzazioni necessarie</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- CONVERTITORE COMPATTO (senza tasso di cambio) -->
+        <div class="converter-section">
+            <div class="converter-header">
+                <span class="converter-title">💱 Convertitore Valuta</span>
+                <span class="update-date" id="updateDateDisplay">📅 Agg. in corso...</span>
+            </div>
+            <div id="errorMsg" class="error-message" style="display: none;"></div>
+            <div id="loadingMsg" class="loading-small">⏳ Aggiornamento tassi...</div>
+            
+            <div id="converterContent" style="display: none;">
+                <!-- Riga EUR → TND -->
+                <div class="converter-row">
+                    <div class="currency-from">
+                        <span class="eur-symbol">🇪🇺 EUR</span>
+                        <input type="number" id="eurAmount" step="any" placeholder="0" value="100">
+                    </div>
+                    <span class="arrow">→</span>
+                    <div class="result-value-tnd" id="eurToTndResult">--.-- TND</div>
+                </div>
+                
+                <!-- Riga TND → EUR -->
+                <div class="converter-row">
+                    <div class="currency-from">
+                        <span class="tnd-symbol">🇹🇳 TND</span>
+                        <input type="number" id="tndAmount" step="any" placeholder="0" value="100">
+                    </div>
+                    <span class="arrow">→</span>
+                    <div class="result-value-eur" id="tndToEurResult">--.-- EUR</div>
+                </div>
+            </div>
+            
+            <!-- PULSANTI AFFIANCATI: CALCOLATRICE + i -->
+            <div class="double-buttons">
+                <button id="openCalculatorBtn" class="calc-btn">🧮 CALCOLATRICE</button>
+                <button id="infoBtn" class="info-btn-black">𝒊</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // ==================== EXPAT ARCHIVIO ====================
+    const VERSION = "expat_archivio_v7.0";
     
-    const onBlur = () => { 
-        hasLostFocus = true; 
-        if (timeoutId) clearTimeout(timeoutId); 
-        window.removeEventListener('blur', onBlur); 
-    };
-    window.addEventListener('blur', onBlur);
+    function isAndroid() { return /Android/.test(navigator.userAgent); }
+    function isIPhone() { return /iPhone|iPad|iPod/.test(navigator.userAgent); }
     
-    if (isAndroid) {
-        window.location.href = "intent://scan/#Intent;package=com.thegrizzlylabs.geniusscan.free;scheme=zxing;end";
-        timeoutId = setTimeout(() => {
-            if (!hasLostFocus && confirm("Genius Scan non si è aperto. Scaricare dal Play Store?"))
-                window.open("https://play.google.com/store/apps/details?id=com.thegrizzlylabs.geniusscan.free", "_blank");
-            window.removeEventListener('blur', onBlur);
-        }, 5000);
-    } else if (isIOS) {
-        window.location.href = "geniuscan://";
-        timeoutId = setTimeout(() => {
-            if (!hasLostFocus && confirm("Genius Scan non si è aperto. Scaricare dall'App Store?"))
-                window.open("https://apps.apple.com/app/genius-scan/id377672876", "_blank");
-            window.removeEventListener('blur', onBlur);
-        }, 5000);
-    } else {
-        alert("Link solo su mobile.");
+    const selectRootBtn = document.getElementById('selectRootBtn');
+    const openGeniusScanBtn = document.getElementById('openGeniusScanBtn');
+    const infoBtn = document.getElementById('infoBtn');
+    const fileListArea = document.getElementById('fileListArea');
+    const openCalculatorBtn = document.getElementById('openCalculatorBtn');
+    
+    let rootHandle = null;
+    let currentFiles = [];
+    
+    // Wake Lock
+    let wakeLock = null;
+    async function requestWakeLock() {
+        if ('wakeLock' in navigator && !wakeLock) {
+            try {
+                wakeLock = await navigator.wakeLock.request('screen');
+            } catch(e) { console.warn('Wake Lock fallito:', e); }
+        }
     }
-}
+    requestWakeLock();
+    document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible') requestWakeLock();
+        else if (wakeLock) { wakeLock.release(); wakeLock = null; }
+    });
+    
+    // Info modificabile da admin (long press su i)
+    let infoTexts = {
+        expatArchivio: "📁 EXPAT ARCHIVIO\n\n• Seleziona una cartella (solo Android).\n• Verranno elencati tutti i PDF.\n• 🔍 visualizza, 📥 scarica.\n• Genius Scan per scansionare.\n\n" + (isIPhone() ? "⚠️ iPhone: selezione cartella non supportata." : "✅ Android: usa Chrome/Edge.")
+    };
+    const savedInfoTexts = localStorage.getItem('expatArchivioInfoText');
+    if (savedInfoTexts) {
+        try { const parsed = JSON.parse(savedInfoTexts); if (parsed.expatArchivio) infoTexts.expatArchivio = parsed.expatArchivio; } catch(e) {}
+    }
+    function saveInfoText() { localStorage.setItem('expatArchivioInfoText', JSON.stringify(infoTexts)); }
+    function showInfo() { alert(infoTexts.expatArchivio); }
+    
+    let pressTimer = null;
+    infoBtn.addEventListener('mousedown', () => {
+        pressTimer = setTimeout(() => {
+            let newText = prompt("Modifica il testo informativo (amministratore):", infoTexts.expatArchivio);
+            if (newText !== null && newText.trim() !== "") {
+                infoTexts.expatArchivio = newText.trim();
+                saveInfoText();
+                alert("Testo aggiornato!");
+            }
+        }, 3000);
+    });
+    infoBtn.addEventListener('mouseup', () => clearTimeout(pressTimer));
+    infoBtn.addEventListener('mouseleave', () => clearTimeout(pressTimer));
+    infoBtn.addEventListener('touchstart', () => {
+        pressTimer = setTimeout(() => {
+            let newText = prompt("Modifica il testo informativo (amministratore):", infoTexts.expatArchivio);
+            if (newText !== null && newText.trim() !== "") {
+                infoTexts.expatArchivio = newText.trim();
+                saveInfoText();
+                alert("Testo aggiornato!");
+            }
+        }, 3000);
+    });
+    infoBtn.addEventListener('touchend', () => clearTimeout(pressTimer));
+    infoBtn.addEventListener('touchcancel', () => clearTimeout(pressTimer));
+    
+    // Gestione IndexedDB cartella
+    function openHandleDB() {
+        return new Promise((resolve, reject) => {
+            const request = indexedDB.open('ExpatArchiveHandles', 1);
+            request.onupgradeneeded = () => {
+                const db = request.result;
+                if (!db.objectStoreNames.contains('handles')) db.createObjectStore('handles');
+            };
+            request.onsuccess = () => resolve(request.result);
+            request.onerror = () => reject(request.error);
+        });
+    }
+    async function saveRootHandle(handle) {
+        const db = await openHandleDB();
+        const tx = db.transaction('handles', 'readwrite');
+        tx.objectStore('handles').put(handle, 'root');
+        await tx.done;
+    }
+    async function getRootHandle() {
+        const db = await openHandleDB();
+        const tx = db.transaction('handles', 'readonly');
+        const result = await tx.objectStore('handles').get('root');
+        return result || null;
+    }
+    async function clearRootHandle() {
+        const db = await openHandleDB();
+        const tx = db.transaction('handles', 'readwrite');
+        tx.objectStore('handles').delete('root');
+        await tx.done;
+    }
+    
+    function showPermissionDenied() {
+        fileListArea.innerHTML = `
+            <div class="message-box">
+                <div class="message-title">⚠️ PERMESSO SCADUTO</div>
+                <div class="message-text">Clicca sul Tasto Seleziona-Visualizza Cartella Archivio e concedi le autorizzazioni necessarie</div>
+            </div>
+        `;
+    }
+    
+    async function listPdfFiles() {
+        if (!rootHandle) { showPermissionDenied(); return; }
+        let isGranted = false;
+        try {
+            const permission = await rootHandle.queryPermission({ mode: 'read' });
+            isGranted = (permission === 'granted');
+        } catch(e) { isGranted = false; }
+        if (!isGranted) {
+            showPermissionDenied();
+            rootHandle = null;
+            await clearRootHandle();
+            return;
+        }
+        const files = [];
+        try {
+            for await (const [name, handle] of rootHandle.entries()) {
+                if (handle.kind === 'file' && name.toLowerCase().endsWith('.pdf')) {
+                    files.push({ name, handle });
+                }
+            }
+        } catch(e) {
+            console.warn(e);
+            showPermissionDenied();
+            rootHandle = null;
+            await clearRootHandle();
+            return;
+        }
+        currentFiles = files;
+        if (files.length === 0) {
+            fileListArea.innerHTML = `<div class="message-box"><div class="message-title">📭 NESSUN PDF TROVATO</div><div class="message-text">Aggiungi file PDF nella cartella e riprova</div></div>`;
+            return;
+        }
+        let html = "";
+        for (const file of files) {
+            html += `<div class="doc-item">
+                        <span class="doc-name">📄 ${escapeHtml(file.name)}</span>
+                        <div class="doc-actions">
+                            <button class="doc-view" data-name="${escapeHtml(file.name)}">🔍</button>
+                            <button class="doc-download" data-name="${escapeHtml(file.name)}">📥</button>
+                        </div>
+                    </div>`;
+        }
+        fileListArea.innerHTML = html;
+        
+        document.querySelectorAll('.doc-view').forEach(btn => {
+            btn.addEventListener('click', async (e) => {
+                const fileName = btn.getAttribute('data-name');
+                const file = currentFiles.find(f => f.name === fileName);
+                if (file && file.handle) {
+                    const blob = await file.handle.getFile();
+                    const url = URL.createObjectURL(blob);
+                    window.open(url, '_blank');
+                    setTimeout(() => URL.revokeObjectURL(url), 60000);
+                } else alert("Impossibile aprire il file.");
+            });
+        });
+        document.querySelectorAll('.doc-download').forEach(btn => {
+            btn.addEventListener('click', async (e) => {
+                const fileName = btn.getAttribute('data-name');
+                const file = currentFiles.find(f => f.name === fileName);
+                if (file && file.handle) {
+                    const blob = await file.handle.getFile();
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = file.name;
+                    a.click();
+                    setTimeout(() => URL.revokeObjectURL(url), 1000);
+                } else alert("Impossibile scaricare il file.");
+            });
+        });
+    }
+    
+    async function selectAndShowFolder() {
+        if (isIPhone()) { alert("La selezione di una cartella non è supportata su iPhone."); showPermissionDenied(); return; }
+        if (!window.showDirectoryPicker) { alert("Usa Chrome/Edge su Android."); showPermissionDenied(); return; }
+        try {
+            const handle = await window.showDirectoryPicker();
+            rootHandle = handle;
+            await saveRootHandle(rootHandle);
+            await listPdfFiles();
+        } catch(e) { if (e.name !== 'AbortError') { console.warn(e); alert("Errore selezione cartella."); showPermissionDenied(); } }
+    }
+    
+    function openGeniusScan() {
+        const isAndroid = /Android/.test(navigator.userAgent);
+        const isIOS = /iPhone|iPad|iPod/.test(navigator.userAgent);
+        let timeoutId = null, hasLostFocus = false;
+        const onBlur = () => { hasLostFocus = true; if (timeoutId) clearTimeout(timeoutId); window.removeEventListener('blur', onBlur); };
+        window.addEventListener('blur', onBlur);
+        if (isAndroid) {
+            window.location.href = "intent://scan/#Intent;package=com.thegrizzlylabs.geniusscan.free;scheme=zxing;end";
+            timeoutId = setTimeout(() => {
+                if (!hasLostFocus && confirm("Genius Scan non si è aperto. Scaricare dal Play Store?"))
+                    window.open("https://play.google.com/store/apps/details?id=com.thegrizzlylabs.geniusscan.free", "_blank");
+                window.removeEventListener('blur', onBlur);
+            }, 5000);
+        } else if (isIOS) {
+            window.location.href = "geniuscan://";
+            timeoutId = setTimeout(() => {
+                if (!hasLostFocus && confirm("Genius Scan non si è aperto. Scaricare dall'App Store?"))
+                    window.open("https://apps.apple.com/app/genius-scan/id377672876", "_blank");
+                window.removeEventListener('blur', onBlur);
+            }, 5000);
+        } else alert("Link solo su mobile.");
+    }
+    
+    // Apri calcolatrice di sistema
+    function openSystemCalculator() {
+        if (isAndroid()) {
+            window.location.href = "intent://#Intent;package=com.sec.android.app.popupcalculator;scheme=android-app;end";
+            setTimeout(() => {
+                window.location.href = "intent://#Intent;package=com.android.calculator2;scheme=android-app;end";
+            }, 500);
+        } else {
+            alert("Su iPhone/iPad, apri l'app Calcolatrice dal telefono.");
+        }
+    }
+    
+    function escapeHtml(str) { return str.replace(/[&<>]/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;' }[m])); }
+    
+    // ==================== CONVERTITORE ====================
+    let currentRateEURtoTND = null, currentRateTNDtoEUR = null;
+    const eurInput = document.getElementById('eurAmount');
+    const tndInput = document.getElementById('tndAmount');
+    const eurToTndResult = document.getElementById('eurToTndResult');
+    const tndToEurResult = document.getElementById('tndToEurResult');
+    const updateDateDisplay = document.getElementById('updateDateDisplay');
+    const loadingMsgConv = document.getElementById('loadingMsg');
+    const converterContent = document.getElementById('converterContent');
+    const errorMsgDivConv = document.getElementById('errorMsg');
+    
+    function updateResults() {
+        if (currentRateEURtoTND === null || currentRateTNDtoEUR === null) return;
+        const eurVal = parseFloat(eurInput.value);
+        if (!isNaN(eurVal)) eurToTndResult.textContent = (eurVal * currentRateEURtoTND).toFixed(3) + ' TND';
+        else eurToTndResult.textContent = '0.000 TND';
+        
+        const tndVal = parseFloat(tndInput.value);
+        if (!isNaN(tndVal)) tndToEurResult.textContent = (tndVal * currentRateTNDtoEUR).toFixed(3) + ' EUR';
+        else tndToEurResult.textContent = '0.000 EUR';
+    }
+    
+    function formatDate(utcString) {
+        if (!utcString) return 'Data non disponibile';
+        try { 
+            return new Date(utcString).toLocaleString('it-IT', { day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit' }); 
+        } catch(e) { return utcString; }
+    }
+    
+    async function fetchExchangeRates() {
+        errorMsgDivConv.style.display = 'none';
+        loadingMsgConv.style.display = 'block';
+        converterContent.style.display = 'none';
+        try {
+            const response = await fetch('https://open.er-api.com/v6/latest/EUR');
+            if (!response.ok) throw new Error();
+            const data = await response.json();
+            if (data.result !== 'success') throw new Error();
+            const eurToTnd = data.rates?.TND;
+            if (!eurToTnd) throw new Error();
+            currentRateEURtoTND = eurToTnd;
+            currentRateTNDtoEUR = 1 / eurToTnd;
+            updateDateDisplay.innerHTML = `📅 Agg. ${formatDate(data.time_last_update_utc)}`;
+            loadingMsgConv.style.display = 'none';
+            converterContent.style.display = 'block';
+            updateResults();
+        } catch(error) {
+            console.error(error);
+            errorMsgDivConv.textContent = '❌ Errore nel caricamento tassi. Verifica la connessione.';
+            errorMsgDivConv.style.display = 'block';
+            loadingMsgConv.style.display = 'none';
+        }
+    }
+    
+    eurInput.addEventListener('input', () => {
+        const val = parseFloat(eurInput.value);
+        if (!isNaN(val) && currentRateEURtoTND !== null) {
+            tndInput.value = (val * currentRateEURtoTND).toFixed(2);
+        }
+        updateResults();
+    });
+    tndInput.addEventListener('input', () => {
+        const val = parseFloat(tndInput.value);
+        if (!isNaN(val) && currentRateTNDtoEUR !== null) {
+            eurInput.value = (val * currentRateTNDtoEUR).toFixed(2);
+        }
+        updateResults();
+    });
+    
+    // ==================== INIZIALIZZAZIONE ====================
+    async function init() {
+        const savedHandle = await getRootHandle();
+        if (savedHandle) { rootHandle = savedHandle; await listPdfFiles(); }
+        else showPermissionDenied();
+        
+        selectRootBtn.addEventListener('click', selectAndShowFolder);
+        openGeniusScanBtn.addEventListener('click', openGeniusScan);
+        infoBtn.addEventListener('click', showInfo);
+        openCalculatorBtn.addEventListener('click', openSystemCalculator);
+        
+        fetchExchangeRates();
+        setInterval(fetchExchangeRates, 60 * 60 * 1000);
+    }
+    init();
+</script>
+</body>
+</html>
