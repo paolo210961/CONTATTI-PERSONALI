@@ -214,6 +214,7 @@
             display: flex;
             flex-direction: column;
             box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            overflow-y: auto;
         }
         .modal-buttons {
             display: flex;
@@ -250,16 +251,61 @@
         .flex-buttons button {
             flex: 1;
         }
-        .android-only-alert {
-            background: #fff3cd;
-            border-left: 4px solid #ffc107;
-            padding: 10px;
-            border-radius: 16px;
-            margin: 8px 0;
-            font-size: 0.75rem;
+        /* Scanner style */
+        .camera-modal-content {
+            width: 95%;
+            max-width: 600px;
+            height: auto;
+            max-height: 90%;
         }
-        hr {
-            margin: 16px 0;
+        .video-container {
+            position: relative;
+            width: 100%;
+            background: #000;
+            border-radius: 16px;
+            overflow: hidden;
+            margin-bottom: 12px;
+        }
+        video {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+        .preview-container {
+            width: 100%;
+            background: #f0f0f0;
+            border-radius: 16px;
+            padding: 8px;
+            margin-bottom: 12px;
+            text-align: center;
+        }
+        .preview-image {
+            max-width: 100%;
+            max-height: 300px;
+            border-radius: 12px;
+        }
+        .photo-thumbnails {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin: 12px 0;
+            max-height: 100px;
+            overflow-x: auto;
+        }
+        .photo-thumb {
+            height: 80px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            cursor: pointer;
+        }
+        .scanner-buttons {
+            display: flex;
+            gap: 12px;
+            margin-top: 12px;
+            flex-wrap: wrap;
+        }
+        .rotate-btn {
+            background: #ff9800;
         }
     </style>
 </head>
@@ -272,6 +318,7 @@
             <input type="text" id="archivioYearInput" class="archivio-year-input" placeholder="2025" maxlength="4" inputmode="numeric">
             <div style="display: flex; gap: 8px;">
                 <button id="archivioCaricaDocBtnTop" style="background:#17a2b8;">📷 CARICA</button>
+                <button id="scannerBtnTop" style="background:#6b8e23;">📸 SCANSIONA</button>
                 <button id="archivioInfoBtnTop" class="info-i-btn" title="Informazioni">i</button>
             </div>
         </div>
@@ -293,7 +340,7 @@
             <div id="archivioDocsList" style="text-align:center; padding:20px; color:#777;">Inserisci un anno</div>
         </div>
         
-        <!-- Pulsanti extra per gestione cartella fisica (visibili a tutti, ma su iPhone mostrano alert) -->
+        <!-- Pulsanti extra per gestione cartella fisica (solo Android) -->
         <div id="androidExtraButtons">
             <div style="display: flex; gap: 8px; flex-wrap: wrap; margin: 8px 0;">
                 <button id="selectRootBtn" style="background:#283593;">📁 Seleziona cartella archivio</button>
@@ -301,13 +348,14 @@
                 <button id="openRootBtn" style="background:#17a2b8;">📂 Apri cartella archivio</button>
                 <button id="exportMultipleBtn" style="background:#4caf50;">📤 ESPORTA MULTIPLO</button>
             </div>
-            <div id="iphoneMessage" class="android-only-alert" style="display: none;">
-                ℹ️ Su iPhone le funzioni di gestione cartella (selezione cartella, creazione sottocartelle, esportazione multipla) non sono supportate. Puoi comunque usare l'archivio interno, esportare i PDF uno alla volta con il pulsante 📤, e fare backup in formato JSON.
+            <div id="iphoneMessage" class="info-message-small" style="background:#fff3cd; padding:8px; border-radius:16px; margin:8px 0; display:none;">
+                ℹ️ Su iPhone le funzioni di gestione cartella non sono supportate. Puoi comunque usare l'archivio interno, esportare i PDF uno alla volta con il pulsante 📤, e fare backup in formato JSON.
             </div>
         </div>
         
         <div class="archivio-button-row">
             <button id="archivioCaricaDocBtn" style="background:#17a2b8;">📁 CARICA DOCUMENTO</button>
+            <button id="scannerBtn" style="background:#6b8e23;">📸 SCANSIONA</button>
             <button id="archivioNewYearBtn" style="background:#e67e22;">➕ CREA ANNO</button>
             <button id="backupYearBtn" style="background:#4caf50;">💾 BACKUP ANNO</button>
             <button id="backupAllBtn" style="background:#2196f3;">💿 BACKUP TUTTO</button>
@@ -320,7 +368,7 @@
     </div>
 </div>
 
-<!-- MODALE PDF -->
+<!-- MODALE PDF PER ANTEPRIMA -->
 <div id="pdfViewerModalArch" class="adaptive-modal" style="display:none;">
     <div class="adaptive-modal-content" style="width:90%; max-width:800px; height:80%;">
         <h3>Anteprima documento</h3>
@@ -332,17 +380,39 @@
     </div>
 </div>
 
+<!-- MODALE FOTOCAMERA PER SCANSIONE GUIDATA -->
+<div id="cameraModal" class="adaptive-modal" style="display:none;">
+    <div class="adaptive-modal-content camera-modal-content">
+        <h3>📸 Scansione documento</h3>
+        <div class="video-container">
+            <video id="scannerVideo" autoplay playsinline muted></video>
+        </div>
+        <canvas id="scannerCanvas" style="display:none;"></canvas>
+        <div id="previewArea" class="preview-container" style="display:none;">
+            <img id="previewImage" class="preview-image">
+            <div class="scanner-buttons">
+                <button id="rotatePhotoBtn" class="rotate-btn">🔄 RUOTA</button>
+                <button id="confirmPhotoBtn" class="save-btn" style="background:#4caf50;">✅ CONFERMA</button>
+                <button id="retakePhotoBtn" class="cancel-btn">❌ RISCATTA</button>
+            </div>
+        </div>
+        <div class="photo-thumbnails" id="photoThumbnails"></div>
+        <div class="scanner-buttons">
+            <button id="capturePhotoBtn" class="save-btn" style="background:#4caf50;">📷 SCATTA</button>
+            <button id="finishScanBtn" class="save-btn" style="background:#283593;">✅ COMPLETA E SALVA</button>
+            <button id="cancelScanBtn" class="cancel-btn">❌ ANNULLA</button>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
 <script>
-    // ==================== ARCHIVIO DOCUMENTI v2.0 (completo) ====================
-    const VERSION = "archivio_v2.0";
+    // ==================== ARCHIVIO VERSIONE CON SCANNER GUIDATO ====================
+    const VERSION = "archivio_v2.2";
     
     // Rilevamento dispositivo
-    function isAndroid() {
-        return /Android/.test(navigator.userAgent);
-    }
-    function isIPhone() {
-        return /iPhone|iPad|iPod/.test(navigator.userAgent);
-    }
+    function isAndroid() { return /Android/.test(navigator.userAgent); }
+    function isIPhone() { return /iPhone|iPad|iPod/.test(navigator.userAgent); }
     
     // DOM elements
     const archivioYearInput = document.getElementById('archivioYearInput');
@@ -364,6 +434,7 @@
     const createYearFolderBtn = document.getElementById('createYearFolderBtn');
     const openRootBtn = document.getElementById('openRootBtn');
     const exportMultipleBtn = document.getElementById('exportMultipleBtn');
+    const scannerBtns = document.querySelectorAll('#scannerBtn, #scannerBtnTop');
     const iphoneMessage = document.getElementById('iphoneMessage');
     
     // Mostra messaggio informativo per iPhone
@@ -385,13 +456,22 @@
         );
     }
     
-    // Variabili per IndexedDB
+    // Variabili IndexedDB
     let currentYear = "";
     let searchTerm = "";
     let archivioDB = null;
-    
-    // Variabili per gestione cartella fisica (solo Android)
     let rootHandle = null;
+    
+    // Variabili scanner
+    let mediaStream = null;
+    let capturedPhotos = [];     // array di oggetti { dataUrl, rotation }
+    let currentPhotoDataUrl = null;
+    let currentRotation = 0;
+    const video = document.getElementById('scannerVideo');
+    const canvas = document.getElementById('scannerCanvas');
+    const photoThumbnails = document.getElementById('photoThumbnails');
+    const previewArea = document.getElementById('previewArea');
+    const previewImage = document.getElementById('previewImage');
     
     // ==================== DATABASE INDEXEDDB ====================
     function openArchivioDB() {
@@ -414,7 +494,6 @@
         });
     }
     
-    // ==================== OPERAZIONI DOCUMENTI (IndexedDB) ====================
     async function getNextProgressivo(anno) {
         const db = await openArchivioDB();
         return new Promise((resolve, reject) => {
@@ -531,7 +610,6 @@
         });
     }
     
-    // ==================== RENDER LISTA DOCUMENTI ====================
     async function renderDocsList() {
         if (!currentYear) {
             archivioDocsList.innerHTML = "<div style='padding:20px;'>Inserisci un anno.</div>";
@@ -564,7 +642,6 @@
         }
         archivioDocsList.innerHTML = html;
         
-        // Anteprima PDF
         document.querySelectorAll('.archivio-doc-open').forEach(btn => {
             btn.addEventListener('click', async (e) => {
                 const id = btn.getAttribute('data-id');
@@ -575,7 +652,6 @@
                     const iframe = document.getElementById('pdfViewerFrameArch');
                     iframe.src = url;
                     modal.style.display = 'flex';
-                    
                     const shareBtn = document.getElementById('sharePdfBtnArch');
                     shareBtn.onclick = () => {
                         if (navigator.share) {
@@ -587,7 +663,6 @@
                             alert("Condivisione non supportata.");
                         }
                     };
-                    
                     document.getElementById('closePdfViewerArch').onclick = () => {
                         modal.style.display = 'none';
                         iframe.src = '';
@@ -600,7 +675,6 @@
             });
         });
         
-        // Esportazione singolo PDF (funziona su tutti i dispositivi)
         document.querySelectorAll('.archivio-doc-export').forEach(btn => {
             btn.addEventListener('click', async (e) => {
                 const id = btn.getAttribute('data-id');
@@ -620,7 +694,6 @@
             });
         });
         
-        // Eliminazione
         document.querySelectorAll('.archivio-doc-delete').forEach(btn => {
             btn.addEventListener('click', async (e) => {
                 if (confirm("Eliminare definitivamente questo documento?")) {
@@ -633,7 +706,6 @@
         });
     }
     
-    // ==================== GESTIONE ANNI LOGICI ====================
     async function createYearFolderManuale() {
         const year = archivioYearInput.value.trim();
         if (!/^\d{4}$/.test(year)) { alert("Inserisci un anno a 4 cifre."); return; }
@@ -664,7 +736,6 @@
         }
     }
     
-    // ==================== UPLOAD DOCUMENTI ====================
     async function uploadDocument() {
         if (!currentYear) {
             alert("Inserisci un anno valido.");
@@ -677,29 +748,22 @@
         input.onchange = async (ev) => {
             const files = Array.from(ev.target.files);
             if (files.length === 0) return;
-            
             const pdfFiles = files.filter(f => f.type === 'application/pdf');
             const imageFiles = files.filter(f => f.type.startsWith('image/'));
-            
             let userDescription = prompt("Descrizione del documento:", "");
             if (userDescription === null) return;
             userDescription = userDescription.trim().replace(/[^a-zA-Z0-9_\-]/g, '_').substring(0, 50);
             if (userDescription === "") userDescription = "documento";
-            
             const now = new Date();
             const year = now.getFullYear();
             const month = String(now.getMonth() + 1).padStart(2, '0');
             const day = String(now.getDate()).padStart(2, '0');
             let baseProg = await getNextProgressivo(currentYear);
-            
-            // PDF singoli
             for (let i = 0; i < pdfFiles.length; i++) {
                 const file = pdfFiles[i];
                 const progNum = String(parseInt(baseProg) + i).padStart(3, '0');
                 await saveDocumentWithErrorHandling(currentYear, progNum, userDescription, file);
             }
-            
-            // Immagini → PDF
             if (imageFiles.length > 0) {
                 const { jsPDF } = window.jspdf;
                 const pdf = new jsPDF();
@@ -723,14 +787,13 @@
                 const progNum = String(parseInt(baseProg) + pdfFiles.length).padStart(3, '0');
                 await saveDocumentWithErrorHandling(currentYear, progNum, userDescription, pdfBlob);
             }
-            
             await renderDocsList();
             alert(`${pdfFiles.length + (imageFiles.length > 0 ? 1 : 0)} documento/i salvato/i nell'archivio.`);
         };
         input.click();
     }
     
-    // ==================== FUNZIONI GESTIONE CARTELLA FISICA (solo Android) ====================
+    // ==================== GESTIONE CARTELLA FISICA (ANDROID) ====================
     function openHandleDB() {
         return new Promise((resolve, reject) => {
             const request = indexedDB.open('ArchiveHandles', 1);
@@ -760,10 +823,7 @@
     }
     
     async function selectRootFolder() {
-        if (isIPhone()) {
-            showAndroidOnlyAlert();
-            return false;
-        }
+        if (isIPhone()) { showAndroidOnlyAlert(); return false; }
         if (!window.showDirectoryPicker) {
             alert("Il tuo browser non supporta la selezione di cartelle. Usa Chrome/Edge su Android.");
             return false;
@@ -783,93 +843,47 @@
     }
     
     async function createYearFolderPhysical() {
-        if (isIPhone()) {
-            showAndroidOnlyAlert();
-            return;
-        }
+        if (isIPhone()) { showAndroidOnlyAlert(); return; }
         const year = archivioYearInput.value.trim();
-        if (!/^\d{4}$/.test(year)) {
-            alert("Inserisci un anno a 4 cifre.");
-            return;
-        }
-        if (!rootHandle) {
-            rootHandle = await getRootHandle();
-        }
-        if (!rootHandle) {
-            alert("Prima seleziona la cartella 'Archivi Expat' usando il pulsante '📁 Seleziona cartella archivio'.");
-            return;
-        }
+        if (!/^\d{4}$/.test(year)) { alert("Inserisci un anno a 4 cifre."); return; }
+        if (!rootHandle) rootHandle = await getRootHandle();
+        if (!rootHandle) { alert("Prima seleziona la cartella 'Archivi Expat'."); return; }
         try {
-            const yearHandle = await rootHandle.getDirectoryHandle(year, { create: true });
-            showMessage(`✅ Cartella fisica "${yearHandle.name}" creata in "${rootHandle.name}".`, false);
-        } catch(e) {
-            alert("Errore nella creazione della cartella: " + e.message);
-        }
+            await rootHandle.getDirectoryHandle(year, { create: true });
+            showMessage(`✅ Cartella fisica "${year}" creata.`, false);
+        } catch(e) { alert("Errore: " + e.message); }
     }
     
     async function openRootFolder() {
-        if (isIPhone()) {
-            showAndroidOnlyAlert();
-            return;
-        }
-        if (!rootHandle) {
-            rootHandle = await getRootHandle();
-        }
-        if (!rootHandle) {
-            alert("Nessuna cartella selezionata. Usa '📁 Seleziona cartella archivio' prima.");
-            return;
-        }
-        alert(`📂 La cartella selezionata è: "${rootHandle.name}"\n\nPuoi aprirla manualmente con un file manager.`);
+        if (isIPhone()) { showAndroidOnlyAlert(); return; }
+        if (!rootHandle) rootHandle = await getRootHandle();
+        if (!rootHandle) { alert("Nessuna cartella selezionata."); return; }
+        alert(`📂 Cartella selezionata: "${rootHandle.name}"\nPuoi aprirla manualmente con un file manager.`);
     }
     
     async function exportMultipleToPhysicalFolder() {
-        if (isIPhone()) {
-            showAndroidOnlyAlert();
-            return;
-        }
-        if (!rootHandle) {
-            rootHandle = await getRootHandle();
-        }
-        if (!rootHandle) {
-            alert("Prima seleziona la cartella 'Archivi Expat'.");
-            return;
-        }
+        if (isIPhone()) { showAndroidOnlyAlert(); return; }
+        if (!rootHandle) rootHandle = await getRootHandle();
+        if (!rootHandle) { alert("Prima seleziona la cartella 'Archivi Expat'."); return; }
         const docs = await loadDocumentsForYear(currentYear, "");
-        if (docs.length === 0) {
-            alert("Nessun documento da esportare.");
-            return;
-        }
+        if (docs.length === 0) { alert("Nessun documento da esportare."); return; }
         let modalHtml = '<div style="max-height:300px; overflow-y:auto;">';
         for (const doc of docs) {
             modalHtml += `<div style="margin:8px 0;"><input type="checkbox" class="exportCheckbox" value="${doc.id}"> ${doc.nomeCompleto}</div>`;
         }
         modalHtml += '</div><div style="display:flex; gap:8px; margin-top:16px;"><button id="confirmExportBtn" class="save-btn" style="flex:1;">ESPORTA SELEZIONATI</button><button id="cancelExportBtn" class="cancel-btn" style="flex:1;">ANNULLA</button></div>';
-        
         const modal = document.createElement('div');
         modal.className = 'adaptive-modal';
         modal.style.display = 'flex';
-        modal.innerHTML = `<div class="adaptive-modal-content"><h3>Seleziona PDF da esportare nella cartella "${rootHandle.name}/${currentYear}"</h3>${modalHtml}</div>`;
+        modal.innerHTML = `<div class="adaptive-modal-content"><h3>Seleziona PDF da esportare</h3>${modalHtml}</div>`;
         document.body.appendChild(modal);
-        
         document.getElementById('cancelExportBtn').onclick = () => modal.remove();
         document.getElementById('confirmExportBtn').onclick = async () => {
             const selected = [];
-            document.querySelectorAll('.exportCheckbox:checked').forEach(cb => {
-                selected.push(cb.value);
-            });
-            if (selected.length === 0) {
-                alert("Nessun documento selezionato.");
-                modal.remove();
-                return;
-            }
+            document.querySelectorAll('.exportCheckbox:checked').forEach(cb => selected.push(cb.value));
+            if (selected.length === 0) { alert("Nessun documento selezionato."); modal.remove(); return; }
             let yearHandle;
-            try {
-                yearHandle = await rootHandle.getDirectoryHandle(currentYear, { create: true });
-            } catch(e) {
-                alert("Errore: " + e.message);
-                modal.remove();
-                return;
-            }
+            try { yearHandle = await rootHandle.getDirectoryHandle(currentYear, { create: true }); } catch(e) { alert("Errore: " + e.message); modal.remove(); return; }
             let successCount = 0;
             for (const id of selected) {
                 const doc = docs.find(d => d.id === id);
@@ -882,22 +896,19 @@
                             await writable.write(blob);
                             await writable.close();
                             successCount++;
-                        } catch(e) {
-                            console.warn("Errore su " + doc.nomeCompleto, e);
-                        }
+                        } catch(e) { console.warn(e); }
                     }
                 }
             }
-            alert(`✅ Esportati ${successCount} documenti su ${selected.length} in "${rootHandle.name}/${currentYear}"`);
+            alert(`✅ Esportati ${successCount} documenti.`);
             modal.remove();
         };
     }
     
-    // ==================== FUNZIONI BACKUP JSON ====================
+    // ==================== BACKUP JSON ====================
     async function backupYear(anno) {
         const docs = await loadDocumentsForYear(anno, "");
         if (docs.length === 0) { alert("Nessun documento."); return; }
-        
         const exportData = { exportDate: new Date().toISOString(), version: VERSION, anno: anno, documents: [] };
         for (const doc of docs) {
             const docCopy = { ...doc };
@@ -920,12 +931,8 @@
             request.onerror = () => reject(request.error);
         });
         if (allDocs.length === 0) { alert("Nessun documento."); return; }
-        
         const docsByYear = {};
-        for (const doc of allDocs) {
-            if (!docsByYear[doc.anno]) docsByYear[doc.anno] = [];
-            docsByYear[doc.anno].push(doc);
-        }
+        for (const doc of allDocs) { if (!docsByYear[doc.anno]) docsByYear[doc.anno] = []; docsByYear[doc.anno].push(doc); }
         const exportData = { exportDate: new Date().toISOString(), version: VERSION, years: docsByYear };
         for (const anno in docsByYear) {
             for (const doc of docsByYear[anno]) {
@@ -997,7 +1004,7 @@
         URL.revokeObjectURL(url);
     }
     
-    // ==================== UI ====================
+    // ==================== UI MESSAGGI ====================
     function showMessage(msg, isError = false) {
         const div = document.createElement('div');
         div.className = 'status-msg';
@@ -1028,6 +1035,7 @@
         let msg = "📁 ARCHIVIO DOCUMENTI EXPAT\n\n" +
             "• CREA ANNO: inserisci anno (2025) e premi\n" +
             "• CARICA: seleziona foto/PDF (più foto → PDF unico)\n" +
+            "• SCANSIONA: apri fotocamera, scatta foto, ritaglia/adatta ad A4, conferma, scatta la successiva.\n" +
             "• 🔍 (lente): anteprima PDF\n" +
             "• 📤 (esporta): salva il PDF sul dispositivo\n" +
             "• 🗑️: elimina documento\n" +
@@ -1041,6 +1049,206 @@
         }
         msg += "\n⚠️ I documenti sono salvati nel database interno (IndexedDB).\nFai backup regolari.";
         alert(msg);
+    }
+    
+    // ==================== SCANNER GUIDATO CON RITAGLIO A4 E CONFERMA ====================
+    async function initCamera() {
+        try {
+            if (mediaStream) {
+                mediaStream.getTracks().forEach(track => track.stop());
+            }
+            const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
+            mediaStream = stream;
+            video.srcObject = stream;
+            await video.play();
+            return true;
+        } catch (err) {
+            console.error("Errore fotocamera:", err);
+            alert("Impossibile accedere alla fotocamera. Verifica i permessi.");
+            return false;
+        }
+    }
+    
+    function stopCamera() {
+        if (mediaStream) {
+            mediaStream.getTracks().forEach(track => track.stop());
+            mediaStream = null;
+        }
+        video.srcObject = null;
+    }
+    
+    // Ritaglia e adatta l'immagine al formato A4 (proporzioni 1/√2)
+    // Riceve dataUrl e rotazione, restituisce nuovo dataUrl con immagine ritagliata e ridimensionata a 595x842 pt (A4 a 72 DPI)
+    async function cropToA4(dataUrl, rotation = 0) {
+        return new Promise((resolve) => {
+            const img = new Image();
+            img.onload = () => {
+                const canvasCrop = document.createElement('canvas');
+                const ctx = canvasCrop.getContext('2d');
+                // Gestisci rotazione
+                let w = img.width;
+                let h = img.height;
+                let rad = rotation * Math.PI / 180;
+                let sin = Math.abs(Math.sin(rad));
+                let cos = Math.abs(Math.cos(rad));
+                let newW = Math.floor(w * cos + h * sin);
+                let newH = Math.floor(w * sin + h * cos);
+                canvasCrop.width = newW;
+                canvasCrop.height = newH;
+                ctx.save();
+                ctx.translate(newW/2, newH/2);
+                ctx.rotate(rad);
+                ctx.drawImage(img, -w/2, -h/2, w, h);
+                ctx.restore();
+                // Ora ritaglia per ottenere proporzioni A4 (larghezza/altezza = 1/√2 ≈ 0.707)
+                let targetRatio = 1 / Math.sqrt(2); // ≈0.707
+                let cropW, cropH, offsetX = 0, offsetY = 0;
+                let currentRatio = newW / newH;
+                if (currentRatio > targetRatio) {
+                    // Troppo largo: taglia orizzontalmente
+                    cropH = newH;
+                    cropW = Math.floor(newH * targetRatio);
+                    offsetX = Math.floor((newW - cropW) / 2);
+                    offsetY = 0;
+                } else {
+                    // Troppo alto: taglia verticalmente
+                    cropW = newW;
+                    cropH = Math.floor(newW / targetRatio);
+                    offsetX = 0;
+                    offsetY = Math.floor((newH - cropH) / 2);
+                }
+                const canvasFinal = document.createElement('canvas');
+                canvasFinal.width = 595;  // A4 width in pt (72dpi)
+                canvasFinal.height = 842; // A4 height
+                const finalCtx = canvasFinal.getContext('2d');
+                finalCtx.drawImage(canvasCrop, offsetX, offsetY, cropW, cropH, 0, 0, 595, 842);
+                resolve(canvasFinal.toDataURL('image/jpeg', 0.9));
+            };
+            img.src = dataUrl;
+        });
+    }
+    
+    async function capturePhoto() {
+        if (!video.videoWidth) return;
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+        currentPhotoDataUrl = canvas.toDataURL('image/jpeg', 0.9);
+        currentRotation = 0;
+        // Mostra anteprima per conferma/ritaglio
+        await showPreviewForCurrentPhoto();
+    }
+    
+    async function showPreviewForCurrentPhoto() {
+        // Applica ritaglio automatico A4 senza rotazione aggiuntiva
+        const cropped = await cropToA4(currentPhotoDataUrl, currentRotation);
+        previewImage.src = cropped;
+        previewArea.style.display = 'block';
+        // Nascondi video e pulsante scatta
+        document.querySelector('.video-container').style.display = 'none';
+        document.getElementById('capturePhotoBtn').style.display = 'none';
+    }
+    
+    function hidePreview() {
+        previewArea.style.display = 'none';
+        document.querySelector('.video-container').style.display = 'block';
+        document.getElementById('capturePhotoBtn').style.display = 'block';
+        currentPhotoDataUrl = null;
+        currentRotation = 0;
+    }
+    
+    async function rotatePhoto() {
+        if (!currentPhotoDataUrl) return;
+        currentRotation = (currentRotation + 90) % 360;
+        const rotated = await cropToA4(currentPhotoDataUrl, currentRotation);
+        previewImage.src = rotated;
+        // Non salviamo ancora, solo anteprima.
+        // Il dato effettivo verrà generato al momento della conferma.
+    }
+    
+    async function confirmPhoto() {
+        if (!currentPhotoDataUrl) return;
+        // Genera l'immagine definitiva ritagliata e ruotata
+        const finalDataUrl = await cropToA4(currentPhotoDataUrl, currentRotation);
+        capturedPhotos.push({ dataUrl: finalDataUrl, rotation: 0 }); // già ritagliata e ruotata
+        // Aggiungi miniatura
+        const thumb = document.createElement('img');
+        thumb.src = finalDataUrl;
+        thumb.className = 'photo-thumb';
+        thumb.style.height = '80px';
+        photoThumbnails.appendChild(thumb);
+        hidePreview();
+        showMessage("✅ Foto confermata. Puoi scattare la prossima.", false);
+    }
+    
+    function retakePhoto() {
+        hidePreview();
+        // Ricomincia la cattura (non cancella le foto già confermate)
+    }
+    
+    async function finishScan() {
+        if (capturedPhotos.length === 0) {
+            alert("Nessuna foto scattata e confermata.");
+            return;
+        }
+        if (!currentYear) {
+            alert("Inserisci un anno valido prima di salvare.");
+            return;
+        }
+        const { jsPDF } = window.jspdf;
+        const pdf = new jsPDF();
+        let firstPage = true;
+        for (const photo of capturedPhotos) {
+            const imgData = photo.dataUrl;
+            const img = new Image();
+            await new Promise((resolve) => { img.onload = resolve; img.src = imgData; });
+            if (!firstPage) pdf.addPage();
+            pdf.addImage(imgData, 'JPEG', 0, 0, pdf.internal.pageSize.getWidth(), pdf.internal.pageSize.getHeight());
+            firstPage = false;
+        }
+        const pdfBlob = pdf.output('blob');
+        let userDescription = prompt("Descrizione del documento (es. fattura, contratto):", "scansione");
+        if (userDescription === null) {
+            closeCameraModal();
+            return;
+        }
+        userDescription = userDescription.trim().replace(/[^a-zA-Z0-9_\-]/g, '_').substring(0, 50);
+        if (userDescription === "") userDescription = "scansione";
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = String(now.getMonth() + 1).padStart(2, '0');
+        const day = String(now.getDate()).padStart(2, '0');
+        let baseProg = await getNextProgressivo(currentYear);
+        const progNum = String(baseProg).padStart(3, '0');
+        await saveDocument(currentYear, progNum, userDescription, pdfBlob);
+        await renderDocsList();
+        alert(`✅ Scansione salvata come ${progNum}_${year}_${month}_${day}_${userDescription}.pdf`);
+        closeCameraModal();
+    }
+    
+    function closeCameraModal() {
+        document.getElementById('cameraModal').style.display = 'none';
+        stopCamera();
+        capturedPhotos = [];
+        photoThumbnails.innerHTML = '';
+        hidePreview();
+    }
+    
+    async function openScanner() {
+        if (!currentYear) {
+            alert("Inserisci un anno valido prima di scansionare.");
+            return;
+        }
+        const modal = document.getElementById('cameraModal');
+        modal.style.display = 'flex';
+        const success = await initCamera();
+        if (!success) {
+            modal.style.display = 'none';
+        }
+        capturedPhotos = [];
+        photoThumbnails.innerHTML = '';
+        hidePreview();
     }
     
     // ==================== INIZIALIZZAZIONE ====================
@@ -1081,6 +1289,7 @@
         });
         infoBtns.forEach(btn => btn.addEventListener('click', showArchivioInfo));
         
+        // Pulsanti extra Android
         if (selectRootBtn) {
             selectRootBtn.addEventListener('click', () => {
                 if (isIPhone()) showAndroidOnlyAlert();
@@ -1103,14 +1312,20 @@
             exportMultipleBtn.addEventListener('click', () => {
                 if (isIPhone()) showAndroidOnlyAlert();
                 else {
-                    if (!currentYear) {
-                        alert("Seleziona un anno prima di esportare.");
-                        return;
-                    }
+                    if (!currentYear) { alert("Seleziona un anno."); return; }
                     exportMultipleToPhysicalFolder();
                 }
             });
         }
+        
+        // Scanner buttons
+        scannerBtns.forEach(btn => btn.addEventListener('click', openScanner));
+        document.getElementById('capturePhotoBtn').addEventListener('click', capturePhoto);
+        document.getElementById('finishScanBtn').addEventListener('click', finishScan);
+        document.getElementById('cancelScanBtn').addEventListener('click', closeCameraModal);
+        document.getElementById('rotatePhotoBtn').addEventListener('click', rotatePhoto);
+        document.getElementById('confirmPhotoBtn').addEventListener('click', confirmPhoto);
+        document.getElementById('retakePhotoBtn').addEventListener('click', retakePhoto);
     }
     
     init();
