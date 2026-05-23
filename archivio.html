@@ -285,7 +285,7 @@
             gap: 6px;
         }
         
-        /* Nuovo pulsante invita amico */
+        /* Pulsante invita amico */
         .invite-btn {
             background: #4caf50;
             margin-top: 12px;
@@ -295,6 +295,47 @@
             align-items: center;
             justify-content: center;
             gap: 10px;
+        }
+        
+        /* Pulsante allegato PDF (solo admin) */
+        .attach-pdf-btn {
+            background: #8e44ad;
+            margin-top: 8px;
+            padding: 10px;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        /* Stile modale anteprima messaggio */
+        .preview-modal-content {
+            max-width: 500px;
+        }
+        .preview-message-text {
+            background: #f8f9fa;
+            border-radius: 16px;
+            padding: 16px;
+            margin: 16px 0;
+            font-size: 0.9rem;
+            white-space: pre-wrap;
+            word-break: break-word;
+            border: 1px solid #ced4da;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .preview-message-text[contenteditable="true"] {
+            background: white;
+            border: 2px solid #283593;
+        }
+        .edit-note {
+            font-size: 0.7rem;
+            color: #6c757d;
+            text-align: center;
+            margin-top: 8px;
+            cursor: pointer;
+            text-decoration: underline;
         }
         
         .error-message {
@@ -380,7 +421,12 @@
                 <button id="infoBtn" class="info-btn-black">𝒊</button>
             </div>
             
-            <!-- NUOVO PULSANTE INVITA AMICO -->
+            <!-- Pulsante per caricare PDF allegato (visibile solo admin) -->
+            <button id="attachPdfBtn" class="attach-pdf-btn" style="display: none;">
+                <i class="fas fa-paperclip"></i> Allega PDF all'invito (solo admin)
+            </button>
+            
+            <!-- PULSANTE INVITA AMICO -->
             <button id="inviteFriendBtn" class="invite-btn">
                 <i class="fab fa-whatsapp"></i> INVITA UN AMICO ALLA PROVA GRATUITA DEI 90gg
             </button>
@@ -390,10 +436,28 @@
 
 <script>
     // ==================== EXPAT ARCHIVIO ====================
-    const VERSION = "expat_archivio_v7.6";
+    const VERSION = "expat_archivio_v7.9";
     
     function isAndroid() { return /Android/.test(navigator.userAgent); }
     function isIPhone() { return /iPhone|iPad|iPod/.test(navigator.userAgent); }
+    
+    // Admin authentication (semplice per demo, nel file originale c'è già)
+    let adminAuthenticated = false;
+    // Per demo, simuliamo admin con doppio tap sul titolo (puoi integrare con la tua logica)
+    const titleBtn = document.querySelector('.archivio-title');
+    let adminTapTimer = null;
+    titleBtn.addEventListener('dblclick', () => {
+        adminAuthenticated = true;
+        document.getElementById('attachPdfBtn').style.display = 'flex';
+        alert("Modalità amministratore attivata. Ora puoi allegare un PDF all'invito.");
+    });
+    titleBtn.addEventListener('touchstart', (e) => {
+        if (e.touches.length === 2) {
+            adminAuthenticated = true;
+            document.getElementById('attachPdfBtn').style.display = 'flex';
+            alert("Modalità amministratore attivata.");
+        }
+    });
     
     const selectRootBtn = document.getElementById('selectRootBtn');
     const openGeniusScanBtn = document.getElementById('openGeniusScanBtn');
@@ -401,9 +465,13 @@
     const fileListArea = document.getElementById('fileListArea');
     const openCalculatorBtn = document.getElementById('openCalculatorBtn');
     const inviteFriendBtn = document.getElementById('inviteFriendBtn');
+    const attachPdfBtn = document.getElementById('attachPdfBtn');
     
     let rootHandle = null;
     let currentFiles = [];
+    
+    // Variabile per PDF allegato (base64)
+    let attachedPdfBase64 = localStorage.getItem('invite_pdf_base64') || null;
     
     // Wake Lock
     let wakeLock = null;
@@ -604,7 +672,6 @@
         } else alert("Link solo su mobile.");
     }
     
-    // Apri calcolatrice di sistema
     function openSystemCalculator() {
         if (isAndroid()) {
             window.location.href = "intent://#Intent;package=com.sec.android.app.popupcalculator;scheme=android-app;end";
@@ -616,22 +683,102 @@
         }
     }
     
-    // Invita amico via WhatsApp
+    // Carica PDF allegato (admin)
+    async function uploadAttachedPdf() {
+        if (!adminAuthenticated) {
+            alert("Solo amministratore può caricare il PDF allegato.");
+            return;
+        }
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = 'application/pdf';
+        input.onchange = async (e) => {
+            const file = e.target.files[0];
+            if (file && file.type === 'application/pdf') {
+                const reader = new FileReader();
+                reader.onload = (ev) => {
+                    attachedPdfBase64 = ev.target.result;
+                    localStorage.setItem('invite_pdf_base64', attachedPdfBase64);
+                    alert("✅ PDF allegato salvato (sostituisce il precedente)");
+                };
+                reader.readAsDataURL(file);
+            } else {
+                alert("Seleziona un file PDF valido.");
+            }
+        };
+        input.click();
+    }
+    
+    // Invita amico con anteprima messaggio e allegato PDF (se presente)
     function inviteFriend() {
-        // Link dell'app (modifica con il tuo URL reale)
-        const appLink = "https://tuo-dominio.com/index.html";
-        const message = "🎉 *Prova la app per 90 giorni gratuitamente!* 🎉\n\n" +
+        const appLink = "https://paolo210961.github.io/CONTATTI-PERSONALI/";
+        let defaultMessage = "🎉 *Prova la app per 90 giorni gratuitamente!* 🎉\n\n" +
                         "Gestisci documenti, converti valuta (EUR/TND), scannerizza con Genius Scan e organizza i tuoi PDF in una cartella.\n\n" +
-                        "👉 *Scopri di più:* " + appLink + "\n\n" +
-                        "✅ 90 giorni di prova gratuita\n" +
                         "✅ Archivio PDF su cartella personale\n" +
                         "✅ Convertitore di valuta aggiornato\n" +
-                        "✅ Integrazione con Genius Scan\n\n" +
-                        "Clicca sul link e inizia subito!";
+                        "✅ Integrazione con Genius Scan\n" +
+                        "✅ Visualizza e invia geolocalizzazione\n" +
+                        "✅ Traduzione vocale automatica italiano ↔ francese (serve connessione internet)\n\n" +
+                        "👉 *Prova subito:* " + appLink;
         
-        const encodedMessage = encodeURIComponent(message);
-        const whatsappUrl = `https://wa.me/?text=${encodedMessage}`;
-        window.open(whatsappUrl, '_blank');
+        const modal = document.createElement('div');
+        modal.className = 'adaptive-modal';
+        modal.style.display = 'flex';
+        modal.innerHTML = `
+            <div class="adaptive-modal-content preview-modal-content">
+                <h3>📱 Anteprima messaggio</h3>
+                <div id="previewMessageText" class="preview-message-text" contenteditable="true">${escapeHtml(defaultMessage)}</div>
+                <div class="edit-note" id="editNoteToggle">✏️ Tocca per modificare il testo</div>
+                <div class="modal-buttons" style="margin-top: 20px;">
+                    <button id="sendWhatsAppBtn" class="save-btn" style="background:#4caf50;">📤 INVIA SU WHATSAPP</button>
+                    <button id="cancelPreviewBtn" class="cancel-btn">ANNULLA</button>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+        
+        const messageDiv = document.getElementById('previewMessageText');
+        const sendBtn = document.getElementById('sendWhatsAppBtn');
+        const cancelBtn = document.getElementById('cancelPreviewBtn');
+        const editNote = document.getElementById('editNoteToggle');
+        
+        let isEditing = true;
+        editNote.addEventListener('click', () => {
+            isEditing = !isEditing;
+            messageDiv.contentEditable = isEditing;
+            editNote.innerText = isEditing ? "✏️ Tocca per modificare il testo" : "🔒 Modifica disattivata. Tocca per riattivare";
+        });
+        
+        sendBtn.onclick = async () => {
+            const finalMessage = messageDiv.innerText;
+            const encodedMessage = encodeURIComponent(finalMessage);
+            let whatsappUrl = `https://wa.me/?text=${encodedMessage}`;
+            
+            // Se c'è un PDF allegato, proviamo a condividerlo usando l'API share
+            if (attachedPdfBase64) {
+                const blob = await (await fetch(attachedPdfBase64)).blob();
+                const file = new File([blob], "allegato_invito.pdf", { type: 'application/pdf' });
+                if (navigator.share) {
+                    try {
+                        await navigator.share({
+                            title: 'Invito app',
+                            text: finalMessage,
+                            files: [file]
+                        });
+                        modal.remove();
+                        return;
+                    } catch (err) {
+                        console.warn("Share fallito, apro WhatsApp senza allegato", err);
+                    }
+                }
+            }
+            // Fallback: solo testo
+            window.open(whatsappUrl, '_blank');
+            modal.remove();
+        };
+        
+        cancelBtn.onclick = () => modal.remove();
+        modal.onclick = (e) => { if (e.target === modal) modal.remove(); };
     }
     
     function escapeHtml(str) { return str.replace(/[&<>]/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;' }[m])); }
@@ -716,6 +863,7 @@
         infoBtn.addEventListener('click', showInfo);
         openCalculatorBtn.addEventListener('click', openSystemCalculator);
         inviteFriendBtn.addEventListener('click', inviteFriend);
+        if (attachPdfBtn) attachPdfBtn.addEventListener('click', uploadAttachedPdf);
         
         fetchExchangeRates();
         setInterval(fetchExchangeRates, 60 * 60 * 1000);
