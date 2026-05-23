@@ -307,6 +307,19 @@
         .rotate-btn {
             background: #ff9800;
         }
+        .enhance-btn {
+            background: #9c27b0;
+        }
+        .counter-badge {
+            background: #283593;
+            color: white;
+            border-radius: 40px;
+            padding: 4px 12px;
+            font-size: 0.8rem;
+            display: inline-block;
+            margin-bottom: 8px;
+            text-align: center;
+        }
     </style>
 </head>
 <body>
@@ -384,6 +397,7 @@
 <div id="cameraModal" class="adaptive-modal" style="display:none;">
     <div class="adaptive-modal-content camera-modal-content">
         <h3>📸 Scansione documento</h3>
+        <div id="photoCounter" class="counter-badge">Foto confermate: 0</div>
         <div class="video-container">
             <video id="scannerVideo" autoplay playsinline muted></video>
         </div>
@@ -392,6 +406,7 @@
             <img id="previewImage" class="preview-image">
             <div class="scanner-buttons">
                 <button id="rotatePhotoBtn" class="rotate-btn">🔄 RUOTA</button>
+                <button id="enhancePhotoBtn" class="enhance-btn">🔧 MIGLIORA</button>
                 <button id="confirmPhotoBtn" class="save-btn" style="background:#4caf50;">✅ CONFERMA</button>
                 <button id="retakePhotoBtn" class="cancel-btn">❌ RISCATTA</button>
             </div>
@@ -407,8 +422,8 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
 <script>
-    // ==================== ARCHIVIO VERSIONE CON SCANNER GUIDATO ====================
-    const VERSION = "archivio_v2.2";
+    // ==================== ARCHIVIO VERSIONE CON SCANNER GUIDATO E MIGLIORAMENTO ====================
+    const VERSION = "archivio_v2.3";
     
     // Rilevamento dispositivo
     function isAndroid() { return /Android/.test(navigator.userAgent); }
@@ -436,6 +451,7 @@
     const exportMultipleBtn = document.getElementById('exportMultipleBtn');
     const scannerBtns = document.querySelectorAll('#scannerBtn, #scannerBtnTop');
     const iphoneMessage = document.getElementById('iphoneMessage');
+    const photoCounterSpan = document.getElementById('photoCounter');
     
     // Mostra messaggio informativo per iPhone
     if (isIPhone()) {
@@ -444,16 +460,8 @@
         if (iphoneMessage) iphoneMessage.style.display = 'none';
     }
     
-    // Funzione per mostrare alert "solo Android"
     function showAndroidOnlyAlert() {
-        alert(
-            "⚠️ FUNZIONE NON DISPONIBILE SU QUESTO DISPOSITIVO\n\n" +
-            "Questa funzione richiede Android con Chrome o Edge.\n\n" +
-            "Su iPhone puoi comunque:\n" +
-            "• Salvare PDF nell'archivio interno (IndexedDB)\n" +
-            "• Esportare i PDF uno alla volta con il pulsante 📤\n" +
-            "• Fare backup completi in formato JSON"
-        );
+        alert("⚠️ FUNZIONE NON DISPONIBILE SU QUESTO DISPOSITIVO\n\nQuesta funzione richiede Android con Chrome o Edge.\n\nSu iPhone puoi comunque:\n• Salvare PDF nell'archivio interno (IndexedDB)\n• Esportare i PDF uno alla volta con il pulsante 📤\n• Fare backup completi in formato JSON");
     }
     
     // Variabili IndexedDB
@@ -464,16 +472,18 @@
     
     // Variabili scanner
     let mediaStream = null;
-    let capturedPhotos = [];     // array di oggetti { dataUrl, rotation }
+    let capturedPhotos = [];     // array di dataUrl delle foto CONFERMATE (già ritagliate/migliorate)
     let currentPhotoDataUrl = null;
     let currentRotation = 0;
+    let currentEnhancedDataUrl = null; // versione migliorata (se applicata)
+    let isEnhanced = false;
     const video = document.getElementById('scannerVideo');
     const canvas = document.getElementById('scannerCanvas');
     const photoThumbnails = document.getElementById('photoThumbnails');
     const previewArea = document.getElementById('previewArea');
     const previewImage = document.getElementById('previewImage');
     
-    // ==================== DATABASE INDEXEDDB ====================
+    // ==================== DATABASE INDEXEDDB (IDENTICO A PRIMA) ====================
     function openArchivioDB() {
         return new Promise((resolve, reject) => {
             if (archivioDB) return resolve(archivioDB);
@@ -546,13 +556,8 @@
             return await saveDocument(anno, numeroProgressivo, nomeUtente, fileBlob);
         } catch (e) {
             if (e.name === 'QuotaExceededError' || (e.message && e.message.includes('quota'))) {
-                const userChoice = confirm(
-                    '⚠️ SPAZIO ESAURITO!\n\nNon c\'è più spazio nel database per salvare nuovi documenti.\n\n' +
-                    'Premi OK per fare un BACKUP completo, poi elimina documenti vecchi.'
-                );
-                if (userChoice) {
-                    await backupAllYears();
-                }
+                const userChoice = confirm('⚠️ SPAZIO ESAURITO!\n\nNon c\'è più spazio nel database per salvare nuovi documenti.\n\nPremi OK per fare un BACKUP completo, poi elimina documenti vecchi.');
+                if (userChoice) await backupAllYears();
                 throw e;
             }
             throw e;
@@ -571,11 +576,9 @@
                 const cursor = e.target.result;
                 if (cursor) {
                     let doc = cursor.value;
-                    if (search.trim() !== "") {
-                        if (!doc.nomeUtente.toLowerCase().includes(search.toLowerCase())) {
-                            cursor.continue();
-                            return;
-                        }
+                    if (search.trim() !== "" && !doc.nomeUtente.toLowerCase().includes(search.toLowerCase())) {
+                        cursor.continue();
+                        return;
                     }
                     docs.push(doc);
                     cursor.continue();
@@ -659,9 +662,7 @@
                                 title: 'Documento PDF',
                                 files: [new File([blob], 'documento.pdf', {type: 'application/pdf'})]
                             }).catch(err => { if (err.message !== 'Share canceled') console.warn(err); });
-                        } else {
-                            alert("Condivisione non supportata.");
-                        }
+                        } else alert("Condivisione non supportata.");
                     };
                     document.getElementById('closePdfViewerArch').onclick = () => {
                         modal.style.display = 'none';
@@ -669,9 +670,7 @@
                         URL.revokeObjectURL(url);
                     };
                     modal.onclick = (e) => { if (e.target === modal) modal.style.display = 'none'; };
-                } else {
-                    alert("Impossibile aprire il file.");
-                }
+                } else alert("Impossibile aprire il file.");
             });
         });
         
@@ -688,9 +687,7 @@
                     a.click();
                     URL.revokeObjectURL(url);
                     showMessage(`✅ "${doc.nomeCompleto}" esportato.`, false);
-                } else {
-                    alert("Errore: file non trovato.");
-                }
+                } else alert("Errore: file non trovato.");
             });
         });
         
@@ -710,10 +707,7 @@
         const year = archivioYearInput.value.trim();
         if (!/^\d{4}$/.test(year)) { alert("Inserisci un anno a 4 cifre."); return; }
         const docs = await loadDocumentsForYear(year, "");
-        if (docs.length > 0) {
-            showMessage(`⚠️ Anno ${year} già esistente.`, true);
-            return;
-        }
+        if (docs.length > 0) { showMessage(`⚠️ Anno ${year} già esistente.`, true); return; }
         currentYear = year;
         localStorage.setItem('archivio_current_year_local', year);
         archivioYearInput.value = year;
@@ -737,10 +731,7 @@
     }
     
     async function uploadDocument() {
-        if (!currentYear) {
-            alert("Inserisci un anno valido.");
-            return;
-        }
+        if (!currentYear) { alert("Inserisci un anno valido."); return; }
         const input = document.createElement('input');
         input.type = 'file';
         input.accept = 'image/*,application/pdf';
@@ -799,68 +790,48 @@
             const request = indexedDB.open('ArchiveHandles', 1);
             request.onupgradeneeded = () => {
                 const db = request.result;
-                if (!db.objectStoreNames.contains('handles')) {
-                    db.createObjectStore('handles');
-                }
+                if (!db.objectStoreNames.contains('handles')) db.createObjectStore('handles');
             };
             request.onsuccess = () => resolve(request.result);
             request.onerror = () => reject(request.error);
         });
     }
-    
     async function saveRootHandle(handle) {
         const db = await openHandleDB();
         const tx = db.transaction('handles', 'readwrite');
         tx.objectStore('handles').put(handle, 'root');
         await tx.done;
     }
-    
     async function getRootHandle() {
         const db = await openHandleDB();
         const tx = db.transaction('handles', 'readonly');
         const result = await tx.objectStore('handles').get('root');
         return result || null;
     }
-    
     async function selectRootFolder() {
         if (isIPhone()) { showAndroidOnlyAlert(); return false; }
-        if (!window.showDirectoryPicker) {
-            alert("Il tuo browser non supporta la selezione di cartelle. Usa Chrome/Edge su Android.");
-            return false;
-        }
+        if (!window.showDirectoryPicker) { alert("Il tuo browser non supporta la selezione di cartelle. Usa Chrome/Edge su Android."); return false; }
         try {
             rootHandle = await window.showDirectoryPicker();
             await saveRootHandle(rootHandle);
             showMessage(`✅ Cartella "${rootHandle.name}" selezionata.`, false);
             return true;
-        } catch(e) {
-            if (e.name !== 'AbortError') {
-                console.warn(e);
-                alert("Errore nella selezione della cartella: " + e.message);
-            }
-            return false;
-        }
+        } catch(e) { if (e.name !== 'AbortError') alert("Errore: " + e.message); return false; }
     }
-    
     async function createYearFolderPhysical() {
         if (isIPhone()) { showAndroidOnlyAlert(); return; }
         const year = archivioYearInput.value.trim();
         if (!/^\d{4}$/.test(year)) { alert("Inserisci un anno a 4 cifre."); return; }
         if (!rootHandle) rootHandle = await getRootHandle();
         if (!rootHandle) { alert("Prima seleziona la cartella 'Archivi Expat'."); return; }
-        try {
-            await rootHandle.getDirectoryHandle(year, { create: true });
-            showMessage(`✅ Cartella fisica "${year}" creata.`, false);
-        } catch(e) { alert("Errore: " + e.message); }
+        try { await rootHandle.getDirectoryHandle(year, { create: true }); showMessage(`✅ Cartella fisica "${year}" creata.`, false); } catch(e) { alert("Errore: " + e.message); }
     }
-    
     async function openRootFolder() {
         if (isIPhone()) { showAndroidOnlyAlert(); return; }
         if (!rootHandle) rootHandle = await getRootHandle();
         if (!rootHandle) { alert("Nessuna cartella selezionata."); return; }
         alert(`📂 Cartella selezionata: "${rootHandle.name}"\nPuoi aprirla manualmente con un file manager.`);
     }
-    
     async function exportMultipleToPhysicalFolder() {
         if (isIPhone()) { showAndroidOnlyAlert(); return; }
         if (!rootHandle) rootHandle = await getRootHandle();
@@ -868,9 +839,7 @@
         const docs = await loadDocumentsForYear(currentYear, "");
         if (docs.length === 0) { alert("Nessun documento da esportare."); return; }
         let modalHtml = '<div style="max-height:300px; overflow-y:auto;">';
-        for (const doc of docs) {
-            modalHtml += `<div style="margin:8px 0;"><input type="checkbox" class="exportCheckbox" value="${doc.id}"> ${doc.nomeCompleto}</div>`;
-        }
+        for (const doc of docs) modalHtml += `<div style="margin:8px 0;"><input type="checkbox" class="exportCheckbox" value="${doc.id}"> ${doc.nomeCompleto}</div>`;
         modalHtml += '</div><div style="display:flex; gap:8px; margin-top:16px;"><button id="confirmExportBtn" class="save-btn" style="flex:1;">ESPORTA SELEZIONATI</button><button id="cancelExportBtn" class="cancel-btn" style="flex:1;">ANNULLA</button></div>';
         const modal = document.createElement('div');
         modal.className = 'adaptive-modal';
@@ -879,8 +848,7 @@
         document.body.appendChild(modal);
         document.getElementById('cancelExportBtn').onclick = () => modal.remove();
         document.getElementById('confirmExportBtn').onclick = async () => {
-            const selected = [];
-            document.querySelectorAll('.exportCheckbox:checked').forEach(cb => selected.push(cb.value));
+            const selected = Array.from(document.querySelectorAll('.exportCheckbox:checked')).map(cb => cb.value);
             if (selected.length === 0) { alert("Nessun documento selezionato."); modal.remove(); return; }
             let yearHandle;
             try { yearHandle = await rootHandle.getDirectoryHandle(currentYear, { create: true }); } catch(e) { alert("Errore: " + e.message); modal.remove(); return; }
@@ -921,7 +889,6 @@
         downloadJson(exportData, `backup_anno_${anno}.json`);
         alert(`✅ Backup anno ${anno} completato (${docs.length} documenti).`);
     }
-    
     async function backupAllYears() {
         const db = await openArchivioDB();
         const allDocs = await new Promise((resolve, reject) => {
@@ -945,7 +912,6 @@
         downloadJson(exportData, `backup_completo_${Date.now()}.json`);
         alert(`✅ Backup completo (${allDocs.length} documenti).`);
     }
-    
     async function importBackup(file) {
         const reader = new FileReader();
         reader.onload = async (e) => {
@@ -977,7 +943,6 @@
         };
         reader.readAsText(file);
     }
-    
     function blobToBase64(blob) {
         return new Promise((resolve, reject) => {
             const reader = new FileReader();
@@ -986,14 +951,12 @@
             reader.readAsDataURL(blob);
         });
     }
-    
     function base64ToBlob(base64) {
         const byteCharacters = atob(base64);
         const byteArray = new Uint8Array(byteCharacters.length);
         for (let i = 0; i < byteCharacters.length; i++) byteArray[i] = byteCharacters.charCodeAt(i);
         return new Blob([byteArray], {type: 'application/pdf'});
     }
-    
     function downloadJson(data, filename) {
         const blob = new Blob([JSON.stringify(data, null, 2)], {type: 'application/json'});
         const url = URL.createObjectURL(blob);
@@ -1004,7 +967,7 @@
         URL.revokeObjectURL(url);
     }
     
-    // ==================== UI MESSAGGI ====================
+    // ==================== UI ====================
     function showMessage(msg, isError = false) {
         const div = document.createElement('div');
         div.className = 'status-msg';
@@ -1014,112 +977,116 @@
         container.parentNode.insertBefore(div, container.nextSibling);
         setTimeout(() => div.remove(), 3000);
     }
-    
-    function toggleSearchPanel() {
-        archivioSearchPanel.style.display = archivioSearchPanel.style.display === 'none' ? 'block' : 'none';
-    }
-    function searchDocs() {
-        searchTerm = archivioSearchInput.value.trim();
-        renderDocsList();
-        showMessage(`🔍 Ricerca: "${searchTerm || 'tutti'}"`, false);
-    }
-    function clearSearch() {
-        archivioSearchInput.value = "";
-        searchTerm = "";
-        renderDocsList();
-        archivioSearchPanel.style.display = 'none';
-        showMessage("🔍 Ricerca cancellata", false);
-    }
-    
+    function toggleSearchPanel() { archivioSearchPanel.style.display = archivioSearchPanel.style.display === 'none' ? 'block' : 'none'; }
+    function searchDocs() { searchTerm = archivioSearchInput.value.trim(); renderDocsList(); showMessage(`🔍 Ricerca: "${searchTerm || 'tutti'}"`, false); }
+    function clearSearch() { archivioSearchInput.value = ""; searchTerm = ""; renderDocsList(); archivioSearchPanel.style.display = 'none'; showMessage("🔍 Ricerca cancellata", false); }
     function showArchivioInfo() {
-        let msg = "📁 ARCHIVIO DOCUMENTI EXPAT\n\n" +
-            "• CREA ANNO: inserisci anno (2025) e premi\n" +
-            "• CARICA: seleziona foto/PDF (più foto → PDF unico)\n" +
-            "• SCANSIONA: apri fotocamera, scatta foto, ritaglia/adatta ad A4, conferma, scatta la successiva.\n" +
-            "• 🔍 (lente): anteprima PDF\n" +
-            "• 📤 (esporta): salva il PDF sul dispositivo\n" +
-            "• 🗑️: elimina documento\n" +
-            "• BACKUP ANNO: esporta tutto l'anno in JSON\n" +
-            "• BACKUP TUTTO: esporta tutto in JSON\n" +
-            "• RIPRISTINA: importa da backup JSON\n\n";
-        if (isAndroid()) {
-            msg += "✅ ANDROID: hai anche le funzioni extra (seleziona cartella, crea sottocartella, esporta multiplo).\n";
-        } else {
-            msg += "ℹ️ IPHONE: le funzioni di gestione cartella non sono supportate.\n";
-        }
-        msg += "\n⚠️ I documenti sono salvati nel database interno (IndexedDB).\nFai backup regolari.";
+        let msg = "📁 ARCHIVIO DOCUMENTI EXPAT\n\n• CREA ANNO: inserisci anno (2025) e premi\n• CARICA: seleziona foto/PDF (più foto → PDF unico)\n• SCANSIONA: apri fotocamera, scatta, migliora, conferma, e ripeti\n• 🔍 lente: anteprima PDF\n• 📤 esporta singolo PDF\n• 🗑️ elimina\n• BACKUP ANNO / TUTTO / RIPRISTINA\n\n" + (isAndroid() ? "✅ ANDROID: funzioni extra cartella" : "ℹ️ IPHONE: solo funzioni base") + "\n\n⚠️ I documenti sono salvati in IndexedDB.";
         alert(msg);
     }
     
-    // ==================== SCANNER GUIDATO CON RITAGLIO A4 E CONFERMA ====================
+    // ==================== SCANNER GUIDATO CON MIGLIORAMENTO ====================
     async function initCamera() {
         try {
-            if (mediaStream) {
-                mediaStream.getTracks().forEach(track => track.stop());
-            }
+            if (mediaStream) mediaStream.getTracks().forEach(track => track.stop());
             const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
             mediaStream = stream;
             video.srcObject = stream;
             await video.play();
             return true;
-        } catch (err) {
-            console.error("Errore fotocamera:", err);
-            alert("Impossibile accedere alla fotocamera. Verifica i permessi.");
-            return false;
-        }
+        } catch (err) { console.error(err); alert("Impossibile accedere alla fotocamera."); return false; }
+    }
+    function stopCamera() { if (mediaStream) { mediaStream.getTracks().forEach(track => track.stop()); mediaStream = null; } video.srcObject = null; }
+    
+    // Funzione di miglioramento immagine (equalizzazione + sharpening)
+    function enhanceImage(dataUrl) {
+        return new Promise((resolve) => {
+            const img = new Image();
+            img.onload = () => {
+                const canvasEnh = document.createElement('canvas');
+                canvasEnh.width = img.width;
+                canvasEnh.height = img.height;
+                const ctx = canvasEnh.getContext('2d');
+                ctx.drawImage(img, 0, 0);
+                const imageData = ctx.getImageData(0, 0, canvasEnh.width, canvasEnh.height);
+                const data = imageData.data;
+                // Equalizzazione dell'istogramma (semplificata, aumenta contrasto)
+                let rMin = 255, rMax = 0, gMin = 255, gMax = 0, bMin = 255, bMax = 0;
+                for (let i = 0; i < data.length; i += 4) {
+                    rMin = Math.min(rMin, data[i]); rMax = Math.max(rMax, data[i]);
+                    gMin = Math.min(gMin, data[i+1]); gMax = Math.max(gMax, data[i+1]);
+                    bMin = Math.min(bMin, data[i+2]); bMax = Math.max(bMax, data[i+2]);
+                }
+                for (let i = 0; i < data.length; i += 4) {
+                    data[i] = (data[i] - rMin) * 255 / (rMax - rMin || 1);
+                    data[i+1] = (data[i+1] - gMin) * 255 / (gMax - gMin || 1);
+                    data[i+2] = (data[i+2] - bMin) * 255 / (bMax - bMin || 1);
+                }
+                ctx.putImageData(imageData, 0, 0);
+                // Sharpening (kernel)
+                const sharpened = ctx.getImageData(0, 0, canvasEnh.width, canvasEnh.height);
+                const sharpData = sharpened.data;
+                const width = canvasEnh.width;
+                const height = canvasEnh.height;
+                const kernel = [0, -1, 0, -1, 5, -1, 0, -1, 0];
+                const temp = new Uint8ClampedArray(sharpData);
+                for (let y = 1; y < height-1; y++) {
+                    for (let x = 1; x < width-1; x++) {
+                        let r = 0, g = 0, b = 0;
+                        for (let ky = -1; ky <= 1; ky++) {
+                            for (let kx = -1; kx <= 1; kx++) {
+                                const idx = ((y + ky) * width + (x + kx)) * 4;
+                                const kidx = (ky+1)*3 + (kx+1);
+                                r += temp[idx] * kernel[kidx];
+                                g += temp[idx+1] * kernel[kidx];
+                                b += temp[idx+2] * kernel[kidx];
+                            }
+                        }
+                        const idx = (y * width + x) * 4;
+                        sharpData[idx] = Math.min(255, Math.max(0, r));
+                        sharpData[idx+1] = Math.min(255, Math.max(0, g));
+                        sharpData[idx+2] = Math.min(255, Math.max(0, b));
+                    }
+                }
+                ctx.putImageData(sharpened, 0, 0);
+                resolve(canvasEnh.toDataURL('image/jpeg', 0.9));
+            };
+            img.src = dataUrl;
+        });
     }
     
-    function stopCamera() {
-        if (mediaStream) {
-            mediaStream.getTracks().forEach(track => track.stop());
-            mediaStream = null;
-        }
-        video.srcObject = null;
-    }
-    
-    // Ritaglia e adatta l'immagine al formato A4 (proporzioni 1/√2)
-    // Riceve dataUrl e rotazione, restituisce nuovo dataUrl con immagine ritagliata e ridimensionata a 595x842 pt (A4 a 72 DPI)
+    // Ritaglia e adatta al formato A4 (proporzioni 1/√2), senza miglioramento
     async function cropToA4(dataUrl, rotation = 0) {
         return new Promise((resolve) => {
             const img = new Image();
             img.onload = () => {
                 const canvasCrop = document.createElement('canvas');
                 const ctx = canvasCrop.getContext('2d');
-                // Gestisci rotazione
-                let w = img.width;
-                let h = img.height;
+                let w = img.width, h = img.height;
                 let rad = rotation * Math.PI / 180;
-                let sin = Math.abs(Math.sin(rad));
-                let cos = Math.abs(Math.cos(rad));
+                let sin = Math.abs(Math.sin(rad)), cos = Math.abs(Math.cos(rad));
                 let newW = Math.floor(w * cos + h * sin);
                 let newH = Math.floor(w * sin + h * cos);
-                canvasCrop.width = newW;
-                canvasCrop.height = newH;
+                canvasCrop.width = newW; canvasCrop.height = newH;
                 ctx.save();
                 ctx.translate(newW/2, newH/2);
                 ctx.rotate(rad);
                 ctx.drawImage(img, -w/2, -h/2, w, h);
                 ctx.restore();
-                // Ora ritaglia per ottenere proporzioni A4 (larghezza/altezza = 1/√2 ≈ 0.707)
-                let targetRatio = 1 / Math.sqrt(2); // ≈0.707
+                let targetRatio = 1 / Math.sqrt(2);
                 let cropW, cropH, offsetX = 0, offsetY = 0;
                 let currentRatio = newW / newH;
                 if (currentRatio > targetRatio) {
-                    // Troppo largo: taglia orizzontalmente
                     cropH = newH;
                     cropW = Math.floor(newH * targetRatio);
                     offsetX = Math.floor((newW - cropW) / 2);
-                    offsetY = 0;
                 } else {
-                    // Troppo alto: taglia verticalmente
                     cropW = newW;
                     cropH = Math.floor(newW / targetRatio);
-                    offsetX = 0;
                     offsetY = Math.floor((newH - cropH) / 2);
                 }
                 const canvasFinal = document.createElement('canvas');
-                canvasFinal.width = 595;  // A4 width in pt (72dpi)
-                canvasFinal.height = 842; // A4 height
+                canvasFinal.width = 595; canvasFinal.height = 842;
                 const finalCtx = canvasFinal.getContext('2d');
                 finalCtx.drawImage(canvasCrop, offsetX, offsetY, cropW, cropH, 0, 0, 595, 842);
                 resolve(canvasFinal.toDataURL('image/jpeg', 0.9));
@@ -1136,18 +1103,20 @@
         ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
         currentPhotoDataUrl = canvas.toDataURL('image/jpeg', 0.9);
         currentRotation = 0;
-        // Mostra anteprima per conferma/ritaglio
+        isEnhanced = false;
+        currentEnhancedDataUrl = null;
         await showPreviewForCurrentPhoto();
     }
     
     async function showPreviewForCurrentPhoto() {
-        // Applica ritaglio automatico A4 senza rotazione aggiuntiva
-        const cropped = await cropToA4(currentPhotoDataUrl, currentRotation);
+        let cropped = await cropToA4(currentPhotoDataUrl, currentRotation);
         previewImage.src = cropped;
         previewArea.style.display = 'block';
-        // Nascondi video e pulsante scatta
         document.querySelector('.video-container').style.display = 'none';
         document.getElementById('capturePhotoBtn').style.display = 'none';
+        // Memorizza la versione ritagliata (non ancora migliorata)
+        currentEnhancedDataUrl = cropped;
+        isEnhanced = false;
     }
     
     function hidePreview() {
@@ -1156,25 +1125,34 @@
         document.getElementById('capturePhotoBtn').style.display = 'block';
         currentPhotoDataUrl = null;
         currentRotation = 0;
+        currentEnhancedDataUrl = null;
+        isEnhanced = false;
     }
     
     async function rotatePhoto() {
         if (!currentPhotoDataUrl) return;
         currentRotation = (currentRotation + 90) % 360;
-        const rotated = await cropToA4(currentPhotoDataUrl, currentRotation);
-        previewImage.src = rotated;
-        // Non salviamo ancora, solo anteprima.
-        // Il dato effettivo verrà generato al momento della conferma.
+        let cropped = await cropToA4(currentPhotoDataUrl, currentRotation);
+        previewImage.src = cropped;
+        currentEnhancedDataUrl = cropped;
+        isEnhanced = false;
+    }
+    
+    async function enhancePhoto() {
+        if (!currentEnhancedDataUrl) return;
+        const enhanced = await enhanceImage(currentEnhancedDataUrl);
+        previewImage.src = enhanced;
+        currentEnhancedDataUrl = enhanced;
+        isEnhanced = true;
     }
     
     async function confirmPhoto() {
-        if (!currentPhotoDataUrl) return;
-        // Genera l'immagine definitiva ritagliata e ruotata
-        const finalDataUrl = await cropToA4(currentPhotoDataUrl, currentRotation);
-        capturedPhotos.push({ dataUrl: finalDataUrl, rotation: 0 }); // già ritagliata e ruotata
-        // Aggiungi miniatura
+        if (!currentEnhancedDataUrl) return;
+        capturedPhotos.push(currentEnhancedDataUrl);
+        // Aggiorna contatore e miniatura
+        photoCounterSpan.innerText = `Foto confermate: ${capturedPhotos.length}`;
         const thumb = document.createElement('img');
-        thumb.src = finalDataUrl;
+        thumb.src = currentEnhancedDataUrl;
         thumb.className = 'photo-thumb';
         thumb.style.height = '80px';
         photoThumbnails.appendChild(thumb);
@@ -1182,37 +1160,24 @@
         showMessage("✅ Foto confermata. Puoi scattare la prossima.", false);
     }
     
-    function retakePhoto() {
-        hidePreview();
-        // Ricomincia la cattura (non cancella le foto già confermate)
-    }
+    function retakePhoto() { hidePreview(); }
     
     async function finishScan() {
-        if (capturedPhotos.length === 0) {
-            alert("Nessuna foto scattata e confermata.");
-            return;
-        }
-        if (!currentYear) {
-            alert("Inserisci un anno valido prima di salvare.");
-            return;
-        }
+        if (capturedPhotos.length === 0) { alert("Nessuna foto confermata."); return; }
+        if (!currentYear) { alert("Inserisci un anno valido."); return; }
         const { jsPDF } = window.jspdf;
         const pdf = new jsPDF();
         let firstPage = true;
-        for (const photo of capturedPhotos) {
-            const imgData = photo.dataUrl;
+        for (const dataUrl of capturedPhotos) {
             const img = new Image();
-            await new Promise((resolve) => { img.onload = resolve; img.src = imgData; });
+            await new Promise((resolve) => { img.onload = resolve; img.src = dataUrl; });
             if (!firstPage) pdf.addPage();
-            pdf.addImage(imgData, 'JPEG', 0, 0, pdf.internal.pageSize.getWidth(), pdf.internal.pageSize.getHeight());
+            pdf.addImage(dataUrl, 'JPEG', 0, 0, pdf.internal.pageSize.getWidth(), pdf.internal.pageSize.getHeight());
             firstPage = false;
         }
         const pdfBlob = pdf.output('blob');
         let userDescription = prompt("Descrizione del documento (es. fattura, contratto):", "scansione");
-        if (userDescription === null) {
-            closeCameraModal();
-            return;
-        }
+        if (userDescription === null) { closeCameraModal(); return; }
         userDescription = userDescription.trim().replace(/[^a-zA-Z0-9_\-]/g, '_').substring(0, 50);
         if (userDescription === "") userDescription = "scansione";
         const now = new Date();
@@ -1232,44 +1197,28 @@
         stopCamera();
         capturedPhotos = [];
         photoThumbnails.innerHTML = '';
+        photoCounterSpan.innerText = 'Foto confermate: 0';
         hidePreview();
     }
     
     async function openScanner() {
-        if (!currentYear) {
-            alert("Inserisci un anno valido prima di scansionare.");
-            return;
-        }
+        if (!currentYear) { alert("Inserisci un anno valido prima di scansionare."); return; }
         const modal = document.getElementById('cameraModal');
         modal.style.display = 'flex';
         const success = await initCamera();
-        if (!success) {
-            modal.style.display = 'none';
-        }
+        if (!success) modal.style.display = 'none';
         capturedPhotos = [];
         photoThumbnails.innerHTML = '';
+        photoCounterSpan.innerText = 'Foto confermate: 0';
         hidePreview();
     }
     
     // ==================== INIZIALIZZAZIONE ====================
     async function init() {
         await openArchivioDB();
-        
-        if (isAndroid()) {
-            rootHandle = await getRootHandle();
-            if (rootHandle) {
-                showMessage(`📁 Cartella "${rootHandle.name}" già selezionata.`, false);
-            }
-        }
-        
+        if (isAndroid()) { rootHandle = await getRootHandle(); if (rootHandle) showMessage(`📁 Cartella "${rootHandle.name}" già selezionata.`, false); }
         const savedYear = localStorage.getItem('archivio_current_year_local');
-        if (savedYear && /^\d{4}$/.test(savedYear)) {
-            currentYear = savedYear;
-            archivioYearInput.value = currentYear;
-            archivioCurrentYearSpan.innerText = currentYear;
-            await renderDocsList();
-        }
-        
+        if (savedYear && /^\d{4}$/.test(savedYear)) { currentYear = savedYear; archivioYearInput.value = currentYear; archivioCurrentYearSpan.innerText = currentYear; await renderDocsList(); }
         archivioYearInput.addEventListener('input', onYearInput);
         archivioYearInput.addEventListener('blur', onYearInput);
         archivioSearchBtn.addEventListener('click', toggleSearchPanel);
@@ -1288,46 +1237,19 @@
             input.click();
         });
         infoBtns.forEach(btn => btn.addEventListener('click', showArchivioInfo));
-        
-        // Pulsanti extra Android
-        if (selectRootBtn) {
-            selectRootBtn.addEventListener('click', () => {
-                if (isIPhone()) showAndroidOnlyAlert();
-                else selectRootFolder();
-            });
-        }
-        if (createYearFolderBtn) {
-            createYearFolderBtn.addEventListener('click', () => {
-                if (isIPhone()) showAndroidOnlyAlert();
-                else createYearFolderPhysical();
-            });
-        }
-        if (openRootBtn) {
-            openRootBtn.addEventListener('click', () => {
-                if (isIPhone()) showAndroidOnlyAlert();
-                else openRootFolder();
-            });
-        }
-        if (exportMultipleBtn) {
-            exportMultipleBtn.addEventListener('click', () => {
-                if (isIPhone()) showAndroidOnlyAlert();
-                else {
-                    if (!currentYear) { alert("Seleziona un anno."); return; }
-                    exportMultipleToPhysicalFolder();
-                }
-            });
-        }
-        
-        // Scanner buttons
+        if (selectRootBtn) selectRootBtn.addEventListener('click', () => { if (isIPhone()) showAndroidOnlyAlert(); else selectRootFolder(); });
+        if (createYearFolderBtn) createYearFolderBtn.addEventListener('click', () => { if (isIPhone()) showAndroidOnlyAlert(); else createYearFolderPhysical(); });
+        if (openRootBtn) openRootBtn.addEventListener('click', () => { if (isIPhone()) showAndroidOnlyAlert(); else openRootFolder(); });
+        if (exportMultipleBtn) exportMultipleBtn.addEventListener('click', () => { if (isIPhone()) showAndroidOnlyAlert(); else { if (!currentYear) { alert("Seleziona un anno."); return; } exportMultipleToPhysicalFolder(); } });
         scannerBtns.forEach(btn => btn.addEventListener('click', openScanner));
         document.getElementById('capturePhotoBtn').addEventListener('click', capturePhoto);
         document.getElementById('finishScanBtn').addEventListener('click', finishScan);
         document.getElementById('cancelScanBtn').addEventListener('click', closeCameraModal);
         document.getElementById('rotatePhotoBtn').addEventListener('click', rotatePhoto);
+        document.getElementById('enhancePhotoBtn').addEventListener('click', enhancePhoto);
         document.getElementById('confirmPhotoBtn').addEventListener('click', confirmPhoto);
         document.getElementById('retakePhotoBtn').addEventListener('click', retakePhoto);
     }
-    
     init();
 </script>
 </body>
