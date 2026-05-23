@@ -140,6 +140,11 @@
             <button id="generateUnlockBtn" class="small-btn" style="background:#e67e22; width:100%; margin-bottom:8px;">🔑 GENERA CODICE SBLOCC</button>
             <div class="flex-row"><input type="text" id="generatedCode" readonly placeholder="Codice generato" style="flex:1; background:#f8f9fa;"><button id="copyGeneratedBtn" class="small-btn" style="background:#283593;">📋 COPIA</button></div>
             <div class="flex-row"><input type="text" id="newAdminCode" placeholder="Nuovo codice amministratore" style="flex:1;"><button id="changeAdminCodeBtn" class="small-btn" style="background:#8e44ad;">CAMBIA CODICE</button></div>
+            <!-- CAMPO EMAIL AMMINISTRATORE MODIFICABILE -->
+            <div class="flex-row">
+                <input type="email" id="adminEmailInput" placeholder="Email amministratore" value="gliamicidipaolino@gmail.com" style="flex:2;">
+                <button id="saveAdminEmailBtn" class="small-btn" style="background:#4caf50;">💾 SALVA EMAIL</button>
+            </div>
             <div class="admin-backup-buttons"><button id="saveInfoIconsBtn" class="small-btn" style="background:#283593;">💾 SALVA (i)</button><button id="restoreInfoIconsBtn" class="small-btn" style="background:#6b8e23;">📂 RIPRISTINA (i)</button></div>
             <div id="backupHint" class="backup-hint">📄 info_icons_backup_v0238.txt</div>
             <button id="hideAdminBtn" class="small-btn" style="background:#757575; width:100%; margin-top:8px;">NASCONDI AREA ADMIN</button>
@@ -223,7 +228,6 @@
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script>
     // ==================== v0238 - APP COMPLETA ====================
     const CURRENT_VERSION = "0238";
@@ -244,6 +248,9 @@
     let licenseActive = false, daysRemaining = 0, licenseCheckPassed = false, clientCode = "";
     const SECRET_KEY = "ChiaveSegreta123";
     let adminCode = "admin2025", adminAuthenticated = false;
+    
+    // EMAIL AMMINISTRATORE MODIFICABILE
+    let adminEmail = localStorage.getItem('adminEmail') || "gliamicidipaolino@gmail.com";
     
     let deferredPrompt = null;
     window.addEventListener('beforeinstallprompt', (e) => {
@@ -355,7 +362,8 @@
     const forceSyncBtn = document.getElementById('forceSyncBtn');
     const syncStatusDiv = document.getElementById('syncStatus');
     
-    // ==================== FUNZIONI ORIGINALI (GEOLOCALIZZAZIONE) ====================
+    // ==================== FUNZIONI ORIGINALI ====================
+    // --- GEOLOCALIZZAZIONE ---
     function haversine(lat1,lng1,lat2,lng2) {
         const R = 6371e3;
         const φ1 = lat1 * Math.PI/180, φ2 = lat2 * Math.PI/180;
@@ -490,7 +498,7 @@
         gpsStatus.innerHTML = "";
     }
     
-    // ==================== GESTIONE NOTE ====================
+    // --- GESTIONE NOTE ---
     function getNormalNotesKey(s) { return `normalNotes_${s}_${CURRENT_VERSION}`; }
     function getSelectedNormalIdKey(s) { return `selectedNormalNote_${s}_${CURRENT_VERSION}`; }
     function saveNormalNotesForService(s) { localStorage.setItem(getNormalNotesKey(s), JSON.stringify(normalNotes[s])); }
@@ -639,7 +647,7 @@
         keepScreenOn();
     }
     
-    // ==================== TRADUZIONI ====================
+    // --- TRADUZIONI ---
     async function translateToFrench(italianText) { if (!italianText || italianText.trim() === "") return ""; try { const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(italianText)}&langpair=it|fr`; const resp = await fetch(url); const data = await resp.json(); if (data && data.responseData && data.responseData.translatedText) return data.responseData.translatedText; } catch(e) { console.warn(e); } return italianText; }
     async function translateFrenchToItalian(frenchText) { if (!frenchText || frenchText.trim() === "") return ""; try { const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(frenchText)}&langpair=fr|it`; const resp = await fetch(url); const data = await resp.json(); if (data && data.responseData && data.responseData.translatedText) return data.responseData.translatedText; } catch(e) { console.warn(e); } return frenchText + " (traduzione fallita)"; }
     function initRecognitionOperator() { if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) { transcribeStatus.innerText = "❌ Riconoscimento non supportato"; return false; } const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition; recognitionOperator = new SpeechRecognition(); recognitionOperator.continuous = true; recognitionOperator.interimResults = false; recognitionOperator.lang = 'fr-FR'; return true; }
@@ -719,7 +727,7 @@
     function showTemporaryMessage(element, message, duration = 15000) { if (!element) return; element.innerText = message; element.style.display = 'block'; if (element._hideTimeout) clearTimeout(element._hideTimeout); element._hideTimeout = setTimeout(() => { element.style.display = 'none'; }, duration); }
     function playBeep() { try { let ctx = new (window.AudioContext || window.webkitAudioContext)(); let osc = ctx.createOscillator(); let gain = ctx.createGain(); osc.connect(gain); gain.connect(ctx.destination); osc.frequency.value = 880; gain.gain.value = 0.3; osc.type = "sine"; osc.start(); gain.gain.exponentialRampToValueAtTime(0.00001, ctx.currentTime + 0.8); osc.stop(ctx.currentTime + 0.8); ctx.resume(); } catch(e) { console.warn("beep fallito", e); } }
     
-    // ==================== ESPORTA/IMPORTA NOTE ====================
+    // --- ESPORTA/IMPORTA NOTE ---
     function exportAllNotes() {
         let content = "";
         content += "[NUMERI TELEFONO]\n"; for (let s of services) { let phone = getPhone(s) || defaultPhone[s]; content += `${s.toUpperCase()}=${phone}\n`; }
@@ -780,7 +788,7 @@
     function getContactButtonText(s) { let extra = contactExtraText[s]; if (extra && extra.trim()) return extra; if (s === 'clinica') return "MONASTIR: Facciamo Rete"; return `Contatto: premi 5 sc. per modifica`; }
     function escapeHtml(str) { return str.replace(/[&<>]/g, function(m) { if (m === '&') return '&amp;'; if (m === '<') return '&lt;'; if (m === '>') return '&gt;'; return m;}); }
     
-    // ==================== HOME BUTTONS ====================
+    // --- HOME BUTTONS ---
     function initHomeButtons() {
         contactsGrid.innerHTML = '';
         services.forEach(service => {
@@ -835,7 +843,7 @@
         keepScreenOn();
     }
     
-    // ==================== PALLINI I ====================
+    // --- PALLINI I ---
     licenseInfoIcon.addEventListener('click', () => openGlobalInfoModal('licenseInfo', 'Informazioni Licenza', 'license_info_text'));
     infoNoteBtn.addEventListener('click', () => openGlobalInfoModal('infoNote', 'Informazioni Note', 'info_note_text'));
     infoOperatorBtn.addEventListener('click', () => openGlobalInfoModal('infoOperator', 'Informazioni Ascolto Operatore', 'info_operator_text'));
@@ -867,7 +875,7 @@
     function onClearResponse() { clearOperatorTranslation(); transcribeStatus.innerText = "🧹 Traduzione cancellata"; setTimeout(() => transcribeStatus.innerText = "", 2000); keepScreenOn(); }
     activityModal.addEventListener('click', (e) => { if (e.target === activityModal) { activityModal.style.display = 'none'; isModalOpen = false; } });
     
-    // ==================== FUNZIONI DI SUPPORTO ====================
+    // --- FUNZIONI DI SUPPORTO ---
     async function keepScreenOn() {
         if ('wakeLock' in navigator && !globalWakeLock) {
             try { globalWakeLock = await navigator.wakeLock.request('screen'); } catch(e) { console.warn("Wake Lock:", e); }
@@ -898,7 +906,7 @@
         document.getElementById('globalInfoCloseBtn').onclick = () => modal.style.display = 'none';
     }
     
-    // ==================== LICENZA ====================
+    // --- LICENZA ---
     async function initLicense() {
         const now = await getCurrentUTCTime();
         let firstRun = localStorage.getItem('firstRun');
@@ -925,7 +933,11 @@
         if (daysHomeDisplay) {
             daysHomeDisplay.innerHTML = `v${CURRENT_VERSION} - Scade: ${daysRemaining} giorni <button id="copyRequestBtnMoved" class="small-btn" style="background:#e67e22;">📋 Richiedi attivazione</button>`;
             let moved = document.getElementById('copyRequestBtnMoved');
-            if (moved) moved.onclick = () => openActivationRequestModal();
+            if (moved) {
+                const newBtn = moved.cloneNode(true);
+                moved.parentNode.replaceChild(newBtn, moved);
+                newBtn.onclick = openActivationRequestModal;
+            }
         }
     }
     function updateLicenseUI() {
@@ -946,177 +958,15 @@
             alert('Licenza attivata per 365 giorni.');
         } else alert('Codice non valido.');
     }
-    function openActivationRequestModal() {
-        const modalContent = `Per attivare la licenza, invia un bonifico di €48,00 a Paolo Maiorana IBAN: IT31R0339512900052702573770 con causale il tuo codice cliente. Dopo il pagamento, premi il pulsante qui sotto per inviare automaticamente i tuoi dati di attivazione all'amministratore.`;
-        infoModalText.innerText = modalContent;
-        const buttonsDiv = document.querySelector('#infoModal .modal-buttons');
-        let existingEmailBtn = document.getElementById('sendActivationEmailBtn');
-        if (!existingEmailBtn) {
-            const emailBtn = document.createElement('button');
-            emailBtn.id = 'sendActivationEmailBtn';
-            emailBtn.className = 'save-btn';
-            emailBtn.style.background = '#4caf50';
-            emailBtn.innerText = '📧 Invia dati per attivazione';
-            emailBtn.onclick = () => {
-                const clientCodeVal = clientCodeInput.value;
-                const firstRunVal = localStorage.getItem('firstRun');
-                const subject = encodeURIComponent('Richiesta attivazione licenza Contatti Personali');
-                const body = encodeURIComponent(`Codice Cliente: ${clientCodeVal}\nFirst Run: ${firstRunVal}`);
-                window.location.href = `mailto:gliamicidipaolino@gmail.com?subject=${subject}&body=${body}`;
-            };
-            buttonsDiv.appendChild(emailBtn);
-        }
-        infoModalDiv.style.display = 'flex';
-        isModalOpen = true;
-        keepScreenOn();
-    }
-    function closeInfoModalFunc() { infoModalDiv.style.display = 'none'; isModalOpen = false; }
-    closeInfoModalBtn.onclick = closeInfoModalFunc;
-    infoModalDiv.onclick = (e) => { if (e.target === infoModalDiv) closeInfoModalFunc(); };
+    // Funzioni helper per licenza
     function generateRandomClientCode() { return Math.floor(1000000000 + Math.random() * 9000000000).toString(); }
     function hashTo20Digits(hash) { let hex = hash.toString(CryptoJS.enc.Hex); let decimal = BigInt('0x' + hex).toString(); return decimal.slice(0,20).padStart(20,'0'); }
     function verifyUnlockCode(clientCode, firstRun, unlockCode) { const message = `${clientCode}|${firstRun}`; const hash = CryptoJS.HmacSHA256(message, SECRET_KEY); const expected = hashTo20Digits(hash); return expected === unlockCode; }
     async function getCurrentUTCTime() { try { let res = await fetch('https://worldtimeapi.org/api/timezone/Etc/UTC'); if (!res.ok) throw new Error(); let data = await res.json(); return new Date(data.utc_datetime); } catch(e) { return new Date(); } }
-    function loadAdminCode() { let saved = localStorage.getItem('adminCode'); if (saved && saved.trim()) adminCode = saved; else { adminCode = "admin2025"; localStorage.setItem('adminCode', adminCode); } }
-    function saveAdminCode(newCode) { if (newCode && newCode.trim()) { adminCode = newCode; localStorage.setItem('adminCode', adminCode); alert("Codice admin cambiato."); } else alert("Codice non valido."); }
-    function generateUnlockCodeAdmin(clientCode, firstRun) { const message = `${clientCode}|${firstRun}`; const hash = CryptoJS.HmacSHA256(message, SECRET_KEY); return hashTo20Digits(hash); }
-    function onGenerateUnlock() { let cc = adminClientCode.value.trim(); let fr = adminFirstRun.value.trim(); if (!/^\d{6,10}$/.test(cc)) { alert("Codice cliente 6-10 cifre."); return; } if (!/^\d+$/.test(fr) || fr.length<10) { alert("First Run non valido."); return; } generatedCode.value = generateUnlockCodeAdmin(cc, fr); }
-    function copyGenerated() { if (generatedCode.value) { navigator.clipboard.writeText(generatedCode.value); alert("Copiato."); } else alert("Nessun codice."); }
-    function showAdminSection() { adminSection.style.display = 'block'; updateAdminReteButtonsVisibility(); }
-    function hideAdminSection() { adminSection.style.display = 'none'; updateAdminReteButtonsVisibility(); }
-    function updateAdminReteButtonsVisibility() {
-        if (adminReteButtons) {
-            if (adminAuthenticated && imagePage && !imagePage.classList.contains('hidden')) {
-                adminReteButtons.classList.remove('hidden-btn');
-            } else {
-                adminReteButtons.classList.add('hidden-btn');
-            }
-        }
-    }
-    let adminTimer = null;
-    function startAdminTimer() { adminTimer = setTimeout(() => { let code = prompt("Codice amministratore:"); if (code === adminCode) { adminAuthenticated = true; showAdminSection(); alert("Accesso admin."); updateAdminReteButtonsVisibility(); if (imagePage && !imagePage.classList.contains('hidden')) { renderReteCategories(reteLevelContainer, reteData); loadSavedImage(); } } else if (code !== null) alert("Codice errato."); }, 3000); }
-    function cancelAdminTimer() { if (adminTimer) clearTimeout(adminTimer); }
-    adminLongPressBtn.addEventListener('mousedown', startAdminTimer);
-    adminLongPressBtn.addEventListener('mouseup', cancelAdminTimer);
-    adminLongPressBtn.addEventListener('mouseleave', cancelAdminTimer);
-    adminLongPressBtn.addEventListener('touchstart', startAdminTimer, { passive: true });
-    adminLongPressBtn.addEventListener('touchend', cancelAdminTimer);
-    adminLongPressBtn.addEventListener('touchcancel', cancelAdminTimer);
-    generateUnlockBtn.onclick = onGenerateUnlock;
-    copyGeneratedBtn.onclick = copyGenerated;
-    hideAdminBtn.onclick = hideAdminSection;
-    changeAdminCodeBtn.onclick = () => { let nc = newAdminCode.value.trim(); if (nc) saveAdminCode(nc); else alert("Inserisci nuovo codice."); };
     
-    // ==================== SALVA / RIPRISTINA TESTI PALLINI I ====================
-    let infoTexts = {
-        licenseInfo: "Informazioni sul codice cliente.\nIl codice cliente è univoco per questa installazione.\nPer attivare la licenza, invia un bonifico di €48,00 a Paolo Maiorana IBAN: IT31R0339512900052702573770 con causale il tuo codice cliente.\nPoi invia email a gli amicidipaolino@gmail.com con il codice cliente per ricevere il codice di sblocco.",
-        licenseRequest: "Richiedi attivazione: Premi 'Richiedi attivazione' e segui le istruzioni per ottenere il codice di sblocco.\nInvia un bonifico di €48,00 a Paolo Maiorana IBAN: IT31R0339512900052702573770 con causale il tuo codice cliente.\nPoi invia email a gli amicidipaolino@gmail.com con il codice cliente.\nRiceverai il codice di sblocco a 20 cifre.",
-        infoNote: "Informazioni sulle note.\nPuoi aggiungere note per ogni contatto. Ogni nota ha un titolo e una descrizione. Puoi selezionare una nota premendo il pallino blu. Le note selezionate vengono usate per la copia e la lettura.",
-        infoOperator: "Informazioni sull'ascolto operatore.\nPremi 'ASCOLTA OPERATORE' per avviare un ascolto di 30 secondi. La voce dell'operatore viene tradotta in italiano e salvata.",
-        infoSpeak: "Informazioni sulla conversazione con operatore.\nPremi 'PARLA CON OPERATORE' e parla in italiano. La tua voce viene tradotta in francese e letta ad alta voce."
-    };
-    function saveInfoIconsToFile() {
-        let content = "# INFO ICONS BACKUP v" + CURRENT_VERSION + "\n# Formato: context|testo\n";
-        for (let key in infoTexts) content += key + "|" + infoTexts[key].replace(/\n/g, '\\n') + "\n";
-        const blob = new Blob([content], {type: 'text/plain'});
-        const a = document.createElement('a');
-        a.href = URL.createObjectURL(blob);
-        const filename = `info_icons_backup_${CURRENT_VERSION}.txt`;
-        a.download = filename;
-        a.click();
-        URL.revokeObjectURL(a.href);
-        backupHint.innerText = `💾 Salvato: ${filename}`;
-        setTimeout(() => { if (backupHint.innerText === `💾 Salvato: ${filename}`) backupHint.innerText = ""; }, 5000);
-    }
-    function restoreInfoIconsFromFile(file) {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            const content = e.target.result;
-            const lines = content.split(/\r?\n/);
-            let newInfoTexts = {};
-            for (let line of lines) {
-                line = line.trim();
-                if (line.startsWith("#") || line === "") continue;
-                let sep = line.indexOf('|');
-                if (sep !== -1) {
-                    let key = line.substring(0, sep);
-                    let value = line.substring(sep+1).replace(/\\n/g, '\n');
-                    if (infoTexts.hasOwnProperty(key)) newInfoTexts[key] = value;
-                }
-            }
-            if (Object.keys(newInfoTexts).length === 0) { alert("Nessun dato valido trovato nel file."); return; }
-            for (let k in newInfoTexts) infoTexts[k] = newInfoTexts[k];
-            localStorage.setItem('infoTextsBackup', JSON.stringify(infoTexts));
-            alert("Testi informativi ripristinati con successo.");
-        };
-        reader.readAsText(file, "UTF-8");
-    }
-    saveInfoIconsBtn.addEventListener('click', saveInfoIconsToFile);
-    restoreInfoIconsBtn.addEventListener('click', () => {
-        let input = document.createElement('input');
-        input.type = 'file';
-        input.accept = '.txt';
-        input.onchange = (e) => { if (e.target.files.length) restoreInfoIconsFromFile(e.target.files[0]); input.remove(); };
-        input.click();
-    });
-    function loadInfoTextsFromLocal() {
-        let saved = localStorage.getItem('infoTextsBackup');
-        if (saved) { try { let parsed = JSON.parse(saved); for (let k in parsed) { if (infoTexts.hasOwnProperty(k)) infoTexts[k] = parsed[k]; } } catch(e){} }
-    }
-    
-    // ==================== MODALE INFORMATIVA ====================
-    function openGlobalInfoModal(context, title, storageKey) {
-        currentInfoContext = { context, storageKey };
-        globalInfoModalTitle.innerText = title;
-        globalInfoTextarea.value = infoTexts[context] || "";
-        globalInfoTextarea.readOnly = !adminAuthenticated;
-        globalInfoEditBtn.style.display = adminAuthenticated ? "block" : "none";
-        globalInfoSaveBtn.style.display = "none";
-        if (context === 'licenseInfo') {
-            globalInfoDownloadBtn.style.display = "block";
-        } else {
-            globalInfoDownloadBtn.style.display = "none";
-        }
-        globalInfoModalDiv.style.display = 'flex';
-        isModalOpen = true;
-        keepScreenOn();
-    }
-    function installPWA() {
-        if (deferredPrompt) {
-            deferredPrompt.prompt();
-            deferredPrompt.userChoice.then((choiceResult) => {
-                if (choiceResult.outcome === 'accepted') {
-                    console.log('Utente ha accettato l\'installazione');
-                }
-                deferredPrompt = null;
-            });
-        } else {
-            alert("Installazione non disponibile in questo momento.\n\nPuoi aggiungere manualmente questa app alla schermata Home:\n- Su Android: menu Chrome → 'Aggiungi a schermata Home'\n- Su iOS: condividi → 'Aggiungi a Home'");
-        }
-    }
-    globalInfoDownloadBtn.addEventListener('click', installPWA);
-    globalInfoEditBtn.addEventListener('click', () => {
-        if (!adminAuthenticated) return;
-        globalInfoTextarea.readOnly = false;
-        globalInfoEditBtn.style.display = "none";
-        globalInfoSaveBtn.style.display = "block";
-    });
-    globalInfoSaveBtn.addEventListener('click', () => {
-        if (!adminAuthenticated) return;
-        infoTexts[currentInfoContext.context] = globalInfoTextarea.value;
-        localStorage.setItem('infoTextsBackup', JSON.stringify(infoTexts));
-        globalInfoTextarea.readOnly = true;
-        globalInfoEditBtn.style.display = "block";
-        globalInfoSaveBtn.style.display = "none";
-        alert("Testo salvato.");
-    });
-    globalInfoCloseBtn.addEventListener('click', () => { globalInfoModalDiv.style.display = 'none'; currentInfoContext = null; isModalOpen = false; });
-    globalInfoModalDiv.addEventListener('click', (e) => { if (e.target === globalInfoModalDiv) { globalInfoModalDiv.style.display = 'none'; isModalOpen = false; } });
-    
-    // ==================== RETE CATEGORIE ====================
+    // --- RETE CATEGORIE ---
     let reteData = { categories: [] };
     let currentImageData = null;
-    function saveReteData() { localStorage.setItem('monastir_rete_data', JSON.stringify(reteData)); }
     function loadReteData() {
         const saved = localStorage.getItem('monastir_rete_data');
         if (saved) {
@@ -1137,6 +987,7 @@
         }
         if (!reteData.categories) reteData.categories = [];
     }
+    function saveReteData() { localStorage.setItem('monastir_rete_data', JSON.stringify(reteData)); }
     function showSyncStatus(message, isError = false) {
         if (syncStatusDiv) {
             syncStatusDiv.textContent = message;
@@ -1177,7 +1028,7 @@
                 if (showMessages) showSyncStatus('❌ File rete_data.json non trovato sul server.', true);
             }
         } catch(e) {
-            console.warn('Errore sincronizzazione rete:', e);
+            console.warn(e);
             if (showMessages) showSyncStatus('❌ Errore di rete: ' + e.message, true);
         }
     }
@@ -1484,24 +1335,122 @@
         else setupImageArea();
     }
     
-    // ==================== ESPORTAZIONE/IMPORTAZIONE RETE PER ADMIN ====================
-    if (exportReteBtn) exportReteBtn.addEventListener('click', exportReteToFile);
-    if (importReteBtn) importReteBtn.addEventListener('click', () => {
-        const input = document.createElement('input');
-        input.type = 'file';
-        input.accept = 'application/json';
-        input.onchange = (e) => { if (e.target.files.length) importReteFromFile(e.target.files[0]); };
-        input.click();
-    });
-    if (forceSyncBtn) forceSyncBtn.addEventListener('click', () => {
-        performSync(true).then(() => {
-            renderReteCategories(reteLevelContainer, reteData);
-            loadSavedImage();
-        });
-    });
+    // ==================== NUOVA FUNZIONE PER RICHIESTA ATTIVAZIONE (MODIFICATA) ====================
+    function openActivationRequestModal() {
+        // Prima modale: istruzioni per bonifico + pulsante per proseguire
+        const modalHtml = `
+            <div class="adaptive-modal" id="activationStep1Modal" style="display:flex;">
+                <div class="adaptive-modal-content">
+                    <h3>📋 Richiesta attivazione</h3>
+                    <div class="modal-info-text" style="margin-bottom:16px;">
+                        Per attivare la licenza, invia un bonifico di €48,00 a<br><br>
+                        <strong>Paolo Maiorana</strong><br>
+                        <strong>IBAN: IT31R0339512900052702573770</strong><br><br>
+                        con causale il tuo codice cliente.
+                    </div>
+                    <div class="modal-buttons" style="flex-direction:column; gap:12px;">
+                        <button id="copyDataBtn" class="save-btn" style="background:#4caf50;">▶️ PREMI QUI PER COPIARE I TUOI DATI DI ATTIVAZIONE</button>
+                        <button id="closeStep1Btn" class="cancel-btn">CHIUDI</button>
+                    </div>
+                </div>
+            </div>
+        `;
+        document.body.insertAdjacentHTML('beforeend', modalHtml);
+        const modal = document.getElementById('activationStep1Modal');
+        const closeBtn = document.getElementById('closeStep1Btn');
+        const copyDataBtn = document.getElementById('copyDataBtn');
+        
+        closeBtn.onclick = () => modal.remove();
+        copyDataBtn.onclick = () => {
+            modal.remove();
+            showActivationDataModal();
+        };
+        modal.onclick = (e) => { if (e.target === modal) modal.remove(); };
+        isModalOpen = true;
+        keepScreenOn();
+    }
+    
+    function showActivationDataModal() {
+        const clientCodeVal = clientCodeInput.value;
+        const firstRunVal = localStorage.getItem('firstRun') || '';
+        const emailDest = adminEmail;
+        const subject = "Richiesta attivazione licenza Contatti Personali";
+        
+        const copyText = `Codice Cliente: ${clientCodeVal}\nFirst Run: ${firstRunVal}\n\nInvia a: ${adminEmail}\nOggetto: ${subject}`;
+        
+        const modalHtml = `
+            <div class="adaptive-modal" id="activationStep2Modal" style="display:flex;">
+                <div class="adaptive-modal-content" style="max-width:500px;">
+                    <h3>📋 DATI PER ATTIVAZIONE LICENZA</h3>
+                    <div style="margin:16px 0; padding:12px; background:#f8f9fa; border-radius:16px;">
+                        <div><strong>📧 Email destinatario:</strong> ${emailDest}</div>
+                        <div style="margin-top:8px;"><strong>🆔 Codice Cliente:</strong> ${clientCodeVal}</div>
+                        <div style="margin-top:8px;"><strong>⏱️ First Run:</strong> ${firstRunVal}</div>
+                    </div>
+                    <div style="margin-bottom:16px; padding:12px; background:#f8f9fa; border-radius:16px;">
+                        <div><strong>✉️ Oggetto email:</strong> ${subject}</div>
+                    </div>
+                    <div style="margin-bottom:16px; padding:12px; background:#e8f0fe; border-radius:16px;">
+                        <div><strong>📝 ISTRUZIONI:</strong></div>
+                        <div style="margin-top:8px; font-size:0.85rem;">
+                            1. Premi il tasto "📋 COPIA DATI" qui sotto<br>
+                            2. Apri la tua app di posta (Gmail, Outlook, ecc.)<br>
+                            3. Incolla i dati nel corpo del messaggio<br>
+                            4. Invia a: ${emailDest}<br>
+                            5. Riceverai il codice di sblocco a 20 cifre via email
+                        </div>
+                    </div>
+                    <div class="modal-buttons" style="gap:12px;">
+                        <button id="copyDataFinalBtn" class="save-btn" style="background:#4caf50;">📋 COPIA DATI</button>
+                        <button id="closeStep2Btn" class="cancel-btn">CHIUDI</button>
+                    </div>
+                </div>
+            </div>
+        `;
+        document.body.insertAdjacentHTML('beforeend', modalHtml);
+        const modal = document.getElementById('activationStep2Modal');
+        const closeBtn = document.getElementById('closeStep2Btn');
+        const copyBtn = document.getElementById('copyDataFinalBtn');
+        
+        closeBtn.onclick = () => modal.remove();
+        copyBtn.onclick = async () => {
+            try {
+                await navigator.clipboard.writeText(copyText);
+                alert("✅ Dati copiati negli appunti! Ora incollali nell'email.");
+            } catch(e) {
+                const textarea = document.createElement('textarea');
+                textarea.value = copyText;
+                document.body.appendChild(textarea);
+                textarea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textarea);
+                alert("✅ Dati copiati negli appunti! Ora incollali nell'email.");
+            }
+        };
+        modal.onclick = (e) => { if (e.target === modal) modal.remove(); };
+        isModalOpen = true;
+        keepScreenOn();
+    }
     
     // ==================== INIZIALIZZAZIONE ====================
     function init() {
+        // Carica email amministratore salvata
+        const adminEmailInput = document.getElementById('adminEmailInput');
+        const saveAdminEmailBtn = document.getElementById('saveAdminEmailBtn');
+        if (adminEmailInput) adminEmailInput.value = adminEmail;
+        if (saveAdminEmailBtn) {
+            saveAdminEmailBtn.addEventListener('click', () => {
+                const newEmail = adminEmailInput.value.trim();
+                if (newEmail && newEmail.includes('@')) {
+                    adminEmail = newEmail;
+                    localStorage.setItem('adminEmail', adminEmail);
+                    alert("✅ Email amministratore aggiornata!");
+                } else {
+                    alert("Inserisci un'email valida.");
+                }
+            });
+        }
+        
         loadAdminCode();
         loadAllNotes();
         loadContactExtraText();
@@ -1535,6 +1484,21 @@
         backStack = ['home'];
         history.replaceState({ page: 'home', modal: false }, '');
     }
+    
+    // Funzioni admin e info
+    function loadAdminCode() { let saved = localStorage.getItem('adminCode'); if (saved && saved.trim()) adminCode = saved; else { adminCode = "admin2025"; localStorage.setItem('adminCode', adminCode); } }
+    function loadInfoTextsFromLocal() {
+        let saved = localStorage.getItem('infoTextsBackup');
+        if (saved) { try { let parsed = JSON.parse(saved); for (let k in parsed) { if (infoTexts.hasOwnProperty(k)) infoTexts[k] = parsed[k]; } } catch(e){} }
+    }
+    let infoTexts = {
+        licenseInfo: "Informazioni sul codice cliente.\nIl codice cliente è univoco per questa installazione.\nPer attivare la licenza, invia un bonifico di €48,00 a Paolo Maiorana IBAN: IT31R0339512900052702573770 con causale il tuo codice cliente.\nPoi invia email a gli amicidipaolino@gmail.com con il codice cliente per ricevere il codice di sblocco.",
+        licenseRequest: "Richiedi attivazione: Premi 'Richiedi attivazione' e segui le istruzioni per ottenere il codice di sblocco.\nInvia un bonifico di €48,00 a Paolo Maiorana IBAN: IT31R0339512900052702573770 con causale il tuo codice cliente.\nPoi invia email a gli amicidipaolino@gmail.com con il codice cliente.\nRiceverai il codice di sblocco a 20 cifre.",
+        infoNote: "Informazioni sulle note.\nPuoi aggiungere note per ogni contatto. Ogni nota ha un titolo e una descrizione. Puoi selezionare una nota premendo il pallino blu. Le note selezionate vengono usate per la copia e la lettura.",
+        infoOperator: "Informazioni sull'ascolto operatore.\nPremi 'ASCOLTA OPERATORE' per avviare un ascolto di 30 secondi. La voce dell'operatore viene tradotta in italiano e salvata.",
+        infoSpeak: "Informazioni sulla conversazione con operatore.\nPremi 'PARLA CON OPERATORE' e parla in italiano. La tua voce viene tradotta in francese e letta ad alta voce."
+    };
+    
     init();
 </script>
 </body>
