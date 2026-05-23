@@ -29,7 +29,7 @@
             box-shadow: 0 8px 24px rgba(0,0,0,0.05);
         }
         
-        /* Titolo in box evidenziato */
+        /* Titolo in box blu con icone ai lati */
         .archivio-title {
             background: linear-gradient(135deg, #1e2a3a, #2c3e66);
             border-radius: 60px;
@@ -40,7 +40,10 @@
             text-align: center;
             margin-bottom: 20px;
             box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
         }
         
         button {
@@ -53,78 +56,66 @@
             cursor: pointer;
             transition: 0.05s linear;
             text-align: center;
+            width: 100%;
         }
         button:active {
             transform: scale(0.97);
         }
         
-        /* Pulsante Seleziona cartella - larghezza piena */
-        .full-width-btn {
-            width: 100%;
-            background: #283593;
-            margin-bottom: 16px;
-        }
-        
-        /* Riga con Genius e i */
-        .row-buttons {
-            display: flex;
-            gap: 12px;
-            margin-bottom: 20px;
-            align-items: center;
-        }
-        
-        /* Pulsante Genius a tutta larghezza nella riga (occupa tutto lo spazio tranne la i) */
+        /* Pulsante Genius Scan con icone ai lati */
         .genius-btn {
-            flex: 1;
-            background: #FF6600;  /* Arancione forte */
+            background: #FF6600;
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 12px;
             font-size: 1.1rem;
             padding: 14px 12px;
+            margin-bottom: 16px;
         }
         
-        /* Pulsante info "i" con dimensioni standard come gli altri */
-        .info-circle-btn {
-            background: black;
-            color: white;
-            border-radius: 60px;
-            width: auto;
-            min-width: 56px;
-            padding: 14px 20px;
-            font-size: 1.3rem;
-            font-weight: bold;
-            font-family: 'Times New Roman', serif;
-            font-style: italic;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            border: none;
-            white-space: nowrap;
-        }
-        .info-circle-btn:active {
-            transform: scale(0.95);
+        /* Pulsante Seleziona cartella */
+        .select-folder-btn {
+            background: #283593;
+            margin-bottom: 20px;
         }
         
-        /* Box grigio per messaggi e istruzioni */
-        .info-box {
-            background: #e9ecef;
-            border-left: 6px solid #2c3e66;
-            border-radius: 20px;
+        /* DARK CARD (come nella home) */
+        .dark-card {
+            background: #d2d6dc;
+            border-left: 6px solid #2c3e50;
+            border-radius: 24px;
             padding: 16px;
-            margin: 20px 0;
-            font-size: 0.9rem;
+            margin: 16px 0;
+            box-shadow: none;
+        }
+        
+        /* Box messaggio (bianco/grigio) per permesso scaduto o nessun PDF */
+        .message-box {
+            background: white;
+            border-radius: 24px;
+            padding: 24px 20px;
+            text-align: center;
+            border: 1px solid #ced4da;
+        }
+        .message-title {
+            font-size: 1.2rem;
             font-weight: bold;
             color: #1e2a3a;
-            text-align: center;
-            line-height: 1.4;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+        .message-text {
+            font-size: 0.9rem;
+            color: #6c757d;
+            font-weight: 500;
         }
         
-        /* Lista file */
+        /* Lista file interna alla dark-card */
         .file-list {
-            margin-top: 20px;
             max-height: 450px;
             overflow-y: auto;
         }
@@ -144,57 +135,100 @@
             word-break: break-all;
             flex: 1;
         }
-        .doc-open {
+        .doc-actions {
+            display: flex;
+            gap: 8px;
+        }
+        .doc-view, .doc-download {
             font-size: 1.3rem;
             cursor: pointer;
             background: none;
             border: none;
             padding: 5px 12px;
+            width: auto;
+        }
+        .doc-view {
             color: #0066cc;
         }
+        .doc-download {
+            color: #28a745;
+        }
+        
+        /* Pulsante info in fondo */
+        .info-footer {
+            margin-top: 24px;
+            display: flex;
+            justify-content: center;
+        }
+        .info-circle-btn {
+            background: #6c757d;
+            color: white;
+            border-radius: 60px;
+            width: auto;
+            min-width: 56px;
+            padding: 12px 24px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            font-family: 'Times New Roman', serif;
+            font-style: italic;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border: none;
+        }
+        .info-circle-btn:active {
+            transform: scale(0.95);
+        }
+        
         .status-msg {
             font-size: 0.75rem;
             color: #2c3e66;
             margin-top: 8px;
             text-align: center;
         }
-        hr {
-            margin: 16px 0;
-        }
     </style>
 </head>
 <body>
 <div class="container">
     <div class="page">
-        <!-- TITOLO IN BOX EVIDENZIATO -->
-        <div class="archivio-title">📁 EXPAT ARCHIVIO</div>
+        <!-- TITOLO BLU CON ICONE ARCHIVIO -->
+        <div class="archivio-title">
+            📁 EXPAT ARCHIVIO 📁
+        </div>
         
-        <!-- Pulsante Seleziona-Visualizza (full width) -->
-        <button id="selectRootBtn" class="full-width-btn">📂 Seleziona-Visualizza cartella archivio</button>
+        <!-- PULSANTE GENIUS SCAN -->
+        <button id="openGeniusScanBtn" class="genius-btn">
+            📸 GENIUS SCAN 📸
+        </button>
         
-        <!-- Riga con Genius Scan (arancione, full width nella riga) e pulsante i -->
-        <div class="row-buttons">
-            <button id="openGeniusScanBtn" class="genius-btn">
-                <i class="fas fa-camera"></i> GENIUS SCAN
-            </button>
+        <!-- PULSANTE SELEZIONA-VISUALIZZA CARTELLA ARCHIVIO -->
+        <button id="selectRootBtn" class="select-folder-btn">📂 Seleziona-Visualizza Cartella ARCHIVIO</button>
+        
+        <!-- DARK CARD che contiene la lista PDF (o il messaggio) -->
+        <div class="dark-card">
+            <div id="fileListArea" class="file-list">
+                <div class="message-box">
+                    <div class="message-title">
+                        ⚠️ PERMESSO SCADUTO
+                    </div>
+                    <div class="message-text">
+                        Clicca sul Tasto Seleziona-Visualizza Cartella Archivio e concedi le autorizzazioni necessarie
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- PULSANTE INFO IN FONDO -->
+        <div class="info-footer">
             <button id="infoBtn" class="info-circle-btn">𝒊</button>
-        </div>
-        
-        <!-- BOX GRIGIO per messaggio informativo/errore -->
-        <div id="infoMessageBox" class="info-box">
-            🔐 Entra nella cartella, concedi autorizzazioni ed apparirà l'elenco dei documenti PDF.
-        </div>
-        
-        <!-- Area lista PDF -->
-        <div id="fileListArea" class="file-list">
-            <div style="text-align:center; padding:20px; color:#777;">Nessuna cartella selezionata</div>
         </div>
     </div>
 </div>
 
 <script>
-    // ==================== EXPAT ARCHIVIO (VERSIONE DEFINITIVA) ====================
-    const VERSION = "expat_archivio_v3.0";
+    // ==================== EXPAT ARCHIVIO ====================
+    const VERSION = "expat_archivio_v4.2";
     
     function isAndroid() { return /Android/.test(navigator.userAgent); }
     function isIPhone() { return /iPhone|iPad|iPod/.test(navigator.userAgent); }
@@ -203,7 +237,6 @@
     const openGeniusScanBtn = document.getElementById('openGeniusScanBtn');
     const infoBtn = document.getElementById('infoBtn');
     const fileListArea = document.getElementById('fileListArea');
-    const infoMessageBox = document.getElementById('infoMessageBox');
     
     let rootHandle = null;
     let currentFiles = [];
@@ -225,7 +258,7 @@
     
     // Informazioni modificabili da admin (long press su i)
     let infoTexts = {
-        expatArchivio: "📁 EXPAT ARCHIVIO\n\n• Seleziona una cartella sul tuo telefono (solo Android).\n• Verranno elencati tutti i file PDF presenti.\n• Clicca su 🔍 per aprire un PDF.\n• Genius Scan può essere usato per scansionare documenti, poi li esporti manualmente nella cartella selezionata.\n\n" + (isIPhone() ? "⚠️ Su iPhone la selezione cartella non è supportata." : "✅ Android: usa Chrome o Edge per la selezione cartella.")
+        expatArchivio: "📁 EXPAT ARCHIVIO\n\n• Seleziona una cartella sul tuo telefono (solo Android).\n• Verranno elencati tutti i file PDF presenti.\n• Clicca su 🔍 per visualizzare il PDF (si apre nel browser).\n• Clicca su 📥 per scaricare il PDF sul dispositivo.\n• Genius Scan può essere usato per scansionare documenti, poi li esporti manualmente nella cartella selezionata.\n\n" + (isIPhone() ? "⚠️ Su iPhone la selezione cartella non è supportata." : "✅ Android: usa Chrome o Edge per la selezione cartella.")
     };
     const savedInfoTexts = localStorage.getItem('expatArchivioInfoText');
     if (savedInfoTexts) {
@@ -233,6 +266,7 @@
     }
     function saveInfoText() { localStorage.setItem('expatArchivioInfoText', JSON.stringify(infoTexts)); }
     function showInfo() { alert(infoTexts.expatArchivio); }
+    
     // Long press su i per modificare
     let pressTimer = null;
     infoBtn.addEventListener('mousedown', () => {
@@ -291,19 +325,24 @@
         await tx.done;
     }
     
-    // Messaggio nel box grigio
-    function setInfoMessage(msg, isError = false) {
-        infoMessageBox.innerHTML = msg;
-        infoMessageBox.style.borderLeftColor = isError ? '#dc3545' : '#2c3e66';
-        infoMessageBox.style.color = isError ? '#721c24' : '#1e2a3a';
-        infoMessageBox.style.background = isError ? '#f8d7da' : '#e9ecef';
+    // Mostra il messaggio di permesso scaduto (stile bianco/grigio)
+    function showPermissionDenied() {
+        fileListArea.innerHTML = `
+            <div class="message-box">
+                <div class="message-title">
+                    ⚠️ PERMESSO SCADUTO
+                </div>
+                <div class="message-text">
+                    Clicca sul Tasto Seleziona-Visualizza Cartella Archivio e concedi le autorizzazioni necessarie
+                </div>
+            </div>
+        `;
     }
     
-    // Elenco PDF
+    // Elenco PDF (mostra la lista se tutto ok, altrimenti il messaggio)
     async function listPdfFiles() {
         if (!rootHandle) {
-            setInfoMessage("🔐 Entra nella cartella, concedi autorizzazioni ed apparirà l'elenco dei documenti PDF.");
-            fileListArea.innerHTML = "<div style='text-align:center; padding:20px; color:#777;'>Nessuna cartella selezionata</div>";
+            showPermissionDenied();
             return;
         }
         
@@ -315,8 +354,7 @@
         } catch(e) { isGranted = false; }
         
         if (!isGranted) {
-            setInfoMessage("⚠️ Permesso scaduto o cartella non più accessibile. Seleziona di nuovo la cartella.", true);
-            fileListArea.innerHTML = "<div style='text-align:center; padding:20px; color:#777;'>Permesso scaduto</div>";
+            showPermissionDenied();
             rootHandle = null;
             await clearRootHandle();
             return;
@@ -331,8 +369,7 @@
             }
         } catch(e) {
             console.warn(e);
-            setInfoMessage("❌ Errore nella lettura della cartella. Potrebbe essere stata spostata o rinominata. Seleziona di nuovo la cartella.", true);
-            fileListArea.innerHTML = "<div style='text-align:center; padding:20px; color:#777;'>Errore lettura</div>";
+            showPermissionDenied();
             rootHandle = null;
             await clearRootHandle();
             return;
@@ -340,23 +377,36 @@
         
         currentFiles = files;
         if (files.length === 0) {
-            setInfoMessage("📭 Nessun file PDF trovato in questa cartella. Aggiungi PDF e riprova.");
-            fileListArea.innerHTML = "<div style='text-align:center; padding:20px; color:#777;'>📭 Nessun PDF</div>";
+            fileListArea.innerHTML = `
+                <div class="message-box">
+                    <div class="message-title">
+                        📭 NESSUN PDF TROVATO
+                    </div>
+                    <div class="message-text">
+                        Aggiungi file PDF nella cartella e riprova
+                    </div>
+                </div>
+            `;
             return;
         }
         
-        setInfoMessage(`✅ ${files.length} PDF trovati. Clicca su 🔍 per aprirli.`);
+        // Mostra lista PDF
         let html = "";
         for (const file of files) {
             html += `
                 <div class="doc-item">
                     <span class="doc-name">📄 ${escapeHtml(file.name)}</span>
-                    <button class="doc-open" data-name="${escapeHtml(file.name)}">🔍</button>
+                    <div class="doc-actions">
+                        <button class="doc-view" data-name="${escapeHtml(file.name)}">🔍</button>
+                        <button class="doc-download" data-name="${escapeHtml(file.name)}">📥</button>
+                    </div>
                 </div>
             `;
         }
         fileListArea.innerHTML = html;
-        document.querySelectorAll('.doc-open').forEach(btn => {
+        
+        // Visualizzazione (solo apertura, non scarica)
+        document.querySelectorAll('.doc-view').forEach(btn => {
             btn.addEventListener('click', async (e) => {
                 const fileName = btn.getAttribute('data-name');
                 const file = currentFiles.find(f => f.name === fileName);
@@ -370,28 +420,49 @@
                 }
             });
         });
+        
+        // Download (scarica il file)
+        document.querySelectorAll('.doc-download').forEach(btn => {
+            btn.addEventListener('click', async (e) => {
+                const fileName = btn.getAttribute('data-name');
+                const file = currentFiles.find(f => f.name === fileName);
+                if (file && file.handle) {
+                    const blob = await file.handle.getFile();
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = file.name;
+                    a.click();
+                    setTimeout(() => URL.revokeObjectURL(url), 1000);
+                } else {
+                    alert("Impossibile scaricare il file.");
+                }
+            });
+        });
     }
     
     // Seleziona cartella
     async function selectAndShowFolder() {
         if (isIPhone()) {
-            setInfoMessage("⚠️ La selezione di una cartella non è supportata su iPhone.", true);
+            alert("La selezione di una cartella non è supportata su iPhone.");
+            showPermissionDenied();
             return;
         }
         if (!window.showDirectoryPicker) {
-            setInfoMessage("⚠️ Il tuo browser non supporta la selezione di cartelle. Usa Chrome/Edge su Android.", true);
+            alert("Il tuo browser non supporta la selezione di cartelle. Usa Chrome/Edge su Android.");
+            showPermissionDenied();
             return;
         }
         try {
             const handle = await window.showDirectoryPicker();
             rootHandle = handle;
             await saveRootHandle(rootHandle);
-            setInfoMessage(`✅ Cartella selezionata: "${rootHandle.name}". Elenco in caricamento...`);
             await listPdfFiles();
         } catch(e) {
             if (e.name !== 'AbortError') {
                 console.warn(e);
-                setInfoMessage("❌ Errore nella selezione della cartella.", true);
+                alert("Errore nella selezione della cartella.");
+                showPermissionDenied();
             }
         }
     }
@@ -448,8 +519,7 @@
             rootHandle = savedHandle;
             await listPdfFiles();
         } else {
-            setInfoMessage("🔐 Entra nella cartella, concedi autorizzazioni ed apparirà l'elenco dei documenti PDF.");
-            fileListArea.innerHTML = "<div style='text-align:center; padding:20px; color:#777;'>Nessuna cartella selezionata</div>";
+            showPermissionDenied();
         }
         
         selectRootBtn.addEventListener('click', selectAndShowFolder);
