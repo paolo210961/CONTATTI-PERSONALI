@@ -401,6 +401,12 @@
             padding: 8px;
             font-size: 0.7rem;
         }
+        iframe {
+            width: 100%;
+            height: 80%;
+            border: none;
+            min-height: 500px;
+        }
     </style>
 </head>
 <body>
@@ -468,9 +474,62 @@
         </div>
     </div>
 </div>
+<!-- Modale PDF viewer (riutilizzabile) -->
+<div id="pdfModal" class="adaptive-modal" style="display:none;">
+    <div class="adaptive-modal-content" style="width:90%; max-width:800px; height:80%;">
+        <h3 id="pdfModalTitle">Documento PDF</h3>
+        <iframe id="pdfFrame" style="width:100%; height:80%; border:none;"></iframe>
+        <div class="modal-buttons">
+            <button id="pdfDownloadBtn" class="save-btn" style="background:#4caf50;">📥 Scarica PDF</button>
+            <button id="pdfCloseBtn" class="cancel-btn">CHIUDI</button>
+        </div>
+    </div>
+</div>
 <script>
-    const VERSION = "expat_archivio_v8.1";
-    let isInviteModalOpen = false;  // impedisce modali multipli
+    const VERSION = "expat_archivio_v8.2";
+    let isInviteModalOpen = false;
+    let currentPdfBlob = null;  // per salvare il blob se necessario
+    let currentPdfUrl = null;   // oggetto URL da revocare
+
+    function showPdfModal(blob, title = "Documento PDF") {
+        const modal = document.getElementById('pdfModal');
+        const iframe = document.getElementById('pdfFrame');
+        const titleSpan = document.getElementById('pdfModalTitle');
+        const downloadBtn = document.getElementById('pdfDownloadBtn');
+        if (currentPdfUrl) {
+            URL.revokeObjectURL(currentPdfUrl);
+            currentPdfUrl = null;
+        }
+        const url = URL.createObjectURL(blob);
+        currentPdfUrl = url;
+        currentPdfBlob = blob;
+        iframe.src = url;
+        titleSpan.innerText = title;
+        modal.style.display = 'flex';
+        downloadBtn.onclick = () => {
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = title.replace(/[^a-z0-9]/gi, '_') + '.pdf';
+            a.click();
+        };
+    }
+
+    function closePdfModal() {
+        const modal = document.getElementById('pdfModal');
+        modal.style.display = 'none';
+        const iframe = document.getElementById('pdfFrame');
+        iframe.src = '';
+        if (currentPdfUrl) {
+            URL.revokeObjectURL(currentPdfUrl);
+            currentPdfUrl = null;
+        }
+        currentPdfBlob = null;
+    }
+
+    document.getElementById('pdfCloseBtn').addEventListener('click', closePdfModal);
+    document.getElementById('pdfModal').addEventListener('click', (e) => {
+        if (e.target === document.getElementById('pdfModal')) closePdfModal();
+    });
 
     function isAndroid() { return /Android/.test(navigator.userAgent); }
     function isIPhone() { return /iPhone|iPad|iPod/.test(navigator.userAgent); }
@@ -620,9 +679,7 @@
                 const file = currentFiles.find(f => f.name === fileName);
                 if (file && file.handle) {
                     const blob = await file.handle.getFile();
-                    const url = URL.createObjectURL(blob);
-                    window.open(url, '_blank');
-                    setTimeout(() => URL.revokeObjectURL(url), 60000);
+                    showPdfModal(blob, file.name);
                 } else alert("Impossibile aprire il file.");
             });
         });
@@ -709,7 +766,15 @@
         input.click();
     }
     function openCircolare() {
-        window.open("https://www.agenziasardaentrate.it/wp-content/uploads/2024/11/circolare-ADE-20-E-04-11-2024.pdf", "_blank");
+        fetch("https://www.agenziasardaentrate.it/wp-content/uploads/2024/11/circolare-ADE-20-E-04-11-2024.pdf")
+            .then(response => response.blob())
+            .then(blob => {
+                showPdfModal(blob, "Circolare ADE 20E");
+            })
+            .catch(err => {
+                alert("Impossibile caricare il PDF. Verifica la connessione.");
+                console.error(err);
+            });
     }
     function inviteFriend() {
         if (isInviteModalOpen) {
