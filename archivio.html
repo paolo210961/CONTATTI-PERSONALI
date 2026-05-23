@@ -29,7 +29,7 @@
             box-shadow: 0 8px 24px rgba(0,0,0,0.05);
         }
         
-        /* Titolo blu con icone (cassetto con fogli) */
+        /* Titolo blu con icone */
         .archivio-title {
             background: linear-gradient(135deg, #1e2a3a, #2c3e66);
             border-radius: 60px;
@@ -61,7 +61,6 @@
             transform: scale(0.97);
         }
         
-        /* Genius Scan con icone più grandi */
         .genius-btn {
             background: #FF6600;
             display: flex;
@@ -76,14 +75,27 @@
             font-size: 1.5rem;
         }
         
-        /* Pulsante Seleziona cartella con icona destra e sinistra */
+        /* Pulsante Seleziona cartella con icona destra e sinistra e testo su due righe */
         .select-folder-btn {
             background: #283593;
             margin-bottom: 16px;
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
-            gap: 10px;
+            gap: 4px;
+            padding: 10px 16px;
+            line-height: 1.3;
+        }
+        .select-folder-btn .btn-line1 {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .select-folder-btn .btn-line2 {
+            font-size: 1.1rem;
+            font-weight: bold;
         }
         
         /* Dark card */
@@ -156,7 +168,7 @@
         .doc-view { color: #0066cc; }
         .doc-download { color: #28a745; }
         
-        /* ==================== CONVERTITORE BLOCCATO (senza wrap) ==================== */
+        /* Convertitore bloccato (senza wrap) */
         .converter-section {
             margin-top: 16px;
         }
@@ -273,6 +285,18 @@
             gap: 6px;
         }
         
+        /* Nuovo pulsante invita amico */
+        .invite-btn {
+            background: #4caf50;
+            margin-top: 12px;
+            padding: 14px;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
         .error-message {
             background: #f8d7da;
             color: #721c24;
@@ -293,19 +317,20 @@
 <body>
 <div class="container">
     <div class="page">
-        <!-- TITOLO con icona cassetto con fogli -->
+        <!-- TITOLO -->
         <div class="archivio-title">
             🗃️📄 EXPAT ARCHIVIO 🗃️📄
         </div>
         
-        <!-- GENIUS SCAN con icone più grandi -->
+        <!-- GENIUS SCAN -->
         <button id="openGeniusScanBtn" class="genius-btn">
             <span class="genius-icon">📸</span> GENIUS SCAN <span class="genius-icon">📸</span>
         </button>
         
-        <!-- SELEZIONA CARTELLA con icona destra e sinistra -->
+        <!-- SELEZIONA CARTELLA -->
         <button id="selectRootBtn" class="select-folder-btn">
-            📂 Seleziona-Visualizza Cartella ARCHIVIO 📂
+            <span class="btn-line1">📂 Selezione-Visualizza 📂</span>
+            <span class="btn-line2">CARTELLA ARCHIVIO</span>
         </button>
         
         <!-- DARK CARD LISTA PDF -->
@@ -318,7 +343,7 @@
             </div>
         </div>
         
-        <!-- CONVERTITORE BLOCCATO (senza wrap) -->
+        <!-- CONVERTITORE BLOCCATO -->
         <div class="converter-section">
             <div class="converter-header">
                 <span class="converter-title">💱 Convertitore Valuta</span>
@@ -354,13 +379,18 @@
                 <button id="openCalculatorBtn" class="calc-btn">🧮 CALCOLATRICE</button>
                 <button id="infoBtn" class="info-btn-black">𝒊</button>
             </div>
+            
+            <!-- NUOVO PULSANTE INVITA AMICO -->
+            <button id="inviteFriendBtn" class="invite-btn">
+                <i class="fab fa-whatsapp"></i> INVITA UN AMICO ALLA PROVA GRATUITA DEI 90gg
+            </button>
         </div>
     </div>
 </div>
 
 <script>
     // ==================== EXPAT ARCHIVIO ====================
-    const VERSION = "expat_archivio_v7.4";
+    const VERSION = "expat_archivio_v7.6";
     
     function isAndroid() { return /Android/.test(navigator.userAgent); }
     function isIPhone() { return /iPhone|iPad|iPod/.test(navigator.userAgent); }
@@ -370,6 +400,7 @@
     const infoBtn = document.getElementById('infoBtn');
     const fileListArea = document.getElementById('fileListArea');
     const openCalculatorBtn = document.getElementById('openCalculatorBtn');
+    const inviteFriendBtn = document.getElementById('inviteFriendBtn');
     
     let rootHandle = null;
     let currentFiles = [];
@@ -585,6 +616,24 @@
         }
     }
     
+    // Invita amico via WhatsApp
+    function inviteFriend() {
+        // Link dell'app (modifica con il tuo URL reale)
+        const appLink = "https://tuo-dominio.com/index.html";
+        const message = "🎉 *Prova la app per 90 giorni gratuitamente!* 🎉\n\n" +
+                        "Gestisci documenti, converti valuta (EUR/TND), scannerizza con Genius Scan e organizza i tuoi PDF in una cartella.\n\n" +
+                        "👉 *Scopri di più:* " + appLink + "\n\n" +
+                        "✅ 90 giorni di prova gratuita\n" +
+                        "✅ Archivio PDF su cartella personale\n" +
+                        "✅ Convertitore di valuta aggiornato\n" +
+                        "✅ Integrazione con Genius Scan\n\n" +
+                        "Clicca sul link e inizia subito!";
+        
+        const encodedMessage = encodeURIComponent(message);
+        const whatsappUrl = `https://wa.me/?text=${encodedMessage}`;
+        window.open(whatsappUrl, '_blank');
+    }
+    
     function escapeHtml(str) { return str.replace(/[&<>]/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;' }[m])); }
     
     // ==================== CONVERTITORE ====================
@@ -666,6 +715,7 @@
         openGeniusScanBtn.addEventListener('click', openGeniusScan);
         infoBtn.addEventListener('click', showInfo);
         openCalculatorBtn.addEventListener('click', openSystemCalculator);
+        inviteFriendBtn.addEventListener('click', inviteFriend);
         
         fetchExchangeRates();
         setInterval(fetchExchangeRates, 60 * 60 * 1000);
