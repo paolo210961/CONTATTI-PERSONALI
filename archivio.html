@@ -369,6 +369,8 @@
         <div class="archivio-button-row">
             <button id="archivioCaricaDocBtn" style="background:#17a2b8;">📁 CARICA DOCUMENTO</button>
             <button id="scannerBtn" style="background:#6b8e23;">📸 SCANSIONA</button>
+            <button id="openCamScannerBtn" style="background:#ff9800;">📱 APRI CAMSCANNER</button>
+            <button id="openGeniusScanBtn" style="background:#4caf50;">📱 APRI GENIUS SCAN</button>
             <button id="archivioNewYearBtn" style="background:#e67e22;">➕ CREA ANNO</button>
             <button id="backupYearBtn" style="background:#4caf50;">💾 BACKUP ANNO</button>
             <button id="backupAllBtn" style="background:#2196f3;">💿 BACKUP TUTTO</button>
@@ -423,9 +425,10 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
 <script>
-    // ==================== ARCHIVIO COMPLETO (SCANNER STABILE, SENZA OPENCV) ====================
-    const VERSION = "archivio_v2.6";
+    // ==================== ARCHIVIO COMPLETO v2.8 (con Genius Scan) ====================
+    const VERSION = "archivio_v2.8";
     
+    // Rilevamento dispositivo
     function isAndroid() { return /Android/.test(navigator.userAgent); }
     function isIPhone() { return /iPhone|iPad|iPod/.test(navigator.userAgent); }
     
@@ -460,11 +463,13 @@
         alert("⚠️ FUNZIONE NON DISPONIBILE SU QUESTO DISPOSITIVO\n\nQuesta funzione richiede Android con Chrome o Edge.\n\nSu iPhone puoi comunque:\n• Salvare PDF nell'archivio interno (IndexedDB)\n• Esportare i PDF uno alla volta con il pulsante 📤\n• Fare backup completi in formato JSON");
     }
     
+    // Variabili IndexedDB
     let currentYear = "";
     let searchTerm = "";
     let archivioDB = null;
     let rootHandle = null;
     
+    // Variabili scanner
     let mediaStream = null;
     let capturedPhotos = [];
     let currentOriginalDataUrl = null;
@@ -477,7 +482,7 @@
     const previewArea = document.getElementById('previewArea');
     const previewImage = document.getElementById('previewImage');
     
-    // ==================== IndexedDB (stessa di prima, funzionante) ====================
+    // ==================== DATABASE INDEXEDDB ====================
     function openArchivioDB() {
         return new Promise((resolve, reject) => {
             if (archivioDB) return resolve(archivioDB);
@@ -778,7 +783,7 @@
         input.click();
     }
     
-    // ==================== Gestione cartella fisica (Android) ====================
+    // ==================== GESTIONE CARTELLA FISICA (ANDROID) ====================
     function openHandleDB() {
         return new Promise((resolve, reject) => {
             const request = indexedDB.open('ArchiveHandles', 1);
@@ -867,7 +872,7 @@
         };
     }
     
-    // ==================== Backup JSON ====================
+    // ==================== BACKUP JSON ====================
     async function backupYear(anno) {
         const docs = await loadDocumentsForYear(anno, "");
         if (docs.length === 0) { alert("Nessun documento."); return; }
@@ -975,11 +980,11 @@
     function searchDocs() { searchTerm = archivioSearchInput.value.trim(); renderDocsList(); showMessage(`🔍 Ricerca: "${searchTerm || 'tutti'}"`, false); }
     function clearSearch() { archivioSearchInput.value = ""; searchTerm = ""; renderDocsList(); archivioSearchPanel.style.display = 'none'; showMessage("🔍 Ricerca cancellata", false); }
     function showArchivioInfo() {
-        let msg = "📁 ARCHIVIO DOCUMENTI EXPAT\n\n• CREA ANNO: inserisci anno (2025) e premi\n• CARICA: seleziona foto/PDF (più foto → PDF unico)\n• SCANSIONA: apri fotocamera, scatta, migliora, conferma, e ripeti\n• 🔍 lente: anteprima PDF\n• 📤 esporta singolo PDF\n• 🗑️ elimina\n• BACKUP ANNO / TUTTO / RIPRISTINA\n\n" + (isAndroid() ? "✅ ANDROID: funzioni extra cartella" : "ℹ️ IPHONE: solo funzioni base") + "\n\n⚠️ I documenti sono salvati in IndexedDB.";
+        let msg = "📁 ARCHIVIO DOCUMENTI EXPAT\n\n• CREA ANNO: inserisci anno (2025) e premi\n• CARICA: seleziona foto/PDF (più foto → PDF unico)\n• SCANSIONA: apri fotocamera, scatta, migliora, conferma, e ripeti\n• APRI CAMSCANNER / APRI GENIUS SCAN: apre l'app corrispondente se installata\n• 🔍 lente: anteprima PDF\n• 📤 esporta singolo PDF\n• 🗑️ elimina\n• BACKUP ANNO / TUTTO / RIPRISTINA\n\n" + (isAndroid() ? "✅ ANDROID: funzioni extra cartella" : "ℹ️ IPHONE: solo funzioni base") + "\n\n⚠️ I documenti sono salvati in IndexedDB.";
         alert(msg);
     }
     
-    // ==================== FUNZIONI DI MIGLIORAMENTO (STABILI) ====================
+    // ==================== FUNZIONI DI MIGLIORAMENTO (RIDUZIONE RUMORE + SHARPENING SELETTIVO) ====================
     async function cropToA4(dataUrl, rotation = 0) {
         return new Promise((resolve) => {
             const img = new Image();
@@ -1019,7 +1024,6 @@
         });
     }
 
-    // Miglioramento semplice ma efficace (contrasto + nitidezza leggera)
     async function enhanceDocumentImage(dataUrl) {
         return new Promise((resolve) => {
             const img = new Image();
@@ -1029,55 +1033,99 @@
                 canvas.height = img.height;
                 const ctx = canvas.getContext('2d');
                 ctx.drawImage(img, 0, 0);
+                
+                // 1. Riduzione rumore (filtro mediano 3x3)
                 const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
                 const data = imageData.data;
-                // Equalizzazione semplice (aumenta contrasto)
-                let min = 255, max = 0;
-                for (let i = 0; i < data.length; i += 4) {
-                    const lum = 0.299 * data[i] + 0.587 * data[i+1] + 0.114 * data[i+2];
-                    if (lum < min) min = lum;
-                    if (lum > max) max = lum;
-                }
-                const range = max - min;
-                for (let i = 0; i < data.length; i += 4) {
-                    const lum = 0.299 * data[i] + 0.587 * data[i+1] + 0.114 * data[i+2];
-                    let newLum = (lum - min) / range * 255;
-                    const factor = newLum / (lum + 0.001);
-                    data[i] = Math.min(255, Math.max(0, data[i] * factor));
-                    data[i+1] = Math.min(255, Math.max(0, data[i+1] * factor));
-                    data[i+2] = Math.min(255, Math.max(0, data[i+2] * factor));
-                }
-                ctx.putImageData(imageData, 0, 0);
-                // Sharpening leggero
-                const sharpCanvas = document.createElement('canvas');
-                sharpCanvas.width = canvas.width;
-                sharpCanvas.height = canvas.height;
-                const sharpCtx = sharpCanvas.getContext('2d');
-                sharpCtx.drawImage(canvas, 0, 0);
-                const sharpData = sharpCtx.getImageData(0, 0, sharpCanvas.width, sharpCanvas.height);
-                const kernel = [0, -1, 0, -1, 5, -1, 0, -1, 0];
-                const temp = new Uint8ClampedArray(sharpData.data);
-                const w = sharpCanvas.width, h = sharpCanvas.height;
-                for (let y = 1; y < h-1; y++) {
-                    for (let x = 1; x < w-1; x++) {
-                        let r=0,g=0,b=0;
+                const width = canvas.width;
+                const height = canvas.height;
+                const median = (values) => values.sort((a,b)=>a-b)[Math.floor(values.length/2)];
+                
+                const denoised = new Uint8ClampedArray(data.length);
+                for (let y = 1; y < height-1; y++) {
+                    for (let x = 1; x < width-1; x++) {
+                        const r = [], g = [], b = [];
                         for (let ky = -1; ky <= 1; ky++) {
                             for (let kx = -1; kx <= 1; kx++) {
-                                const idx = ((y+ky)*w + (x+kx)) * 4;
-                                const kidx = (ky+1)*3 + (kx+1);
-                                r += temp[idx] * kernel[kidx];
-                                g += temp[idx+1] * kernel[kidx];
-                                b += temp[idx+2] * kernel[kidx];
+                                const idx = ((y+ky)*width + (x+kx)) * 4;
+                                r.push(data[idx]);
+                                g.push(data[idx+1]);
+                                b.push(data[idx+2]);
                             }
                         }
-                        const idx = (y*w + x) * 4;
-                        sharpData.data[idx] = Math.min(255, Math.max(0, r));
-                        sharpData.data[idx+1] = Math.min(255, Math.max(0, g));
-                        sharpData.data[idx+2] = Math.min(255, Math.max(0, b));
+                        const idx = (y*width + x) * 4;
+                        denoised[idx] = median(r);
+                        denoised[idx+1] = median(g);
+                        denoised[idx+2] = median(b);
+                        denoised[idx+3] = 255;
+                    }
+                }
+                // bordi
+                for (let y = 0; y < height; y++) {
+                    for (let x = 0; x < width; x++) {
+                        if (x === 0 || y === 0 || x === width-1 || y === height-1) {
+                            const idx = (y*width + x) * 4;
+                            denoised[idx] = data[idx];
+                            denoised[idx+1] = data[idx+1];
+                            denoised[idx+2] = data[idx+2];
+                            denoised[idx+3] = 255;
+                        }
+                    }
+                }
+                const denoisedImageData = new ImageData(denoised, width, height);
+                ctx.putImageData(denoisedImageData, 0, 0);
+                
+                // 2. Sharpening selettivo (solo sui bordi)
+                const sharpCanvas = document.createElement('canvas');
+                sharpCanvas.width = width;
+                sharpCanvas.height = height;
+                const sharpCtx = sharpCanvas.getContext('2d');
+                sharpCtx.drawImage(canvas, 0, 0);
+                const sharpData = sharpCtx.getImageData(0, 0, width, height);
+                const outData = sharpData.data;
+                const sobelX = [-1,0,1, -2,0,2, -1,0,1];
+                const sobelY = [-1,-2,-1, 0,0,0, 1,2,1];
+                
+                for (let y = 1; y < height-1; y++) {
+                    for (let x = 1; x < width-1; x++) {
+                        let gx = 0, gy = 0;
+                        for (let ky = -1; ky <= 1; ky++) {
+                            for (let kx = -1; kx <= 1; kx++) {
+                                const idx = ((y+ky)*width + (x+kx)) * 4;
+                                const gray = 0.299*outData[idx] + 0.587*outData[idx+1] + 0.114*outData[idx+2];
+                                gx += gray * sobelX[(ky+1)*3 + (kx+1)];
+                                gy += gray * sobelY[(ky+1)*3 + (kx+1)];
+                            }
+                        }
+                        const mag = Math.hypot(gx, gy);
+                        if (mag > 30) {
+                            for (let c = 0; c < 3; c++) {
+                                const idx = (y*width + x) * 4 + c;
+                                outData[idx] = Math.min(255, Math.max(0, outData[idx] + (outData[idx] - outData[idx]) * 0.5));
+                            }
+                        }
                     }
                 }
                 sharpCtx.putImageData(sharpData, 0, 0);
-                resolve(sharpCanvas.toDataURL('image/jpeg', 0.95));
+                
+                // 3. Binarizzazione adattativa finale
+                const finalCanvas = document.createElement('canvas');
+                finalCanvas.width = width;
+                finalCanvas.height = height;
+                const finalCtx = finalCanvas.getContext('2d');
+                finalCtx.drawImage(sharpCanvas, 0, 0);
+                const finalImageData = finalCtx.getImageData(0, 0, width, height);
+                const finalData = finalImageData.data;
+                for (let i = 0; i < finalData.length; i += 4) {
+                    const lum = 0.299 * finalData[i] + 0.587 * finalData[i+1] + 0.114 * finalData[i+2];
+                    const thresh = 128;
+                    const val = lum < thresh ? 0 : 255;
+                    finalData[i] = val;
+                    finalData[i+1] = val;
+                    finalData[i+2] = val;
+                }
+                finalCtx.putImageData(finalImageData, 0, 0);
+                resolve(finalCanvas.toDataURL('image/jpeg', 0.95));
             };
             img.src = dataUrl;
         });
@@ -1244,6 +1292,57 @@
         hidePreview();
     }
     
+    // ==================== APRI APP ESTERNE ====================
+    function openCamScanner() {
+        const isAndroid = /Android/.test(navigator.userAgent);
+        const isIOS = /iPhone|iPad|iPod/.test(navigator.userAgent);
+        
+        if (isAndroid) {
+            window.location.href = "intent://scan/#Intent;package=com.intsig.camscanner;scheme=zxing;end";
+            setTimeout(() => {
+                if (confirm("CamScanner non sembra installato. Vuoi scaricarlo dal Play Store?")) {
+                    window.open("https://play.google.com/store/apps/details?id=com.intsig.camscanner", "_blank");
+                }
+            }, 2000);
+        } 
+        else if (isIOS) {
+            window.location.href = "camscanner://";
+            setTimeout(() => {
+                if (confirm("CamScanner non sembra installato. Vuoi scaricarlo dall'App Store?")) {
+                    window.open("https://apps.apple.com/app/camscanner/id388626783", "_blank");
+                }
+            }, 2000);
+        }
+        else {
+            alert("Questo link funziona solo su dispositivi mobili.");
+        }
+    }
+    
+    function openGeniusScan() {
+        const isAndroid = /Android/.test(navigator.userAgent);
+        const isIOS = /iPhone|iPad|iPod/.test(navigator.userAgent);
+        
+        if (isAndroid) {
+            window.location.href = "intent://scan/#Intent;package=com.thegrizzlylabs.geniusscan.free;scheme=zxing;end";
+            setTimeout(() => {
+                if (confirm("Genius Scan non sembra installato. Vuoi scaricarlo dal Play Store?")) {
+                    window.open("https://play.google.com/store/apps/details?id=com.thegrizzlylabs.geniusscan.free", "_blank");
+                }
+            }, 2000);
+        } 
+        else if (isIOS) {
+            window.location.href = "geniuscan://";
+            setTimeout(() => {
+                if (confirm("Genius Scan non sembra installato. Vuoi scaricarlo dall'App Store?")) {
+                    window.open("https://apps.apple.com/app/genius-scan/id377672876", "_blank");
+                }
+            }, 2000);
+        }
+        else {
+            alert("Questo link funziona solo su dispositivi mobili.");
+        }
+    }
+    
     // ==================== INIZIALIZZAZIONE ====================
     async function init() {
         await openArchivioDB();
@@ -1281,6 +1380,11 @@
         document.getElementById('resetPhotoBtn').addEventListener('click', resetToOriginal);
         document.getElementById('confirmPhotoBtn').addEventListener('click', confirmPhoto);
         document.getElementById('retakePhotoBtn').addEventListener('click', retakePhoto);
+        
+        const camScannerBtn = document.getElementById('openCamScannerBtn');
+        if (camScannerBtn) camScannerBtn.addEventListener('click', openCamScanner);
+        const geniusScanBtn = document.getElementById('openGeniusScanBtn');
+        if (geniusScanBtn) geniusScanBtn.addEventListener('click', openGeniusScan);
     }
     init();
 </script>
