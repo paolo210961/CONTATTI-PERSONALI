@@ -29,7 +29,7 @@
             box-shadow: 0 8px 24px rgba(0,0,0,0.05);
         }
         
-        /* Titolo blu con icone */
+        /* Titolo blu con icone (cassetto con fogli) */
         .archivio-title {
             background: linear-gradient(135deg, #1e2a3a, #2c3e66);
             border-radius: 60px;
@@ -61,20 +61,33 @@
             transform: scale(0.97);
         }
         
+        /* Genius Scan con icone più grandi */
         .genius-btn {
             background: #FF6600;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 10px;
+            gap: 12px;
             font-size: 1rem;
             padding: 12px;
             margin-bottom: 12px;
         }
+        .genius-btn i, .genius-btn .fa-camera {
+            font-size: 1.4rem;
+        }
+        /* Icone emoji più grandi */
+        .genius-btn .genius-icon {
+            font-size: 1.5rem;
+        }
         
+        /* Pulsante Seleziona cartella con icona destra e sinistra */
         .select-folder-btn {
             background: #283593;
             margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
         }
         
         /* Dark card */
@@ -147,7 +160,7 @@
         .doc-view { color: #0066cc; }
         .doc-download { color: #28a745; }
         
-        /* Convertitore responsivo - CORRETTO */
+        /* Convertitore compatto */
         .converter-section {
             margin-top: 16px;
         }
@@ -156,16 +169,16 @@
             justify-content: space-between;
             align-items: baseline;
             flex-wrap: wrap;
-            margin-bottom: 12px;
+            margin-bottom: 10px;
             gap: 8px;
         }
         .converter-title {
-            font-size: 1rem;
+            font-size: 0.95rem;
             font-weight: bold;
             color: #1e2a3a;
         }
         .update-date {
-            font-size: 0.7rem;
+            font-size: 0.65rem;
             color: #6c757d;
         }
         .converter-row {
@@ -174,53 +187,49 @@
             justify-content: space-between;
             background: #f8f9fa;
             border-radius: 60px;
-            padding: 10px 12px;
-            margin-bottom: 10px;
-            flex-wrap: wrap;
-            gap: 8px;
+            padding: 6px 12px;
+            margin-bottom: 8px;
+            gap: 6px;
         }
         .currency-from {
             display: flex;
             align-items: center;
-            gap: 8px;
-            flex: 2;
-            min-width: 150px;
+            gap: 6px;
+            flex-shrink: 0;
         }
         .currency-from .eur-symbol {
             font-weight: bold;
-            font-size: 0.9rem;
-            min-width: 50px;
+            font-size: 0.85rem;
+            min-width: 45px;
             color: #004C97;
         }
         .currency-from .tnd-symbol {
             font-weight: bold;
-            font-size: 0.9rem;
-            min-width: 50px;
+            font-size: 0.85rem;
+            min-width: 45px;
             color: #E70000;
         }
         .currency-from input {
-            flex: 1;
-            min-width: 80px;
-            padding: 8px 8px;
+            width: 130px;
+            padding: 8px 6px;
             border: 1px solid #ced4da;
             border-radius: 40px;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             text-align: center;
             background: white;
         }
         .arrow {
-            font-size: 1rem;
-            margin: 0 4px;
+            font-size: 0.9rem;
             flex-shrink: 0;
             color: #6c757d;
         }
         .result-value-eur {
             font-weight: bold;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             background: white;
-            padding: 6px 12px;
+            padding: 6px 10px;
             border-radius: 40px;
-            min-width: 100px;
+            min-width: 110px;
             text-align: center;
             border: 1px solid #ced4da;
             color: #004C97;
@@ -228,11 +237,11 @@
         }
         .result-value-tnd {
             font-weight: bold;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             background: white;
-            padding: 6px 12px;
+            padding: 6px 10px;
             border-radius: 40px;
-            min-width: 100px;
+            min-width: 110px;
             text-align: center;
             border: 1px solid #ced4da;
             color: #E70000;
@@ -242,14 +251,20 @@
         /* Responsive per schermi piccoli */
         @media (max-width: 480px) {
             .converter-row {
-                flex-direction: column;
-                align-items: stretch;
+                flex-wrap: wrap;
                 border-radius: 24px;
+                padding: 8px;
             }
             .currency-from {
                 width: 100%;
+                justify-content: space-between;
+            }
+            .currency-from input {
+                flex: 1;
+                width: auto;
             }
             .arrow {
+                width: 100%;
                 text-align: center;
                 margin: 4px 0;
             }
@@ -310,18 +325,20 @@
 <body>
 <div class="container">
     <div class="page">
-        <!-- TITOLO -->
+        <!-- TITOLO con icona cassetto con fogli -->
         <div class="archivio-title">
-            📁 EXPAT ARCHIVIO 📁
+            🗃️📄 EXPAT ARCHIVIO 🗃️📄
         </div>
         
-        <!-- GENIUS SCAN -->
+        <!-- GENIUS SCAN con icone più grandi -->
         <button id="openGeniusScanBtn" class="genius-btn">
-            📸 GENIUS SCAN 📸
+            <span class="genius-icon">📸</span> GENIUS SCAN <span class="genius-icon">📸</span>
         </button>
         
-        <!-- SELEZIONA CARTELLA -->
-        <button id="selectRootBtn" class="select-folder-btn">📂 Seleziona-Visualizza Cartella ARCHIVIO</button>
+        <!-- SELEZIONA CARTELLA con icona destra e sinistra -->
+        <button id="selectRootBtn" class="select-folder-btn">
+            📂 Seleziona-Visualizza Cartella ARCHIVIO 📂
+        </button>
         
         <!-- DARK CARD LISTA PDF -->
         <div class="dark-card">
@@ -333,7 +350,7 @@
             </div>
         </div>
         
-        <!-- CONVERTITORE COMPATTO (responsivo) -->
+        <!-- CONVERTITORE COMPATTO -->
         <div class="converter-section">
             <div class="converter-header">
                 <span class="converter-title">💱 Convertitore Valuta</span>
@@ -375,7 +392,7 @@
 
 <script>
     // ==================== EXPAT ARCHIVIO ====================
-    const VERSION = "expat_archivio_v7.1";
+    const VERSION = "expat_archivio_v7.3";
     
     function isAndroid() { return /Android/.test(navigator.userAgent); }
     function isIPhone() { return /iPhone|iPad|iPod/.test(navigator.userAgent); }
