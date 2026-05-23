@@ -393,7 +393,7 @@
     </div>
 </div>
 
-<!-- MODALE FOTOCAMERA PER SCANSIONE GUIDATA -->
+<!-- MODALE FOTOCAMERA PER SCANSIONE GUIDATA CON MIGLIORAMENTO AVANZATO -->
 <div id="cameraModal" class="adaptive-modal" style="display:none;">
     <div class="adaptive-modal-content camera-modal-content">
         <h3>📸 Scansione documento</h3>
@@ -407,6 +407,7 @@
             <div class="scanner-buttons">
                 <button id="rotatePhotoBtn" class="rotate-btn">🔄 RUOTA</button>
                 <button id="enhancePhotoBtn" class="enhance-btn">🔧 MIGLIORA</button>
+                <button id="resetPhotoBtn" class="cancel-btn">🔄 RIPRISTINA</button>
                 <button id="confirmPhotoBtn" class="save-btn" style="background:#4caf50;">✅ CONFERMA</button>
                 <button id="retakePhotoBtn" class="cancel-btn">❌ RISCATTA</button>
             </div>
@@ -422,8 +423,8 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
 <script>
-    // ==================== ARCHIVIO VERSIONE CON SCANNER GUIDATO E MIGLIORAMENTO ====================
-    const VERSION = "archivio_v2.3";
+    // ==================== ARCHIVIO VERSIONE CON SCANNER AVANZATO (BINARIZZAZIONE ADATTATIVA + SHARPENING) ====================
+    const VERSION = "archivio_v2.4";
     
     // Rilevamento dispositivo
     function isAndroid() { return /Android/.test(navigator.userAgent); }
@@ -453,12 +454,8 @@
     const iphoneMessage = document.getElementById('iphoneMessage');
     const photoCounterSpan = document.getElementById('photoCounter');
     
-    // Mostra messaggio informativo per iPhone
-    if (isIPhone()) {
-        if (iphoneMessage) iphoneMessage.style.display = 'block';
-    } else {
-        if (iphoneMessage) iphoneMessage.style.display = 'none';
-    }
+    if (isIPhone() && iphoneMessage) iphoneMessage.style.display = 'block';
+    else if (iphoneMessage) iphoneMessage.style.display = 'none';
     
     function showAndroidOnlyAlert() {
         alert("⚠️ FUNZIONE NON DISPONIBILE SU QUESTO DISPOSITIVO\n\nQuesta funzione richiede Android con Chrome o Edge.\n\nSu iPhone puoi comunque:\n• Salvare PDF nell'archivio interno (IndexedDB)\n• Esportare i PDF uno alla volta con il pulsante 📤\n• Fare backup completi in formato JSON");
@@ -472,18 +469,18 @@
     
     // Variabili scanner
     let mediaStream = null;
-    let capturedPhotos = [];     // array di dataUrl delle foto CONFERMATE (già ritagliate/migliorate)
-    let currentPhotoDataUrl = null;
+    let capturedPhotos = [];     // dataUrl delle foto CONFERMATE (già migliorate/ritagliate)
+    let currentOriginalDataUrl = null;   // versione ritagliata A4 (originale)
+    let currentEnhancedDataUrl = null;   // versione migliorata
+    let isCurrentlyEnhanced = false;      // stato attuale dell'anteprima
     let currentRotation = 0;
-    let currentEnhancedDataUrl = null; // versione migliorata (se applicata)
-    let isEnhanced = false;
     const video = document.getElementById('scannerVideo');
     const canvas = document.getElementById('scannerCanvas');
     const photoThumbnails = document.getElementById('photoThumbnails');
     const previewArea = document.getElementById('previewArea');
     const previewImage = document.getElementById('previewImage');
     
-    // ==================== DATABASE INDEXEDDB (IDENTICO A PRIMA) ====================
+    // ==================== DATABASE INDEXEDDB (INVARIATO) ====================
     function openArchivioDB() {
         return new Promise((resolve, reject) => {
             if (archivioDB) return resolve(archivioDB);
@@ -985,77 +982,8 @@
         alert(msg);
     }
     
-    // ==================== SCANNER GUIDATO CON MIGLIORAMENTO ====================
-    async function initCamera() {
-        try {
-            if (mediaStream) mediaStream.getTracks().forEach(track => track.stop());
-            const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
-            mediaStream = stream;
-            video.srcObject = stream;
-            await video.play();
-            return true;
-        } catch (err) { console.error(err); alert("Impossibile accedere alla fotocamera."); return false; }
-    }
-    function stopCamera() { if (mediaStream) { mediaStream.getTracks().forEach(track => track.stop()); mediaStream = null; } video.srcObject = null; }
-    
-    // Funzione di miglioramento immagine (equalizzazione + sharpening)
-    function enhanceImage(dataUrl) {
-        return new Promise((resolve) => {
-            const img = new Image();
-            img.onload = () => {
-                const canvasEnh = document.createElement('canvas');
-                canvasEnh.width = img.width;
-                canvasEnh.height = img.height;
-                const ctx = canvasEnh.getContext('2d');
-                ctx.drawImage(img, 0, 0);
-                const imageData = ctx.getImageData(0, 0, canvasEnh.width, canvasEnh.height);
-                const data = imageData.data;
-                // Equalizzazione dell'istogramma (semplificata, aumenta contrasto)
-                let rMin = 255, rMax = 0, gMin = 255, gMax = 0, bMin = 255, bMax = 0;
-                for (let i = 0; i < data.length; i += 4) {
-                    rMin = Math.min(rMin, data[i]); rMax = Math.max(rMax, data[i]);
-                    gMin = Math.min(gMin, data[i+1]); gMax = Math.max(gMax, data[i+1]);
-                    bMin = Math.min(bMin, data[i+2]); bMax = Math.max(bMax, data[i+2]);
-                }
-                for (let i = 0; i < data.length; i += 4) {
-                    data[i] = (data[i] - rMin) * 255 / (rMax - rMin || 1);
-                    data[i+1] = (data[i+1] - gMin) * 255 / (gMax - gMin || 1);
-                    data[i+2] = (data[i+2] - bMin) * 255 / (bMax - bMin || 1);
-                }
-                ctx.putImageData(imageData, 0, 0);
-                // Sharpening (kernel)
-                const sharpened = ctx.getImageData(0, 0, canvasEnh.width, canvasEnh.height);
-                const sharpData = sharpened.data;
-                const width = canvasEnh.width;
-                const height = canvasEnh.height;
-                const kernel = [0, -1, 0, -1, 5, -1, 0, -1, 0];
-                const temp = new Uint8ClampedArray(sharpData);
-                for (let y = 1; y < height-1; y++) {
-                    for (let x = 1; x < width-1; x++) {
-                        let r = 0, g = 0, b = 0;
-                        for (let ky = -1; ky <= 1; ky++) {
-                            for (let kx = -1; kx <= 1; kx++) {
-                                const idx = ((y + ky) * width + (x + kx)) * 4;
-                                const kidx = (ky+1)*3 + (kx+1);
-                                r += temp[idx] * kernel[kidx];
-                                g += temp[idx+1] * kernel[kidx];
-                                b += temp[idx+2] * kernel[kidx];
-                            }
-                        }
-                        const idx = (y * width + x) * 4;
-                        sharpData[idx] = Math.min(255, Math.max(0, r));
-                        sharpData[idx+1] = Math.min(255, Math.max(0, g));
-                        sharpData[idx+2] = Math.min(255, Math.max(0, b));
-                    }
-                }
-                ctx.putImageData(sharpened, 0, 0);
-                resolve(canvasEnh.toDataURL('image/jpeg', 0.9));
-            };
-            img.src = dataUrl;
-        });
-    }
-    
-    // Ritaglia e adatta al formato A4 (proporzioni 1/√2), senza miglioramento
+    // ==================== FUNZIONI DI MIGLIORAMENTO AVANZATO ====================
+    // Ritaglia e adatta al formato A4 (senza miglioramento)
     async function cropToA4(dataUrl, rotation = 0) {
         return new Promise((resolve) => {
             const img = new Image();
@@ -1094,6 +1022,146 @@
             img.src = dataUrl;
         });
     }
+
+    // Applica binarizzazione adattativa (Sauvola) + sharpening
+    // Input: dataUrl dell'immagine (già ritagliata A4)
+    // Output: dataUrl migliorata (binarizzata e nitida)
+    async function enhanceDocumentImage(dataUrl) {
+        return new Promise((resolve) => {
+            const img = new Image();
+            img.onload = () => {
+                // Lavoriamo su canvas per manipolazione pixel
+                const workCanvas = document.createElement('canvas');
+                workCanvas.width = img.width;
+                workCanvas.height = img.height;
+                const ctx = workCanvas.getContext('2d');
+                ctx.drawImage(img, 0, 0);
+                const imageData = ctx.getImageData(0, 0, workCanvas.width, workCanvas.height);
+                const data = imageData.data;
+                const width = workCanvas.width;
+                const height = workCanvas.height;
+                
+                // Converti in scala di grigi (luminanza)
+                let gray = new Array(width * height);
+                for (let i = 0; i < data.length; i += 4) {
+                    let lum = 0.299 * data[i] + 0.587 * data[i+1] + 0.114 * data[i+2];
+                    gray[i/4] = lum;
+                }
+                
+                // Parametri per Sauvola
+                const windowSize = Math.floor(Math.min(width, height) / 20) + 1; // finestra ~5% dell'immagine
+                const k = 0.2;  // parametro di sensibilità
+                const R = 128;   // massimo valore dinamico (per 8 bit)
+                
+                // Calcolo media e deviazione locale (algoritmo integrale per performance)
+                let integral = new Array((width+1)*(height+1)).fill(0);
+                let integralSq = new Array((width+1)*(height+1)).fill(0);
+                for (let y = 0; y < height; y++) {
+                    for (let x = 0; x < width; x++) {
+                        const idx = y*width + x;
+                        const val = gray[idx];
+                        const prevIdx = y*(width+1) + x;
+                        const prevRowIdx = (y)*(width+1) + (x+1);
+                        const prevColIdx = (y+1)*(width+1) + x;
+                        const prevDiagIdx = (y)*(width+1) + x;
+                        integral[prevRowIdx] = integral[prevDiagIdx] + integral[prevColIdx] - integral[prevIdx] + val;
+                        integralSq[prevRowIdx] = integralSq[prevDiagIdx] + integralSq[prevColIdx] - integralSq[prevIdx] + val*val;
+                    }
+                }
+                
+                function getLocalMeanAndStd(x, y, w, h) {
+                    let x1 = Math.max(0, x - w/2);
+                    let y1 = Math.max(0, y - w/2);
+                    let x2 = Math.min(width-1, x + w/2);
+                    let y2 = Math.min(height-1, y + w/2);
+                    let count = (x2 - x1 + 1) * (y2 - y1 + 1);
+                    let sum = integral[(y2+1)*(width+1) + (x2+1)] - integral[(y1)*(width+1) + (x2+1)] - integral[(y2+1)*(width+1) + (x1)] + integral[(y1)*(width+1) + (x1)];
+                    let sumSq = integralSq[(y2+1)*(width+1) + (x2+1)] - integralSq[(y1)*(width+1) + (x2+1)] - integralSq[(y2+1)*(width+1) + (x1)] + integralSq[(y1)*(width+1) + (x1)];
+                    let mean = sum / count;
+                    let variance = (sumSq / count) - (mean * mean);
+                    let std = Math.sqrt(Math.max(0, variance));
+                    return { mean, std };
+                }
+                
+                // Applica Sauvola binarization
+                let binary = new Uint8ClampedArray(width * height);
+                for (let y = 0; y < height; y++) {
+                    for (let x = 0; x < width; x++) {
+                        const { mean, std } = getLocalMeanAndStd(x, y, windowSize, windowSize);
+                        let threshold = mean * (1 + k * (std / R - 1));
+                        let val = gray[y*width + x];
+                        binary[y*width + x] = val < threshold ? 0 : 255;
+                    }
+                }
+                
+                // Sharpening (kernel laplaciano)
+                const sharpCanvas = document.createElement('canvas');
+                sharpCanvas.width = width;
+                sharpCanvas.height = height;
+                const sharpCtx = sharpCanvas.getContext('2d');
+                const sharpImgData = sharpCtx.createImageData(width, height);
+                const sharpData = sharpImgData.data;
+                const kernel = [0, -1, 0, -1, 5, -1, 0, -1, 0];
+                for (let y = 1; y < height-1; y++) {
+                    for (let x = 1; x < width-1; x++) {
+                        let val = 0;
+                        for (let ky = -1; ky <= 1; ky++) {
+                            for (let kx = -1; kx <= 1; kx++) {
+                                const idx = (y+ky)*width + (x+kx);
+                                const kidx = (ky+1)*3 + (kx+1);
+                                val += binary[idx] * kernel[kidx];
+                            }
+                        }
+                        val = Math.min(255, Math.max(0, val));
+                        const idx = (y*width + x) * 4;
+                        sharpData[idx] = val;
+                        sharpData[idx+1] = val;
+                        sharpData[idx+2] = val;
+                        sharpData[idx+3] = 255;
+                    }
+                }
+                // Copia i bordi senza sharpening
+                for (let y = 0; y < height; y++) {
+                    for (let x = 0; x < width; x++) {
+                        if (x === 0 || y === 0 || x === width-1 || y === height-1) {
+                            const idx = (y*width + x) * 4;
+                            const g = binary[y*width + x];
+                            sharpData[idx] = g;
+                            sharpData[idx+1] = g;
+                            sharpData[idx+2] = g;
+                            sharpData[idx+3] = 255;
+                        }
+                    }
+                }
+                sharpCtx.putImageData(sharpImgData, 0, 0);
+                resolve(sharpCanvas.toDataURL('image/jpeg', 0.95));
+            };
+            img.src = dataUrl;
+        });
+    }
+    
+    // ==================== SCANNER GUIDATO ====================
+    async function initCamera() {
+        try {
+            if (mediaStream) mediaStream.getTracks().forEach(track => track.stop());
+            const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
+            mediaStream = stream;
+            video.srcObject = stream;
+            await video.play();
+            return true;
+        } catch (err) {
+            console.error(err);
+            alert("Impossibile accedere alla fotocamera.");
+            return false;
+        }
+    }
+    function stopCamera() {
+        if (mediaStream) {
+            mediaStream.getTracks().forEach(track => track.stop());
+            mediaStream = null;
+        }
+        video.srcObject = null;
+    }
     
     async function capturePhoto() {
         if (!video.videoWidth) return;
@@ -1101,62 +1169,79 @@
         canvas.height = video.videoHeight;
         const ctx = canvas.getContext('2d');
         ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-        currentPhotoDataUrl = canvas.toDataURL('image/jpeg', 0.9);
+        const rawDataUrl = canvas.toDataURL('image/jpeg', 0.9);
         currentRotation = 0;
-        isEnhanced = false;
+        // Ritaglia subito a A4, senza miglioramento
+        currentOriginalDataUrl = await cropToA4(rawDataUrl, currentRotation);
         currentEnhancedDataUrl = null;
-        await showPreviewForCurrentPhoto();
+        isCurrentlyEnhanced = false;
+        await showPreview(currentOriginalDataUrl);
     }
     
-    async function showPreviewForCurrentPhoto() {
-        let cropped = await cropToA4(currentPhotoDataUrl, currentRotation);
-        previewImage.src = cropped;
+    async function showPreview(dataUrl) {
+        previewImage.src = dataUrl;
         previewArea.style.display = 'block';
         document.querySelector('.video-container').style.display = 'none';
         document.getElementById('capturePhotoBtn').style.display = 'none';
-        // Memorizza la versione ritagliata (non ancora migliorata)
-        currentEnhancedDataUrl = cropped;
-        isEnhanced = false;
     }
     
     function hidePreview() {
         previewArea.style.display = 'none';
         document.querySelector('.video-container').style.display = 'block';
         document.getElementById('capturePhotoBtn').style.display = 'block';
-        currentPhotoDataUrl = null;
-        currentRotation = 0;
+        currentOriginalDataUrl = null;
         currentEnhancedDataUrl = null;
-        isEnhanced = false;
+        isCurrentlyEnhanced = false;
+        currentRotation = 0;
     }
     
     async function rotatePhoto() {
-        if (!currentPhotoDataUrl) return;
+        if (!currentOriginalDataUrl) return;
         currentRotation = (currentRotation + 90) % 360;
-        let cropped = await cropToA4(currentPhotoDataUrl, currentRotation);
-        previewImage.src = cropped;
-        currentEnhancedDataUrl = cropped;
-        isEnhanced = false;
+        const rotated = await cropToA4(currentOriginalDataUrl, currentRotation);
+        currentOriginalDataUrl = rotated;
+        if (isCurrentlyEnhanced && currentEnhancedDataUrl) {
+            // Se era migliorata, rigenera il miglioramento sulla nuova originale
+            currentEnhancedDataUrl = await enhanceDocumentImage(currentOriginalDataUrl);
+            await showPreview(currentEnhancedDataUrl);
+        } else {
+            await showPreview(currentOriginalDataUrl);
+        }
     }
     
     async function enhancePhoto() {
-        if (!currentEnhancedDataUrl) return;
-        const enhanced = await enhanceImage(currentEnhancedDataUrl);
-        previewImage.src = enhanced;
-        currentEnhancedDataUrl = enhanced;
-        isEnhanced = true;
+        if (!currentOriginalDataUrl) return;
+        if (isCurrentlyEnhanced) {
+            alert("L'immagine è già migliorata. Usa 'Ripristina' per tornare all'originale.");
+            return;
+        }
+        // Applica il miglioramento avanzato (binarizzazione + sharpening)
+        currentEnhancedDataUrl = await enhanceDocumentImage(currentOriginalDataUrl);
+        isCurrentlyEnhanced = true;
+        await showPreview(currentEnhancedDataUrl);
+    }
+    
+    async function resetToOriginal() {
+        if (!currentOriginalDataUrl) return;
+        isCurrentlyEnhanced = false;
+        currentEnhancedDataUrl = null;
+        await showPreview(currentOriginalDataUrl);
     }
     
     async function confirmPhoto() {
-        if (!currentEnhancedDataUrl) return;
-        capturedPhotos.push(currentEnhancedDataUrl);
-        // Aggiorna contatore e miniatura
+        const finalDataUrl = (isCurrentlyEnhanced && currentEnhancedDataUrl) ? currentEnhancedDataUrl : currentOriginalDataUrl;
+        if (!finalDataUrl) return;
+        capturedPhotos.push(finalDataUrl);
         photoCounterSpan.innerText = `Foto confermate: ${capturedPhotos.length}`;
         const thumb = document.createElement('img');
-        thumb.src = currentEnhancedDataUrl;
+        thumb.src = finalDataUrl;
         thumb.className = 'photo-thumb';
         thumb.style.height = '80px';
         photoThumbnails.appendChild(thumb);
         hidePreview();
+        currentOriginalDataUrl = null;
+        currentEnhancedDataUrl = null;
+        isCurrentlyEnhanced = false;
         showMessage("✅ Foto confermata. Puoi scattare la prossima.", false);
     }
     
@@ -1247,6 +1332,7 @@
         document.getElementById('cancelScanBtn').addEventListener('click', closeCameraModal);
         document.getElementById('rotatePhotoBtn').addEventListener('click', rotatePhoto);
         document.getElementById('enhancePhotoBtn').addEventListener('click', enhancePhoto);
+        document.getElementById('resetPhotoBtn').addEventListener('click', resetToOriginal);
         document.getElementById('confirmPhotoBtn').addEventListener('click', confirmPhoto);
         document.getElementById('retakePhotoBtn').addEventListener('click', retakePhoto);
     }
