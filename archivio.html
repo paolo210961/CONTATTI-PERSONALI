@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
     <title>Expat Archivio - Gestione PDF</title>
+    <!-- FontAwesome per icone (opzionale, se vuoi icone più belle) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         * {
             margin: 0;
@@ -28,58 +30,63 @@
             box-shadow: 0 8px 24px rgba(0,0,0,0.05);
         }
         button {
-            background: #0066cc;
             border: none;
             color: white;
-            padding: 10px 16px;
-            border-radius: 40px;
-            font-size: 0.9rem;
-            font-weight: bold;
-            cursor: pointer;
-            transition: 0.05s linear;
-            margin: 4px;
-            width: 100%;
-        }
-        button:active {
-            transform: scale(0.96);
-            background: #004999;
-        }
-        input {
-            width: 100%;
             padding: 12px 16px;
-            border-radius: 32px;
-            border: 1px solid #ced4da;
-            font-size: 0.9rem;
-            background: #fff;
-            margin: 8px 0;
-        }
-        .archivio-title {
-            background: #6c757d;
-            border-radius: 60px;
-            padding: 14px 12px;
-            font-size: 1.3rem;
-            font-weight: bold;
-            color: white;
-            text-align: center;
-            margin-bottom: 20px;
-        }
-        .info-i-btn {
-            background: #17a2b8;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
+            border-radius: 40px;
             font-size: 1rem;
             font-weight: bold;
             cursor: pointer;
-            margin: 8px auto;
-            display: block;
+            transition: 0.05s linear;
+            text-align: center;
         }
-        .dark-card {
-            background: #d2d6dc;
-            border-left: 6px solid #2c3e50;
-            border-radius: 24px;
-            padding: 16px;
-            margin: 16px 0;
+        button:active {
+            transform: scale(0.96);
+        }
+        .full-width-btn {
+            width: 100%;
+            background: #283593;
+            margin-bottom: 12px;
+        }
+        .row-buttons {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        .row-buttons button {
+            flex: 1;
+        }
+        .genius-btn {
+            background: #4caf50;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .info-circle-btn {
+            background: black;
+            color: white;
+            border-radius: 50%;
+            width: 48px;
+            height: 48px;
+            font-size: 1.5rem;
+            font-weight: bold;
+            font-family: 'Times New Roman', serif;
+            font-style: italic;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border: none;
+            flex-shrink: 0;
+        }
+        .info-circle-btn:active {
+            transform: scale(0.95);
+        }
+        .file-list {
+            margin-top: 20px;
+            max-height: 500px;
+            overflow-y: auto;
         }
         .doc-item {
             display: flex;
@@ -110,24 +117,9 @@
             margin-top: 6px;
             text-align: center;
         }
-        .info-message-small {
-            font-size: 0.7rem;
-            color: #555;
-            text-align: center;
-            margin-top: 8px;
-        }
-        .flex-buttons {
-            display: flex;
-            gap: 12px;
-            margin-top: 16px;
-            flex-wrap: wrap;
-        }
-        .flex-buttons button {
-            flex: 1;
-            margin: 0;
-        }
-        hr {
-            margin: 16px 0;
+        /* Nascondi elementi rimossi */
+        .hidden {
+            display: none;
         }
     </style>
 </head>
@@ -136,60 +128,112 @@
     <div class="page">
         <div class="archivio-title">📁 EXPAT ARCHIVIO</div>
         
-        <!-- Campo anno modificabile e persistente -->
-        <input type="text" id="yearInput" placeholder="Anno (opzionale)" maxlength="4" inputmode="numeric">
+        <!-- Pulsante Seleziona-Visualizza cartella archivio (full width) -->
+        <button id="selectRootBtn" class="full-width-btn">📁 Seleziona-Visualizza cartella archivio</button>
         
-        <div class="flex-buttons">
-            <button id="selectRootBtn" style="background:#283593;">📁 Seleziona-Visualizza cartella archivio</button>
-            <button id="openGeniusScanBtn" style="background:#4caf50;">📱 APRI GENIUS SCAN</button>
+        <!-- Riga con Genius Scan (logo) e pulsante info "i" -->
+        <div class="row-buttons">
+            <button id="openGeniusScanBtn" class="genius-btn">
+                <i class="fas fa-camera"></i> <!-- icona FontAwesome, alternativa emoji: 📸 -->
+                <span>GENIUS SCAN</span>
+            </button>
+            <button id="infoBtn" class="info-circle-btn">𝒊</button>
         </div>
         
-        <button id="openRootFolderBtn" style="background:#17a2b8;">📂 APRI CARTELLA ARCHIVIO</button>
-        <button id="infoBtn" class="info-i-btn">i</button>
-        
-        <div class="dark-card" style="max-height: 450px; overflow-y: auto;">
-            <div id="fileListArea" style="text-align:center; padding:20px; color:#777;">Seleziona una cartella per vedere i PDF</div>
-        </div>
-        
-        <div class="info-message-small">
-            ℹ️ I file PDF sono visualizzati dalla cartella che hai selezionato.<br>
-            Per aprire un PDF, clicca su 🔍.
+        <!-- Lista PDF (senza box colorato) -->
+        <div id="fileListArea" class="file-list">
+            <div style="text-align:center; padding:20px; color:#777;">Seleziona una cartella per vedere i PDF</div>
         </div>
     </div>
 </div>
 
 <script>
-    // ==================== EXPAT ARCHIVIO (VERSIONE LEGGERA) ====================
-    const VERSION = "expat_archivio_v1.0";
+    // ==================== EXPAT ARCHIVIO VERSIONE LEGGERA ====================
+    const VERSION = "expat_archivio_v2.0";
     
     // Rilevamento dispositivo
     function isAndroid() { return /Android/.test(navigator.userAgent); }
     function isIPhone() { return /iPhone|iPad|iPod/.test(navigator.userAgent); }
     
     // DOM elementi
-    const yearInput = document.getElementById('yearInput');
     const selectRootBtn = document.getElementById('selectRootBtn');
-    const openRootFolderBtn = document.getElementById('openRootFolderBtn');
     const openGeniusScanBtn = document.getElementById('openGeniusScanBtn');
     const infoBtn = document.getElementById('infoBtn');
     const fileListArea = document.getElementById('fileListArea');
     
     // Variabili
     let rootHandle = null;
-    let currentFiles = [];   // array di { name, handle }
+    let currentFiles = [];
     
-    // Persistenza anno
-    function loadYear() {
-        const saved = localStorage.getItem('expat_archivio_year');
-        if (saved !== null) {
-            yearInput.value = saved;
+    // Wake Lock (schermo acceso)
+    let wakeLock = null;
+    async function requestWakeLock() {
+        if ('wakeLock' in navigator && !wakeLock) {
+            try {
+                wakeLock = await navigator.wakeLock.request('screen');
+                console.log('Wake Lock attivo');
+            } catch(e) { console.warn('Wake Lock fallito:', e); }
         }
     }
-    function saveYear() {
-        localStorage.setItem('expat_archivio_year', yearInput.value.trim());
+    function releaseWakeLock() {
+        if (wakeLock) {
+            wakeLock.release();
+            wakeLock = null;
+        }
     }
-    yearInput.addEventListener('input', saveYear);
-    yearInput.addEventListener('blur', saveYear);
+    // Richiedi wake lock all'avvio
+    requestWakeLock();
+    // Rilascia se la pagina viene nascosta (non necessario, ma buona prassi)
+    document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible') requestWakeLock();
+        else releaseWakeLock();
+    });
+    
+    // Gestione info testuale (modificabile da admin)
+    let infoTexts = {
+        expatArchivio: "📁 EXPAT ARCHIVIO\n\n• Seleziona una cartella sul tuo telefono (solo Android).\n• Verranno elencati tutti i file PDF presenti.\n• Clicca su 🔍 per aprire un PDF.\n• Genius Scan può essere usato per scansionare documenti, poi li esporti manualmente nella cartella selezionata.\n\n" + (isIPhone() ? "⚠️ Su iPhone la selezione cartella non è supportata." : "✅ Android: usa Chrome o Edge per la selezione cartella.")
+    };
+    // Carica testo da localStorage se presente
+    const savedInfoTexts = localStorage.getItem('expatArchivioInfoText');
+    if (savedInfoTexts) {
+        try {
+            const parsed = JSON.parse(savedInfoTexts);
+            if (parsed.expatArchivio) infoTexts.expatArchivio = parsed.expatArchivio;
+        } catch(e) {}
+    }
+    function saveInfoText() {
+        localStorage.setItem('expatArchivioInfoText', JSON.stringify(infoTexts));
+    }
+    function showInfo() {
+        alert(infoTexts.expatArchivio);
+    }
+    // Per admin: possibilità di modificare il testo (tenendo premuto il pulsante info? opzionale)
+    // Aggiungiamo un long-press per modificare (solo se admin autenticato? ma per semplicità usiamo un alert)
+    let pressTimer = null;
+    infoBtn.addEventListener('mousedown', () => {
+        pressTimer = setTimeout(() => {
+            let newText = prompt("Modifica il testo informativo (per amministratori):", infoTexts.expatArchivio);
+            if (newText !== null && newText.trim() !== "") {
+                infoTexts.expatArchivio = newText.trim();
+                saveInfoText();
+                alert("Testo aggiornato!");
+            }
+        }, 3000);
+    });
+    infoBtn.addEventListener('mouseup', () => clearTimeout(pressTimer));
+    infoBtn.addEventListener('mouseleave', () => clearTimeout(pressTimer));
+    infoBtn.addEventListener('touchstart', () => {
+        pressTimer = setTimeout(() => {
+            let newText = prompt("Modifica il testo informativo (per amministratori):", infoTexts.expatArchivio);
+            if (newText !== null && newText.trim() !== "") {
+                infoTexts.expatArchivio = newText.trim();
+                saveInfoText();
+                alert("Testo aggiornato!");
+            }
+        }, 3000);
+    });
+    infoBtn.addEventListener('touchend', () => clearTimeout(pressTimer));
+    infoBtn.addEventListener('touchcancel', () => clearTimeout(pressTimer));
     
     // Gestione cartella (IndexedDB per l'handle)
     function openHandleDB() {
@@ -243,7 +287,7 @@
     
     async function listPdfFiles() {
         if (!rootHandle) {
-            fileListArea.innerHTML = "<div style='padding:20px;'>Nessuna cartella selezionata. Premi 'Seleziona-Visualizza cartella archivio'.</div>";
+            fileListArea.innerHTML = "<div style='text-align:center; padding:20px; color:#777;'>Nessuna cartella selezionata. Premi 'Seleziona-Visualizza cartella archivio'.</div>";
             return;
         }
         const files = [];
@@ -255,12 +299,12 @@
             }
         } catch(e) {
             console.warn(e);
-            fileListArea.innerHTML = "<div style='padding:20px;'>Errore nella lettura della cartella.</div>";
+            fileListArea.innerHTML = "<div style='text-align:center; padding:20px; color:#777;'>Errore nella lettura della cartella.</div>";
             return;
         }
         currentFiles = files;
         if (files.length === 0) {
-            fileListArea.innerHTML = "<div style='padding:20px;'>📭 Nessun file PDF trovato in questa cartella.</div>";
+            fileListArea.innerHTML = "<div style='text-align:center; padding:20px; color:#777;'>📭 Nessun file PDF trovato in questa cartella.</div>";
             return;
         }
         let html = "";
@@ -273,7 +317,6 @@
             `;
         }
         fileListArea.innerHTML = html;
-        // Aggiungi event listener per i pulsanti di apertura
         document.querySelectorAll('.doc-open').forEach(btn => {
             btn.addEventListener('click', async (e) => {
                 const fileName = btn.getAttribute('data-name');
@@ -290,20 +333,7 @@
         });
     }
     
-    async function openRootFolderMessage() {
-        if (!rootHandle) {
-            const stored = await getRootHandle();
-            if (stored) {
-                rootHandle = stored;
-            } else {
-                alert("Nessuna cartella selezionata. Usa prima 'Seleziona-Visualizza cartella archivio'.");
-                return;
-            }
-        }
-        alert(`📂 La cartella selezionata è: "${rootHandle.name}"\n\nPuoi aprirla manualmente con un file manager.`);
-    }
-    
-    // Genius Scan
+    // Genius Scan (con logo e icona, stesso stile)
     function openGeniusScan() {
         const isAndroid = /Android/.test(navigator.userAgent);
         const isIOS = /iPhone|iPad|iPod/.test(navigator.userAgent);
@@ -340,11 +370,6 @@
         }
     }
     
-    // Info
-    function showInfo() {
-        alert("📁 EXPAT ARCHIVIO\n\n• Seleziona una cartella sul tuo telefono (solo Android).\n• Verranno elencati tutti i file PDF presenti.\n• Clicca su 🔍 per aprire un PDF.\n• Genius Scan può essere usato per scansionare documenti, poi li esporti manualmente nella cartella selezionata.\n• Il campo ANNO è solo un promemoria (viene salvato automaticamente).\n\n" + (isIPhone() ? "⚠️ Su iPhone la selezione cartella non è supportata." : "✅ Android: usa Chrome o Edge per la selezione cartella."));
-    }
-    
     function showMessage(msg, isError = false) {
         const div = document.createElement('div');
         div.className = 'status-msg';
@@ -364,9 +389,7 @@
         });
     }
     
-    // Inizializzazione
     async function init() {
-        loadYear();
         // Recupera handle salvato
         const savedHandle = await getRootHandle();
         if (savedHandle) {
@@ -374,13 +397,12 @@
             showMessage(`📁 Cartella "${rootHandle.name}" già selezionata.`);
             await listPdfFiles();
         } else {
-            fileListArea.innerHTML = "<div style='padding:20px;'>Nessuna cartella selezionata. Premi 'Seleziona-Visualizza cartella archivio'.</div>";
+            fileListArea.innerHTML = "<div style='text-align:center; padding:20px; color:#777;'>Nessuna cartella selezionata. Premi 'Seleziona-Visualizza cartella archivio'.</div>";
         }
         
         selectRootBtn.addEventListener('click', selectAndShowFolder);
-        openRootFolderBtn.addEventListener('click', openRootFolderMessage);
         openGeniusScanBtn.addEventListener('click', openGeniusScan);
-        infoBtn.addEventListener('click', showInfo);
+        infoBtn.addEventListener('click', showInfo); // click breve mostra info
     }
     init();
 </script>
