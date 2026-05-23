@@ -228,7 +228,7 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
 <script>
-    // ==================== v0238 - APP COMPLETA ====================
+    // ==================== v0238 - APP COMPLETA (MODIFICATA: LEGGI FRANCESE CON PAUSA 1s TRA NUMERI) ====================
     const CURRENT_VERSION = "0238";
     let currentService = "ambulanza";
     let currentLat = null, currentLng = null;
@@ -536,6 +536,29 @@
             if (words[i].match(/[\d\.]+/)) await new Promise(r => setTimeout(r, 500));
         }
     }
+    
+    // ========== NUOVA FUNZIONE PER LEGGERE IL FRANCESE CON PAUSA DI 1 SECONDO TRA I NUMERI ==========
+    async function speakFrenchWithNumericPause(text, langCode = 'fr-FR', wordPauseMs = 200, numericPauseMs = 1000) {
+        if (!window.speechSynthesis) return;
+        speechSynthesis.cancel();
+        const words = text.split(/\s+/);
+        for (let i = 0; i < words.length; i++) {
+            const word = words[i];
+            const utterance = new SpeechSynthesisUtterance(word);
+            utterance.lang = langCode;
+            utterance.rate = 1.0;
+            speechSynthesis.speak(utterance);
+            // Controlla se la parola contiene numeri (con punti o virgole) 
+            // e se non è una parola puramente alfabetica (esclude articoli, preposizioni)
+            const isNumeric = /^[\d\.,]+$/.test(word.replace(/[.,]/g, '').trim());
+            if (isNumeric) {
+                await new Promise(r => setTimeout(r, numericPauseMs));
+            } else {
+                await new Promise(r => setTimeout(r, wordPauseMs));
+            }
+        }
+    }
+    
     async function speakNoteFromModal(lang) {
         const title = editNoteTitle.value.trim();
         const description = editNoteDesc.value.trim();
@@ -550,7 +573,7 @@
                 else { fullText = noteText + ". " + coordText; }
             } else { fullText = noteText + (lang === 'it' ? ". Coordinate non disponibili." : ". Coordonnées non disponibles."); }
         }
-        if (lang === 'fr') await speakWordsWithPause(fullText, 'fr-FR', 1.0, 200);
+        if (lang === 'fr') await speakFrenchWithNumericPause(fullText, 'fr-FR', 200, 1000);
         else await speakWordsWithPause(fullText, 'it-IT', 1.0, 200);
         playBeep(); keepScreenOn();
     }
@@ -620,7 +643,7 @@
                 else { fullText = note + ". " + coordText; }
             } else { fullText = note + (lang === 'it' ? ". Coordinate non disponibili." : ". Coordonnées non disponibles."); }
         }
-        if (lang === 'fr') { gpsStatus.innerHTML = "🔊 Lettura FR..."; await speakWordsWithPause(fullText, 'fr-FR', 1.0, 200); }
+        if (lang === 'fr') { gpsStatus.innerHTML = "🔊 Lettura FR..."; await speakFrenchWithNumericPause(fullText, 'fr-FR', 200, 1000); }
         else { gpsStatus.innerHTML = "🔊 Lettura IT..."; await speakWordsWithPause(fullText, 'it-IT', 1.0, 200); }
         playBeep();
         gpsStatus.innerHTML = "✅ Messaggio completato. Avvio ascolto operatore (30 secondi)...";
@@ -699,6 +722,8 @@
         setTimeout(() => { if (recognitionSpeak && recognitionSpeak.stop) recognitionSpeak.stop(); }, 30000);
         keepScreenOn();
     }
+    
+    // ========== FUNZIONE MODIFICATA: LEGGI FRANCESE NOTA E COORDINATE CON PAUSA 1 SECONDO TRA I NUMERI ==========
     async function readFrenchNoteAndCoords() {
         if (!window.speechSynthesis) { alert("Sintesi non supportata"); return; }
         speechSynthesis.cancel();
@@ -708,14 +733,23 @@
         const includeCoords = getSelectedNoteIncludeCoords();
         if (includeCoords && currentLat !== null && currentLng !== null) {
             const coordText = getFormattedCoordinatesForSpeech('fr');
-            if (coordText) { const translatedCoord = await translateToFrench(coordText); fullText = note + ". " + translatedCoord; }
-            else { fullText = note + ". Coordonnées non disponibles."; }
-        } else if (includeCoords && (currentLat === null || currentLng === null)) { fullText = note + ". Coordonnées non disponibles."; }
-        await speakWordsWithPause(fullText, 'fr-FR', 1.0, 200);
+            if (coordText) { 
+                const translatedCoord = await translateToFrench(coordText); 
+                fullText = note + ". " + translatedCoord; 
+            } else { 
+                fullText = note + ". Coordonnées non disponibles."; 
+            }
+        } else if (includeCoords && (currentLat === null || currentLng === null)) { 
+            fullText = note + ". Coordonnées non disponibles."; 
+        }
+        // Usa la nuova funzione che mette pausa di 1 secondo tra i numeri
+        await speakFrenchWithNumericPause(fullText, 'fr-FR', 200, 1000);
         playBeep();
         keepScreenOn();
     }
     speakReadFrBtn.addEventListener('click', readFrenchNoteAndCoords);
+    // ============================================================================
+    
     function saveSpeakTranslation() { if (currentService) localStorage.setItem(`speakTranslation_${currentService}_${CURRENT_VERSION}`, JSON.stringify({ italian: lastItalianText, french: lastFrenchTranslation })); }
     function loadSpeakTranslation() { if (currentService) { const saved = localStorage.getItem(`speakTranslation_${currentService}_${CURRENT_VERSION}`); if (saved) { try { const data = JSON.parse(saved); lastItalianText = data.italian || ""; lastFrenchTranslation = data.french || ""; if (lastItalianText && lastFrenchTranslation) speakResultField.innerHTML = `<strong>Italiano:</strong> ${lastItalianText}<br><strong>Francese:</strong> ${lastFrenchTranslation}`; else speakResultField.innerHTML = "Traduzione Italiana e Francese"; } catch(e) { console.warn(e); } } else speakResultField.innerHTML = "Traduzione Italiana e Francese"; } }
     function saveOperatorTranslation(text) { if (currentService) localStorage.setItem(`operatorResponse_${currentService}_${CURRENT_VERSION}`, text); }
@@ -804,7 +838,6 @@
                         renderReteCategories(reteLevelContainer, reteData);
                         loadSavedImage();
                     });
-                    // Usa hash per navigazione
                     window.location.hash = 'image';
                     keepScreenOn();
                 } else {
@@ -1575,10 +1608,9 @@
         keepScreenOn();
     }
     
-    // ==================== GESTIONE NAVIGAZIONE CON HASH (SEMPLICE E ROBUSTA) ====================
-    // Questa è la nuova funzione che sostituisce il vecchio pushPage + popstate
+    // ==================== GESTIONE NAVIGAZIONE CON HASH ====================
     function onHashChange() {
-        const hash = window.location.hash.substring(1); // toglie il #
+        const hash = window.location.hash.substring(1);
         if (hash === 'emergency') {
             homePage.classList.add('hidden');
             emergencyPage.classList.remove('hidden');
@@ -1592,7 +1624,6 @@
             updateAdminReteButtonsVisibility();
             performSync(true);
         } else {
-            // default: home
             homePage.classList.remove('hidden');
             emergencyPage.classList.add('hidden');
             imagePage.classList.add('hidden');
@@ -1600,22 +1631,11 @@
         }
         keepScreenOn();
     }
-    
-    // Sostituisci il vecchio popstate con hashchange
     window.addEventListener('hashchange', onHashChange);
-    // Se non c'è hash o è vuoto, vai a home
     if (!window.location.hash || window.location.hash === '#') {
         window.location.hash = 'home';
     } else {
         onHashChange();
-    }
-    
-    // Modifica i pulsanti "Back to Home" (se esistono)
-    const backHomeBtn = document.getElementById('backHomeBtn');
-    if (backHomeBtn) {
-        backHomeBtn.onclick = () => {
-            window.location.hash = 'home';
-        };
     }
     
     // ==================== ESPORTAZIONE/IMPORTAZIONE RETE PER ADMIN ====================
@@ -1636,7 +1656,6 @@
     
     // ==================== INIZIALIZZAZIONE ====================
     function init() {
-        // Carica email amministratore salvata
         const adminEmailInput = document.getElementById('adminEmailInput');
         const saveAdminEmailBtn = document.getElementById('saveAdminEmailBtn');
         if (adminEmailInput) adminEmailInput.value = adminEmail;
