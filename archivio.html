@@ -121,16 +121,20 @@
             border-radius: 40px;
             padding: 8px 12px;
             margin: 6px 0;
+            flex-wrap: wrap;
+            gap: 8px;
         }
         .doc-name {
             font-family: monospace;
             font-size: 0.75rem;
             word-break: break-all;
             flex: 1;
+            min-width: 120px;
         }
         .doc-actions {
             display: flex;
             gap: 6px;
+            flex-shrink: 0;
         }
         .doc-view, .doc-download {
             font-size: 1.1rem;
@@ -143,7 +147,7 @@
         .doc-view { color: #0066cc; }
         .doc-download { color: #28a745; }
         
-        /* Convertitore compatto */
+        /* Convertitore responsivo - CORRETTO */
         .converter-section {
             margin-top: 16px;
         }
@@ -153,6 +157,7 @@
             align-items: baseline;
             flex-wrap: wrap;
             margin-bottom: 12px;
+            gap: 8px;
         }
         .converter-title {
             font-size: 1rem;
@@ -169,30 +174,34 @@
             justify-content: space-between;
             background: #f8f9fa;
             border-radius: 60px;
-            padding: 8px 16px;
+            padding: 10px 12px;
             margin-bottom: 10px;
+            flex-wrap: wrap;
+            gap: 8px;
         }
         .currency-from {
             display: flex;
             align-items: center;
             gap: 8px;
-            flex: 1;
+            flex: 2;
+            min-width: 150px;
         }
         .currency-from .eur-symbol {
             font-weight: bold;
             font-size: 0.9rem;
-            min-width: 45px;
+            min-width: 50px;
             color: #004C97;
         }
         .currency-from .tnd-symbol {
             font-weight: bold;
             font-size: 0.9rem;
-            min-width: 45px;
+            min-width: 50px;
             color: #E70000;
         }
         .currency-from input {
             flex: 1;
-            padding: 8px 12px;
+            min-width: 80px;
+            padding: 8px 8px;
             border: 1px solid #ced4da;
             border-radius: 40px;
             font-size: 0.9rem;
@@ -200,8 +209,9 @@
             background: white;
         }
         .arrow {
-            font-size: 1.2rem;
-            margin: 0 8px;
+            font-size: 1rem;
+            margin: 0 4px;
+            flex-shrink: 0;
             color: #6c757d;
         }
         .result-value-eur {
@@ -214,6 +224,7 @@
             text-align: center;
             border: 1px solid #ced4da;
             color: #004C97;
+            flex-shrink: 0;
         }
         .result-value-tnd {
             font-weight: bold;
@@ -225,6 +236,34 @@
             text-align: center;
             border: 1px solid #ced4da;
             color: #E70000;
+            flex-shrink: 0;
+        }
+        
+        /* Responsive per schermi piccoli */
+        @media (max-width: 480px) {
+            .converter-row {
+                flex-direction: column;
+                align-items: stretch;
+                border-radius: 24px;
+            }
+            .currency-from {
+                width: 100%;
+            }
+            .arrow {
+                text-align: center;
+                margin: 4px 0;
+            }
+            .result-value-eur, .result-value-tnd {
+                width: 100%;
+                text-align: center;
+            }
+            .doc-item {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .doc-actions {
+                justify-content: flex-end;
+            }
         }
         
         /* Pulsanti affiancati */
@@ -294,7 +333,7 @@
             </div>
         </div>
         
-        <!-- CONVERTITORE COMPATTO (senza tasso di cambio) -->
+        <!-- CONVERTITORE COMPATTO (responsivo) -->
         <div class="converter-section">
             <div class="converter-header">
                 <span class="converter-title">💱 Convertitore Valuta</span>
@@ -336,7 +375,7 @@
 
 <script>
     // ==================== EXPAT ARCHIVIO ====================
-    const VERSION = "expat_archivio_v7.0";
+    const VERSION = "expat_archivio_v7.1";
     
     function isAndroid() { return /Android/.test(navigator.userAgent); }
     function isIPhone() { return /iPhone|iPad|iPod/.test(navigator.userAgent); }
