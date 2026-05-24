@@ -6,16 +6,59 @@
     <title>Expat Archivio + Convertitore (Tasso manuale)</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
-        *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-        body{font-family:system-ui,'Segoe UI',Roboto,Helvetica,sans-serif;background:#e9ecef;padding:16px;min-height:100vh}
-        .container{max-width:600px;margin:0 auto}
-        .page{background:white;border-radius:32px;padding:20px 16px 24px;box-shadow:0 8px 24px rgba(0,0,0,0.05)}
-        .archivio-title{background:linear-gradient(135deg,#1e2a3a,#2c3e66);border-radius:60px;padding:12px;font-size:1.3rem;font-weight:bold;color:white;text-align:center;margin-bottom:16px;display:flex;align-items:center;justify-content:center;gap:10px;user-select:none;-webkit-user-select:none}
-        
-        /* Stile base pulsanti */
-        button{border:none;color:white;padding:12px 16px;border-radius:60px;font-size:0.95rem;font-weight:bold;cursor:pointer;transition:0.05s linear;width:100%}
-        
-        /* Solo alcuni pulsanti hanno l'effetto di ridimensionamento */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+        body {
+            font-family: system-ui, 'Segoe UI', Roboto, Helvetica, sans-serif;
+            background: #e9ecef;
+            padding: 16px;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            overflow-x: hidden;
+        }
+        .page {
+            background: white;
+            border-radius: 32px;
+            padding: 20px 16px 24px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.05);
+            overflow-x: hidden;
+        }
+        .archivio-title {
+            background: linear-gradient(135deg,#1e2a3a,#2c3e66);
+            border-radius: 60px;
+            padding: 12px;
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: white;
+            text-align: center;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            user-select: none;
+        }
+        /* Stile base pulsanti (senza trasformazioni automatiche) */
+        button {
+            border: none;
+            color: white;
+            padding: 12px 16px;
+            border-radius: 60px;
+            font-size: 0.95rem;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+            transition: none; /* niente transizioni */
+        }
+        /* Effetto solo per alcuni pulsanti (esclusi i due che ci interessano) */
         .genius-btn:active,
         .select-folder-btn:active,
         .invite-btn:active,
@@ -24,10 +67,10 @@
         .info-circle-btn:active {
             transform: scale(0.97);
         }
-        
-        /* I pulsanti CALCOLATRICE e TASSO BCT non hanno alcun effetto, neanche transizione */
+        /* Pulsanti CALCOLATRICE e TASSO BCT: nessuna trasformazione, nessuna transizione */
         .calc-btn, .bct-btn {
             transition: none;
+            transform: none !important;
         }
         .calc-btn:active, .bct-btn:active,
         .calc-btn:focus, .bct-btn:focus {
@@ -36,72 +79,75 @@
             transition: none;
         }
         
-        .genius-btn{background:#FF6600;display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:12px}
-        .select-folder-btn{background:#283593;margin-bottom:16px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:10px 16px}
-        .dark-card{background:#d2d6dc;border-left:6px solid #2c3e50;border-radius:24px;padding:12px;margin:16px 0}
-        .message-box{background:white;border-radius:20px;padding:20px 16px;text-align:center;border:1px solid #ced4da}
-        .file-list{max-height:400px;overflow-y:auto}
-        .doc-item{display:flex;align-items:center;justify-content:space-between;background:white;border:1px solid #ced4da;border-radius:40px;padding:8px 12px;margin:6px 0;flex-wrap:wrap;gap:8px}
-        .doc-name{font-family:monospace;font-size:0.75rem;word-break:break-all;flex:1;min-width:120px}
-        .doc-actions{display:flex;gap:6px;flex-shrink:0}
-        .doc-view,.doc-download{font-size:1.1rem;cursor:pointer;background:none;border:none;padding:4px 8px;width:auto}
-        .doc-view{color:#0066cc}
-        .doc-download{color:#28a745}
-        .converter-section{margin-top:16px}
-        .converter-row{display:flex;align-items:center;justify-content:space-between;background:#f8f9fa;border-radius:60px;padding:6px 10px;margin-bottom:8px;gap:8px;flex-wrap:nowrap;overflow-x:auto}
-        .currency-from{display:flex;align-items:center;gap:6px;flex-shrink:0}
-        .currency-from .eur-symbol{font-weight:bold;font-size:0.85rem;min-width:45px;color:#004C97}
-        .currency-from .tnd-symbol{font-weight:bold;font-size:0.85rem;min-width:45px;color:#E70000}
-        .currency-from input.eur-field{width:120px;padding:8px 6px;border:1px solid #ced4da;border-radius:40px;font-size:0.85rem;text-align:center;background:#FFEB3B;font-weight:bold}
-        .currency-from input.tnd-field{width:120px;padding:8px 6px;border:1px solid #ced4da;border-radius:40px;font-size:0.85rem;text-align:center;background:white;font-weight:normal}
-        .arrow{font-size:0.9rem;flex-shrink:0;color:#6c757d}
-        .result-value-eur{font-weight:bold;font-size:0.85rem;background:white;padding:6px 10px;border-radius:40px;min-width:105px;text-align:center;border:1px solid #ced4da;color:#004C97;flex-shrink:0}
-        .result-value-tnd{font-weight:bold;font-size:0.85rem;background:white;padding:6px 10px;border-radius:40px;min-width:105px;text-align:center;border:1px solid #ced4da;color:#E70000;flex-shrink:0}
-        .rate-row{display:flex;align-items:center;justify-content:space-between;background:#f8f9fa;border-radius:60px;padding:6px 10px;margin-bottom:8px;gap:8px;flex-wrap:wrap}
-        .rate-label{font-weight:bold;font-size:0.85rem;color:#1e2a3a;flex-shrink:0;white-space:nowrap}
-        .rate-input{width:130px;padding:8px 6px;border:1px solid #ced4da;border-radius:40px;font-size:0.95rem;font-weight:bold;text-align:center;background:#FFEB3B;flex-shrink:0}
+        .genius-btn { background: #FF6600; display: flex; align-items: center; justify-content: center; gap: 12px; margin-bottom: 12px; }
+        .select-folder-btn { background: #283593; margin-bottom: 16px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; padding: 10px 16px; }
+        .dark-card { background: #d2d6dc; border-left: 6px solid #2c3e50; border-radius: 24px; padding: 12px; margin: 16px 0; }
+        .message-box { background: white; border-radius: 20px; padding: 20px 16px; text-align: center; border: 1px solid #ced4da; }
+        .file-list { max-height: 400px; overflow-y: auto; }
+        .doc-item { display: flex; align-items: center; justify-content: space-between; background: white; border: 1px solid #ced4da; border-radius: 40px; padding: 8px 12px; margin: 6px 0; flex-wrap: wrap; gap: 8px; }
+        .doc-name { font-family: monospace; font-size: 0.75rem; word-break: break-all; flex: 1; min-width: 120px; }
+        .doc-actions { display: flex; gap: 6px; flex-shrink: 0; }
+        .doc-view, .doc-download { font-size: 1.1rem; cursor: pointer; background: none; border: none; padding: 4px 8px; width: auto; }
+        .doc-view { color: #0066cc; }
+        .doc-download { color: #28a745; }
+        .converter-section { margin-top: 16px; }
+        .converter-row { display: flex; align-items: center; justify-content: space-between; background: #f8f9fa; border-radius: 60px; padding: 6px 10px; margin-bottom: 8px; gap: 8px; flex-wrap: nowrap; overflow-x: auto; }
+        .currency-from { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+        .currency-from .eur-symbol { font-weight: bold; font-size: 0.85rem; min-width: 45px; color: #004C97; }
+        .currency-from .tnd-symbol { font-weight: bold; font-size: 0.85rem; min-width: 45px; color: #E70000; }
+        .currency-from input.eur-field { width: 120px; padding: 8px 6px; border: 1px solid #ced4da; border-radius: 40px; font-size: 0.85rem; text-align: center; background: #FFEB3B; font-weight: bold; }
+        .currency-from input.tnd-field { width: 120px; padding: 8px 6px; border: 1px solid #ced4da; border-radius: 40px; font-size: 0.85rem; text-align: center; background: white; font-weight: normal; }
+        .arrow { font-size: 0.9rem; flex-shrink: 0; color: #6c757d; }
+        .result-value-eur { font-weight: bold; font-size: 0.85rem; background: white; padding: 6px 10px; border-radius: 40px; min-width: 105px; text-align: center; border: 1px solid #ced4da; color: #004C97; flex-shrink: 0; }
+        .result-value-tnd { font-weight: bold; font-size: 0.85rem; background: white; padding: 6px 10px; border-radius: 40px; min-width: 105px; text-align: center; border: 1px solid #ced4da; color: #E70000; flex-shrink: 0; }
+        .rate-row { display: flex; align-items: center; justify-content: space-between; background: #f8f9fa; border-radius: 60px; padding: 6px 10px; margin-bottom: 8px; gap: 8px; flex-wrap: wrap; }
+        .rate-label { font-weight: bold; font-size: 0.85rem; color: #1e2a3a; flex-shrink: 0; white-space: nowrap; }
+        .rate-input { width: 130px; padding: 8px 6px; border: 1px solid #ced4da; border-radius: 40px; font-size: 0.95rem; font-weight: bold; text-align: center; background: #FFEB3B; flex-shrink: 0; }
         
-        .double-buttons{display:flex;gap:12px;margin:12px 0 8px;align-items:center}
-        .calc-btn, .bct-btn{flex:1;display:flex;align-items:center;justify-content:center;gap:8px;white-space:nowrap}
-        .calc-btn{background:#283593}
-        .bct-btn{background:#E70000 !important}
+        .double-buttons { display: flex; gap: 12px; margin: 12px 0 8px; align-items: center; }
+        .calc-btn, .bct-btn { flex: 1; display: flex; align-items: center; justify-content: center; gap: 8px; white-space: nowrap; }
+        .calc-btn { background: #283593; }
+        .bct-btn { background: #E70000 !important; }
         
-        .info-circle-btn{
-            background:black;
-            color:white;
-            border-radius:50%;
-            width:40px;
-            height:40px;
-            font-size:1.5rem;
-            font-weight:normal;
-            font-family:'Times New Roman',serif;
-            font-style:italic;
-            display:inline-flex;
-            align-items:center;
-            justify-content:center;
-            cursor:pointer;
-            border:none;
-            transition:0.05s linear;
-            flex-shrink:0;
-            padding:0;
+        .info-circle-btn {
+            background: black;
+            color: white;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            font-size: 1.5rem;
+            font-weight: normal;
+            font-family: 'Times New Roman', serif;
+            font-style: italic;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border: none;
+            flex-shrink: 0;
+            padding: 0;
+            transition: none;
+        }
+        .info-circle-btn:active {
+            transform: scale(0.97);
         }
         
-        .invite-btn{background:#4caf50;margin-top:12px;padding:14px;font-size:1rem;display:flex;align-items:center;justify-content:center;gap:10px}
-        .circolare-btn{background:#8e44ad;margin-top:8px;padding:12px;font-size:0.9rem;display:flex;align-items:center;justify-content:center;gap:8px}
-        .attach-pdf-btn{background:#8e44ad;margin-top:8px;padding:10px;font-size:0.9rem;display:flex;align-items:center;justify-content:center;gap:8px}
-        .adaptive-modal{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.7);display:flex;justify-content:center;align-items:center;z-index:2000}
-        .adaptive-modal-content{background:white;border-radius:32px;padding:20px;max-width:90%;max-height:80%;width:auto;display:flex;flex-direction:column;box-shadow:0 10px 30px rgba(0,0,0,0.3);overflow-y:auto}
-        .preview-modal-content{max-width:500px}
-        .preview-message-text{background:#f8f9fa;border-radius:16px;padding:16px;margin:16px 0;font-size:0.9rem;white-space:pre-wrap;word-break:break-word;border:1px solid #ced4da;max-height:300px;overflow-y:auto}
-        .preview-message-text[contenteditable="true"]{background:white;border:2px solid #283593}
-        .edit-note{font-size:0.7rem;color:#6c757d;text-align:center;margin-top:8px;cursor:pointer;text-decoration:underline}
-        .modal-buttons{display:flex;gap:10px;justify-content:flex-end;margin-top:20px}
-        .save-btn{background:#283593;color:white;border:none;padding:10px 20px;border-radius:40px;font-weight:bold}
-        .cancel-btn{background:#8e44ad;color:white;border:none;padding:10px 20px;border-radius:40px;font-weight:bold}
-        .error-message{background:#f8d7da;color:#721c24;padding:8px;border-radius:16px;text-align:center;margin-bottom:10px;font-size:0.7rem;display:none}
-        .loading-small{text-align:center;color:#6c757d;padding:8px;font-size:0.7rem;display:none}
-        iframe{width:100%;height:80%;border:none;min-height:500px}
-        .info-rate-line{display:none}
+        .invite-btn { background: #4caf50; margin-top: 12px; padding: 14px; font-size: 1rem; display: flex; align-items: center; justify-content: center; gap: 10px; }
+        .circolare-btn { background: #8e44ad; margin-top: 8px; padding: 12px; font-size: 0.9rem; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .attach-pdf-btn { background: #8e44ad; margin-top: 8px; padding: 10px; font-size: 0.9rem; display: flex; align-items: center; justify-content: center; gap: 8px; display: none; }
+        
+        .adaptive-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); display: flex; justify-content: center; align-items: center; z-index: 2000; }
+        .adaptive-modal-content { background: white; border-radius: 32px; padding: 20px; max-width: 90%; max-height: 80%; width: auto; display: flex; flex-direction: column; box-shadow: 0 10px 30px rgba(0,0,0,0.3); overflow-y: auto; }
+        .preview-modal-content { max-width: 500px; }
+        .preview-message-text { background: #f8f9fa; border-radius: 16px; padding: 16px; margin: 16px 0; font-size: 0.9rem; white-space: pre-wrap; word-break: break-word; border: 1px solid #ced4da; max-height: 300px; overflow-y: auto; }
+        .preview-message-text[contenteditable="true"] { background: white; border: 2px solid #283593; }
+        .edit-note { font-size: 0.7rem; color: #6c757d; text-align: center; margin-top: 8px; cursor: pointer; text-decoration: underline; }
+        .modal-buttons { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; }
+        .save-btn { background: #283593; color: white; border: none; padding: 10px 20px; border-radius: 40px; font-weight: bold; }
+        .cancel-btn { background: #8e44ad; color: white; border: none; padding: 10px 20px; border-radius: 40px; font-weight: bold; }
+        .error-message, .loading-small { display: none; }
+        iframe { width: 100%; height: 80%; border: none; min-height: 500px; }
+        .info-rate-line { display: none; }
     </style>
 </head>
 <body>
@@ -134,7 +180,7 @@
                 <button id="infoBtn" class="info-circle-btn">𝒊</button>
                 <button id="bctLinkBtn" class="bct-btn">🔗 TASSO BCT</button>
             </div>
-            <button id="attachPdfBtn" class="attach-pdf-btn" style="display:none;"><i class="fas fa-paperclip"></i> Allega PDF all'invito (solo admin)</button>
+            <button id="attachPdfBtn" class="attach-pdf-btn"><i class="fas fa-paperclip"></i> Allega PDF all'invito (solo admin)</button>
             <button id="inviteFriendBtn" class="invite-btn"><i class="fab fa-whatsapp"></i> INVITA UN AMICO ALLA PROVA GRATUITA DEI 90gg</button>
             <button id="circolareBtn" class="circolare-btn"><i class="fas fa-file-pdf"></i> AdE - Circolare 20e - AIRE</button>
         </div>
@@ -142,7 +188,7 @@
 </div>
 <div id="pdfModal" class="adaptive-modal" style="display:none;"><div class="adaptive-modal-content" style="width:90%; max-width:800px; height:80%;"><h3 id="pdfModalTitle">Documento PDF</h3><iframe id="pdfFrame" style="width:100%; height:80%; border:none;"></iframe><div class="modal-buttons"><button id="pdfDownloadBtn" class="save-btn" style="background:#4caf50;">📥 Scarica PDF</button><button id="pdfCloseBtn" class="cancel-btn">CHIUDI</button></div></div></div>
 <script>
-    const VERSION = "expat_archivio_manual_v13";
+    const VERSION = "expat_archivio_manual_v14";
     let isInviteModalOpen = false;
     let currentPdfBlob = null, currentPdfUrl = null;
     let adminAuthenticated = false;
@@ -238,11 +284,7 @@
         else { alert("Su iPhone/iPad, apri l'app Calcolatrice dal telefono."); }
     }
     async function uploadAttachedPdf() { if (!adminAuthenticated) { alert("Solo amministratore può caricare il PDF allegato."); return; } const input = document.createElement('input'); input.type = 'file'; input.accept = 'application/pdf'; input.onchange = async (e) => { const file = e.target.files[0]; if (file && file.type === 'application/pdf') { const reader = new FileReader(); reader.onload = (ev) => { attachedPdfBase64 = ev.target.result; localStorage.setItem('invite_pdf_base64', attachedPdfBase64); alert("✅ PDF allegato salvato (sostituisce il precedente)"); }; reader.readAsDataURL(file); } else { alert("Seleziona un file PDF valido."); } }; input.click(); }
-    
-    function openCircolare() {
-        window.open('https://drive.google.com/file/d/1l6jadyjTlHcfEauNVPv-CPv00pl510jH/view?usp=sharing', '_blank');
-    }
-    
+    function openCircolare() { window.open('https://drive.google.com/file/d/1l6jadyjTlHcfEauNVPv-CPv00pl510jH/view?usp=sharing', '_blank'); }
     function inviteFriend() {
         if (isInviteModalOpen) { alert("Attendi: la finestra di anteprima è già aperta."); return; }
         isInviteModalOpen = true;
@@ -270,69 +312,47 @@
     }
     function escapeHtml(str) { return str.replace(/[&<>]/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;' }[m])); }
 
-    // ==================== CONVERTITORE ====================
+    // CONVERTITORE
     let updating = false;
     const eurInput = document.getElementById('eurAmount');
     const tndInput = document.getElementById('tndAmount');
     const eurToTndResult = document.getElementById('eurToTndResult');
     const tndToEurResult = document.getElementById('tndToEurResult');
     const exchangeRateInput = document.getElementById('exchangeRate');
-    const infoRateLine = document.getElementById('infoRateLine');
 
     function updateFromEuro() {
         if (updating) return;
         updating = true;
         let rate = parseFloat(exchangeRateInput.value);
-        if (isNaN(rate) || rate <= 0) {
-            eurToTndResult.textContent = '? TND';
-            updating = false;
-            return;
-        }
+        if (isNaN(rate) || rate <= 0) { eurToTndResult.textContent = '? TND'; updating = false; return; }
         let euro = parseFloat(eurInput.value);
         if (isNaN(euro)) euro = 0;
         let tnd = euro * rate;
         tndInput.value = tnd.toFixed(2);
         eurToTndResult.textContent = tnd.toFixed(3) + ' TND';
         let tndVal = parseFloat(tndInput.value);
-        if (!isNaN(tndVal)) {
-            let eurCalc = tndVal / rate;
-            tndToEurResult.textContent = eurCalc.toFixed(3) + ' EUR';
-        }
+        if (!isNaN(tndVal)) { tndToEurResult.textContent = (tndVal / rate).toFixed(3) + ' EUR'; }
         updating = false;
     }
-
     function updateFromTnd() {
         if (updating) return;
         updating = true;
         let rate = parseFloat(exchangeRateInput.value);
-        if (isNaN(rate) || rate <= 0) {
-            tndToEurResult.textContent = '? EUR';
-            updating = false;
-            return;
-        }
+        if (isNaN(rate) || rate <= 0) { tndToEurResult.textContent = '? EUR'; updating = false; return; }
         let tnd = parseFloat(tndInput.value);
         if (isNaN(tnd)) tnd = 0;
         let euro = tnd / rate;
         eurInput.value = euro.toFixed(2);
         tndToEurResult.textContent = euro.toFixed(3) + ' EUR';
         let euroVal = parseFloat(eurInput.value);
-        if (!isNaN(euroVal)) {
-            let tndCalc = euroVal * rate;
-            eurToTndResult.textContent = tndCalc.toFixed(3) + ' TND';
-        }
+        if (!isNaN(euroVal)) { eurToTndResult.textContent = (euroVal * rate).toFixed(3) + ' TND'; }
         updating = false;
     }
-
     function updateFromRate() {
         if (updating) return;
         updating = true;
         let rate = parseFloat(exchangeRateInput.value);
-        if (isNaN(rate) || rate <= 0) {
-            eurToTndResult.textContent = '? TND';
-            tndToEurResult.textContent = '? EUR';
-            updating = false;
-            return;
-        }
+        if (isNaN(rate) || rate <= 0) { eurToTndResult.textContent = '? TND'; tndToEurResult.textContent = '? EUR'; updating = false; return; }
         let euro = parseFloat(eurInput.value);
         if (!isNaN(euro)) {
             let tnd = euro * rate;
@@ -347,45 +367,40 @@
                 tndToEurResult.textContent = euroCalc.toFixed(3) + ' EUR';
                 eurToTndResult.textContent = tnd.toFixed(3) + ' TND';
             } else {
-                eurInput.value = '0';
-                tndInput.value = '0';
-                eurToTndResult.textContent = '0.000 TND';
-                tndToEurResult.textContent = '0.000 EUR';
+                eurInput.value = '0'; tndInput.value = '0';
+                eurToTndResult.textContent = '0.000 TND'; tndToEurResult.textContent = '0.000 EUR';
             }
         }
         updating = false;
     }
-
     eurInput.addEventListener('input', updateFromEuro);
     tndInput.addEventListener('input', updateFromTnd);
     exchangeRateInput.addEventListener('input', updateFromRate);
-    document.getElementById('bctLinkBtn').addEventListener('click', () => {
-        window.open('https://www.bct.gov.tn/bct/siteprod/cours.jsp?utm_source=chatgpt.com', '_blank');
-    });
+    document.getElementById('bctLinkBtn').addEventListener('click', () => { window.open('https://www.bct.gov.tn/bct/siteprod/cours.jsp?utm_source=chatgpt.com', '_blank'); });
     updateFromRate();
 
+    // Admin
     function checkAdminPassword() {
         const password = prompt("Inserisci la password amministratore:");
         if (password === "admin2025") {
             adminAuthenticated = true;
-            document.getElementById('attachPdfBtn').style.display = 'flex';
+            attachPdfBtn.style.display = 'flex';
             alert("Modalità amministratore attivata.");
-        } else if (password !== null) { alert("Password errata."); }
+        } else if (password !== null) alert("Password errata.");
     }
     const titleBtn = document.querySelector('.archivio-title');
-    titleBtn.addEventListener('dblclick', () => { checkAdminPassword(); });
-    titleBtn.addEventListener('touchstart', (e) => { if (e.touches.length === 2) { checkAdminPassword(); } });
+    titleBtn.addEventListener('dblclick', checkAdminPassword);
+    titleBtn.addEventListener('touchstart', (e) => { if (e.touches.length === 2) checkAdminPassword(); });
 
     async function init() {
         const savedHandle = await getRootHandle();
-        if (savedHandle) { rootHandle = savedHandle; await listPdfFiles(); }
-        else showPermissionDenied();
+        if (savedHandle) { rootHandle = savedHandle; await listPdfFiles(); } else showPermissionDenied();
         selectRootBtn.addEventListener('click', selectAndShowFolder);
         openGeniusScanBtn.addEventListener('click', openGeniusScan);
         infoBtn.addEventListener('click', showInfo);
         openCalculatorBtn.addEventListener('click', openSystemCalculator);
         inviteFriendBtn.addEventListener('click', inviteFriend);
-        if (attachPdfBtn) attachPdfBtn.addEventListener('click', uploadAttachedPdf);
+        attachPdfBtn.addEventListener('click', uploadAttachedPdf);
         circolareBtn.addEventListener('click', openCircolare);
     }
     init();
