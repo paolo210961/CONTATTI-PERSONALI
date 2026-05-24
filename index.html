@@ -526,11 +526,10 @@
     modalCoordN.addEventListener('click', () => { currentEditIncludeCoords = false; updateModalCoordButtons(); });
     
     // ==================== FUNZIONI DI SINTESI VOCALE ROBUSTE ====================
-    // Legge un testo intero senza pause aggiuntive
     async function speakFullText(text, langCode, rate = 1.0) {
         if (!window.speechSynthesis) return;
         speechSynthesis.cancel();
-        await new Promise(r => setTimeout(r, 50)); // Attendi la cancellazione
+        await new Promise(r => setTimeout(r, 50));
         return new Promise((resolve) => {
             const utterance = new SpeechSynthesisUtterance(text);
             utterance.lang = langCode;
@@ -540,57 +539,16 @@
         });
     }
     
-    // Legge le coordinate con pausa di 1 secondo tra i numeri
-    async function speakCoordinatesWithPauses(coordText, langCode) {
+    // Funzione che aggiunge il prefisso "RIPETO COORDINATE:" prima di leggere le coordinate
+    async function speakCoordinatesWithRepeatPrefix(coordText, langCode) {
         if (!coordText) return;
-        // Trova tutti i numeri (interi o decimali) nel testo
-        const regex = /\d+(?:\.\d+)?/g;
-        let lastIndex = 0;
-        let match;
-        let parts = [];
-        while ((match = regex.exec(coordText)) !== null) {
-            const start = match.index;
-            const end = regex.lastIndex;
-            // Testo prima del numero
-            if (start > lastIndex) {
-                parts.push({ type: 'text', content: coordText.substring(lastIndex, start) });
-            }
-            // Il numero
-            parts.push({ type: 'number', content: match[0] });
-            lastIndex = end;
-        }
-        // Testo dopo l'ultimo numero
-        if (lastIndex < coordText.length) {
-            parts.push({ type: 'text', content: coordText.substring(lastIndex) });
-        }
-        
-        // Se non ci sono numeri, leggi tutto normalmente
-        if (parts.filter(p => p.type === 'number').length === 0) {
-            await speakFullText(coordText, langCode, 1.0);
-            return;
-        }
-        
-        // Leggi ogni parte: il testo normale viene letto intero, il numero viene letto singolarmente con pausa
-        for (let part of parts) {
-            if (part.type === 'text') {
-                if (part.content.trim()) {
-                    await speakFullText(part.content, langCode, 1.0);
-                }
-            } else { // part.type === 'number'
-                const utterance = new SpeechSynthesisUtterance(part.content);
-                utterance.lang = langCode;
-                utterance.rate = 1.0;
-                await new Promise((resolve) => {
-                    utterance.onend = resolve;
-                    speechSynthesis.speak(utterance);
-                });
-                // PAUSA DI 1 SECONDO DOPO OGNI NUMERO
-                await new Promise(r => setTimeout(r, 1000));
-            }
-        }
+        const prefix = (langCode === 'it-IT') ? "RIPETO COORDINATE:" : "RÉPÉTER COORDONNÉES:";
+        await speakFullText(prefix, langCode, 1.0);
+        await new Promise(r => setTimeout(r, 200)); // piccola pausa
+        await speakFullText(coordText, langCode, 1.0);
     }
     
-    // Funzione principale per leggere nota + coordinate
+    // Funzione principale per leggere nota + coordinate (con prefisso sulle coordinate)
     async function speakNoteWithCoordSeparately(noteText, includeCoords, lang, coordTextProvider) {
         // Legge la nota intera
         await speakFullText(noteText, lang === 'it' ? 'it-IT' : 'fr-FR', 1.0);
@@ -599,7 +557,7 @@
             if (coordText) {
                 if (lang === 'fr') coordText = await translateToFrench(coordText);
                 await new Promise(r => setTimeout(r, 300)); // pausa prima delle coordinate
-                await speakCoordinatesWithPauses(coordText, lang === 'it' ? 'it-IT' : 'fr-FR');
+                await speakCoordinatesWithRepeatPrefix(coordText, lang === 'it' ? 'it-IT' : 'fr-FR');
             } else {
                 let missingMsg = (lang === 'it') ? ". Coordinate non disponibili." : ". Coordonnées non disponibles.";
                 await speakFullText(missingMsg, lang === 'it' ? 'it-IT' : 'fr-FR', 1.0);
@@ -778,7 +736,7 @@
         keepScreenOn();
     }
     
-    // ========== FUNZIONE LEGGI FRANCESE NOTA E COORDINATE ==========
+    // ========== FUNZIONE LEGGI FRANCESE NOTA E COORDINATE CON PREFISSO ==========
     async function readFrenchNoteAndCoords() {
         if (!window.speechSynthesis) { alert("Sintesi non supportata"); return; }
         speechSynthesis.cancel();
@@ -796,7 +754,7 @@
         await speakFullText(frenchNote, 'fr-FR', 1.0);
         if (coordPart) {
             await new Promise(r => setTimeout(r, 300));
-            await speakCoordinatesWithPauses(coordPart, 'fr-FR');
+            await speakCoordinatesWithRepeatPrefix(coordPart, 'fr-FR');
         } else if (includeCoords) {
             await speakFullText(" Coordonnées non disponibles.", 'fr-FR', 1.0);
         }
