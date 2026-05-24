@@ -541,14 +541,12 @@
     async function speakNumericStringWithPauses(numStr, langCode, wordPauseMs=200, numericPauseMs=1000) {
         if (!window.speechSynthesis) return;
         speechSynthesis.cancel();
-        // Dividi la stringa in parole/spazi ma mantenendo i numeri interi
         const parts = numStr.split(/\s+/);
         for (let part of parts) {
             const utterance = new SpeechSynthesisUtterance(part);
             utterance.lang = langCode;
             utterance.rate = 1.0;
             speechSynthesis.speak(utterance);
-            // Se la parte contiene cifre, attesa lunga; altrimenti attesa breve
             if (/\d/.test(part)) {
                 await new Promise(r => setTimeout(r, numericPauseMs));
             } else {
@@ -557,24 +555,86 @@
         }
     }
     
+    // ===== FUNZIONE MODIFICATA PER LEGGERE NOTA + COORDINATE CON PAUSA DI 1 SECONDO TRA I NUMERI =====
+    async function speakNoteWithCoordSeparately(noteText, includeCoords, lang, coordTextProvider) {
+        // noteText è già nella lingua desiderata
+        await speakWordsWithPause(noteText, lang === 'it' ? 'it-IT' : 'fr-FR', 1.0, 200);
+        if (includeCoords && currentLat !== null && currentLng !== null) {
+            let coordText = coordTextProvider(lang);
+            if (coordText) {
+                if (lang === 'fr') coordText = await translateToFrench(coordText);
+                await new Promise(r => setTimeout(r, 300)); // piccola pausa prima delle coordinate
+                await speakNumericStringWithPauses(coordText, lang === 'it' ? 'it-IT' : 'fr-FR', 200, 1000);
+            } else {
+                let missingMsg = (lang === 'it') ? ". Coordinate non disponibili." : ". Coordonnées non disponibles.";
+                await speakWordsWithPause(missingMsg, lang === 'it' ? 'it-IT' : 'fr-FR', 1.0, 200);
+            }
+        } else if (includeCoords) {
+            let missingMsg = (lang === 'it') ? ". Coordinate non disponibili." : ". Coordonnées non disponibles.";
+            await speakWordsWithPause(missingMsg, lang === 'it' ? 'it-IT' : 'fr-FR', 1.0, 200);
+        }
+    }
+    
+    // MODIFICATA: speakNoteFromModal (usata dai tasti nel modale "LEGGI in IT/FR")
     async function speakNoteFromModal(lang) {
+        if (!window.speechSynthesis) { alert(lang==='it'?"Sintesi non supportata":"Synthèse non supportée"); return; }
+        speechSynthesis.cancel();
         const title = editNoteTitle.value.trim();
         const description = editNoteDesc.value.trim();
-        let noteText = description ? description : (title ? title : "Nota vuota");
+        let noteText = description ? description : (title ? title : (lang === 'it' ? "Nota vuota" : "Note vide"));
         if (lang === 'fr') { gpsStatus.innerHTML = "⏳ Traduzione FR..."; noteText = await translateToFrench(noteText); }
         const includeCoordsModal = currentEditIncludeCoords;
-        let fullText = noteText;
-        if (includeCoordsModal && currentLat !== null && currentLng !== null) {
-            const coordText = getFormattedCoordinatesForSpeech(lang);
-            if (coordText) {
-                if (lang === 'fr') { const translatedCoord = await translateToFrench(coordText); fullText = noteText + ". " + translatedCoord; }
-                else { fullText = noteText + ". " + coordText; }
-            } else { fullText = noteText + (lang === 'it' ? ". Coordinate non disponibili." : ". Coordonnées non disponibles."); }
-        }
-        if (lang === 'fr') await speakWordsWithPause(fullText, 'fr-FR', 1.0, 200);
-        else await speakWordsWithPause(fullText, 'it-IT', 1.0, 200);
+        await speakNoteWithCoordSeparately(noteText, includeCoordsModal, lang, (l) => getFormattedCoordinatesForSpeech(l));
         playBeep(); keepScreenOn();
+        gpsStatus.innerHTML = "✅ Messaggio completato.";
+        setTimeout(() => { if (gpsStatus.innerHTML === "✅ Messaggio completato.") gpsStatus.innerHTML = "✅ Pronto."; }, 2000);
     }
+    
+    // MODIFICATA: speakNoteWithOptionalCoords (usata dalle funzioni speakItalianNote / speakFrenchNote)
+    async function speakNoteWithOptionalCoords(lang) {
+        if (!window.speechSynthesis) { alert(lang==='it'?"Sintesi non supportata":"Synthèse non supportée"); return; }
+        speechSynthesis.cancel();
+        let note = getSelectedNoteDescription();
+        if (!note) note = (lang==='it' ? "Nessuna nota selezionata" : "Aucune note sélectionnée");
+        if (lang === 'fr') { gpsStatus.innerHTML = "⏳ Traduzione FR..."; note = await translateToFrench(note); }
+        const includeCoords = getSelectedNoteIncludeCoords();
+        await speakNoteWithCoordSeparately(note, includeCoords, lang, (l) => getFormattedCoordinatesForSpeech(l));
+        playBeep();
+        gpsStatus.innerHTML = "✅ Messaggio completato. Avvio ascolto operatore (30 secondi)...";
+        setTimeout(() => startListening30s(), 500);
+        keepScreenOn();
+    }
+    // ============================================================================
+    
+    async function speakNoteFromModal(lang) {
+        if (!window.speechSynthesis) { alert(lang==='it'?"Sintesi non supportata":"Synthèse non supportée"); return; }
+        speechSynthesis.cancel();
+        const title = editNoteTitle.value.trim();
+        const description = editNoteDesc.value.trim();
+        let noteText = description ? description : (title ? title : (lang === 'it' ? "Nota vuota" : "Note vide"));
+        if (lang === 'fr') { gpsStatus.innerHTML = "⏳ Traduzione FR..."; noteText = await translateToFrench(noteText); }
+        const includeCoordsModal = currentEditIncludeCoords;
+        await speakNoteWithCoordSeparately(noteText, includeCoordsModal, lang, (l) => getFormattedCoordinatesForSpeech(l));
+        playBeep(); keepScreenOn();
+        gpsStatus.innerHTML = "✅ Messaggio completato.";
+        setTimeout(() => { if (gpsStatus.innerHTML === "✅ Messaggio completato.") gpsStatus.innerHTML = "✅ Pronto."; }, 2000);
+    }
+    
+    async function speakNoteWithOptionalCoords(lang) {
+        if (!window.speechSynthesis) { alert(lang==='it'?"Sintesi non supportata":"Synthèse non supportée"); return; }
+        speechSynthesis.cancel();
+        let note = getSelectedNoteDescription();
+        if (!note) note = (lang==='it' ? "Nessuna nota selezionata" : "Aucune note sélectionnée");
+        if (lang === 'fr') { gpsStatus.innerHTML = "⏳ Traduzione FR..."; note = await translateToFrench(note); }
+        const includeCoords = getSelectedNoteIncludeCoords();
+        await speakNoteWithCoordSeparately(note, includeCoords, lang, (l) => getFormattedCoordinatesForSpeech(l));
+        playBeep();
+        gpsStatus.innerHTML = "✅ Messaggio completato. Avvio ascolto operatore (30 secondi)...";
+        setTimeout(() => startListening30s(), 500);
+        keepScreenOn();
+    }
+    // ============================================================================
+    
     modalAudioIt.addEventListener('click', () => speakNoteFromModal('it'));
     modalAudioFr.addEventListener('click', () => speakNoteFromModal('fr'));
     function saveNoteFromModal() {
@@ -625,28 +685,6 @@
         const lngAbs = Math.abs(currentLng).toFixed(6);
         if (lang === 'it') return `Coordinate: ${latAbs} gradi ${latDir}, ${lngAbs} gradi ${lngDir}`;
         else return `Coordonnées: ${latAbs} degrés ${latDir}, ${lngAbs} degrés ${lngDir}`;
-    }
-    async function speakNoteWithOptionalCoords(lang) {
-        if (!window.speechSynthesis) { alert(lang==='it'?"Sintesi non supportata":"Synthèse non supportée"); return; }
-        speechSynthesis.cancel();
-        let note = getSelectedNoteDescription();
-        if (!note) note = (lang==='it' ? "Nessuna nota selezionata" : "Aucune note sélectionnée");
-        if (lang === 'fr') { gpsStatus.innerHTML = "⏳ Traduzione FR..."; note = await translateToFrench(note); }
-        let fullText = note;
-        const includeCoords = getSelectedNoteIncludeCoords();
-        if (includeCoords) {
-            const coordText = getFormattedCoordinatesForSpeech(lang);
-            if (coordText) {
-                if (lang === 'fr') { const translatedCoord = await translateToFrench(coordText); fullText = note + ". " + translatedCoord; }
-                else { fullText = note + ". " + coordText; }
-            } else { fullText = note + (lang === 'it' ? ". Coordinate non disponibili." : ". Coordonnées non disponibles."); }
-        }
-        if (lang === 'fr') { gpsStatus.innerHTML = "🔊 Lettura FR..."; await speakWordsWithPause(fullText, 'fr-FR', 1.0, 200); }
-        else { gpsStatus.innerHTML = "🔊 Lettura IT..."; await speakWordsWithPause(fullText, 'it-IT', 1.0, 200); }
-        playBeep();
-        gpsStatus.innerHTML = "✅ Messaggio completato. Avvio ascolto operatore (30 secondi)...";
-        setTimeout(() => startListening30s(), 500);
-        keepScreenOn();
     }
     function speakItalianNote() { speakNoteWithOptionalCoords('it'); }
     function speakFrenchNote() { speakNoteWithOptionalCoords('fr'); }
@@ -727,7 +765,6 @@
         speechSynthesis.cancel();
         let note = getSelectedNoteDescription();
         if (!note) { alert("Nessuna nota selezionata. Seleziona una nota premendo il pallino blu."); return; }
-        // Traduci la nota in francese
         let frenchNote = await translateToFrench(note);
         const includeCoords = getSelectedNoteIncludeCoords();
         let fullText = frenchNote;
@@ -745,14 +782,11 @@
             fullText = frenchNote + ". Coordonnées non disponibles.";
         }
         
-        // Leggi la nota normalmente (pause brevi)
         await speakWordsWithPause(frenchNote, 'fr-FR', 1.0, 200);
-        // Se ci sono coordinate, fai una pausa di 200 ms e poi leggile con pause lunghe tra i numeri
         if (coordPart) {
-            await new Promise(r => setTimeout(r, 200));
+            await new Promise(r => setTimeout(r, 300));
             await speakNumericStringWithPauses(coordPart, 'fr-FR', 200, 1000);
         } else if (fullText !== frenchNote) {
-            // Se c'è solo la frase "Coordonnées non disponibles." la legge normalmente
             await speakWordsWithPause(fullText.substring(frenchNote.length), 'fr-FR', 1.0, 200);
         }
         playBeep();
