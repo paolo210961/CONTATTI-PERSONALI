@@ -10,7 +10,8 @@
         body{font-family:system-ui,'Segoe UI',Roboto,Helvetica,sans-serif;background:#e9ecef;padding:16px;min-height:100vh}
         .container{max-width:600px;margin:0 auto}
         .page{background:white;border-radius:32px;padding:20px 16px 24px;box-shadow:0 8px 24px rgba(0,0,0,0.05)}
-        .archivio-title{background:linear-gradient(135deg,#1e2a3a,#2c3e66);border-radius:60px;padding:12px;font-size:1.3rem;font-weight:bold;color:white;text-align:center;margin-bottom:16px;display:flex;align-items:center;justify-content:center;gap:10px}
+        /* Titolo: impedisce la selezione del testo */
+        .archivio-title{background:linear-gradient(135deg,#1e2a3a,#2c3e66);border-radius:60px;padding:12px;font-size:1.3rem;font-weight:bold;color:white;text-align:center;margin-bottom:16px;display:flex;align-items:center;justify-content:center;gap:10px;user-select:none;-webkit-user-select:none}
         button{border:none;color:white;padding:12px 16px;border-radius:60px;font-size:0.95rem;font-weight:bold;cursor:pointer;transition:0.05s linear;width:100%}
         button:active{transform:scale(0.97)}
         .genius-btn{background:#FF6600;display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:12px}
@@ -37,13 +38,13 @@
         .result-value-eur{font-weight:bold;font-size:0.85rem;background:white;padding:6px 10px;border-radius:40px;min-width:105px;text-align:center;border:1px solid #ced4da;color:#004C97;flex-shrink:0}
         .result-value-tnd{font-weight:bold;font-size:0.85rem;background:white;padding:6px 10px;border-radius:40px;min-width:105px;text-align:center;border:1px solid #ced4da;color:#E70000;flex-shrink:0}
         .rate-row{display:flex;align-items:center;justify-content:space-between;background:#f8f9fa;border-radius:60px;padding:6px 10px;margin-bottom:8px;gap:8px;flex-wrap:wrap}
-        .rate-label{font-weight:bold;font-size:0.85rem;color:#1e2a3a;flex-shrink:0}
+        .rate-label{font-weight:bold;font-size:0.85rem;color:#1e2a3a;flex-shrink:0;white-space:nowrap}
         /* Campo tasso: sfondo giallo acceso, testo grassetto, più largo */
         .rate-input{width:130px;padding:8px 6px;border:1px solid #ced4da;border-radius:40px;font-size:0.95rem;font-weight:bold;text-align:center;background:#FFEB3B;flex-shrink:0}
+        /* Riga bottoni: tutti e tre uniformi e proporzionati */
         .double-buttons{display:flex;gap:12px;margin:12px 0 8px}
-        .double-buttons button{flex:1}
+        .double-buttons button{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
         .calc-btn{background:#283593}
-        .info-refresh-group{display:flex;gap:8px;flex:1}
         .info-btn-black{background:black;font-size:1.2rem;font-family:'Times New Roman',serif;font-style:italic;display:flex;align-items:center;justify-content:center;gap:6px;flex:1}
         /* Pulsante rosso TASSO BCT */
         .bct-btn{background:#dc3545 !important;display:flex;align-items:center;justify-content:center;gap:8px;flex:1}
@@ -74,7 +75,7 @@
         <div class="dark-card"><div id="fileListArea" class="file-list"><div class="message-box"><div class="message-title">⚠️ PERMESSO SCADUTO</div><div class="message-text">Clicca sul Tasto Seleziona-Visualizza Cartella Archivio e concedi le autorizzazioni necessarie</div></div></div></div>
         <div class="converter-section">
             <div class="rate-row">
-                <span class="rate-label">💱 INSERICI Cambio di Tasso TND corrente:</span>
+                <span class="rate-label">💱 CAMBIO TND:</span>
                 <input type="number" id="exchangeRate" class="rate-input" step="0.0001" value="3.3937" placeholder="es. 3.3937">
             </div>
             <div id="converterContent">
@@ -92,10 +93,8 @@
             <div id="infoRateLine" class="info-rate-line">💱 Inserisci il tasso manualmente (es. dal sito BCT) e i calcoli sono automatici</div>
             <div class="double-buttons">
                 <button id="openCalculatorBtn" class="calc-btn">🧮 CALCOLATRICE</button>
-                <div class="info-refresh-group">
-                    <button id="infoBtn" class="info-btn-black">𝒊</button>
-                    <button id="bctLinkBtn" class="bct-btn">🔗 TASSO BCT</button>
-                </div>
+                <button id="infoBtn" class="info-btn-black">𝒊</button>
+                <button id="bctLinkBtn" class="bct-btn">🔗 TASSO BCT</button>
             </div>
             <button id="attachPdfBtn" class="attach-pdf-btn" style="display:none;"><i class="fas fa-paperclip"></i> Allega PDF all'invito (solo admin)</button>
             <button id="inviteFriendBtn" class="invite-btn"><i class="fab fa-whatsapp"></i> INVITA UN AMICO ALLA PROVA GRATUITA DEI 90gg</button>
@@ -106,9 +105,11 @@
 <div id="pdfModal" class="adaptive-modal" style="display:none;"><div class="adaptive-modal-content" style="width:90%; max-width:800px; height:80%;"><h3 id="pdfModalTitle">Documento PDF</h3><iframe id="pdfFrame" style="width:100%; height:80%; border:none;"></iframe><div class="modal-buttons"><button id="pdfDownloadBtn" class="save-btn" style="background:#4caf50;">📥 Scarica PDF</button><button id="pdfCloseBtn" class="cancel-btn">CHIUDI</button></div></div></div>
 <script>
     // ==================== EXPAT ARCHIVIO + CONVERTITORE (TASSO MANUALE) ====================
-    const VERSION = "expat_archivio_manual_v4";
+    const VERSION = "expat_archivio_manual_v5";
     let isInviteModalOpen = false;
     let currentPdfBlob = null, currentPdfUrl = null;
+    let adminAuthenticated = false; // variabile globale per stato admin
+
     function showPdfModal(blob, title) {
         const modal = document.getElementById('pdfModal');
         const iframe = document.getElementById('pdfFrame');
@@ -135,7 +136,6 @@
     document.getElementById('pdfModal').addEventListener('click', (e) => { if (e.target === document.getElementById('pdfModal')) closePdfModal(); });
     function isAndroid() { return /Android/.test(navigator.userAgent); }
     function isIPhone() { return /iPhone|iPad|iPod/.test(navigator.userAgent); }
-    let adminAuthenticated = false;
     const selectRootBtn = document.getElementById('selectRootBtn');
     const openGeniusScanBtn = document.getElementById('openGeniusScanBtn');
     const infoBtn = document.getElementById('infoBtn');
@@ -207,10 +207,23 @@
         isInviteModalOpen = true;
         const appLink = "https://paolo210961.github.io/CONTATTI-PERSONALI/";
         let defaultMessage = "🎉 *Prova la app per 90 giorni gratuitamente!* 🎉\n\nGestisci documenti, converti valuta (EUR/TND tasso manuale), scannerizza con Genius Scan e organizza i tuoi PDF in una cartella.\n\n✅ Archivio PDF su cartella personale\n✅ Convertitore di valuta (tasso inserito manualmente)\n✅ Integrazione con Genius Scan\n✅ Visualizza e invia geolocalizzazione\n✅ Traduzione vocale automatica italiano ↔ francese\n\n👉 *Prova subito:* " + appLink;
-        const modal = document.createElement('div'); modal.className = 'adaptive-modal'; modal.style.display = 'flex'; modal.innerHTML = `<div class="adaptive-modal-content preview-modal-content"><h3>📱 Anteprima messaggio</h3><div id="previewMessageText" class="preview-message-text" contenteditable="true">${escapeHtml(defaultMessage)}</div><div class="edit-note" id="editNoteToggle">✏️ Tocca per modificare il testo</div><div class="modal-buttons" style="margin-top: 20px;"><button id="sendWhatsAppBtn" class="save-btn" style="background:#4caf50;">📤 INVIA SU WHATSAPP</button><button id="cancelPreviewBtn" class="cancel-btn">ANNULLA</button></div></div>`;
+        const modal = document.createElement('div'); modal.className = 'adaptive-modal'; modal.style.display = 'flex'; 
+        // Se admin autenticato, contenteditable true; altrimenti false e senza bordo editabile
+        const editable = adminAuthenticated ? 'true' : 'false';
+        modal.innerHTML = `<div class="adaptive-modal-content preview-modal-content"><h3>📱 Anteprima messaggio</h3><div id="previewMessageText" class="preview-message-text" contenteditable="${editable}">${escapeHtml(defaultMessage)}</div>${adminAuthenticated ? '<div class="edit-note" id="editNoteToggle">✏️ Tocca per modificare il testo</div>' : '<div class="edit-note" style="color:#999;">🔒 Solo admin può modificare</div>'}<div class="modal-buttons" style="margin-top: 20px;"><button id="sendWhatsAppBtn" class="save-btn" style="background:#4caf50;">📤 INVIA SU WHATSAPP</button><button id="cancelPreviewBtn" class="cancel-btn">ANNULLA</button></div></div>`;
         document.body.appendChild(modal);
-        const messageDiv = document.getElementById('previewMessageText'); const sendBtn = document.getElementById('sendWhatsAppBtn'); const cancelBtn = document.getElementById('cancelPreviewBtn'); const editNote = document.getElementById('editNoteToggle'); let isEditing = true;
-        editNote.addEventListener('click', () => { isEditing = !isEditing; messageDiv.contentEditable = isEditing; editNote.innerText = isEditing ? "✏️ Tocca per modificare il testo" : "🔒 Modifica disattivata. Tocca per riattivare"; });
+        const messageDiv = document.getElementById('previewMessageText');
+        const sendBtn = document.getElementById('sendWhatsAppBtn');
+        const cancelBtn = document.getElementById('cancelPreviewBtn');
+        const editNote = document.getElementById('editNoteToggle');
+        if (adminAuthenticated && editNote) {
+            let isEditing = true;
+            editNote.addEventListener('click', () => {
+                isEditing = !isEditing;
+                messageDiv.contentEditable = isEditing;
+                editNote.innerText = isEditing ? "✏️ Tocca per modificare il testo" : "🔒 Modifica disattivata. Tocca per riattivare";
+            });
+        }
         const closeModal = () => { modal.remove(); isInviteModalOpen = false; };
         sendBtn.onclick = async () => { const finalMessage = messageDiv.innerText; const encodedMessage = encodeURIComponent(finalMessage); let whatsappUrl = `https://wa.me/?text=${encodedMessage}`; if (attachedPdfBase64) { const blob = await (await fetch(attachedPdfBase64)).blob(); const file = new File([blob], "allegato_invito.pdf", { type: 'application/pdf' }); if (navigator.share) { try { await navigator.share({ title: 'Invito app', text: finalMessage, files: [file] }); closeModal(); return; } catch (err) { console.warn(err); } } } window.open(whatsappUrl, '_blank'); closeModal(); };
         cancelBtn.onclick = closeModal; modal.onclick = (e) => { if (e.target === modal) closeModal(); };
@@ -312,14 +325,23 @@
     eurInput.addEventListener('input', updateFromEuro);
     tndInput.addEventListener('input', updateFromTnd);
     exchangeRateInput.addEventListener('input', updateFromRate);
-
-    // Pulsante BCT rosso
     document.getElementById('bctLinkBtn').addEventListener('click', () => {
         window.open('https://www.bct.gov.tn/bct/siteprod/cours.jsp?utm_source=chatgpt.com', '_blank');
     });
-
-    // Inizializza i calcoli
     updateFromRate();
+
+    // ==================== ADMIN ====================
+    function checkAdminPassword() {
+        const password = prompt("Inserisci la password amministratore:");
+        if (password === "admin2025") {
+            adminAuthenticated = true;
+            document.getElementById('attachPdfBtn').style.display = 'flex';
+            alert("Modalità amministratore attivata.");
+        } else if (password !== null) { alert("Password errata."); }
+    }
+    const titleBtn = document.querySelector('.archivio-title');
+    titleBtn.addEventListener('dblclick', () => { checkAdminPassword(); });
+    titleBtn.addEventListener('touchstart', (e) => { if (e.touches.length === 2) { checkAdminPassword(); } });
 
     // ==================== INIT ====================
     async function init() {
@@ -334,18 +356,6 @@
         if (attachPdfBtn) attachPdfBtn.addEventListener('click', uploadAttachedPdf);
         if (circolareBtn) circolareBtn.addEventListener('click', openCircolare);
     }
-
-    function checkAdminPassword() {
-        const password = prompt("Inserisci la password amministratore:");
-        if (password === "admin2025") {
-            adminAuthenticated = true;
-            document.getElementById('attachPdfBtn').style.display = 'flex';
-            alert("Modalità amministratore attivata.");
-        } else if (password !== null) { alert("Password errata."); }
-    }
-    const titleBtn = document.querySelector('.archivio-title');
-    titleBtn.addEventListener('dblclick', () => { checkAdminPassword(); });
-    titleBtn.addEventListener('touchstart', (e) => { if (e.touches.length === 2) { checkAdminPassword(); } });
     init();
 </script>
 </body>
