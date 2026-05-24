@@ -537,20 +537,21 @@
         }
     }
     
-    // ========== NUOVA FUNZIONE PER LEGGERE IL FRANCESE CON PAUSA DI 1 SECONDO TRA I NUMERI ==========
+    // ========== FUNZIONE CORRETTA PER LEGGERE IL FRANCESE CON PAUSA DI 1 SECONDO TRA I NUMERI ==========
     async function speakFrenchWithNumericPause(text, langCode = 'fr-FR', wordPauseMs = 200, numericPauseMs = 1000) {
         if (!window.speechSynthesis) return;
         speechSynthesis.cancel();
-        const words = text.split(/\s+/);
-        for (let i = 0; i < words.length; i++) {
-            const word = words[i];
-            const utterance = new SpeechSynthesisUtterance(word);
+        // Dividiamo il testo in parti: ognuna può essere una parola normale o un numero (con punti, virgole)
+        // Usiamo una regex che separa i blocchi numerici da quelli non numerici
+        const parts = text.split(/(\d+[\d\.,]*\d+|\d+)/g);
+        for (let part of parts) {
+            if (!part.trim()) continue;
+            const utterance = new SpeechSynthesisUtterance(part);
             utterance.lang = langCode;
             utterance.rate = 1.0;
             speechSynthesis.speak(utterance);
-            // Controlla se la parola contiene numeri (con punti o virgole) 
-            // e se non è una parola puramente alfabetica (esclude articoli, preposizioni)
-            const isNumeric = /^[\d\.,]+$/.test(word.replace(/[.,]/g, '').trim());
+            // Determina se la parte è un numero (cifre, punti, virgole)
+            const isNumeric = /^[\d\.,]+$/.test(part.trim());
             if (isNumeric) {
                 await new Promise(r => setTimeout(r, numericPauseMs));
             } else {
@@ -742,7 +743,7 @@
         } else if (includeCoords && (currentLat === null || currentLng === null)) { 
             fullText = note + ". Coordonnées non disponibles."; 
         }
-        // Usa la nuova funzione che mette pausa di 1 secondo tra i numeri
+        // Usa la nuova funzione che mette pausa di 1 secondo tra i numeri (basata su parti)
         await speakFrenchWithNumericPause(fullText, 'fr-FR', 200, 1000);
         playBeep();
         keepScreenOn();
