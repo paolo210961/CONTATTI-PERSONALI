@@ -539,7 +539,6 @@
         });
     }
     
-    // Tokenizza il testo delle coordinate in singoli caratteri cifra/punto e parole/punteggiatura
     function tokenizeCoordinates(coordText) {
         const tokens = [];
         let i = 0;
@@ -547,17 +546,14 @@
         while (i < len) {
             const ch = coordText[i];
             if (ch >= '0' && ch <= '9') {
-                // singola cifra
                 tokens.push(ch);
                 i++;
             } else if (ch === '.') {
                 tokens.push('.');
                 i++;
             } else if (ch === ' ' || ch === '\t') {
-                // ignora spazi
                 i++;
             } else {
-                // parola o punteggiatura non numerica: raccogli fino al prossimo spazio o fine
                 let word = '';
                 while (i < len && coordText[i] !== ' ' && coordText[i] !== '\t' && !(coordText[i] >= '0' && coordText[i] <= '9') && coordText[i] !== '.') {
                     word += coordText[i];
@@ -569,7 +565,6 @@
         return tokens;
     }
     
-    // Legge le coordinate: pausa di 1 secondo per ogni cifra e punto, 200 ms per parole/punteggiatura
     async function speakCoordinatesWithPauses(coordText, langCode) {
         if (!coordText) return;
         const tokens = tokenizeCoordinates(coordText);
@@ -589,16 +584,13 @@
         }
     }
     
-    // Funzione principale per leggere nota + coordinate (senza prefisso)
     async function speakNoteWithCoordSeparately(noteText, includeCoords, lang, coordTextProvider) {
-        // 1. Legge la nota intera (fluida)
         await speakFullText(noteText, lang === 'it' ? 'it-IT' : 'fr-FR', 1.0);
         if (includeCoords && currentLat !== null && currentLng !== null) {
             let coordText = coordTextProvider(lang);
             if (coordText) {
                 if (lang === 'fr') coordText = await translateToFrench(coordText);
-                await new Promise(r => setTimeout(r, 300)); // pausa prima delle coordinate
-                // 2. Legge le coordinate con pause tra le cifre (nessun prefisso)
+                await new Promise(r => setTimeout(r, 300));
                 await speakCoordinatesWithPauses(coordText, lang === 'it' ? 'it-IT' : 'fr-FR');
             } else {
                 let missingMsg = (lang === 'it') ? ". Coordinate non disponibili." : ". Coordonnées non disponibles.";
@@ -665,7 +657,7 @@
     }
     speakReadFrBtn.addEventListener('click', readFrenchNoteAndCoords);
     
-    // Manteniamo speakWordsWithPause per compatibilità con altre parti (es. traduzione)
+    // Manteniamo speakWordsWithPause per compatibilità con altre parti
     async function speakWordsWithPause(msg, langCode, rate=1.0, wordPauseMs=200) {
         if (!window.speechSynthesis) return;
         speechSynthesis.cancel();
@@ -1004,7 +996,82 @@
         document.getElementById('globalInfoCloseBtn').onclick = () => modal.style.display = 'none';
     }
     
-    // ==================== LICENZA ====================
+    // ==================== LICENZA E PULSANTE RICHIEDI ATTIVAZIONE PERSONALIZZABILE ====================
+    // Carica i dati personalizzati del pulsante Richiedi attivazione (admin)
+    function loadCustomRequestData() {
+        const defaultData = {
+            buttonText: "📋 Richiedi attivazione",
+            modalText: "Per attivare la licenza, invia un bonifico di €48,00 a<br><br><strong>Paolo Maiorana</strong><br><strong>IBAN: IT31R0339512900052702573770</strong><br><br>con causale il tuo codice cliente.",
+            emailDest: adminEmail,
+            subject: "Richiesta attivazione licenza Contatti Personali",
+            amount: "€48,00",
+            iban: "IT31R0339512900052702573770"
+        };
+        const saved = localStorage.getItem('customRequestData');
+        if (saved) {
+            try {
+                const parsed = JSON.parse(saved);
+                return { ...defaultData, ...parsed };
+            } catch(e) { return defaultData; }
+        }
+        return defaultData;
+    }
+    
+    function saveCustomRequestData(data) {
+        localStorage.setItem('customRequestData', JSON.stringify(data));
+    }
+    
+    // Mostra il modal di modifica per admin (pressione lunga sul tasto)
+    function showEditRequestModal() {
+        const current = loadCustomRequestData();
+        const modalHtml = `
+            <div class="adaptive-modal" id="editRequestModal" style="display:flex;">
+                <div class="adaptive-modal-content" style="max-width:500px;">
+                    <h3>✏️ Personalizza tasto Richiedi attivazione</h3>
+                    <label class="detail-label">Testo pulsante</label>
+                    <input type="text" id="editBtnText" value="${escapeHtml(current.buttonText)}" placeholder="📋 Richiedi attivazione">
+                    <label class="detail-label">Messaggio primo passaggio (HTML)</label>
+                    <textarea id="editModalText" rows="4">${escapeHtml(current.modalText)}</textarea>
+                    <label class="detail-label">Email destinatario</label>
+                    <input type="email" id="editEmailDest" value="${escapeHtml(current.emailDest)}">
+                    <label class="detail-label">Oggetto email</label>
+                    <input type="text" id="editSubject" value="${escapeHtml(current.subject)}">
+                    <label class="detail-label">Importo (es. €48,00)</label>
+                    <input type="text" id="editAmount" value="${escapeHtml(current.amount)}">
+                    <label class="detail-label">IBAN</label>
+                    <input type="text" id="editIban" value="${escapeHtml(current.iban)}">
+                    <div class="modal-buttons">
+                        <button id="saveEditRequestBtn" class="save-btn">💾 SALVA</button>
+                        <button id="cancelEditRequestBtn" class="cancel-btn">ANNULLA</button>
+                    </div>
+                </div>
+            </div>
+        `;
+        document.body.insertAdjacentHTML('beforeend', modalHtml);
+        const modal = document.getElementById('editRequestModal');
+        const saveBtn = document.getElementById('saveEditRequestBtn');
+        const cancelBtn = document.getElementById('cancelEditRequestBtn');
+        saveBtn.onclick = () => {
+            const newData = {
+                buttonText: document.getElementById('editBtnText').value,
+                modalText: document.getElementById('editModalText').value,
+                emailDest: document.getElementById('editEmailDest').value,
+                subject: document.getElementById('editSubject').value,
+                amount: document.getElementById('editAmount').value,
+                iban: document.getElementById('editIban').value
+            };
+            saveCustomRequestData(newData);
+            // Aggiorna il pulsante nella home
+            const requestBtn = document.getElementById('copyRequestBtnMoved');
+            if (requestBtn) requestBtn.innerText = newData.buttonText;
+            modal.remove();
+            alert("✅ Dati personalizzati salvati!");
+        };
+        cancelBtn.onclick = () => modal.remove();
+        modal.onclick = (e) => { if (e.target === modal) modal.remove(); };
+        keepScreenOn();
+    }
+    
     async function initLicense() {
         const now = await getCurrentUTCTime();
         let firstRun = localStorage.getItem('firstRun');
@@ -1029,12 +1096,34 @@
         updateLicenseUI();
         if (clientCodeInput) clientCodeInput.value = clientCode;
         if (daysHomeDisplay) {
-            daysHomeDisplay.innerHTML = `v${CURRENT_VERSION} - Scade: ${daysRemaining} giorni <button id="copyRequestBtnMoved" class="small-btn" style="background:#e67e22;">📋 Richiedi attivazione</button>`;
-            let moved = document.getElementById('copyRequestBtnMoved');
+            const custom = loadCustomRequestData();
+            daysHomeDisplay.innerHTML = `v${CURRENT_VERSION} - Scade: ${daysRemaining} giorni <button id="copyRequestBtnMoved" class="small-btn" style="background:#e67e22;">${custom.buttonText}</button>`;
+            const moved = document.getElementById('copyRequestBtnMoved');
             if (moved) {
+                // Rimuovi vecchi listener
                 const newBtn = moved.cloneNode(true);
                 moved.parentNode.replaceChild(newBtn, moved);
                 newBtn.onclick = openActivationRequestModal;
+                // Aggiungi pressione lunga per admin (5 secondi)
+                let pressTimer = null;
+                const startPress = () => {
+                    pressTimer = setTimeout(() => {
+                        if (adminAuthenticated) {
+                            showEditRequestModal();
+                        } else {
+                            alert("Solo amministratore può personalizzare questo pulsante.");
+                        }
+                    }, 5000);
+                };
+                const cancelPress = () => {
+                    if (pressTimer) clearTimeout(pressTimer);
+                };
+                newBtn.addEventListener('mousedown', startPress);
+                newBtn.addEventListener('mouseup', cancelPress);
+                newBtn.addEventListener('mouseleave', cancelPress);
+                newBtn.addEventListener('touchstart', startPress, { passive: true });
+                newBtn.addEventListener('touchend', cancelPress);
+                newBtn.addEventListener('touchcancel', cancelPress);
             }
         }
     }
@@ -1567,17 +1656,15 @@
         else setupImageArea();
     }
     
-    // ==================== NUOVA FUNZIONE PER RICHIESTA ATTIVAZIONE ====================
+    // ==================== FUNZIONE APERTURA MODALE RICHIESTA ATTIVAZIONE (usando i dati personalizzati) ====================
     function openActivationRequestModal() {
+        const custom = loadCustomRequestData();
         const modalHtml = `
             <div class="adaptive-modal" id="activationStep1Modal" style="display:flex;">
                 <div class="adaptive-modal-content">
                     <h3>📋 Richiesta attivazione</h3>
                     <div class="modal-info-text" style="margin-bottom:16px;">
-                        Per attivare la licenza, invia un bonifico di €48,00 a<br><br>
-                        <strong>Paolo Maiorana</strong><br>
-                        <strong>IBAN: IT31R0339512900052702573770</strong><br><br>
-                        con causale il tuo codice cliente.
+                        ${custom.modalText}
                     </div>
                     <div class="modal-buttons" style="flex-direction:column; gap:12px;">
                         <button id="copyDataBtn" class="save-btn" style="background:#4caf50;">▶️ PREMI QUI PER COPIARE I TUOI DATI DI ATTIVAZIONE</button>
@@ -1602,12 +1689,13 @@
     }
     
     function showActivationDataModal() {
+        const custom = loadCustomRequestData();
         const clientCodeVal = clientCodeInput.value;
         const firstRunVal = localStorage.getItem('firstRun') || '';
-        const emailDest = adminEmail;
-        const subject = "Richiesta attivazione licenza Contatti Personali";
+        const emailDest = custom.emailDest;
+        const subject = custom.subject;
         
-        const copyText = `Codice Cliente: ${clientCodeVal}\nFirst Run: ${firstRunVal}\n\nInvia a: ${adminEmail}\nOggetto: ${subject}`;
+        const copyText = `Codice Cliente: ${clientCodeVal}\nFirst Run: ${firstRunVal}\n\nInvia a: ${emailDest}\nOggetto: ${subject}`;
         
         const modalHtml = `
             <div class="adaptive-modal" id="activationStep2Modal" style="display:flex;">
