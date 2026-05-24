@@ -529,6 +529,8 @@
     async function speakFullText(text, langCode, rate=1.0) {
         if (!window.speechSynthesis) return;
         speechSynthesis.cancel();
+        // attendere che la cancel abbia effetto
+        await new Promise(r => setTimeout(r, 50));
         return new Promise((resolve) => {
             const utterance = new SpeechSynthesisUtterance(text);
             utterance.lang = langCode;
@@ -538,16 +540,23 @@
         });
     }
     
-    async function speakNumericStringWithPauses(numStr, langCode, wordPauseMs=200, numericPauseMs=1000) {
+    // Nuova funzione che rispetta la pausa di 1 secondo tra i numeri (attende la fine di ogni token)
+    async function speakNumericStringWithPauses(text, langCode, numericPauseMs = 1000, wordPauseMs = 200) {
         if (!window.speechSynthesis) return;
         speechSynthesis.cancel();
-        const parts = numStr.split(/\s+/);
-        for (let part of parts) {
-            const utterance = new SpeechSynthesisUtterance(part);
+        await new Promise(r => setTimeout(r, 50));
+        const tokens = text.split(/\s+/);
+        for (let token of tokens) {
+            if (token.trim() === "") continue;
+            const utterance = new SpeechSynthesisUtterance(token);
             utterance.lang = langCode;
             utterance.rate = 1.0;
-            speechSynthesis.speak(utterance);
-            if (/\d/.test(part)) {
+            await new Promise((resolve) => {
+                utterance.onend = resolve;
+                speechSynthesis.speak(utterance);
+            });
+            // pausa dopo il token
+            if (/\d/.test(token)) {
                 await new Promise(r => setTimeout(r, numericPauseMs));
             } else {
                 await new Promise(r => setTimeout(r, wordPauseMs));
@@ -564,7 +573,7 @@
             if (coordText) {
                 if (lang === 'fr') coordText = await translateToFrench(coordText);
                 await new Promise(r => setTimeout(r, 300)); // piccola pausa prima delle coordinate
-                await speakNumericStringWithPauses(coordText, lang === 'it' ? 'it-IT' : 'fr-FR', 200, 1000);
+                await speakNumericStringWithPauses(coordText, lang === 'it' ? 'it-IT' : 'fr-FR', 1000, 200);
             } else {
                 let missingMsg = (lang === 'it') ? ". Coordinate non disponibili." : ". Coordonnées non disponibles.";
                 await speakFullText(missingMsg, lang === 'it' ? 'it-IT' : 'fr-FR', 1.0);
@@ -606,8 +615,8 @@
     
     // ========== FINE FUNZIONI SINTESI ==========
     
+    // manteniamo speakWordsWithPause per compatibilità con altre parti (es. traduzione)
     async function speakWordsWithPause(msg, langCode, rate=1.0, wordPauseMs=200) {
-        // mantenuta per compatibilità con altre parti (es. traduzione)
         if (!window.speechSynthesis) return;
         speechSynthesis.cancel();
         const words = msg.split(/\s+/);
@@ -757,15 +766,13 @@
             const coordText = getFormattedCoordinatesForSpeech('fr');
             if (coordText) {
                 coordPart = await translateToFrench(coordText);
-            } else {
-                coordPart = null;
             }
         }
         // Legge la nota in francese
         await speakFullText(frenchNote, 'fr-FR', 1.0);
         if (coordPart) {
             await new Promise(r => setTimeout(r, 300));
-            await speakNumericStringWithPauses(coordPart, 'fr-FR', 200, 1000);
+            await speakNumericStringWithPauses(coordPart, 'fr-FR', 1000, 200);
         } else if (includeCoords) {
             await speakFullText(" Coordonnées non disponibles.", 'fr-FR', 1.0);
         }
