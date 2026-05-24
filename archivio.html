@@ -46,7 +46,7 @@
             gap: 10px;
             user-select: none;
         }
-        /* Stile base pulsanti (senza trasformazioni automatiche) */
+        /* Stile base pulsanti */
         button {
             border: none;
             color: white;
@@ -56,9 +56,9 @@
             font-weight: bold;
             cursor: pointer;
             width: 100%;
-            transition: none; /* niente transizioni */
+            transition: none;
         }
-        /* Effetto solo per alcuni pulsanti (esclusi i due che ci interessano) */
+        /* Effetto di scala solo per alcuni pulsanti */
         .genius-btn:active,
         .select-folder-btn:active,
         .invite-btn:active,
@@ -67,16 +67,35 @@
         .info-circle-btn:active {
             transform: scale(0.97);
         }
-        /* Pulsanti CALCOLATRICE e TASSO BCT: nessuna trasformazione, nessuna transizione */
-        .calc-btn, .bct-btn {
-            transition: none;
+        /* DISATTIVAZIONE COMPLETA per CALCOLATRICE e TASSO BCT */
+        .calc-btn, .bct-btn,
+        .calc-btn * , .bct-btn * {
             transform: none !important;
+            transition: none !important;
+            animation: none !important;
         }
         .calc-btn:active, .bct-btn:active,
-        .calc-btn:focus, .bct-btn:focus {
+        .calc-btn:focus, .bct-btn:focus,
+        .calc-btn:hover, .bct-btn:hover {
             transform: none !important;
             scale: 1 !important;
-            transition: none;
+            transition: none !important;
+            background-color: inherit !important;
+            outline: none !important;
+            box-shadow: none !important;
+        }
+        /* Colori specifici e stile compatto per evitare fuoriuscite */
+        .calc-btn { 
+            background: #283593; 
+            font-size: 0.85rem; 
+            padding: 10px 8px; 
+            white-space: nowrap;
+        }
+        .bct-btn { 
+            background: #E70000 !important; 
+            font-size: 0.85rem; 
+            padding: 10px 8px; 
+            white-space: nowrap;
         }
         
         .genius-btn { background: #FF6600; display: flex; align-items: center; justify-content: center; gap: 12px; margin-bottom: 12px; }
@@ -104,10 +123,8 @@
         .rate-label { font-weight: bold; font-size: 0.85rem; color: #1e2a3a; flex-shrink: 0; white-space: nowrap; }
         .rate-input { width: 130px; padding: 8px 6px; border: 1px solid #ced4da; border-radius: 40px; font-size: 0.95rem; font-weight: bold; text-align: center; background: #FFEB3B; flex-shrink: 0; }
         
-        .double-buttons { display: flex; gap: 12px; margin: 12px 0 8px; align-items: center; }
-        .calc-btn, .bct-btn { flex: 1; display: flex; align-items: center; justify-content: center; gap: 8px; white-space: nowrap; }
-        .calc-btn { background: #283593; }
-        .bct-btn { background: #E70000 !important; }
+        .double-buttons { display: flex; gap: 12px; margin: 12px 0 8px; align-items: center; justify-content: space-between; }
+        .calc-btn, .bct-btn { flex: 1; display: flex; align-items: center; justify-content: center; gap: 6px; white-space: nowrap; }
         
         .info-circle-btn {
             background: black;
@@ -126,7 +143,6 @@
             border: none;
             flex-shrink: 0;
             padding: 0;
-            transition: none;
         }
         .info-circle-btn:active {
             transform: scale(0.97);
@@ -176,9 +192,9 @@
             </div>
             <div id="infoRateLine" class="info-rate-line"></div>
             <div class="double-buttons">
-                <button id="openCalculatorBtn" class="calc-btn">🧮 CALCOLATRICE</button>
+                <button id="openCalculatorBtn" class="calc-btn">CALCOLATRICE</button>
                 <button id="infoBtn" class="info-circle-btn">𝒊</button>
-                <button id="bctLinkBtn" class="bct-btn">🔗 TASSO BCT</button>
+                <button id="bctLinkBtn" class="bct-btn">TASSO BCT</button>
             </div>
             <button id="attachPdfBtn" class="attach-pdf-btn"><i class="fas fa-paperclip"></i> Allega PDF all'invito (solo admin)</button>
             <button id="inviteFriendBtn" class="invite-btn"><i class="fab fa-whatsapp"></i> INVITA UN AMICO ALLA PROVA GRATUITA DEI 90gg</button>
@@ -188,7 +204,7 @@
 </div>
 <div id="pdfModal" class="adaptive-modal" style="display:none;"><div class="adaptive-modal-content" style="width:90%; max-width:800px; height:80%;"><h3 id="pdfModalTitle">Documento PDF</h3><iframe id="pdfFrame" style="width:100%; height:80%; border:none;"></iframe><div class="modal-buttons"><button id="pdfDownloadBtn" class="save-btn" style="background:#4caf50;">📥 Scarica PDF</button><button id="pdfCloseBtn" class="cancel-btn">CHIUDI</button></div></div></div>
 <script>
-    const VERSION = "expat_archivio_manual_v14";
+    const VERSION = "expat_archivio_manual_v15";
     let isInviteModalOpen = false;
     let currentPdfBlob = null, currentPdfUrl = null;
     let adminAuthenticated = false;
