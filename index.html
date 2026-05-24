@@ -525,7 +525,7 @@
     modalCoordS.addEventListener('click', () => { currentEditIncludeCoords = true; updateModalCoordButtons(); });
     modalCoordN.addEventListener('click', () => { currentEditIncludeCoords = false; updateModalCoordButtons(); });
     
-    // ==================== FUNZIONI DI SINTESI VOCALE ROBUSTE ====================
+    // ==================== FUNZIONI DI SINTESI VOCALE CORRETTE (PAUSA 1 SECONDO TRA LE CIFRE) ====================
     async function speakFullText(text, langCode, rate = 1.0) {
         if (!window.speechSynthesis) return;
         speechSynthesis.cancel();
@@ -539,25 +539,67 @@
         });
     }
     
-    // Funzione che aggiunge il prefisso "RIPETO COORDINATE:" prima di leggere le coordinate
-    async function speakCoordinatesWithRepeatPrefix(coordText, langCode) {
-        if (!coordText) return;
-        const prefix = (langCode === 'it-IT') ? "RIPETO COORDINATE:" : "RÉPÉTER COORDONNÉES:";
-        await speakFullText(prefix, langCode, 1.0);
-        await new Promise(r => setTimeout(r, 200)); // piccola pausa
-        await speakFullText(coordText, langCode, 1.0);
+    // Tokenizza il testo delle coordinate in singoli caratteri cifra/punto e parole/punteggiatura
+    function tokenizeCoordinates(coordText) {
+        const tokens = [];
+        let i = 0;
+        const len = coordText.length;
+        while (i < len) {
+            const ch = coordText[i];
+            if (ch >= '0' && ch <= '9') {
+                // singola cifra
+                tokens.push(ch);
+                i++;
+            } else if (ch === '.') {
+                tokens.push('.');
+                i++;
+            } else if (ch === ' ' || ch === '\t') {
+                // ignora spazi
+                i++;
+            } else {
+                // parola o punteggiatura non numerica: raccogli fino al prossimo spazio o fine
+                let word = '';
+                while (i < len && coordText[i] !== ' ' && coordText[i] !== '\t' && !(coordText[i] >= '0' && coordText[i] <= '9') && coordText[i] !== '.') {
+                    word += coordText[i];
+                    i++;
+                }
+                if (word.length > 0) tokens.push(word);
+            }
+        }
+        return tokens;
     }
     
-    // Funzione principale per leggere nota + coordinate (con prefisso sulle coordinate)
+    // Legge le coordinate: pausa di 1 secondo per ogni cifra e punto, 200 ms per parole/punteggiatura
+    async function speakCoordinatesWithPauses(coordText, langCode) {
+        if (!coordText) return;
+        const tokens = tokenizeCoordinates(coordText);
+        for (let token of tokens) {
+            const utterance = new SpeechSynthesisUtterance(token);
+            utterance.lang = langCode;
+            utterance.rate = 1.0;
+            await new Promise((resolve) => {
+                utterance.onend = resolve;
+                speechSynthesis.speak(utterance);
+            });
+            if (token.length === 1 && (token >= '0' && token <= '9' || token === '.')) {
+                await new Promise(r => setTimeout(r, 1000));
+            } else {
+                await new Promise(r => setTimeout(r, 200));
+            }
+        }
+    }
+    
+    // Funzione principale per leggere nota + coordinate (senza prefisso)
     async function speakNoteWithCoordSeparately(noteText, includeCoords, lang, coordTextProvider) {
-        // Legge la nota intera
+        // 1. Legge la nota intera (fluida)
         await speakFullText(noteText, lang === 'it' ? 'it-IT' : 'fr-FR', 1.0);
         if (includeCoords && currentLat !== null && currentLng !== null) {
             let coordText = coordTextProvider(lang);
             if (coordText) {
                 if (lang === 'fr') coordText = await translateToFrench(coordText);
                 await new Promise(r => setTimeout(r, 300)); // pausa prima delle coordinate
-                await speakCoordinatesWithRepeatPrefix(coordText, lang === 'it' ? 'it-IT' : 'fr-FR');
+                // 2. Legge le coordinate con pause tra le cifre (nessun prefisso)
+                await speakCoordinatesWithPauses(coordText, lang === 'it' ? 'it-IT' : 'fr-FR');
             } else {
                 let missingMsg = (lang === 'it') ? ". Coordinate non disponibili." : ". Coordonnées non disponibles.";
                 await speakFullText(missingMsg, lang === 'it' ? 'it-IT' : 'fr-FR', 1.0);
@@ -597,7 +639,33 @@
         keepScreenOn();
     }
     
-    // Manteniamo speakWordsWithPause per compatibilità (usata altrove)
+    async function readFrenchNoteAndCoords() {
+        if (!window.speechSynthesis) { alert("Sintesi non supportata"); return; }
+        speechSynthesis.cancel();
+        let note = getSelectedNoteDescription();
+        if (!note) { alert("Nessuna nota selezionata. Seleziona una nota premendo il pallino blu."); return; }
+        let frenchNote = await translateToFrench(note);
+        const includeCoords = getSelectedNoteIncludeCoords();
+        let coordPart = null;
+        if (includeCoords && currentLat !== null && currentLng !== null) {
+            const coordText = getFormattedCoordinatesForSpeech('fr');
+            if (coordText) {
+                coordPart = await translateToFrench(coordText);
+            }
+        }
+        await speakFullText(frenchNote, 'fr-FR', 1.0);
+        if (coordPart) {
+            await new Promise(r => setTimeout(r, 300));
+            await speakCoordinatesWithPauses(coordPart, 'fr-FR');
+        } else if (includeCoords) {
+            await speakFullText(" Coordonnées non disponibles.", 'fr-FR', 1.0);
+        }
+        playBeep();
+        keepScreenOn();
+    }
+    speakReadFrBtn.addEventListener('click', readFrenchNoteAndCoords);
+    
+    // Manteniamo speakWordsWithPause per compatibilità con altre parti (es. traduzione)
     async function speakWordsWithPause(msg, langCode, rate=1.0, wordPauseMs=200) {
         if (!window.speechSynthesis) return;
         speechSynthesis.cancel();
@@ -735,33 +803,6 @@
         setTimeout(() => { if (recognitionSpeak && recognitionSpeak.stop) recognitionSpeak.stop(); }, 30000);
         keepScreenOn();
     }
-    
-    // ========== FUNZIONE LEGGI FRANCESE NOTA E COORDINATE CON PREFISSO ==========
-    async function readFrenchNoteAndCoords() {
-        if (!window.speechSynthesis) { alert("Sintesi non supportata"); return; }
-        speechSynthesis.cancel();
-        let note = getSelectedNoteDescription();
-        if (!note) { alert("Nessuna nota selezionata. Seleziona una nota premendo il pallino blu."); return; }
-        let frenchNote = await translateToFrench(note);
-        const includeCoords = getSelectedNoteIncludeCoords();
-        let coordPart = null;
-        if (includeCoords && currentLat !== null && currentLng !== null) {
-            const coordText = getFormattedCoordinatesForSpeech('fr');
-            if (coordText) {
-                coordPart = await translateToFrench(coordText);
-            }
-        }
-        await speakFullText(frenchNote, 'fr-FR', 1.0);
-        if (coordPart) {
-            await new Promise(r => setTimeout(r, 300));
-            await speakCoordinatesWithRepeatPrefix(coordPart, 'fr-FR');
-        } else if (includeCoords) {
-            await speakFullText(" Coordonnées non disponibles.", 'fr-FR', 1.0);
-        }
-        playBeep();
-        keepScreenOn();
-    }
-    speakReadFrBtn.addEventListener('click', readFrenchNoteAndCoords);
     
     // ==================== SALVATAGGIO STATI ====================
     function saveSpeakTranslation() { if (currentService) localStorage.setItem(`speakTranslation_${currentService}_${CURRENT_VERSION}`, JSON.stringify({ italian: lastItalianText, french: lastFrenchTranslation })); }
