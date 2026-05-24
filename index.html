@@ -228,7 +228,7 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
 <script>
-    // ==================== v0238 - APP COMPLETA (MODIFICATA: LEGGI FRANCESE CON PAUSA 1s TRA NUMERI) ====================
+    // ==================== v0238 - APP COMPLETA ====================
     const CURRENT_VERSION = "0238";
     let currentService = "ambulanza";
     let currentLat = null, currentLng = null;
@@ -537,22 +537,19 @@
         }
     }
     
-    // ========== FUNZIONE CORRETTA PER LEGGERE IL FRANCESE CON PAUSA DI 1 SECONDO TRA I NUMERI ==========
-    async function speakFrenchWithNumericPause(text, langCode = 'fr-FR', wordPauseMs = 200, numericPauseMs = 1000) {
+    // ---------- Funzione per leggere una stringa numerica con pause di 1 secondo tra i numeri ----------
+    async function speakNumericStringWithPauses(numStr, langCode, wordPauseMs=200, numericPauseMs=1000) {
         if (!window.speechSynthesis) return;
         speechSynthesis.cancel();
-        // Dividiamo il testo in parti: ognuna può essere una parola normale o un numero (con punti, virgole)
-        // Usiamo una regex che separa i blocchi numerici da quelli non numerici
-        const parts = text.split(/(\d+[\d\.,]*\d+|\d+)/g);
+        // Dividi la stringa in parole/spazi ma mantenendo i numeri interi
+        const parts = numStr.split(/\s+/);
         for (let part of parts) {
-            if (!part.trim()) continue;
             const utterance = new SpeechSynthesisUtterance(part);
             utterance.lang = langCode;
             utterance.rate = 1.0;
             speechSynthesis.speak(utterance);
-            // Determina se la parte è un numero (cifre, punti, virgole)
-            const isNumeric = /^[\d\.,]+$/.test(part.trim());
-            if (isNumeric) {
+            // Se la parte contiene cifre, attesa lunga; altrimenti attesa breve
+            if (/\d/.test(part)) {
                 await new Promise(r => setTimeout(r, numericPauseMs));
             } else {
                 await new Promise(r => setTimeout(r, wordPauseMs));
@@ -574,7 +571,7 @@
                 else { fullText = noteText + ". " + coordText; }
             } else { fullText = noteText + (lang === 'it' ? ". Coordinate non disponibili." : ". Coordonnées non disponibles."); }
         }
-        if (lang === 'fr') await speakFrenchWithNumericPause(fullText, 'fr-FR', 200, 1000);
+        if (lang === 'fr') await speakWordsWithPause(fullText, 'fr-FR', 1.0, 200);
         else await speakWordsWithPause(fullText, 'it-IT', 1.0, 200);
         playBeep(); keepScreenOn();
     }
@@ -644,7 +641,7 @@
                 else { fullText = note + ". " + coordText; }
             } else { fullText = note + (lang === 'it' ? ". Coordinate non disponibili." : ". Coordonnées non disponibles."); }
         }
-        if (lang === 'fr') { gpsStatus.innerHTML = "🔊 Lettura FR..."; await speakFrenchWithNumericPause(fullText, 'fr-FR', 200, 1000); }
+        if (lang === 'fr') { gpsStatus.innerHTML = "🔊 Lettura FR..."; await speakWordsWithPause(fullText, 'fr-FR', 1.0, 200); }
         else { gpsStatus.innerHTML = "🔊 Lettura IT..."; await speakWordsWithPause(fullText, 'it-IT', 1.0, 200); }
         playBeep();
         gpsStatus.innerHTML = "✅ Messaggio completato. Avvio ascolto operatore (30 secondi)...";
@@ -724,27 +721,40 @@
         keepScreenOn();
     }
     
-    // ========== FUNZIONE MODIFICATA: LEGGI FRANCESE NOTA E COORDINATE CON PAUSA 1 SECONDO TRA I NUMERI ==========
+    // ========== FUNZIONE MODIFICATA: LEGGI FRANCESE NOTA E COORDINATE CON PAUSA 1 SECONDO TRA I NUMERI (SOLO NELLE COORDINATE) ==========
     async function readFrenchNoteAndCoords() {
         if (!window.speechSynthesis) { alert("Sintesi non supportata"); return; }
         speechSynthesis.cancel();
         let note = getSelectedNoteDescription();
         if (!note) { alert("Nessuna nota selezionata. Seleziona una nota premendo il pallino blu."); return; }
-        let fullText = note;
+        // Traduci la nota in francese
+        let frenchNote = await translateToFrench(note);
         const includeCoords = getSelectedNoteIncludeCoords();
+        let fullText = frenchNote;
+        let coordPart = null;
         if (includeCoords && currentLat !== null && currentLng !== null) {
             const coordText = getFormattedCoordinatesForSpeech('fr');
-            if (coordText) { 
-                const translatedCoord = await translateToFrench(coordText); 
-                fullText = note + ". " + translatedCoord; 
-            } else { 
-                fullText = note + ". Coordonnées non disponibles."; 
+            if (coordText) {
+                coordPart = await translateToFrench(coordText);
+                fullText = frenchNote + ". " + coordPart;
+            } else {
+                coordPart = null;
+                fullText = frenchNote + ". Coordonnées non disponibles.";
             }
-        } else if (includeCoords && (currentLat === null || currentLng === null)) { 
-            fullText = note + ". Coordonnées non disponibles."; 
+        } else if (includeCoords && (currentLat === null || currentLng === null)) {
+            fullText = frenchNote + ". Coordonnées non disponibles.";
         }
-        // Usa la nuova funzione che mette pausa di 1 secondo tra i numeri (basata su parti)
-        await speakFrenchWithNumericPause(fullText, 'fr-FR', 200, 1000);
+        
+        // Leggi la nota normalmente (pause brevi)
+        await speakWordsWithPause(frenchNote, 'fr-FR', 1.0, 200);
+        // Se ci sono coordinate, fai una pausa di 200 ms e poi leggile con pause lunghe tra i numeri
+        if (coordPart) {
+            await new Promise(r => setTimeout(r, 200));
+            await speakNumericStringWithPauses(coordPart, 'fr-FR', 200, 1000);
+        } else if (fullText !== frenchNote) {
+            // Se c'è solo la frase "Coordonnées non disponibles." la legge normalmente
+            await speakWordsWithPause(fullText.substring(frenchNote.length), 'fr-FR', 1.0, 200);
+        }
         playBeep();
         keepScreenOn();
     }
