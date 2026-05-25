@@ -123,6 +123,8 @@
         .sync-status.error { background: #f8d7da; color: #721c24; }
         .sync-status.success { background: #d4edda; color: #155724; }
         .force-sync-btn { background: #17a2b8 !important; margin-top: 10px; }
+        .unlock-monastir-btn { background: #e67e22 !important; margin-top: 10px; margin-left: 10px; }
+        .button-row { display: flex; gap: 10px; align-items: center; justify-content: center; margin-top: 10px; }
     </style>
 </head>
 <body>
@@ -202,9 +204,12 @@
         <div class="image-top-box"><div class="image-top-title">MONASTIR: Facciamo Rete</div><div id="imagePreviewArea" class="image-container"><div class="image-placeholder" id="imagePlaceholder">📸 Solo amministratore: premi a lungo (3 sec) per caricare un'immagine</div></div></div>
         <div class="info-message-small">Per la consultazione, Richiedi Codice Attivazione nella Home.</div>
         <div id="syncStatus" class="sync-status"></div>
+        <div class="button-row">
+            <button id="forceSyncBtn" class="small-btn force-sync-btn">🔄 FORZA SINCRONIZZAZIONE</button>
+            <button id="unlockMonastirBtn" class="small-btn unlock-monastir-btn" style="display:none;">🔓 SBLOCCA MONASTIR</button>
+        </div>
         <div id="reteRootContainer" class="rete-container"><div id="reteLevelContainer"></div></div>
         <div id="adminReteButtons" class="admin-rete-buttons hidden-btn"><button id="exportReteBtn">📤 ESPORTA RETE</button><button id="importReteBtn">📥 IMPORTA RETE DA FILE</button></div>
-        <button id="forceSyncBtn" class="small-btn force-sync-btn">🔄 FORZA SINCRONIZZAZIONE</button>
     </div>
 
     <!-- MODALI -->
@@ -256,6 +261,9 @@
         e.preventDefault();
         deferredPrompt = e;
     });
+    
+    // Variabili per sblocco Monastir (persistente in sessione)
+    let monastirUnlocked = sessionStorage.getItem('monastirUnlocked') === 'true';
     
     // DOM elements
     const homePage = document.getElementById('homePage');
@@ -360,6 +368,7 @@
     const adminReteButtons = document.getElementById('adminReteButtons');
     const forceSyncBtn = document.getElementById('forceSyncBtn');
     const syncStatusDiv = document.getElementById('syncStatus');
+    const unlockMonastirBtn = document.getElementById('unlockMonastirBtn');
     
     // ==================== FUNZIONI ORIGINALI (GEOLOCALIZZAZIONE) ====================
     function haversine(lat1,lng1,lat2,lng2) {
@@ -877,6 +886,12 @@
             btn.innerText = getContactButtonText(service);
             btn.onclick = () => {
                 if (service === 'clinica') {
+                    // Verifica licenza principale prima di tentare l'apertura di Monastir
+                    if (!licenseCheckPassed) {
+                        alert('Licenza principale non attiva o scaduta. Attivala dalla home per accedere a Monastir.');
+                        return;
+                    }
+                    // Mostra sempre la pagina Monastir (anche se bloccata)
                     homePage.classList.add('hidden');
                     imagePage.classList.remove('hidden');
                     requestImagePageWakeLock();
@@ -884,6 +899,7 @@
                     performSync(true).then(() => {
                         renderReteCategories(reteLevelContainer, reteData);
                         loadSavedImage();
+                        updateMonastirPageVisibility(); // Mostra/nasconde pulsante sblocca e disabilita interazioni
                     });
                     window.location.hash = 'image';
                     keepScreenOn();
@@ -909,6 +925,118 @@
             contactsGrid.appendChild(btn);
         });
     }
+    
+    // ==================== FUNZIONI PER SBLOCCIO MONASTIR ====================
+    function showMonastirUnlockModal() {
+        // Primo passo: password amministratore
+        const modalHtml = `
+            <div class="adaptive-modal" id="unlockModal1" style="display:flex;">
+                <div class="adaptive-modal-content" style="max-width:350px;">
+                    <h3>🔐 Sblocca Monastir</h3>
+                    <div style="margin-bottom:16px;">Inserisci la password amministratore:</div>
+                    <input type="password" id="adminPassInput" placeholder="Password amministratore" autocomplete="off">
+                    <div class="modal-buttons" style="margin-top:16px;">
+                        <button id="adminPassOkBtn" class="save-btn">AVANTI</button>
+                        <button id="adminPassCancelBtn" class="cancel-btn">ANNULLA</button>
+                    </div>
+                </div>
+            </div>
+        `;
+        document.body.insertAdjacentHTML('beforeend', modalHtml);
+        const modal = document.getElementById('unlockModal1');
+        const passInput = document.getElementById('adminPassInput');
+        const okBtn = document.getElementById('adminPassOkBtn');
+        const cancelBtn = document.getElementById('adminPassCancelBtn');
+        
+        okBtn.onclick = () => {
+            const enteredPass = passInput.value.trim();
+            if (enteredPass === adminCode) {
+                modal.remove();
+                // Secondo passo: codice cliente
+                showClientCodeModal();
+            } else {
+                alert("Password amministratore errata.");
+            }
+        };
+        cancelBtn.onclick = () => modal.remove();
+        modal.onclick = (e) => { if (e.target === modal) modal.remove(); };
+        keepScreenOn();
+    }
+    
+    function showClientCodeModal() {
+        const modalHtml = `
+            <div class="adaptive-modal" id="unlockModal2" style="display:flex;">
+                <div class="adaptive-modal-content" style="max-width:350px;">
+                    <h3>🔐 Sblocca Monastir</h3>
+                    <div style="margin-bottom:16px;">Inserisci il codice cliente (visibile in home):</div>
+                    <input type="text" id="clientCodeInputModal" placeholder="Codice Cliente" autocomplete="off">
+                    <div class="modal-buttons" style="margin-top:16px;">
+                        <button id="clientCodeOkBtn" class="save-btn">SBLOCCA</button>
+                        <button id="clientCodeCancelBtn" class="cancel-btn">ANNULLA</button>
+                    </div>
+                </div>
+            </div>
+        `;
+        document.body.insertAdjacentHTML('beforeend', modalHtml);
+        const modal = document.getElementById('unlockModal2');
+        const codeInput = document.getElementById('clientCodeInputModal');
+        const okBtn = document.getElementById('clientCodeOkBtn');
+        const cancelBtn = document.getElementById('clientCodeCancelBtn');
+        
+        okBtn.onclick = () => {
+            const enteredCode = codeInput.value.trim();
+            const storedClientCode = localStorage.getItem('clientCode');
+            if (enteredCode === storedClientCode) {
+                monastirUnlocked = true;
+                sessionStorage.setItem('monastirUnlocked', 'true');
+                modal.remove();
+                // Aggiorna la visibilità della pagina (rimuove il pulsante sblocca e abilita interazioni)
+                updateMonastirPageVisibility();
+                // Ricarica i contenuti per abilitare i clic
+                renderReteCategories(reteLevelContainer, reteData);
+                loadSavedImage();
+                alert("Monastir sbloccata! Ora puoi interagire con le attività.");
+            } else {
+                alert("Codice cliente errato.");
+            }
+        };
+        cancelBtn.onclick = () => modal.remove();
+        modal.onclick = (e) => { if (e.target === modal) modal.remove(); };
+        keepScreenOn();
+    }
+    
+    // Aggiorna l'interfaccia di Monastir in base allo stato di sblocco
+    function updateMonastirPageVisibility() {
+        if (!imagePage.classList.contains('hidden')) {
+            if (unlockMonastirBtn) {
+                if (!monastirUnlocked) {
+                    unlockMonastirBtn.style.display = 'block';
+                } else {
+                    unlockMonastirBtn.style.display = 'none';
+                }
+            }
+            // Forza il re-render delle categorie per applicare i comportamenti cliccabili o meno
+            renderReteCategories(reteLevelContainer, reteData);
+            // Aggiorna i pulsanti admin (possono essere visibili solo se sbloccato e admin autenticato)
+            updateAdminReteButtonsVisibility();
+        }
+    }
+    
+    // Modifico renderReteCategories per rispettare lo stato di sblocco: se bloccato, i nomi delle attività non sono cliccabili.
+    // La funzione è già definita più avanti, ma aggiungeremo un controllo in showActivityModalForChild e nel rendering.
+    
+    // Funzione per gestire il click su un'attività (se sbloccato)
+    function handleChildClick(child) {
+        if (!monastirUnlocked) {
+            alert("Pagina bloccata. Usa il tasto 'Sblocca Monastir' per accedere alle attività.");
+            return;
+        }
+        showActivityModalForChild(child);
+    }
+    
+    // Modifica showActivityModalForChild per usare handleChildClick (ma viene già chiamato dal rendering)
+    // Lascio invariato showActivityModalForChild, ma nel rendering controllo monastirUnlocked prima di assegnare onclick.
+    
     function showCustomPrompt(service, currentExtra) {
         if (service === 'clinica') return;
         let ov = document.createElement('div'); ov.className = 'custom-prompt';
@@ -997,7 +1125,6 @@
     }
     
     // ==================== LICENZA E PULSANTE RICHIEDI ATTIVAZIONE PERSONALIZZABILE ====================
-    // Carica i dati personalizzati del pulsante Richiedi attivazione (admin)
     function loadCustomRequestData() {
         const defaultData = {
             buttonText: "📋 Richiedi attivazione",
@@ -1021,7 +1148,6 @@
         localStorage.setItem('customRequestData', JSON.stringify(data));
     }
     
-    // Mostra il modal di modifica per admin (pressione lunga sul tasto)
     function showEditRequestModal() {
         const current = loadCustomRequestData();
         const modalHtml = `
@@ -1061,7 +1187,6 @@
                 iban: document.getElementById('editIban').value
             };
             saveCustomRequestData(newData);
-            // Aggiorna il pulsante nella home
             const requestBtn = document.getElementById('copyRequestBtnMoved');
             if (requestBtn) requestBtn.innerText = newData.buttonText;
             modal.remove();
@@ -1100,11 +1225,9 @@
             daysHomeDisplay.innerHTML = `v${CURRENT_VERSION} - Scade: ${daysRemaining} giorni <button id="copyRequestBtnMoved" class="small-btn" style="background:#e67e22;">${custom.buttonText}</button>`;
             const moved = document.getElementById('copyRequestBtnMoved');
             if (moved) {
-                // Rimuovi vecchi listener
                 const newBtn = moved.cloneNode(true);
                 moved.parentNode.replaceChild(newBtn, moved);
                 newBtn.onclick = openActivationRequestModal;
-                // Aggiungi pressione lunga per admin (5 secondi)
                 let pressTimer = null;
                 const startPress = () => {
                     pressTimer = setTimeout(() => {
@@ -1158,7 +1281,7 @@
     function hideAdminSection() { adminSection.style.display = 'none'; updateAdminReteButtonsVisibility(); }
     function updateAdminReteButtonsVisibility() {
         if (adminReteButtons) {
-            if (adminAuthenticated && imagePage && !imagePage.classList.contains('hidden')) {
+            if (adminAuthenticated && imagePage && !imagePage.classList.contains('hidden') && monastirUnlocked) {
                 adminReteButtons.classList.remove('hidden-btn');
             } else {
                 adminReteButtons.classList.add('hidden-btn');
@@ -1166,7 +1289,7 @@
         }
     }
     let adminTimer = null;
-    function startAdminTimer() { adminTimer = setTimeout(() => { let code = prompt("Codice amministratore:"); if (code === adminCode) { adminAuthenticated = true; showAdminSection(); alert("Accesso admin."); updateAdminReteButtonsVisibility(); if (imagePage && !imagePage.classList.contains('hidden')) { renderReteCategories(reteLevelContainer, reteData); loadSavedImage(); } } else if (code !== null) alert("Codice errato."); }, 3000); }
+    function startAdminTimer() { adminTimer = setTimeout(() => { let code = prompt("Codice amministratore:"); if (code === adminCode) { adminAuthenticated = true; showAdminSection(); alert("Accesso admin."); updateAdminReteButtonsVisibility(); if (imagePage && !imagePage.classList.contains('hidden') && monastirUnlocked) { renderReteCategories(reteLevelContainer, reteData); loadSavedImage(); } } else if (code !== null) alert("Codice errato."); }, 3000); }
     function cancelAdminTimer() { if (adminTimer) clearTimeout(adminTimer); }
     adminLongPressBtn.addEventListener('mousedown', startAdminTimer);
     adminLongPressBtn.addEventListener('mouseup', cancelAdminTimer);
@@ -1397,15 +1520,19 @@
         };
         reader.readAsText(file);
     }
-    function addCategory() { if (!adminAuthenticated) { alert("Solo amministratore."); return; } reteData.categories.push({ title: "Tasto vuoto", children: [] }); saveReteData(); renderReteCategories(reteLevelContainer, reteData); }
-    function addChildToCategory(category) { if (!adminAuthenticated) { alert("Solo amministratore."); return; } if (!category.children) category.children = []; category.children.push({ id: Date.now() + '_' + Math.random(), title: "Selezione attività", infoText: "", infoImage: null, coordinate: "", websiteUrl: "" }); saveReteData(); renderReteCategories(reteLevelContainer, reteData); }
-    function editCategoryTitle(category, newTitle) { if (!adminAuthenticated) { alert("Solo amministratore."); return false; } category.title = newTitle; saveReteData(); renderReteCategories(reteLevelContainer, reteData); return true; }
-    function deleteCategory(category, index) { if (!adminAuthenticated) { alert("Solo amministratore."); return; } if (confirm("Vuoi eliminare la categoria '" + category.title + "' e tutti i suoi figli?")) { reteData.categories.splice(index, 1); saveReteData(); renderReteCategories(reteLevelContainer, reteData); } }
-    function deleteChild(category, childIndex) { if (!adminAuthenticated) { alert("Solo amministratore."); return; } if (confirm("Vuoi eliminare questo figlio?")) { category.children.splice(childIndex, 1); saveReteData(); renderReteCategories(reteLevelContainer, reteData); } }
-    function editChildTitle(child, newTitle) { if (!adminAuthenticated) { alert("Solo amministratore."); return false; } child.title = newTitle; saveReteData(); renderReteCategories(reteLevelContainer, reteData); return true; }
+    function addCategory() { if (!adminAuthenticated || !monastirUnlocked) { alert("Solo amministratore e pagina sbloccata."); return; } reteData.categories.push({ title: "Tasto vuoto", children: [] }); saveReteData(); renderReteCategories(reteLevelContainer, reteData); }
+    function addChildToCategory(category) { if (!adminAuthenticated || !monastirUnlocked) { alert("Solo amministratore e pagina sbloccata."); return; } if (!category.children) category.children = []; category.children.push({ id: Date.now() + '_' + Math.random(), title: "Selezione attività", infoText: "", infoImage: null, coordinate: "", websiteUrl: "" }); saveReteData(); renderReteCategories(reteLevelContainer, reteData); }
+    function editCategoryTitle(category, newTitle) { if (!adminAuthenticated || !monastirUnlocked) { alert("Solo amministratore e pagina sbloccata."); return false; } category.title = newTitle; saveReteData(); renderReteCategories(reteLevelContainer, reteData); return true; }
+    function deleteCategory(category, index) { if (!adminAuthenticated || !monastirUnlocked) { alert("Solo amministratore e pagina sbloccata."); return; } if (confirm("Vuoi eliminare la categoria '" + category.title + "' e tutti i suoi figli?")) { reteData.categories.splice(index, 1); saveReteData(); renderReteCategories(reteLevelContainer, reteData); } }
+    function deleteChild(category, childIndex) { if (!adminAuthenticated || !monastirUnlocked) { alert("Solo amministratore e pagina sbloccata."); return; } if (confirm("Vuoi eliminare questo figlio?")) { category.children.splice(childIndex, 1); saveReteData(); renderReteCategories(reteLevelContainer, reteData); } }
+    function editChildTitle(child, newTitle) { if (!adminAuthenticated || !monastirUnlocked) { alert("Solo amministratore e pagina sbloccata."); return false; } child.title = newTitle; saveReteData(); renderReteCategories(reteLevelContainer, reteData); return true; }
     
     let currentActivityNode = null;
     function showActivityModalForChild(child) {
+        if (!monastirUnlocked) {
+            alert("Pagina bloccata. Usa il tasto 'Sblocca Monastir' per accedere alle attività.");
+            return;
+        }
         if (!adminAuthenticated) {
             const activated = localStorage.getItem('activated') === 'true';
             if (!activated) {
@@ -1432,7 +1559,7 @@
             placeholder.innerText = "Nessuna foto disponibile";
             activityImageContainer.appendChild(placeholder);
         }
-        if (adminAuthenticated) {
+        if (adminAuthenticated && monastirUnlocked) {
             activityAdminImageButtons.classList.remove('hidden-btn');
             activityInfoAdminButtons.classList.remove('hidden-btn');
             activityEditInfoBtn.style.display = "block";
@@ -1453,7 +1580,7 @@
         const web = child.websiteUrl || "";
         activityCoordBtn.onclick = () => { if (coord.trim()) window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(coord)}`, '_blank'); else alert("Nessuna coordinata impostata."); };
         activityWebBtn.onclick = () => { if (web.trim()) { let full = web.trim(); if (!full.startsWith('http')) full = 'https://' + full; window.open(full, '_blank'); } else alert("Nessun sito web associato."); };
-        if (adminAuthenticated) {
+        if (adminAuthenticated && monastirUnlocked) {
             let coordTimer = null;
             activityCoordBtn.onmousedown = () => { coordTimer = setTimeout(() => { let newCoord = prompt("Modifica coordinate (formato: latitudine,longitudine):", child.coordinate || ""); if (newCoord !== null) { if (newCoord.trim() === "") { child.coordinate = ""; saveReteData(); updateActivityButtonsForChild(child); showActivityModalForChild(child); } else if (newCoord.includes(',') && !isNaN(parseFloat(newCoord.split(',')[0])) && !isNaN(parseFloat(newCoord.split(',')[1]))) { child.coordinate = newCoord.trim(); saveReteData(); updateActivityButtonsForChild(child); showActivityModalForChild(child); } else { alert("Formato non valido. Usa lat,lon (es. 43.841977,11.170855)"); } } }, 3000); };
             activityCoordBtn.onmouseup = activityCoordBtn.onmouseleave = () => { if (coordTimer) clearTimeout(coordTimer); };
@@ -1468,7 +1595,7 @@
     }
     
     activityUploadImageBtn.addEventListener('click', () => {
-        if (!adminAuthenticated || !currentActivityNode) return;
+        if (!adminAuthenticated || !currentActivityNode || !monastirUnlocked) return;
         let input = document.createElement('input');
         input.type = 'file';
         input.accept = 'image/*';
@@ -1488,14 +1615,14 @@
     });
     
     activityEditInfoBtn.addEventListener('click', () => {
-        if (!adminAuthenticated || !currentActivityNode) return;
+        if (!adminAuthenticated || !currentActivityNode || !monastirUnlocked) return;
         activityInfoText.readOnly = false;
         activityEditInfoBtn.style.display = "none";
         activitySaveInfoBtn.style.display = "block";
         activityCancelInfoBtn.style.display = "block";
     });
     activitySaveInfoBtn.addEventListener('click', () => {
-        if (!adminAuthenticated || !currentActivityNode) return;
+        if (!adminAuthenticated || !currentActivityNode || !monastirUnlocked) return;
         currentActivityNode.infoText = activityInfoText.value;
         saveReteData();
         activityInfoText.readOnly = true;
@@ -1520,7 +1647,7 @@
             let empty = document.createElement('div');
             empty.style.textAlign = 'center';
             empty.style.padding = '20px';
-            empty.innerText = adminAuthenticated ? 'Nessuna categoria. Premi "+ AGGIUNGI TASTO" per aggiungere.' : 'Nessuna categoria disponibile.';
+            empty.innerText = (adminAuthenticated && monastirUnlocked) ? 'Nessuna categoria. Premi "+ AGGIUNGI TASTO" per aggiungere.' : 'Nessuna categoria disponibile.';
             container.appendChild(empty);
         } else {
             data.categories.forEach((cat, idx) => {
@@ -1531,7 +1658,7 @@
                 catNameSpan.innerText = (cat.title && cat.title.trim()) ? cat.title : "Tasto vuoto";
                 catNameSpan.style.userSelect = 'none';
                 catNameSpan.style.webkitUserSelect = 'none';
-                if (adminAuthenticated) {
+                if (adminAuthenticated && monastirUnlocked) {
                     let pressTimer = null;
                     catNameSpan.addEventListener('mousedown', () => { pressTimer = setTimeout(() => { let newTitle = prompt("Modifica nome categoria:", cat.title); if (newTitle !== null && newTitle.trim() !== "") { editCategoryTitle(cat, newTitle.trim()); } else if (newTitle !== null && newTitle.trim() === "") alert("Titolo non può essere vuoto."); }, 3000); });
                     catNameSpan.addEventListener('mouseup', () => { if (pressTimer) clearTimeout(pressTimer); });
@@ -1544,13 +1671,13 @@
                 let addBtn = document.createElement('button');
                 addBtn.innerText = '+';
                 addBtn.className = 'small-icon';
-                addBtn.onclick = (e) => { e.stopPropagation(); addChildToCategory(cat); };
-                if (adminAuthenticated) catDiv.appendChild(addBtn);
+                addBtn.onclick = (e) => { e.stopPropagation(); if (adminAuthenticated && monastirUnlocked) addChildToCategory(cat); };
+                if (adminAuthenticated && monastirUnlocked) catDiv.appendChild(addBtn);
                 let delBtn = document.createElement('button');
                 delBtn.innerText = '🗑️';
                 delBtn.className = 'delete-icon';
-                delBtn.onclick = (e) => { e.stopPropagation(); deleteCategory(cat, idx); };
-                if (adminAuthenticated) catDiv.appendChild(delBtn);
+                delBtn.onclick = (e) => { e.stopPropagation(); if (adminAuthenticated && monastirUnlocked) deleteCategory(cat, idx); };
+                if (adminAuthenticated && monastirUnlocked) catDiv.appendChild(delBtn);
                 container.appendChild(catDiv);
                 if (cat.children && cat.children.length > 0) {
                     let childrenDiv = document.createElement('div');
@@ -1561,8 +1688,15 @@
                         let childNameSpan = document.createElement('span');
                         childNameSpan.className = 'child-name';
                         childNameSpan.innerText = (child.title && child.title.trim()) ? child.title : "Selezione attività";
-                        childNameSpan.onclick = (e) => { e.stopPropagation(); showActivityModalForChild(child); };
-                        if (adminAuthenticated) {
+                        // Gestione click in base allo sblocco
+                        if (monastirUnlocked) {
+                            childNameSpan.onclick = (e) => { e.stopPropagation(); showActivityModalForChild(child); };
+                            childNameSpan.style.cursor = 'pointer';
+                        } else {
+                            childNameSpan.onclick = (e) => { e.stopPropagation(); alert("Pagina bloccata. Usa il tasto 'Sblocca Monastir' per accedere alle attività."); };
+                            childNameSpan.style.cursor = 'default';
+                        }
+                        if (adminAuthenticated && monastirUnlocked) {
                             let pressTimer = null;
                             childNameSpan.addEventListener('mousedown', () => { pressTimer = setTimeout(() => { let newTitle = prompt("Modifica nome attività:", child.title); if (newTitle !== null && newTitle.trim() !== "") { editChildTitle(child, newTitle.trim()); } else if (newTitle !== null && newTitle.trim() === "") alert("Titolo non può essere vuoto."); }, 3000); });
                             childNameSpan.addEventListener('mouseup', () => { if (pressTimer) clearTimeout(pressTimer); });
@@ -1575,15 +1709,15 @@
                         let delChildBtn = document.createElement('button');
                         delChildBtn.innerText = '-';
                         delChildBtn.className = 'delete-child-icon';
-                        delChildBtn.onclick = (e) => { e.stopPropagation(); deleteChild(cat, childIdx); };
-                        if (adminAuthenticated) childDiv.appendChild(delChildBtn);
+                        delChildBtn.onclick = (e) => { e.stopPropagation(); if (adminAuthenticated && monastirUnlocked) deleteChild(cat, childIdx); };
+                        if (adminAuthenticated && monastirUnlocked) childDiv.appendChild(delChildBtn);
                         childrenDiv.appendChild(childDiv);
                     });
                     container.appendChild(childrenDiv);
                 }
             });
         }
-        if (adminAuthenticated) {
+        if (adminAuthenticated && monastirUnlocked) {
             let addCatBtn = document.createElement('button');
             addCatBtn.innerText = '+ AGGIUNGI TASTO (premi 3 sec)';
             addCatBtn.className = 'add-category-btn';
@@ -1605,29 +1739,29 @@
             img.style.maxWidth = '100%';
             img.style.maxHeight = '180px';
             imagePreviewArea.appendChild(img);
-            attachMainImageLongPress(img);
+            if (adminAuthenticated && monastirUnlocked) attachMainImageLongPress(img);
         } else {
             let ph = document.createElement('div');
             ph.className = 'image-placeholder';
-            ph.innerText = adminAuthenticated ? '📸 Premi a lungo (3 sec) per caricare un\'immagine' : '🔐 Solo amministratore';
+            ph.innerText = (adminAuthenticated && monastirUnlocked) ? '📸 Premi a lungo (3 sec) per caricare un\'immagine' : '🔐 Solo amministratore';
             imagePreviewArea.appendChild(ph);
-            attachMainPlaceholderLongPress(ph);
+            if (adminAuthenticated && monastirUnlocked) attachMainPlaceholderLongPress(ph);
         }
     }
     
     function attachMainPlaceholderLongPress(el) {
         let timer;
-        el.onmousedown = () => { timer = setTimeout(() => { if (adminAuthenticated) openMainImageGallery(); }, 3000); };
+        el.onmousedown = () => { timer = setTimeout(() => { if (adminAuthenticated && monastirUnlocked) openMainImageGallery(); }, 3000); };
         el.onmouseup = el.onmouseleave = () => clearTimeout(timer);
-        el.ontouchstart = () => { timer = setTimeout(() => { if (adminAuthenticated) openMainImageGallery(); }, 3000); };
+        el.ontouchstart = () => { timer = setTimeout(() => { if (adminAuthenticated && monastirUnlocked) openMainImageGallery(); }, 3000); };
         el.ontouchend = el.ontouchcancel = () => clearTimeout(timer);
     }
     
     function attachMainImageLongPress(img) {
         let timer;
-        img.onmousedown = () => { timer = setTimeout(() => { if (adminAuthenticated) openMainImageGallery(); }, 3000); };
+        img.onmousedown = () => { timer = setTimeout(() => { if (adminAuthenticated && monastirUnlocked) openMainImageGallery(); }, 3000); };
         img.onmouseup = img.onmouseleave = () => clearTimeout(timer);
-        img.ontouchstart = () => { timer = setTimeout(() => { if (adminAuthenticated) openMainImageGallery(); }, 3000); };
+        img.ontouchstart = () => { timer = setTimeout(() => { if (adminAuthenticated && monastirUnlocked) openMainImageGallery(); }, 3000); };
         img.ontouchend = img.ontouchcancel = () => clearTimeout(timer);
     }
     
@@ -1656,7 +1790,7 @@
         else setupImageArea();
     }
     
-    // ==================== FUNZIONE APERTURA MODALE RICHIESTA ATTIVAZIONE (usando i dati personalizzati) ====================
+    // ==================== FUNZIONE APERTURA MODALE RICHIESTA ATTIVAZIONE ====================
     function openActivationRequestModal() {
         const custom = loadCustomRequestData();
         const modalHtml = `
@@ -1760,12 +1894,23 @@
             imagePage.classList.add('hidden');
             requestImagePageWakeLock();
         } else if (hash === 'image') {
+            // Se si prova ad accedere direttamente con hash #image, verifica licenza principale
+            if (!licenseCheckPassed) {
+                alert('Licenza principale non attiva o scaduta.');
+                window.location.hash = 'home';
+                return;
+            }
+            // Se non sbloccato, mostra comunque la pagina ma con pulsante sblocca e interazioni disabilitate
             homePage.classList.add('hidden');
             emergencyPage.classList.add('hidden');
             imagePage.classList.remove('hidden');
             requestImagePageWakeLock();
             updateAdminReteButtonsVisibility();
-            performSync(true);
+            performSync(true).then(() => {
+                renderReteCategories(reteLevelContainer, reteData);
+                loadSavedImage();
+                updateMonastirPageVisibility();
+            });
         } else {
             homePage.classList.remove('hidden');
             emergencyPage.classList.add('hidden');
@@ -1782,20 +1927,15 @@
     }
     
     // ==================== ESPORTAZIONE/IMPORTAZIONE RETE PER ADMIN ====================
-    if (exportReteBtn) exportReteBtn.addEventListener('click', exportReteToFile);
-    if (importReteBtn) importReteBtn.addEventListener('click', () => {
-        const input = document.createElement('input');
-        input.type = 'file';
-        input.accept = 'application/json';
-        input.onchange = (e) => { if (e.target.files.length) importReteFromFile(e.target.files[0]); };
-        input.click();
-    });
+    if (exportReteBtn) exportReteBtn.addEventListener('click', () => { if (monastirUnlocked && adminAuthenticated) exportReteToFile(); else alert("Pagina bloccata o non autorizzato."); });
+    if (importReteBtn) importReteBtn.addEventListener('click', () => { if (monastirUnlocked && adminAuthenticated) { const input = document.createElement('input'); input.type = 'file'; input.accept = 'application/json'; input.onchange = (e) => { if (e.target.files.length) importReteFromFile(e.target.files[0]); }; input.click(); } else alert("Pagina bloccata o non autorizzato."); });
     if (forceSyncBtn) forceSyncBtn.addEventListener('click', () => {
         performSync(true).then(() => {
             renderReteCategories(reteLevelContainer, reteData);
             loadSavedImage();
         });
     });
+    if (unlockMonastirBtn) unlockMonastirBtn.addEventListener('click', () => { showMonastirUnlockModal(); });
     
     // ==================== INIZIALIZZAZIONE ====================
     function init() {
